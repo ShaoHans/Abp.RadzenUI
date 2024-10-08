@@ -1,0 +1,43 @@
+﻿<RadzenHeader>
+    <ChildContent>
+        <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px">
+            <RadzenColumn Size="5">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                    <RadzenSidebarToggle Click="@MenuToggle" />
+                    <span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">Abp RadzenUI</span>
+                </RadzenStack>
+            </RadzenColumn>
+            <RadzenColumn Size="7">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
+                    @* <div class="rz-display-none rz-display-sm-inline-flex align-items-center">
+                    <RadzenLink Path="/docs/" Text="Documentation" title="Radzen Blazor Components Documentation" class="rz-mx-2 rz-mx-lg-4" target="_blank" />
+                    <RadzenLink Path="https://www.radzen.com/" Text="About Radzen" title="Create .NET Core web applications fast & easy" class="rz-text-nowrap rz-mx-2 rz-mx-lg-4" target="_blank" />
+                    <RadzenLink Path="https://github.com/radzenhq/radzen-blazor" Text="GitHub" title="Star Radzen Blazor Components on GitHub" class="rz-text-nowrap rz-mx-2 rz-mx-lg-4" target="_blank" />
+                    </div> *@
+                    <RadzenAppearanceToggle class="rz-mx-2" />
+                    <RadzenSidebarToggle Icon="settings" Click="@ThemeToggle" class="rz-m-0" />
+                    <LanguageSwitch />
+                    <div>
+                        <RadzenProfileMenu class="rz-mx-2">
+                            <Template>
+                                <RadzenGravatar Email="user@example.com" Style="width:24px;height:24px;"></RadzenGravatar>
+                            </Template>
+                            <ChildContent>
+                                <RadzenProfileMenuItem Text="我的账户" Icon="person" Path="/account/manage"></RadzenProfileMenuItem>
+                                <RadzenProfileMenuItem Text="退出" Icon="logout" Path="/account/logout"></RadzenProfileMenuItem>
+                            </ChildContent>
+                        </RadzenProfileMenu>
+                    </div>
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+    </ChildContent>
+</RadzenHeader>
+
+@code {
+    [Parameter]
+    public EventCallback<EventArgs> MenuToggle { get; set; }
+
+    [Parameter]
+    public EventCallback<EventArgs> ThemeToggle { get; set; }
+}

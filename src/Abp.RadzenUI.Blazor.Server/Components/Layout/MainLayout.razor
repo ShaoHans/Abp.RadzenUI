@@ -1,0 +1,56 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Radzen.Blazor
+@inherits LayoutComponentBase
+
+<RadzenComponents />
+
+<RadzenLayout Style="grid-template-columns: auto 1fr auto; grid-template-areas: 'rz-header rz-header rz-header' 'rz-sidebar rz-body rz-config-sidebar'">
+    <Header MenuToggle="@(() => menuSidebarExpanded = !menuSidebarExpanded)"
+            ThemeToggle="@(() => themeSidebarExpanded = !themeSidebarExpanded)" />
+    <RadzenBody>
+        <ChildContent>
+            <RadzenContentContainer Name="main">
+                <RadzenRow Gap="2rem" class="rz-pt-6 rz-px-4 rz-px-sm-8 rz-px-xl-12">
+                    <RadzenColumn Size="12">
+                        <RadzenRow class="rz-mx-auto" Style="max-width: 1600px;">
+                            <RadzenColumn Size="12">
+                                <CustomErrorBoundary>
+                                    @Body
+                                </CustomErrorBoundary>
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenContentContainer>
+        </ChildContent>
+    </RadzenBody>
+    <MenuSiderbar @bind-SidebarExpanded="menuSidebarExpanded" />
+    <ThemeSiderbar @bind-SidebarExpanded="themeSidebarExpanded" />
+</RadzenLayout>
+
+@if (!rendered)
+{
+    <div class="rz-app-loading">
+        <div class="logo-loading"></div>
+    </div>
+}
+
+@code {
+    bool menuSidebarExpanded = true;
+    bool themeSidebarExpanded = false;
+    bool rendered;
+
+    protected override void OnInitialized()
+    {
+        System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            rendered = true;
+            StateHasChanged();
+        }
+    }
+}

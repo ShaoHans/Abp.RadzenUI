@@ -1,0 +1,13 @@
+﻿@if (Value)
+{
+    <b><RadzenIcon Icon="done" IconColor="@Colors.Success" /></b>
+}
+else
+{
+    <b><RadzenIcon Icon="dangerous" IconColor="@Colors.Danger" /></b>
+}
+
+@code {
+    [Parameter]
+    public bool Value { get; set; }
+}

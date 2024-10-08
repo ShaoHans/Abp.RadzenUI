@@ -1,0 +1,63 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.Extensions.Localization
+@using Volo.Abp
+@using Volo.Abp.Identity
+@using Volo.Abp.Localization
+@inherits ErrorBoundary
+@inject ILogger<CustomErrorBoundary> Logger
+@inject NotificationService NotificationService
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<CustomErrorBoundary> L
+@inject IServiceProvider ScopedServices
+
+@if (CurrentException is null)
+{
+    @ChildContent
+}
+else if (ErrorContent is not null)
+{
+    @ErrorContent(CurrentException)
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+
+    protected override async Task OnErrorAsync(Exception ex)
+    {
+        Logger.LogError(ex, "Server internal error");
+
+        if (authenticationState is not null)
+        {
+            var authState = await authenticationState;
+            var user = authState?.User;
+
+            if (user?.Identity is null || !user.Identity.IsAuthenticated)
+            {
+                NavigationManager.NavigateTo("/login");
+            }
+            else
+            {
+                switch (ex)
+                {
+                    case AbpIdentityResultException identityResultException:
+                        {
+                            using var scope = ScopedServices.CreateScope();
+                            NotificationService.Error(identityResultException.LocalizeMessage(new LocalizationContext(scope.ServiceProvider)));
+                        }
+                        break;
+                    case BusinessException businessException:
+                        NotificationService.Error(L[businessException.Code!]);
+                        break;
+                    default:
+                        NotificationService.Error(ex.Message);
+                        break;
+                }
+            }
+        }
+        else
+        {
+            NotificationService.Error("服务器繁忙！");
+        }
+    }
+}
