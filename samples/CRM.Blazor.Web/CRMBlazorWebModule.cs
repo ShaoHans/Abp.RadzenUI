@@ -1,5 +1,7 @@
 using Abp.RadzenUI;
 using Abp.RadzenUI.Components;
+
+using CRM.Blazor.Web.Components.Pages;
 using CRM.EntityFrameworkCore;
 using CRM.Localization;
 using CRM.MultiTenancy;
@@ -110,6 +112,7 @@ public class CRMBlazorWebModule : AbpModule
             options.AutoValidate = false;
         });
 
+        ConfigureAbpRadzenUI();
         ConfigureAuthentication(context, configuration);
         ConfigureUrls(configuration);
         ConfigureBundles();
@@ -212,6 +215,14 @@ public class CRMBlazorWebModule : AbpModule
         });
     }
 
+    private void ConfigureAbpRadzenUI()
+    {
+        Configure<AbpRadzenUIOptions>(options =>
+        {
+            options.RouterAdditionalAssemblies = [typeof(TestManager).Assembly];
+        });
+    }
+
     public override void OnApplicationInitialization(ApplicationInitializationContext context)
     {
         var env = context.GetEnvironment();
@@ -235,7 +246,9 @@ public class CRMBlazorWebModule : AbpModule
         app.UseStaticFiles();
         app.UseStatusCodePagesWithRedirects("/404");
         app.UseAntiforgery();
-        ((WebApplication)app).MapRazorComponents<App>().AddInteractiveServerRenderMode();
+        ((WebApplication)app).MapRazorComponents<App>()
+            .AddAdditionalAssemblies(typeof(TestManager).Assembly)
+            .AddInteractiveServerRenderMode();
         app.UseAbpSecurityHeaders();
         app.UseAuthentication();
         app.UseAbpOpenIddictValidation();

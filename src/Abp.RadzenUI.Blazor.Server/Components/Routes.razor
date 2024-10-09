@@ -1,10 +1,11 @@
 ﻿@using Abp.RadzenUI.Components.Layout
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.Extensions.Options
 @inject NavigationManager Nav
-
+@inject IOptions<AbpRadzenUIOptions> Options
 
 <CascadingAuthenticationState>
-    <Router AppAssembly="typeof(App).Assembly">
+    <Router AppAssembly="typeof(App).Assembly" AdditionalAssemblies="@Options.Value.RouterAdditionalAssemblies">
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                 <NotAuthorized>
@@ -33,3 +34,4 @@
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
+
