@@ -14,11 +14,8 @@
     <None Remove="Logs\**" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="wwwroot\bootstrap\bootstrap.min.css.map" />
-  </ItemGroup>
-
 	<ItemGroup>
+		<ProjectReference Include="..\..\src\Abp.RadzenUI.Blazor.Server\Abp.RadzenUI.Blazor.Server.csproj" />
 		<ProjectReference Include="..\CRM.Application\CRM.Application.csproj" />
 		<ProjectReference Include="..\CRM.HttpApi\CRM.HttpApi.csproj" />
 		<ProjectReference Include="..\CRM.EntityFrameworkCore\CRM.EntityFrameworkCore.csproj" />

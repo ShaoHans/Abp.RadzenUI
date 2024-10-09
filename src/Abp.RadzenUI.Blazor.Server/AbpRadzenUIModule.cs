@@ -11,7 +11,6 @@ using Volo.Abp.AspNetCore.Components.Web;
 using Volo.Abp.AspNetCore.Components.Web.Configuration;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc.Localization;
-using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.Autofac;
 using Volo.Abp.AutoMapper;
@@ -22,14 +21,11 @@ using Volo.Abp.Identity.EntityFrameworkCore;
 using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
-using Volo.Abp.Swashbuckle;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
 
 namespace Abp.RadzenUI;
 
 [DependsOn(
-    typeof(AbpAspNetCoreMultiTenancyModule),
-    typeof(AbpAspNetCoreAuthenticationJwtBearerModule),
     typeof(AbpAutofacModule),
     typeof(AbpCachingStackExchangeRedisModule),
     typeof(AbpEntityFrameworkCorePostgreSqlModule),
@@ -39,8 +35,6 @@ namespace Abp.RadzenUI;
     typeof(AbpTenantManagementEntityFrameworkCoreModule),
     typeof(AbpIdentityEntityFrameworkCoreModule),
     typeof(AbpIdentityAspNetCoreModule),
-    typeof(AbpAspNetCoreSerilogModule),
-    typeof(AbpSwashbuckleModule),
     typeof(AbpAspNetCoreComponentsWebModule)
 )]
 public class AbpRadzenUIModule : AbpModule

@@ -1,20 +1,14 @@
-using CRM.Blazor.Web.Components;
-using CRM.Blazor.Web.Services;
+using Abp.RadzenUI;
+using Abp.RadzenUI.Components;
 using CRM.EntityFrameworkCore;
 using CRM.Localization;
 using CRM.MultiTenancy;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.OpenApi.Models;
 using OpenIddict.Server.AspNetCore;
 using OpenIddict.Validation.AspNetCore;
-using Radzen;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.Authentication.JwtBearer;
-using Volo.Abp.AspNetCore.Components.Messages;
-using Volo.Abp.AspNetCore.Components.Server.Configuration;
-using Volo.Abp.AspNetCore.Components.Web;
-using Volo.Abp.AspNetCore.Components.Web.Configuration;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc.AntiForgery;
@@ -23,18 +17,12 @@ using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
-using Volo.Abp.Autofac;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.EntityFrameworkCore.PostgreSql;
-using Volo.Abp.Identity.AspNetCore;
-using Volo.Abp.Identity.EntityFrameworkCore;
 using Volo.Abp.Modularity;
-using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.Security.Claims;
-using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.Swashbuckle;
-using Volo.Abp.TenantManagement.EntityFrameworkCore;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
 
@@ -44,20 +32,14 @@ namespace CRM.Blazor;
     typeof(CRMApplicationModule),
     typeof(CRMEntityFrameworkCoreModule),
     typeof(CRMHttpApiModule),
+    typeof(AbpRadzenUIModule),
     typeof(AbpAspNetCoreMultiTenancyModule),
     typeof(AbpAspNetCoreAuthenticationJwtBearerModule),
-    typeof(AbpAutofacModule),
     typeof(AbpCachingStackExchangeRedisModule),
     typeof(AbpEntityFrameworkCorePostgreSqlModule),
     typeof(AbpAuditLoggingEntityFrameworkCoreModule),
-    typeof(AbpPermissionManagementEntityFrameworkCoreModule),
-    typeof(AbpSettingManagementEntityFrameworkCoreModule),
-    typeof(AbpTenantManagementEntityFrameworkCoreModule),
-    typeof(AbpIdentityEntityFrameworkCoreModule),
-    typeof(AbpIdentityAspNetCoreModule),
     typeof(AbpAspNetCoreSerilogModule),
-    typeof(AbpSwashbuckleModule),
-    typeof(AbpAspNetCoreComponentsWebModule)
+    typeof(AbpSwashbuckleModule)
 )]
 public class CRMBlazorWebModule : AbpModule
 {
@@ -135,25 +117,6 @@ public class CRMBlazorWebModule : AbpModule
         ConfigureVirtualFileSystem(hostingEnvironment);
         ConfigureSwaggerServices(context.Services);
         ConfigureAutoApiControllers();
-
-        // Add services to the container.
-        context.Services.AddRazorComponents().AddInteractiveServerComponents();
-
-        // Add Radzen.Blazor services
-        context.Services.AddRadzenComponents();
-        context.Services.AddRadzenQueryStringThemeService();
-        context.Services.AddCascadingAuthenticationState();
-
-        context.Services.AddScoped<MenuService>();
-        context.Services.Replace(
-            ServiceDescriptor.Singleton<
-                ICurrentApplicationConfigurationCacheResetService,
-                BlazorServerCurrentApplicationConfigurationCacheResetService
-            >()
-        );
-        context.Services.Replace(
-            ServiceDescriptor.Transient<IUiMessageService, RadzenUiMessageService>()
-        );
     }
 
     private void ConfigureAuthentication(
