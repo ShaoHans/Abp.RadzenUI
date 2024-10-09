@@ -1,5 +1,6 @@
 using Abp.RadzenUI.Services;
 using CRM.Localization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Radzen;
 using Volo.Abp;
