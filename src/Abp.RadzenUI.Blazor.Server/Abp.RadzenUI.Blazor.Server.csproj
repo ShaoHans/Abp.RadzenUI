@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -6,13 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>Abp.RadzenUI</RootNamespace>
 	</PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="Logs\**" />
-    <Content Remove="Logs\**" />
-    <EmbeddedResource Remove="Logs\**" />
-    <None Remove="Logs\**" />
-  </ItemGroup>
 
   <ItemGroup>
     <None Include="wwwroot\bootstrap\bootstrap.min.css.map" />

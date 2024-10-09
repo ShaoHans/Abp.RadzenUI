@@ -1,0 +1,221 @@
+﻿@page "/account/manage"
+@using Volo.Abp.Account
+@using Volo.Abp.Account.Localization
+@using Volo.Abp.AspNetCore.Components
+@using Volo.Abp.Identity
+@inject NotificationService NotificationService
+@inject IProfileAppService ProfileAppService
+@inject NavigationManager NavigationManager
+@inherits AbpComponentBase
+
+<RadzenTabs @bind-SelectedIndex=@_selectedIndex Change="TabChange" TabPosition="TabPosition.Left" RenderMode="TabRenderMode.Client" >
+    <Tabs>
+        <RadzenTabsItem Text="@L["ProfileTab:Password"]">
+            <RadzenTemplateForm TItem="ChangePasswordModel" Data=@ChangePasswordModel Submit="ChangePasswordAsync">
+                <RadzenStack Gap="2rem" >
+                    <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                        <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
+                            <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
+                            <RadzenLabel Text="@L["DisplayName:CurrentPassword"]" Component="@nameof(ChangePasswordModel.CurrentPassword)" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="8">
+                            <RadzenPassword Name="@nameof(ChangePasswordModel.CurrentPassword)" @bind-Value=@ChangePasswordModel.CurrentPassword MaxLength="IdentityUserConsts.MaxPasswordLength" />
+                            <RadzenRequiredValidator Component="@nameof(ChangePasswordModel.CurrentPassword)" Text="@L.Required("DisplayName:CurrentPassword")" Style="position: absolute" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                        <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
+                            <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
+                            <RadzenLabel Text="@L["DisplayName:NewPassword"]" Component="@nameof(ChangePasswordModel.NewPassword)" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="8">
+                            <RadzenPassword Name="@nameof(ChangePasswordModel.NewPassword)" @bind-Value=@ChangePasswordModel.NewPassword MaxLength="IdentityUserConsts.MaxPasswordLength" />
+                            <RadzenRequiredValidator Component="@nameof(ChangePasswordModel.NewPassword)" Text="@L.Required("DisplayName:NewPassword")" Style="position: absolute" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                        <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
+                            <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
+                            <RadzenLabel Text="@L["DisplayName:NewPasswordConfirm"]" Component="@nameof(ChangePasswordModel.NewPasswordConfirm)" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="8">
+                            <RadzenPassword Name="@nameof(ChangePasswordModel.NewPasswordConfirm)" @bind-Value=@ChangePasswordModel.NewPasswordConfirm MaxLength="IdentityUserConsts.MaxPasswordLength" />
+                            <RadzenRequiredValidator Component="@nameof(ChangePasswordModel.NewPasswordConfirm)" Text="@L.Required("DisplayName:NewPasswordConfirm")" Style="position: absolute" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                        <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
+                            <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="@L["Save"]"></RadzenButton>
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenStack>
+            </RadzenTemplateForm>
+        </RadzenTabsItem>
+
+        <RadzenTabsItem Text="@L["ProfileTab:PersonalInfo"]">
+            <RadzenTemplateForm TItem="PersonalInfoModel" Data=@PersonalInfoModel Submit="UpdatePersonalInfoAsync">
+                <RadzenStack Gap="2rem">
+                    <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                        <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
+                            <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
+                            <RadzenLabel Text="@L["DisplayName:UserName"]" Component="@nameof(PersonalInfoModel.UserName)" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="8">
+                            <RadzenTextBox Name="@nameof(PersonalInfoModel.UserName)" @bind-Value="@PersonalInfoModel.UserName" MaxLength="IdentityUserConsts.MaxUserNameLength" />
+                            <RadzenRequiredValidator Component="@nameof(PersonalInfoModel.UserName)" Text="@L.Required("DisplayName:UserName")" Style="position: absolute" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                        <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
+                            <RadzenLabel Text="@L["DisplayName:Name"]" Component="@nameof(PersonalInfoModel.Name)" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="8">
+                            <RadzenTextBox Name="@nameof(PersonalInfoModel.Name)" @bind-Value="@PersonalInfoModel.Name" MaxLength="IdentityUserConsts.MaxNameLength" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                        <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
+                            <RadzenLabel Text="@L["DisplayName:Surname"]" Component="@nameof(PersonalInfoModel.Surname)" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="8">
+                            <RadzenTextBox Name="@nameof(PersonalInfoModel.Surname)" @bind-Value="@PersonalInfoModel.Surname" MaxLength="IdentityUserConsts.MaxSurnameLength" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                        <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
+                            <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
+                            <RadzenLabel Text="@L["DisplayName:Email"]" Component="@nameof(PersonalInfoModel.Email)" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="8">
+                            <RadzenTextBox Name="@nameof(PersonalInfoModel.Email)" @bind-Value="@PersonalInfoModel.Email" MaxLength="IdentityUserConsts.MaxEmailLength" />
+                            <RadzenRequiredValidator Component="@nameof(PersonalInfoModel.Email)" Text="@L.Required("DisplayName:Email")" Style="position: absolute" />
+                            <RadzenEmailValidator Component="Email" Text="@L["Volo.Abp.Identity:InvalidEmail",PersonalInfoModel.Email]" Style="position: absolute" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                        <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
+                            <RadzenLabel Text="@L["DisplayName:PhoneNumber"]" Component="@nameof(PersonalInfoModel.PhoneNumber)" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="8">
+                            <RadzenTextBox Name="@nameof(PersonalInfoModel.PhoneNumber)" @bind-Value="@PersonalInfoModel.PhoneNumber" MaxLength="IdentityUserConsts.MaxPhoneNumberLength" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                        <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
+                            <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="@L["Save"]"></RadzenButton>
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenStack>
+            </RadzenTemplateForm>
+        </RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>
+
+@code {
+    int _selectedIndex = 0;
+    Dictionary<int, string> _tabs = new Dictionary<int, string>
+    {
+        { 0,"ChangePassword"},
+        { 1,"PersonalInfo"},
+    };
+
+    ChangePasswordModel ChangePasswordModel = new();
+    PersonalInfoModel PersonalInfoModel = new();
+
+    public Manage()
+    {
+        LocalizationResource = typeof(AccountResource);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        var fragment = uri.Fragment.TrimStart('#'); 
+
+        if (!string.IsNullOrEmpty(fragment))
+        {
+            foreach (var k in _tabs.Keys)
+            {
+                if (_tabs[k].Equals(fragment, StringComparison.OrdinalIgnoreCase))
+                {
+                    _selectedIndex = k;
+                    break;
+                }
+            }
+        }
+
+        await GetUserInformations();
+    }
+
+    protected async Task GetUserInformations()
+    {
+        var user = await ProfileAppService.GetAsync();
+
+        ChangePasswordModel = new ChangePasswordModel
+            {
+                HideOldPasswordInput = !user.HasPassword
+            };
+
+        PersonalInfoModel = ObjectMapper.Map<ProfileDto, PersonalInfoModel>(user);
+    }
+
+    void TabChange(int index)
+    {
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        NavigationManager.NavigateTo($"{uri.AbsolutePath}#{_tabs[index]}");
+    }
+
+    async Task ChangePasswordAsync()
+    {
+        if (string.IsNullOrWhiteSpace(ChangePasswordModel.CurrentPassword))
+        {
+            return;
+        }
+
+        if (ChangePasswordModel.NewPassword != ChangePasswordModel.NewPasswordConfirm)
+        {
+            NotificationService.Error(L["NewPasswordConfirmFailed"]);
+            return;
+        }
+
+        if (ChangePasswordModel.CurrentPassword == ChangePasswordModel.NewPassword)
+        {
+            NotificationService.Error(L["NewPasswordSameAsOld"]);
+            return;
+        }
+
+        try
+        {
+            await ProfileAppService.ChangePasswordAsync(new ChangePasswordInput
+                {
+                    CurrentPassword = ChangePasswordModel.CurrentPassword,
+                    NewPassword = ChangePasswordModel.NewPassword
+                });
+
+            ChangePasswordModel.Clear();
+            NotificationService.Success(L["PasswordChanged"]);
+            NavigationManager.Refresh();
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(ex);
+        }
+    }
+
+    async Task UpdatePersonalInfoAsync()
+    {
+        try
+        {
+            await ProfileAppService.UpdateAsync(
+            ObjectMapper.Map<PersonalInfoModel, UpdateProfileDto>(PersonalInfoModel)
+            );
+
+            NotificationService.Success(L["PersonalSettingsSaved"]);
+            NavigationManager.Refresh();
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(ex);
+        }
+    }
+}

@@ -1,0 +1,245 @@
+﻿@using Volo.Abp.AspNetCore.Components
+@using Volo.Abp.AspNetCore.Components.Web.Configuration
+@using Volo.Abp.PermissionManagement
+@using Volo.Abp.PermissionManagement.Localization
+@inject IPermissionAppService PermissionAppService
+@inject ICurrentApplicationConfigurationCacheResetService CacheResetService
+@inject NotificationService NotificationService
+@inject DialogService DialogService
+@inherits AbpComponentBase
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start">
+    <RadzenCheckBox TValue="bool" Name="GrantAll" Disabled="_selectAllDisabled" Value="@(_groups.All(x=>x.GrantAll))" ValueChanged="GrantAll" />
+    <RadzenLabel Text="@L["SelectAllInAllTabs"]" Component="GrantAll" />
+</RadzenStack>
+<RadzenStack Orientation="Orientation.Vertical" Gap="0" class="rz-pt-1"
+             Style="border-top: var(--rz-grid-cell-border); min-height: 2rem; max-height: 12rem; overflow: auto;" />
+
+<RadzenTabs TabPosition="TabPosition.Left" RenderMode="TabRenderMode.Client">
+    <Tabs>
+        @foreach (var item in _groups)
+        {
+            <RadzenTabsItem Text="@GetTabShowName(item)">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start">
+                    <RadzenCheckBox TValue="bool" Name="@item.DisplayName" @bind-Value="@item.GrantAll" Disabled="IsPermissionGroupDisabled(item)" />
+                    <RadzenLabel Text="@L["SelectAllInThisTab"]" Component="@item.DisplayName" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Vertical" Gap="0" class="rz-pt-1" 
+                            Style="border-top: var(--rz-grid-cell-border); min-height: 2rem; max-height: 12rem; overflow: auto;" />
+
+                <RadzenTree Style="width: 100%; height: 100%"
+                            Data=@item.TreeItems>
+                    <RadzenTreeLevel Text="(i=>GetPermissionShownName(((PermissionTreeItemVm)i).Permission))"
+                                     ChildrenProperty="Children"
+                                     Expanded="(i=>true)"
+                                     HasChildren="(i=>((PermissionTreeItemVm)i).Children.Count>0)">
+                        <Template>
+                            @{
+                                var treeItem = (PermissionTreeItemVm)context.Value;
+                                <RadzenCheckBox TValue="bool"
+                                                Name="@treeItem.Permission.Name"
+                                                Disabled="@_disabledPermissions.Exists(x=>x.Name==treeItem.Permission.Name)"
+                                                onclick="@(()=>PermissionCheckChanged(context.Value))"
+                                                @bind-Value="treeItem.Permission.IsGranted" />
+                                <RadzenLabel Text="@context.Text" Component="@treeItem.Permission.Name" />
+                            }
+                        </Template>
+                    </RadzenTreeLevel>
+                </RadzenTree>
+            </RadzenTabsItem>
+        }
+    </Tabs>
+</RadzenTabs>
+
+<div class="dialog-footer">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Right">
+        <RadzenButton Icon="save" Click="SaveAsync" Text="@L["Save"]" ButtonStyle="ButtonStyle.Primary" />
+        <RadzenButton Icon="cancel" Click="()=>DialogService.Close(false)" Text="@L["Cancel"]" ButtonStyle="ButtonStyle.Light" />
+    </RadzenStack>
+</div>
+
+@code {
+    [Parameter]
+    public string ProviderName { get; set; } = default!;
+    [Parameter]
+    public string ProviderKey { get; set; } = default!;
+
+    List<PermissionGroupVm> _groups = [];
+    List<PermissionGrantInfoDto> _disabledPermissions = [];
+
+    bool _selectAllDisabled;
+
+    public Permission()
+    {
+        LocalizationResource = typeof(AbpPermissionManagementResource);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var result = await PermissionAppService.GetAsync(ProviderName, ProviderKey);
+
+        foreach (var group in result.Groups)
+        {
+            _groups.Add(new PermissionGroupVm
+                {
+                    Name = group.Name,
+                    DisplayName = group.DisplayName,
+                    TreeItems = GenerateTree(group.Permissions, null, 0, null)
+                });
+        }
+
+        _selectAllDisabled = _groups.All(IsPermissionGroupDisabled);
+
+        foreach (var permission in result.Groups.SelectMany(x => x.Permissions))
+        {
+            if (permission.IsGranted && permission.GrantedProviders.All(x => x.ProviderName != ProviderName))
+            {
+                _disabledPermissions.Add(permission);
+            }
+        }
+    }
+
+    bool IsPermissionGroupDisabled(PermissionGroupVm group)
+    {
+        var permissions = group.Expand();
+        var grantedProviders = permissions.SelectMany(x => x.Permission.GrantedProviders);
+
+        return permissions.All(x => x.Permission.IsGranted) && grantedProviders.Any(p => p.ProviderName != ProviderName);
+    }
+
+    List<PermissionTreeItemVm> GenerateTree(List<PermissionGrantInfoDto> allPermissions, string? parentName, int depth, PermissionTreeItemVm? parent)
+    {
+        var treeItems = new List<PermissionTreeItemVm>();
+        var subPermissions = allPermissions.Where(p => p.ParentName == parentName);
+
+        foreach (var item in subPermissions)
+        {
+            var treeItem = new PermissionTreeItemVm(depth, item);
+            treeItem.SetParent(parent);
+            treeItem.Children = GenerateTree(allPermissions, item.Name, depth + 1, treeItem);
+            treeItems.Add(treeItem);
+        }
+        return treeItems;
+    }
+
+    bool IsDisabledPermission(PermissionGrantInfoDto permissionGrantInfo)
+    {
+        return _disabledPermissions.Any(x => x == permissionGrantInfo);
+    }
+
+    string GetTabShowName(PermissionGroupVm group)
+    {
+        var permissions = group.Expand();
+        return $"{group.DisplayName}（{permissions.Count(x => x.Permission.IsGranted)}/{permissions.Count}）";
+    }
+
+    string GetPermissionShownName(PermissionGrantInfoDto permissionGrantInfo)
+    {
+        if (!IsDisabledPermission(permissionGrantInfo))
+        {
+            return permissionGrantInfo.DisplayName;
+        }
+
+        return string.Format(
+            "{0} ({1})",
+            permissionGrantInfo.DisplayName,
+            permissionGrantInfo.GrantedProviders
+                .Where(p => p.ProviderName != ProviderName)
+                .Select(p => p.ProviderName)
+                .JoinAsString(", ")
+        );
+    }
+
+    void PermissionCheckChanged(object obj)
+    {
+        var treeItem = (PermissionTreeItemVm)obj;
+
+        if (treeItem.Permission.IsGranted)
+        {
+            // 选中所有直接父节点
+            GrantAllDirectParents(treeItem);
+        }
+        else
+        {
+            // 取消所有子节点
+            GrantAllChildren(treeItem, false);
+        }
+
+        StateHasChanged();
+    }
+
+    void GrantAllDirectParents(PermissionTreeItemVm treeItem)
+    {
+        var parentTreeItem = treeItem.Parent;
+        while (parentTreeItem != null)
+        {
+            parentTreeItem.Permission.IsGranted = true;
+            parentTreeItem = parentTreeItem.Parent;
+            if (parentTreeItem == null)
+            {
+                break;
+            }
+        }
+    }
+
+    void GrantAllChildren(PermissionTreeItemVm treeItem, bool isGranted)
+    {
+        foreach (var child in treeItem.Children)
+        {
+            child.Permission.IsGranted = isGranted;
+            GrantAllChildren(child, isGranted);
+        }
+    }
+
+    void GrantAll(bool isGranted)
+    {
+        foreach (var g in _groups)
+        {
+            g.Grant(isGranted);
+        }
+    }
+
+    async Task SaveAsync()
+    {
+        try
+        {
+            var treeItems = new List<PermissionTreeItemVm>();
+            _groups.ForEach(x => treeItems.AddRange(x.Expand()));
+            var updateDto = new UpdatePermissionsDto
+                {
+                    Permissions = treeItems.Select(x => new UpdatePermissionDto
+                    {
+                        IsGranted = x.Permission.IsGranted,
+                        Name = x.Permission.Name
+                    }).ToArray()
+                };
+
+            if (!updateDto.Permissions.Any(x => x.IsGranted))
+            {
+                var result = await DialogService.Confirm(L["SaveWithoutAnyPermissionsWarningMessage"], "保存权限",
+                    new ConfirmOptions()
+                        {
+                            OkButtonText = L["Yes"],
+                            CancelButtonText = L["Cancel"]
+                        });
+
+                if (result == false)
+                {
+                    return;
+                }
+            }
+
+            await PermissionAppService.UpdateAsync(ProviderName, ProviderKey, updateDto);
+            await CacheResetService.ResetAsync();
+
+            NotificationService.Success(L["SuccessfullySaved"]);
+            DialogService.Close(true);
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Error(ex.Message);
+        }
+    }
+}

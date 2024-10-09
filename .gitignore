@@ -254,18 +254,7 @@ paket-files/
 # ABP Studio
 **/.abpstudio/
 
-# CRM
-src/CRM.Web/Logs/*
-src/CRM.Web.Host/Logs/*
-src/CRM.Web.Public/Logs/*
-src/CRM.Web.Public.Host/Logs/*
-src/CRM.AuthServer/Logs/*
-src/CRM.HttpApi.Host/Logs/*
-src/CRM.HttpApi.HostWithIds/Logs/*
-src/CRM.DbMigrator/Logs/*
-src/CRM.Blazor/Logs/*
-src/CRM.Blazor.Web/Logs/*
-src/CRM.Blazor.Tiered/Logs/*
+
 
 # Use abp install-libs to restore.
 **/wwwroot/libs/*

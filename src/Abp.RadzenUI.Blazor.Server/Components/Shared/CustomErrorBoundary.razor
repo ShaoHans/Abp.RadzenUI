@@ -4,7 +4,7 @@
 @using Volo.Abp.Identity
 @using Volo.Abp.Localization
 @inherits ErrorBoundary
-@inject ILogger<CustomErrorBoundary> Logger
+@* @inject ILogger<CustomErrorBoundary> Logger *@
 @inject NotificationService NotificationService
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<CustomErrorBoundary> L
@@ -25,7 +25,7 @@ else if (ErrorContent is not null)
 
     protected override async Task OnErrorAsync(Exception ex)
     {
-        Logger.LogError(ex, "Server internal error");
+        // Logger.LogError(ex, "Server internal error");
 
         if (authenticationState is not null)
         {
