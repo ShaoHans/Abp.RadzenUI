@@ -1,3 +1,4 @@
+using Abp.RadzenUI.Bundling;
 using Abp.RadzenUI.Services;
 using CRM.Localization;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +12,7 @@ using Volo.Abp.AspNetCore.Components.Web;
 using Volo.Abp.AspNetCore.Components.Web.Configuration;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc.Localization;
+using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.Autofac;
 using Volo.Abp.AutoMapper;
@@ -78,5 +80,22 @@ public class AbpRadzenUIModule : AbpModule
         context.Services.Replace(
             ServiceDescriptor.Transient<IUiMessageService, RadzenUiMessageService>()
         );
+
+        Configure<AbpBundlingOptions>(options =>
+        {
+            options
+                .StyleBundles
+                .Add("Blazor.Global", bundle =>
+                {
+                    bundle.AddContributors(typeof(BlazorGlobalStyleContributor));
+                });
+
+            options
+                .ScriptBundles
+                .Add("Blazor.Global", bundle =>
+                {
+                    bundle.AddContributors(typeof(BlazorGlobalScriptContributor));
+                });
+        });
     }
 }
