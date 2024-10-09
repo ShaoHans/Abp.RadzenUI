@@ -273,3 +273,5 @@ src/CRM.Blazor.Tiered/Logs/*
 # IdentityServer temp files
 tempkey.rsa
 tempkey.jwk
+/samples/CRM.Blazor.Web/Logs
+/samples/CRM.Blazor/Logs
