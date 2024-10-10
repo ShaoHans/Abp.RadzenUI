@@ -1,4 +1,5 @@
 using Abp.RadzenUI.Bundling;
+using Abp.RadzenUI.Menus;
 using Abp.RadzenUI.Services;
 using CRM.Localization;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,7 @@ using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
+using Volo.Abp.UI.Navigation;
 
 namespace Abp.RadzenUI;
 
@@ -96,6 +98,11 @@ public class AbpRadzenUIModule : AbpModule
                 {
                     bundle.AddContributors(typeof(BlazorGlobalScriptContributor));
                 });
+        });
+
+        Configure<AbpNavigationOptions>(options =>
+        {
+            options.MenuContributors.Add(new DefaultRadzenMenuContributor());
         });
     }
 }

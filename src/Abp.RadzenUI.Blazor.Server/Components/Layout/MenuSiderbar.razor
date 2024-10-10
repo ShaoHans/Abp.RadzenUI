@@ -1,4 +1,6 @@
-﻿@inject MenuService MenuService
+﻿@using Volo.Abp.UI.Navigation
+@inject MenuService MenuService
+@inject IMenuManager MenuManager
 
 <RadzenSidebar @bind-Expanded="@SidebarExpanded" class="demos-sidebar" style="display: flex; flex-direction: column">
     <div style="padding: 1rem">
@@ -42,10 +44,13 @@
     [Parameter]
     public EventCallback<bool> SidebarExpandedChanged { get; set; }
 
-    protected override Task OnInitializedAsync()
+    ApplicationMenu _applicationMenu = default!;
+
+    protected override async Task OnInitializedAsync()
     {
         menus = MenuService.Menus;
-        return Task.CompletedTask;
+
+        _applicationMenu = await MenuManager.GetMainMenuAsync();
     }
 
     void FilterPanelMenu(ChangeEventArgs args)
