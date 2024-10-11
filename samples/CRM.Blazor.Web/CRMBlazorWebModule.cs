@@ -1,7 +1,7 @@
 using Abp.RadzenUI;
 using Abp.RadzenUI.Components;
-
 using CRM.Blazor.Web.Components.Pages;
+using CRM.Blazor.Web.Menus;
 using CRM.EntityFrameworkCore;
 using CRM.Localization;
 using CRM.MultiTenancy;
@@ -25,6 +25,7 @@ using Volo.Abp.EntityFrameworkCore.PostgreSql;
 using Volo.Abp.Modularity;
 using Volo.Abp.Security.Claims;
 using Volo.Abp.Swashbuckle;
+using Volo.Abp.UI.Navigation;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
 
@@ -120,6 +121,7 @@ public class CRMBlazorWebModule : AbpModule
         ConfigureVirtualFileSystem(hostingEnvironment);
         ConfigureSwaggerServices(context.Services);
         ConfigureAutoApiControllers();
+        ConfigMenu();
     }
 
     private void ConfigureAuthentication(
@@ -219,7 +221,15 @@ public class CRMBlazorWebModule : AbpModule
     {
         Configure<AbpRadzenUIOptions>(options =>
         {
-            options.RouterAdditionalAssemblies = [typeof(TestManager).Assembly];
+            options.RouterAdditionalAssemblies = [typeof(Home).Assembly];
+        });
+    }
+
+    private void ConfigMenu()
+    {
+        Configure<AbpNavigationOptions>(options =>
+        {
+            options.MenuContributors.Add(new CRMMenuContributor());
         });
     }
 
@@ -246,8 +256,9 @@ public class CRMBlazorWebModule : AbpModule
         app.UseStaticFiles();
         app.UseStatusCodePagesWithRedirects("/404");
         app.UseAntiforgery();
-        ((WebApplication)app).MapRazorComponents<App>()
-            .AddAdditionalAssemblies(typeof(TestManager).Assembly)
+        ((WebApplication)app)
+            .MapRazorComponents<App>()
+            .AddAdditionalAssemblies(typeof(Home).Assembly)
             .AddInteractiveServerRenderMode();
         app.UseAbpSecurityHeaders();
         app.UseAuthentication();
