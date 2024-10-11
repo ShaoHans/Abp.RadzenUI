@@ -72,7 +72,6 @@ public class AbpRadzenUIModule : AbpModule
         context.Services.AddRadzenQueryStringThemeService();
         context.Services.AddCascadingAuthenticationState();
 
-        context.Services.AddScoped<MenuService>();
         context.Services.Replace(
             ServiceDescriptor.Singleton<
                 ICurrentApplicationConfigurationCacheResetService,

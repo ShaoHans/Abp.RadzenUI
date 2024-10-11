@@ -1,5 +1,4 @@
 ﻿@using Volo.Abp.UI.Navigation
-@inject MenuService MenuService
 @inject IMenuManager MenuManager
 
 <RadzenSidebar @bind-Expanded="@SidebarExpanded" class="demos-sidebar" style="display: flex; flex-direction: column">
@@ -8,30 +7,6 @@
     </div> *@
     <div style="flex: 1; overflow: auto">
         <RadzenPanelMenu Match="NavLinkMatch.Prefix">
-            @* @foreach (var first in menus)
-            {
-                <NavigationItem @key=first @bind-Expanded=@first.Expanded Menu=@first>
-                    @if (first.Children != null)
-                    {
-                        @foreach (var second in first.Children)
-                        {
-                            if (second.Children != null)
-                            {
-                                <NavigationItem @key=second @bind-Expanded=@second.Expanded Menu=@second>
-                                    @foreach (var third in second.Children)
-                                    {
-                                        <NavigationItem @key=third @bind-Expanded=@third.Expanded Menu=@third />
-                                    }
-                                </NavigationItem>
-                            }
-                            else
-                            {
-                                <NavigationItem @key=second @bind-Expanded=@second.Expanded Menu=@second />
-                            }
-                        }
-                    }
-                </NavigationItem>
-            } *@
             @foreach (var menu in _applicationMenu?.Items ?? [])
             {
                 @BuildMenuTree(menu);
@@ -41,7 +16,6 @@
 </RadzenSidebar>
 
 @code {
-    IEnumerable<Menu> menus = [];
     [Parameter]
     public bool SidebarExpanded { get; set; }
 
@@ -52,16 +26,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        //menus = MenuService.Menus;
-
         _applicationMenu = await MenuManager.GetMainMenuAsync();
     }
 
     void FilterPanelMenu(ChangeEventArgs args)
     {
         var term = args.Value?.ToString();
-
-        menus = string.IsNullOrEmpty(term) ? MenuService.Menus : MenuService.Filter(term);
     }
 
     RenderFragment BuildMenuTree(ApplicationMenuItem menuItem) => __builder =>
