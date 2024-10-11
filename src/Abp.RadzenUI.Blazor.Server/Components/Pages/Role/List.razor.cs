@@ -27,7 +27,7 @@ public partial class List
         await base.SetPermissionsAsync();
 
         HasManagePermissionsPermission = await AuthorizationService.IsGrantedAsync(
-            IdentityPermissions.Roles.ManagePermissions
+            ManagePermissionsPolicyName
         );
     }
 
