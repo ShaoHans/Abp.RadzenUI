@@ -3,12 +3,12 @@
 @inject IMenuManager MenuManager
 
 <RadzenSidebar @bind-Expanded="@SidebarExpanded" class="demos-sidebar" style="display: flex; flex-direction: column">
-    <div style="padding: 1rem">
+    @* <div style="padding: 1rem">
         <RadzenTextBox id="find" Placeholder="Find menu ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" class="rz-search-input" aria-label="find" />
-    </div>
+    </div> *@
     <div style="flex: 1; overflow: auto">
         <RadzenPanelMenu Match="NavLinkMatch.Prefix">
-            @foreach (var first in menus)
+            @* @foreach (var first in menus)
             {
                 <NavigationItem @key=first @bind-Expanded=@first.Expanded Menu=@first>
                     @if (first.Children != null)
@@ -31,6 +31,10 @@
                         }
                     }
                 </NavigationItem>
+            } *@
+            @foreach (var menu in _applicationMenu?.Items ?? [])
+            {
+                @BuildMenuTree(menu);
             }
         </RadzenPanelMenu>
     </div>
@@ -48,7 +52,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        menus = MenuService.Menus;
+        //menus = MenuService.Menus;
 
         _applicationMenu = await MenuManager.GetMainMenuAsync();
     }
@@ -59,4 +63,16 @@
 
         menus = string.IsNullOrEmpty(term) ? MenuService.Menus : MenuService.Filter(term);
     }
+
+    RenderFragment BuildMenuTree(ApplicationMenuItem menuItem) => __builder =>
+    {
+        <RadzenPanelMenuItem Icon="@menuItem.Icon" Text="@menuItem.DisplayName" Path="@menuItem.Url">
+            <ChildContent>
+                @foreach (var child in menuItem.Items ?? [])
+                {
+                    @BuildMenuTree(child);
+                }
+            </ChildContent>
+        </RadzenPanelMenuItem>
+    };
 }
