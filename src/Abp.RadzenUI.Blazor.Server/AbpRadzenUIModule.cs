@@ -102,7 +102,10 @@ public class AbpRadzenUIModule : AbpModule
 
         Configure<AbpNavigationOptions>(options =>
         {
+            options.MenuContributors.Clear();
             options.MenuContributors.Add(new DefaultRadzenMenuContributor());
+            options.MenuContributors.Add(new AbpIdentityMenuContributor());
+            options.MenuContributors.Add(new AbpTenantMenuContributor());
         });
     }
 }

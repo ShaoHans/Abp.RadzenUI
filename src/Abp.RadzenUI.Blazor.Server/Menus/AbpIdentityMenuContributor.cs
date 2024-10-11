@@ -5,7 +5,7 @@ using Volo.Abp.UI.Navigation;
 
 namespace Abp.RadzenUI.Menus;
 
-public class AbpIdentityWebMainMenuContributor : IMenuContributor
+public class AbpIdentityMenuContributor : IMenuContributor
 {
     public virtual Task ConfigureMenuAsync(MenuConfigurationContext context)
     {

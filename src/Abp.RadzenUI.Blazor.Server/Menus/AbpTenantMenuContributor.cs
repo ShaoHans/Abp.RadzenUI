@@ -5,7 +5,7 @@ using Volo.Abp.TenantManagement;
 
 namespace Abp.RadzenUI.Menus;
 
-public class AbpTenantManagementWebMainMenuContributor : IMenuContributor
+public class AbpTenantMenuContributor : IMenuContributor
 {
     public virtual Task ConfigureMenuAsync(MenuConfigurationContext context)
     {
@@ -21,7 +21,7 @@ public class AbpTenantManagementWebMainMenuContributor : IMenuContributor
         var tenantManagementMenuItem = new ApplicationMenuItem(
             RadzenUI.TenantManagementMenuNames.GroupName,
             l["Menu:TenantManagement"],
-            icon: "tenant"
+            icon: "reduce_capacity"
         );
         administrationMenu.AddItem(tenantManagementMenuItem);
 
