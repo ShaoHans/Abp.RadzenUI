@@ -22,13 +22,13 @@ public class MenuService
                 new Menu
                 {
                     Name = "½ÇÉ«",
-                    Path = "/role/list",
+                    Path = "/identity/roles",
                     Icon = "safety_check"
                 },
                 new Menu
                 {
                     Name = "ÓÃ»§",
-                    Path = "/user/list",
+                    Path = "/identity/users",
                     Icon = "person"
                 },
             ]

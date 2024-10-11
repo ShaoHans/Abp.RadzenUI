@@ -27,7 +27,7 @@ public class DefaultRadzenMenuContributor : IMenuContributor
             new ApplicationMenuItem(
                 "Identity.Roles",
                 "角色",
-                url: "/role/list",
+                url: "/identity/roles",
                 icon: "safety_check"
             ).RequirePermissions(IdentityPermissions.Roles.Default)
         );
@@ -36,7 +36,7 @@ public class DefaultRadzenMenuContributor : IMenuContributor
             new ApplicationMenuItem(
                 "Identity.Users",
                 "用户",
-                url: "/user/list",
+                url: "/identity/users",
                 icon: "person"
             ).RequirePermissions(IdentityPermissions.Users.Default)
         );
