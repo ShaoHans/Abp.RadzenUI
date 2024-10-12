@@ -18,6 +18,17 @@
         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
             <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
                 <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
+                <RadzenLabel Text="@L["DisplayName:AdminEmailAddress"]" Component="AdminEmailAddress" />
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="8">
+                <RadzenTextBox Name="AdminEmailAddress" @bind-Value=@DialogFromOption.Model.AdminEmailAddress Style="display: block; width: 100%;" MaxLength="TenantConsts.MaxAdminEmailAddressLength" />
+                <RadzenRequiredValidator Component="AdminEmailAddress" Text="@L.Required("DisplayName:AdminEmailAddress")" Style="position: absolute" />
+                <RadzenEmailValidator Component="AdminEmailAddress" Text="@L.ValidEmail("DisplayName:AdminEmailAddress")" Style="position: absolute" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
                 <RadzenLabel Text="@L["DisplayName:AdminPassword"]" Component="AdminPassword" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
@@ -25,19 +36,6 @@
                 <RadzenRequiredValidator Component="AdminPassword" Text="@L.Required("DisplayName:AdminPassword")" Style="position: absolute" />
             </RadzenColumn>
         </RadzenRow>
-        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
-                <RadzenLabel Text="@L["DisplayName:AdminEmailAddress"]" Component="AdminEmailAddress" />
-            </RadzenColumn>
-            <RadzenColumn Size="12" SizeMD="8">
-                <RadzenTextBox Name="AdminEmailAddress" @bind-Value=@DialogFromOption.Model.AdminEmailAddress Style="display: block; width: 100%;" MaxLength="TenantConsts.MaxAdminEmailAddressLength" />
-                <RadzenRequiredValidator Component="AdminEmailAddress" Text="@L.Required("DisplayName:AdminEmailAddress")" Style="position: absolute" />
-                <RadzenEmailValidator Component="AdminEmailAddress" Text="@L["Volo.Abp.Identity:InvalidEmail",DialogFromOption.Model.AdminEmailAddress]" Style="position: absolute" />
-            </RadzenColumn>
-        </RadzenRow>
-       
-       
     </RadzenStack>
     <div class="dialog-footer">
         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Right">

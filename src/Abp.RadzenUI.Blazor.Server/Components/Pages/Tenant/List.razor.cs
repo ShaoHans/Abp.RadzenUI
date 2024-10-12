@@ -73,8 +73,8 @@ public partial class List
         return new DialogOptions
         {
             Draggable = true,
-            Width = "600px",
-            Height = "740px"
+            Width = "700px",
+            Height = "450px"
         };
     }
 }
