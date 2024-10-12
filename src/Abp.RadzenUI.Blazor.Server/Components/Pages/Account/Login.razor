@@ -1,10 +1,11 @@
 ﻿@page "/login"
 @using Abp.RadzenUI.Components.Layout
-@using Microsoft.AspNetCore.Components.Authorization
+@using Volo.Abp.Users
 @inherits LayoutComponentBase
 @layout LoginLayout
 @inject NotificationService NotificationService
 @inject NavigationManager NavigationManager
+@inject ICurrentUser CurrentUser
 
 <PageTitle>Login</PageTitle>
 
@@ -35,9 +36,6 @@
     [Parameter]
     public string? Error { get; set; }
 
-    [CascadingParameter]
-    private Task<AuthenticationState>? authenticationState { get; set; }
-
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
@@ -47,15 +45,9 @@
             NotificationService.Error(Error);
         }
 
-        if (authenticationState is not null)
+        if (CurrentUser != null && CurrentUser.IsAuthenticated)
         {
-            var authState = await authenticationState;
-            var user = authState?.User;
-
-            if (user?.Identity is not null && user.Identity.IsAuthenticated)
-            {
-                NavigationManager.NavigateTo("/");
-            }
+            NavigationManager.NavigateTo("/");
         }
     }
 }
