@@ -128,9 +128,6 @@ public abstract class AbpCrudPageBase<
     protected TAppService AppService { get; set; } = default!;
 
     [Inject]
-    protected IStringLocalizer<AbpUiResource> UiLocalizer { get; set; } = default!;
-
-    [Inject]
     public IAbpEnumLocalizer AbpEnumLocalizer { get; set; } = default!;
 
     protected RadzenDataGrid<TListViewModel> _grid = default!;
@@ -394,11 +391,6 @@ public abstract class AbpCrudPageBase<
         }
 
         return ObjectMapper.Map<TUpdateViewModel, TUpdateInput>(updateViewModel);
-    }
-
-    protected virtual string GetDeleteConfirmationMessage(TListViewModel entity)
-    {
-        return UiLocalizer["ItemWillBeDeletedMessage"];
     }
 
     protected virtual async Task CheckCreatePolicyAsync()

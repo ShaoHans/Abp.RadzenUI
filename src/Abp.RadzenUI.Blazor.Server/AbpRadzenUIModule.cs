@@ -6,12 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Radzen;
 using Volo.Abp;
-using Volo.Abp.AspNetCore.Authentication.JwtBearer;
 using Volo.Abp.AspNetCore.Components.Messages;
 using Volo.Abp.AspNetCore.Components.Server.Configuration;
 using Volo.Abp.AspNetCore.Components.Web;
 using Volo.Abp.AspNetCore.Components.Web.Configuration;
-using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc.Localization;
 using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
@@ -84,19 +82,21 @@ public class AbpRadzenUIModule : AbpModule
 
         Configure<AbpBundlingOptions>(options =>
         {
-            options
-                .StyleBundles
-                .Add("Blazor.Global", bundle =>
+            options.StyleBundles.Add(
+                "Blazor.Global",
+                bundle =>
                 {
                     bundle.AddContributors(typeof(BlazorGlobalStyleContributor));
-                });
+                }
+            );
 
-            options
-                .ScriptBundles
-                .Add("Blazor.Global", bundle =>
+            options.ScriptBundles.Add(
+                "Blazor.Global",
+                bundle =>
                 {
                     bundle.AddContributors(typeof(BlazorGlobalScriptContributor));
-                });
+                }
+            );
         });
 
         Configure<AbpNavigationOptions>(options =>
