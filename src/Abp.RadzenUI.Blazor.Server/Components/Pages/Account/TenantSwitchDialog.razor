@@ -1,0 +1,79 @@
+﻿@using Volo.Abp
+@using Volo.Abp.AspNetCore.Components
+@using Volo.Abp.MultiTenancy
+@using Volo.Abp.MultiTenancy.Localization
+@using Volo.Abp.TenantManagement
+@inherits AbpComponentBase
+@inject ITenantStore TenantStore
+@inject ITenantNormalizer TenantNormalizer
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+
+<RadzenTemplateForm TItem="TenantInfoModel" Data="@Model" Submit="@OnSubmit">
+    <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
+        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                <RadzenLabel Text="@L["Name"]" Component="TenantName" />
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="8">
+                <RadzenTextBox Name="TenantName" @bind-Value="@Model.TenantName" Style="display: block; width: 100%;" MaxLength="TenantConsts.MaxNameLength" />
+                <RadzenLabel Text="@L["SwitchTenantHint"]" />
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenStack>
+    <div class="dialog-footer">
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Right">
+            <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="@L["Save"]"></RadzenButton>
+            <RadzenButton Icon="cancel" Click="() => {DialogService.Close(false);}" Text="@L["Cancel"]" ButtonStyle="ButtonStyle.Light" />
+        </RadzenStack>
+    </div>
+</RadzenTemplateForm>
+
+@code {
+
+    [Parameter]
+    public string? TenantName { get; set; }
+
+    TenantInfoModel Model = new();
+
+    public TenantSwitchDialog()
+    {
+        LocalizationResource = typeof(AbpMultiTenancyResource);
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        Model.TenantName = TenantName;
+    }
+
+    async Task OnSubmit()
+    {
+        try
+        {
+            Guid? tenantId = null;
+            if (!Model.TenantName.IsNullOrEmpty())
+            {
+                var tenant =
+                    await TenantStore.FindAsync(TenantNormalizer.NormalizeName(Model.TenantName!)!)
+                    ?? throw new UserFriendlyException(L["GivenTenantIsNotExist", Model.TenantName!]);
+                if (!tenant.IsActive)
+                {
+                    throw new UserFriendlyException(L["GivenTenantIsNotAvailable", Model.TenantName!]);
+                }
+
+                tenantId = tenant.Id;
+            }
+
+            NavigationManager.NavigateTo(
+                $"/tenant/switch?tenantId={tenantId}",
+                forceLoad: true
+            );
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(ex);
+        }
+    }
+}

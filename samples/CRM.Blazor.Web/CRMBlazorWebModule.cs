@@ -23,6 +23,7 @@ using Volo.Abp.AutoMapper;
 using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.EntityFrameworkCore.PostgreSql;
 using Volo.Abp.Modularity;
+using Volo.Abp.MultiTenancy;
 using Volo.Abp.Security.Claims;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation;
@@ -122,6 +123,11 @@ public class CRMBlazorWebModule : AbpModule
         ConfigureSwaggerServices(context.Services);
         ConfigureAutoApiControllers();
         ConfigMenu();
+
+        Configure<AbpMultiTenancyOptions>(options =>
+        {
+            options.IsEnabled = MultiTenancyConsts.IsEnabled;
+        });
     }
 
     private void ConfigureAuthentication(
