@@ -1,7 +1,7 @@
-﻿@using Volo.Abp
+﻿@using CRM.Localization
+@using Volo.Abp
 @using Volo.Abp.AspNetCore.Components
 @using Volo.Abp.MultiTenancy
-@using Volo.Abp.MultiTenancy.Localization
 @using Volo.Abp.TenantManagement
 @inherits AbpComponentBase
 @inject ITenantStore TenantStore
@@ -38,7 +38,7 @@
 
     public TenantSwitchDialog()
     {
-        LocalizationResource = typeof(AbpMultiTenancyResource);
+        LocalizationResource = typeof(AbpRadzenUIResource);
     }
 
     protected override void OnInitialized()

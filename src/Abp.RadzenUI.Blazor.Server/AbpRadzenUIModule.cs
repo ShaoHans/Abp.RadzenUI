@@ -19,6 +19,7 @@ using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.EntityFrameworkCore.PostgreSql;
 using Volo.Abp.Identity.AspNetCore;
 using Volo.Abp.Identity.EntityFrameworkCore;
+using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
@@ -105,6 +106,13 @@ public class AbpRadzenUIModule : AbpModule
             options.MenuContributors.Add(new DefaultRadzenMenuContributor());
             options.MenuContributors.Add(new AbpIdentityMenuContributor());
             options.MenuContributors.Add(new AbpTenantMenuContributor());
+        });
+
+        Configure<AbpLocalizationOptions>(options =>
+        {
+            options
+                .Resources.Add<AbpRadzenUIResource>("en")
+                .AddVirtualJson("/Localization/UI");
         });
     }
 }

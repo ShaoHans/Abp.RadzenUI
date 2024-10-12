@@ -1,5 +1,5 @@
 {
-  "culture": "es",
+  "culture": "es-MX",
   "texts": {
     "GivenTenantIsNotExist": "El inquilino {0} no existe",
     "GivenTenantIsNotAvailable": "El inquilino {0} no está disponible",
@@ -7,7 +7,7 @@
     "Switch": "Cambiar",
     "Name": "Nombre",
     "SwitchTenant": "Cambiar inquilino",
-    "SwitchTenantHint": "Dejar en blanco para cambiar por el host.",
+    "SwitchTenantHint": "Dejar en blanco para cambiar al host.",
     "NotSelected": "No seleccionado"
   }
 }
