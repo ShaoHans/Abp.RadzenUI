@@ -25,6 +25,7 @@ using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
 using Volo.Abp.UI.Navigation;
+using Volo.Abp.VirtualFileSystem;
 
 namespace Abp.RadzenUI;
 
@@ -108,11 +109,13 @@ public class AbpRadzenUIModule : AbpModule
             options.MenuContributors.Add(new AbpTenantMenuContributor());
         });
 
+        Configure<AbpVirtualFileSystemOptions>(options =>
+        {
+            options.FileSets.AddEmbedded<AbpRadzenUIModule>();
+        });
         Configure<AbpLocalizationOptions>(options =>
         {
-            options
-                .Resources.Add<AbpRadzenUIResource>("en")
-                .AddVirtualJson("/Localization/UI");
+            options.Resources.Add<AbpRadzenUIResource>("en").AddVirtualJson("/Localization/UI");
         });
     }
 }
