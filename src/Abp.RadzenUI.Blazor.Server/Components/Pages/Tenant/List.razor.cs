@@ -24,7 +24,7 @@ public partial class List
 
     protected override Task<TenantUpdateDto> SetEditDialogModelAsync(TenantDto dto)
     {
-        throw new NotImplementedException();
+        return Task.FromResult(new TenantUpdateDto { Name = dto.Name });
     }
 
     protected override async Task SetPermissionsAsync()
@@ -42,39 +42,13 @@ public partial class List
         await base.UpdateGetListInputAsync(args);
     }
 
-    //protected override async Task<IdentityUserCreateDto> SetCreateDialogModelAsync()
-    //{
-    //    var model = await base.SetCreateDialogModelAsync();
-    //    model.IsActive = true;
-    //    model.LockoutEnabled = true;
-    //    model.RoleNames = [];
-    //    return model;
-    //}
-
-    //protected override async Task<IdentityUserUpdateDto> SetEditDialogModelAsync(
-    //    IdentityUserDto dto
-    //)
-    //{
-    //    var userRoles =
-    //        (await AppService.GetRolesAsync(dto.Id)).Items?.Select(r => r.Name).ToArray() ?? [];
-    //    return new IdentityUserUpdateDto
-    //    {
-    //        UserName = dto.UserName,
-    //        Email = dto.Email,
-    //        PhoneNumber = dto.PhoneNumber,
-    //        IsActive = dto.IsActive,
-    //        LockoutEnabled = dto.LockoutEnabled,
-    //        RoleNames = userRoles
-    //    };
-    //}
-
-    private DialogOptions SetDialogOptions()
+    private DialogOptions SetDialogOptions(int heigth = 450, int width = 700)
     {
         return new DialogOptions
         {
             Draggable = true,
-            Width = "700px",
-            Height = "450px"
+            Width = $"{width}px",
+            Height = $"{heigth}px",
         };
     }
 }
