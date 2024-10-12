@@ -94,7 +94,7 @@ public class CRMTenantDatabaseMigrationHandler :
             using (_currentTenant.Change(tenantId))
             {
                 // Create database tables if needed
-                using (var uow = _unitOfWorkManager.Begin(requiresNew: true, isTransactional: false))
+                using (var uow = _unitOfWorkManager.Begin(requiresNew: false, isTransactional: false))
                 {
                     var tenantConfiguration = await _tenantStore.FindAsync(tenantId);
                     if (tenantConfiguration?.ConnectionStrings != null &&
@@ -110,7 +110,7 @@ public class CRMTenantDatabaseMigrationHandler :
                 }
 
                 // Seed data
-                using (var uow = _unitOfWorkManager.Begin(requiresNew: true, isTransactional: true))
+                using (var uow = _unitOfWorkManager.Begin(requiresNew: false, isTransactional: true))
                 {
                     await _dataSeeder.SeedAsync(
                         new DataSeedContext(tenantId)

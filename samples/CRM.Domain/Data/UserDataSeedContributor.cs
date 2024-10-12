@@ -8,8 +8,8 @@ using Volo.Abp.Identity;
 namespace CRM.Data;
 
 public class UserDataSeedContributor(IIdentityDataSeeder identityDataSeeder)
-    : IDataSeedContributor,
-        ITransientDependency
+    //: IDataSeedContributor,
+    //    ITransientDependency
 {
     protected IIdentityDataSeeder IdentityDataSeeder { get; } = identityDataSeeder;
     private static Random random = new();

@@ -21,7 +21,7 @@ public class AbpIdentityMenuContributor : IMenuContributor
         var identityMenuItem = new ApplicationMenuItem(
             RadzenUI.IdentityMenuNames.GroupName,
             l["Menu:IdentityManagement"],
-            icon: "security_key"
+            icon: "id_card"
         );
         administrationMenu.AddItem(identityMenuItem);
 
