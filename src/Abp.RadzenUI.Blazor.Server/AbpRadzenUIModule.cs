@@ -1,7 +1,7 @@
+using Abp.RadzenUI.Blazor.Server.Localization;
 using Abp.RadzenUI.Bundling;
 using Abp.RadzenUI.Menus;
 using Abp.RadzenUI.Services;
-using CRM.Localization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Radzen;
@@ -113,6 +113,7 @@ public class AbpRadzenUIModule : AbpModule
         {
             options.FileSets.AddEmbedded<AbpRadzenUIModule>();
         });
+
         Configure<AbpLocalizationOptions>(options =>
         {
             options.Resources.Add<AbpRadzenUIResource>("en").AddVirtualJson("/Localization/UI");

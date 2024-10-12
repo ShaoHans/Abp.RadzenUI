@@ -5,69 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>Abp.RadzenUI</RootNamespace>
-	</PropertyGroup>
-
-  <ItemGroup>
-    <Content Remove="Localization\UI\ar.json" />
-    <Content Remove="Localization\UI\cs.json" />
-    <Content Remove="Localization\UI\de.json" />
-    <Content Remove="Localization\UI\el.json" />
-    <Content Remove="Localization\UI\en-GB.json" />
-    <Content Remove="Localization\UI\en.json" />
-    <Content Remove="Localization\UI\es-mx.json" />
-    <Content Remove="Localization\UI\es.json" />
-    <Content Remove="Localization\UI\fa.json" />
-    <Content Remove="Localization\UI\fi.json" />
-    <Content Remove="Localization\UI\fr.json" />
-    <Content Remove="Localization\UI\hi.json" />
-    <Content Remove="Localization\UI\hr.json" />
-    <Content Remove="Localization\UI\hu.json" />
-    <Content Remove="Localization\UI\is.json" />
-    <Content Remove="Localization\UI\it.json" />
-    <Content Remove="Localization\UI\nl.json" />
-    <Content Remove="Localization\UI\pl-PL.json" />
-    <Content Remove="Localization\UI\pt-BR.json" />
-    <Content Remove="Localization\UI\ro-RO.json" />
-    <Content Remove="Localization\UI\ru.json" />
-    <Content Remove="Localization\UI\sk.json" />
-    <Content Remove="Localization\UI\sl.json" />
-    <Content Remove="Localization\UI\sv.json" />
-    <Content Remove="Localization\UI\tr.json" />
-    <Content Remove="Localization\UI\vi.json" />
-    <Content Remove="Localization\UI\zh-Hans.json" />
-    <Content Remove="Localization\UI\zh-Hant.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Localization\UI\ar.json" />
-    <EmbeddedResource Include="Localization\UI\cs.json" />
-    <EmbeddedResource Include="Localization\UI\de.json" />
-    <EmbeddedResource Include="Localization\UI\el.json" />
-    <EmbeddedResource Include="Localization\UI\en-GB.json" />
-    <EmbeddedResource Include="Localization\UI\en.json" />
-    <EmbeddedResource Include="Localization\UI\es-mx.json" />
-    <EmbeddedResource Include="Localization\UI\es.json" />
-    <EmbeddedResource Include="Localization\UI\fa.json" />
-    <EmbeddedResource Include="Localization\UI\fi.json" />
-    <EmbeddedResource Include="Localization\UI\fr.json" />
-    <EmbeddedResource Include="Localization\UI\hi.json" />
-    <EmbeddedResource Include="Localization\UI\hr.json" />
-    <EmbeddedResource Include="Localization\UI\hu.json" />
-    <EmbeddedResource Include="Localization\UI\is.json" />
-    <EmbeddedResource Include="Localization\UI\it.json" />
-    <EmbeddedResource Include="Localization\UI\nl.json" />
-    <EmbeddedResource Include="Localization\UI\pl-PL.json" />
-    <EmbeddedResource Include="Localization\UI\pt-BR.json" />
-    <EmbeddedResource Include="Localization\UI\ro-RO.json" />
-    <EmbeddedResource Include="Localization\UI\ru.json" />
-    <EmbeddedResource Include="Localization\UI\sk.json" />
-    <EmbeddedResource Include="Localization\UI\sl.json" />
-    <EmbeddedResource Include="Localization\UI\sv.json" />
-    <EmbeddedResource Include="Localization\UI\tr.json" />
-    <EmbeddedResource Include="Localization\UI\vi.json" />
-    <EmbeddedResource Include="Localization\UI\zh-Hans.json" />
-    <EmbeddedResource Include="Localization\UI\zh-Hant.json" />
-  </ItemGroup>
+	</PropertyGroup>  
 
   <ItemGroup>
     <None Include="wwwroot\bootstrap\bootstrap.min.css.map" />
@@ -105,9 +43,18 @@
 		<PackageReference Include="Volo.Abp.Account.Web.OpenIddict" Version="8.3.0" />
 	</ItemGroup>
 
-	<ItemGroup>
+	<!--<ItemGroup>
 	  <Content Update="Components\Pages\Tenant\Edit.razor">
 	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 	  </Content>
+	</ItemGroup>-->
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.4" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Localization\UI\*.json" />
+		<Content Remove="Localization\UI\*.json" />
 	</ItemGroup>
 </Project>
