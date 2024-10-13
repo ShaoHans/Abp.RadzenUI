@@ -40,7 +40,7 @@ public class AccountController : AbpControllerBase
             return Redirect("~/");
         }
 
-        return Redirect($"~/Login?error=Invalid user or password:{result.GetResultAsString()}");
+        return Redirect($"~/Login?error=Login Failed:{result.GetResultAsString()}");
     }
 
     [HttpGet("/account/logout")]

@@ -122,9 +122,6 @@ public abstract class AbpCrudPageBase<
     protected DialogService DialogService { get; set; } = default!;
 
     [Inject]
-    protected NotificationService NotificationService { get; set; } = default!;
-
-    [Inject]
     protected TAppService AppService { get; set; } = default!;
 
     [Inject]
@@ -272,7 +269,7 @@ public abstract class AbpCrudPageBase<
         try
         {
             await AppService.CreateAsync(model);
-            NotificationService.Success(L["SuccessfullySaved"]);
+            await Message.Success(L["SuccessfullySaved"]);
             DialogService.Close(true);
         }
         catch (Exception ex)
@@ -325,7 +322,7 @@ public abstract class AbpCrudPageBase<
         try
         {
             await AppService.UpdateAsync(EditingEntityId, model);
-            NotificationService.Success(L["SuccessfullySaved"]);
+            await Message.Success(L["SuccessfullySaved"]);
             DialogService.Close(true);
         }
         catch (Exception ex)
@@ -354,7 +351,7 @@ public abstract class AbpCrudPageBase<
         {
             await AppService.DeleteAsync(id);
             await _grid.Reload();
-            NotificationService.Success(L["SuccessfullyDeleted"]);
+            await Message.Success(L["SuccessfullyDeleted"]);
         }
     }
 

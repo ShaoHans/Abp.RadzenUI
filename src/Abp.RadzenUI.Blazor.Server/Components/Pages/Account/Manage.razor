@@ -3,7 +3,6 @@
 @using Volo.Abp.Account.Localization
 @using Volo.Abp.AspNetCore.Components
 @using Volo.Abp.Identity
-@inject NotificationService NotificationService
 @inject IProfileAppService ProfileAppService
 @inject NavigationManager NavigationManager
 @inherits AbpComponentBase
@@ -174,13 +173,13 @@
 
         if (ChangePasswordModel.NewPassword != ChangePasswordModel.NewPasswordConfirm)
         {
-            NotificationService.Error(L["NewPasswordConfirmFailed"]);
+            await Message.Error(L["NewPasswordConfirmFailed"]);
             return;
         }
 
         if (ChangePasswordModel.CurrentPassword == ChangePasswordModel.NewPassword)
         {
-            NotificationService.Error(L["NewPasswordSameAsOld"]);
+            await Message.Error(L["NewPasswordSameAsOld"]);
             return;
         }
 
@@ -193,7 +192,7 @@
                 });
 
             ChangePasswordModel.Clear();
-            NotificationService.Success(L["PasswordChanged"]);
+            await Message.Success(L["PasswordChanged"]);
             NavigationManager.Refresh();
         }
         catch (Exception ex)
@@ -210,7 +209,7 @@
             ObjectMapper.Map<PersonalInfoModel, UpdateProfileDto>(PersonalInfoModel)
             );
 
-            NotificationService.Success(L["PersonalSettingsSaved"]);
+            await Message.Success(L["PersonalSettingsSaved"]);
             NavigationManager.Refresh();
         }
         catch (Exception ex)

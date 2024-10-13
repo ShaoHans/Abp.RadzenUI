@@ -8,7 +8,6 @@
 @using Volo.Abp.AspNetCore.MultiTenancy
 @inherits AbpComponentBase
 @layout LoginLayout
-@inject NotificationService NotificationService
 @inject NavigationManager NavigationManager
 @inject DialogService DialogService
 @inject IStringLocalizer<AbpRadzenUIResource> TL
@@ -82,7 +81,7 @@
 
         if (!string.IsNullOrWhiteSpace(Error))
         {
-            NotificationService.Error(Error);
+            await Message.Error(Error);
         }
 
         if (CurrentUser != null && CurrentUser.IsAuthenticated)

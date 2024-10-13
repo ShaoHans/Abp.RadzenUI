@@ -4,7 +4,6 @@
 @using Volo.Abp.PermissionManagement.Localization
 @inject IPermissionAppService PermissionAppService
 @inject ICurrentApplicationConfigurationCacheResetService CacheResetService
-@inject NotificationService NotificationService
 @inject DialogService DialogService
 @inherits AbpComponentBase
 
@@ -233,12 +232,12 @@
             await PermissionAppService.UpdateAsync(ProviderName, ProviderKey, updateDto);
             await CacheResetService.ResetAsync();
 
-            NotificationService.Success(L["SuccessfullySaved"]);
+            await Message.Success(L["SuccessfullySaved"]);
             DialogService.Close(true);
         }
         catch (Exception ex)
         {
-            NotificationService.Error(ex.Message);
+            await Message.Error(ex.Message);
         }
     }
 }
