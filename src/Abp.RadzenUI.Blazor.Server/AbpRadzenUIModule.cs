@@ -1,5 +1,5 @@
-using Abp.RadzenUI.Blazor.Server.Localization;
 using Abp.RadzenUI.Bundling;
+using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Menus;
 using Abp.RadzenUI.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +25,7 @@ using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
 using Volo.Abp.UI.Navigation;
+using Volo.Abp.Validation.Localization;
 using Volo.Abp.VirtualFileSystem;
 
 namespace Abp.RadzenUI;
@@ -116,7 +117,10 @@ public class AbpRadzenUIModule : AbpModule
 
         Configure<AbpLocalizationOptions>(options =>
         {
-            options.Resources.Add<AbpRadzenUIResource>("en").AddVirtualJson("/Localization/UI");
+            options
+                .Resources.Add<AbpRadzenUIResource>("en")
+                .AddBaseTypes(typeof(AbpValidationResource))
+                .AddVirtualJson("/Localization/UI");
         });
     }
 }

@@ -2,11 +2,11 @@
 
 public class ChangePasswordModel
 {
-    public string CurrentPassword { get; set; }
+    public string CurrentPassword { get; set; } = default!;
 
-    public string NewPassword { get; set; }
+    public string NewPassword { get; set; } = default!;
 
-    public string NewPasswordConfirm { get; set; }
+    public string NewPasswordConfirm { get; set; } = default!;
 
     public bool HideOldPasswordInput { get; set; }
 
