@@ -5,12 +5,10 @@ using Abp.RadzenUI.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Radzen;
-using Volo.Abp;
 using Volo.Abp.AspNetCore.Components.Messages;
 using Volo.Abp.AspNetCore.Components.Server.Configuration;
 using Volo.Abp.AspNetCore.Components.Web;
 using Volo.Abp.AspNetCore.Components.Web.Configuration;
-using Volo.Abp.AspNetCore.Mvc.Localization;
 using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.Autofac;
@@ -44,21 +42,20 @@ namespace Abp.RadzenUI;
 )]
 public class AbpRadzenUIModule : AbpModule
 {
-    public override void PreConfigureServices(ServiceConfigurationContext context)
-    {
-        context.Services.PreConfigure<AbpMvcDataAnnotationsLocalizationOptions>(options =>
-        {
-            options.AddAssemblyResource(
-                typeof(AbpRadzenUIResource),
-                typeof(AbpRadzenUIModule).Assembly
-            );
-        });
-    }
-
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        var hostingEnvironment = context.Services.GetHostingEnvironment();
-        var configuration = context.Services.GetConfiguration();
+        Configure<AbpVirtualFileSystemOptions>(options =>
+        {
+            options.FileSets.AddEmbedded<AbpRadzenUIModule>("Abp.RadzenUI");
+        });
+
+        Configure<AbpLocalizationOptions>(options =>
+        {
+            options
+                .Resources.Add<AbpRadzenUIResource>("en")
+                .AddBaseTypes(typeof(AbpValidationResource))
+                .AddVirtualJson("/Localization/UI");
+        });
 
         Configure<AbpAutoMapperOptions>(options =>
         {
@@ -108,19 +105,6 @@ public class AbpRadzenUIModule : AbpModule
             options.MenuContributors.Add(new DefaultRadzenMenuContributor());
             options.MenuContributors.Add(new AbpIdentityMenuContributor());
             options.MenuContributors.Add(new AbpTenantMenuContributor());
-        });
-
-        Configure<AbpVirtualFileSystemOptions>(options =>
-        {
-            options.FileSets.AddEmbedded<AbpRadzenUIModule>();
-        });
-
-        Configure<AbpLocalizationOptions>(options =>
-        {
-            options
-                .Resources.Add<AbpRadzenUIResource>("en")
-                .AddBaseTypes(typeof(AbpValidationResource))
-                .AddVirtualJson("/Localization/UI");
         });
     }
 }
