@@ -12,12 +12,12 @@
             <RadzenColumn Size="5">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
                     <RadzenSidebarToggle Click="@MenuToggle" />
-                    <span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">Abp RadzenUI</span>
+                    <span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">@Options.Value.TitleBar.Title</span>
                 </RadzenStack>
             </RadzenColumn>
             <RadzenColumn Size="7">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
-                    @if (Options.Value.ShowGithubLink)
+                    @if (Options.Value.TitleBar.ShowGithubLink)
                     {
                         <div class="rz-display-none rz-display-sm-inline-flex align-items-center">
                             <RadzenLink Path="https://github.com/ShaoHans/Abp-RadzenUI" Text="GitHub" title="Star Abp-RadzenUI on GitHub" class="rz-text-nowrap rz-mx-2 rz-mx-lg-4" target="_blank" />
