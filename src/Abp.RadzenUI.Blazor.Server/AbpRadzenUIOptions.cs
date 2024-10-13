@@ -20,4 +20,9 @@ public class TitleBarOptions
     /// Whether to display the GitHub address of the project in the title bar
     /// </summary>
     public bool ShowGithubLink = true;
+
+    /// <summary>
+    /// Whether to display multilingual menus
+    /// </summary>
+    public bool ShowLanguageMenu = true;
 }

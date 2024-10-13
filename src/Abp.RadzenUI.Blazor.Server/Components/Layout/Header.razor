@@ -25,7 +25,10 @@
                     }
                     <RadzenAppearanceToggle class="rz-mx-2" />
                     <RadzenSidebarToggle Icon="settings" Click="@ThemeToggle" class="rz-m-0" />
-                    <LanguageSwitch />
+                    @if (Options.Value.TitleBar.ShowLanguageMenu)
+                    {
+                        <LanguageSwitch />
+                    }
                     @if (CurrentUser != null && CurrentUser.IsAuthenticated)
                     {
                         <div>

@@ -1,4 +1,4 @@
-using Abp.RadzenUI;
+﻿using Abp.RadzenUI;
 using Abp.RadzenUI.Components;
 using CRM.Blazor.Web.Components.Pages;
 using CRM.Blazor.Web.Menus;
@@ -22,6 +22,7 @@ using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.EntityFrameworkCore.PostgreSql;
+using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.Security.Claims;
@@ -128,6 +129,14 @@ public class CRMBlazorWebModule : AbpModule
         {
             options.IsEnabled = MultiTenancyConsts.IsEnabled;
         });
+
+        Configure<AbpLocalizationOptions>(options =>
+        {
+            options.Languages.Clear();
+            options.Languages.Add(new LanguageInfo("en", "en", "English"));
+            options.Languages.Add(new LanguageInfo("fr", "fr", "Français"));
+            options.Languages.Add(new LanguageInfo("zh-Hans", "zh-Hans", "简体中文"));
+        });
     }
 
     private void ConfigureAuthentication(
@@ -228,6 +237,11 @@ public class CRMBlazorWebModule : AbpModule
         Configure<AbpRadzenUIOptions>(options =>
         {
             options.RouterAdditionalAssemblies = [typeof(Home).Assembly];
+            //options.TitleBar = new TitleBarOptions
+            //{
+            //    ShowLanguageMenu = false,
+            //    Title = "CRM"
+            //};
         });
     }
 
