@@ -3,10 +3,13 @@
 @inherits AbpComponentBase
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, <RadzenLink Path="/account/manage#PersonalInfo" Text="@CurrentUser.UserName" /></h1>
+@if (CurrentUser is null || !CurrentUser.IsAuthenticated)
+{
+    <p>You are not logged in yet, please <RadzenLink Icon="login" Path="/login">log in</RadzenLink></p>
+}
+else
+{
+    <h1>Hello, <RadzenLink Path="/account/manage#PersonalInfo" Text="@CurrentUser.UserName" /></h1>
 
-Welcome to your new app.
-
-@code{
-    
+    <p>Welcome to your new app.</p>
 }
