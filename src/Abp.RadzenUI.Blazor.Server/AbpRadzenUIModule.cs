@@ -2,6 +2,7 @@ using Abp.RadzenUI.Bundling;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Menus;
 using Abp.RadzenUI.Services;
+using Localization.Resources.AbpUi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Radzen;
@@ -53,7 +54,7 @@ public class AbpRadzenUIModule : AbpModule
         {
             options
                 .Resources.Add<AbpRadzenUIResource>("en")
-                .AddBaseTypes(typeof(AbpValidationResource))
+                .AddBaseTypes(typeof(AbpValidationResource), typeof(AbpUiResource))
                 .AddVirtualJson("/Localization/UI");
         });
 

@@ -53,12 +53,13 @@
                 <Devider />
             }
 
-            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mb-6">
+            @* <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mb-6">
                 @L["Login"]
-            </RadzenText>
+            </RadzenText> *@
             <RadzenTemplateForm Data=@("") Method="post" Action="/account/login">
                 <RadzenLogin AllowRegister="false" AllowResetPassword="false" AllowRememberMe="true" RememberMe="true"
-                             UserText="@L["UserName"]" PasswordText="@L["Password"]" RememberMeText="@L["RememberMe"]"
+                             UserText="@L["UserName"]" PasswordText="@L["Password"]" 
+                             RememberMeText="@L["RememberMe"]" LoginText="@L["Login"]"
                              Username="admin" Password="2024@09$14&Start" />
             </RadzenTemplateForm>
         </RadzenCard>
