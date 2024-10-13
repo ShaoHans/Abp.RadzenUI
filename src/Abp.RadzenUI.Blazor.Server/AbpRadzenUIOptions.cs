@@ -6,10 +6,17 @@ public class AbpRadzenUIOptions
 {
     public List<Assembly> RouterAdditionalAssemblies { get; set; } = [];
 
-    public TitleBarOptions TitleBar { get; set; } = new();
+    public TitleBarSettings TitleBar { get; set; } = new();
+
+    public LoginPageSettings LoginPage { get; set; } = new();
 }
 
-public class TitleBarOptions
+public class LoginPageSettings
+{
+    public string LogoPath { get; set; } = "_content/Abp.RadzenUI.Blazor.Server/images/radzen.webp";
+}
+
+public class TitleBarSettings
 {
     /// <summary>
     /// title bar header name
