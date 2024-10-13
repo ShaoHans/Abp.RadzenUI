@@ -22,9 +22,9 @@ public class AccountController : AbpControllerBase
     }
 
     [HttpPost("/account/login")]
-    public async Task<IActionResult> LoginAsync(string username, string password)
+    public async Task<IActionResult> LoginAsync(string username, string password, bool rememberMe)
     {
-        var result = await _signInManager.PasswordSignInAsync(username, password, true, true);
+        var result = await _signInManager.PasswordSignInAsync(username, password, rememberMe, true);
 
         await _identitySecurityLogManager.SaveAsync(
             new IdentitySecurityLogContext()
