@@ -12,8 +12,7 @@
     <RadzenCheckBox TValue="bool" Name="GrantAll" Disabled="_selectAllDisabled" Value="@(_groups.All(x=>x.GrantAll))" ValueChanged="GrantAll" />
     <RadzenLabel Text="@L["SelectAllInAllTabs"]" Component="GrantAll" />
 </RadzenStack>
-<RadzenStack Orientation="Orientation.Vertical" Gap="0" class="rz-pt-1"
-             Style="border-top: var(--rz-grid-cell-border); min-height: 2rem; max-height: 12rem; overflow: auto;" />
+<Devider />
 
 <RadzenTabs TabPosition="TabPosition.Left" RenderMode="TabRenderMode.Client">
     <Tabs>
