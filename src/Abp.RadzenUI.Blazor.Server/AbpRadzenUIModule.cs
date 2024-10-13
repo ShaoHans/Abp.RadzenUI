@@ -16,6 +16,7 @@ using Volo.Abp.Autofac;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.EntityFrameworkCore.PostgreSql;
+using Volo.Abp.ExceptionHandling.Localization;
 using Volo.Abp.Identity.AspNetCore;
 using Volo.Abp.Identity.EntityFrameworkCore;
 using Volo.Abp.Localization;
@@ -54,7 +55,11 @@ public class AbpRadzenUIModule : AbpModule
         {
             options
                 .Resources.Add<AbpRadzenUIResource>("en")
-                .AddBaseTypes(typeof(AbpValidationResource), typeof(AbpUiResource))
+                .AddBaseTypes(
+                    typeof(AbpValidationResource),
+                    typeof(AbpUiResource),
+                    typeof(AbpExceptionHandlingResource)
+                )
                 .AddVirtualJson("/Localization/UI");
         });
 

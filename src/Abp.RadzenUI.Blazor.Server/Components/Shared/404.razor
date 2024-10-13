@@ -1,5 +1,18 @@
 ﻿@page "/404"
+@using Volo.Abp.AspNetCore.Components
+@using Volo.Abp.ExceptionHandling.Localization
+@inherits AbpComponentBase
 
-<RadzenText TextStyle="TextStyle.DisplayH5" class="rz-my-12">
-    Sorry, the page not found!
+<RadzenText TextStyle="TextStyle.H3" class="rz-my-12">
+    @L["404Message"]
 </RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-my-12">
+    @L["DefaultErrorMessage404Detail"]
+</RadzenText>
+
+@code{
+    public _404()
+    {
+        LocalizationResource = typeof(AbpExceptionHandlingResource);
+    }
+}

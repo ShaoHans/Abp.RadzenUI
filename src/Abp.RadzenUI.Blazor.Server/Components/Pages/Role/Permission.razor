@@ -217,7 +217,7 @@
 
             if (!updateDto.Permissions.Any(x => x.IsGranted))
             {
-                var result = await DialogService.Confirm(L["SaveWithoutAnyPermissionsWarningMessage"], "保存权限",
+                var result = await DialogService.Confirm(L["SaveWithoutAnyPermissionsWarningMessage"], L["Permissions"],
                     new ConfirmOptions()
                         {
                             OkButtonText = L["Yes"],

@@ -1,4 +1,8 @@
-﻿<RadzenHeader>
+﻿@using Volo.Abp.Account.Localization
+@using Volo.Abp.AspNetCore.Components
+@inherits AbpComponentBase
+
+<RadzenHeader>
     <ChildContent>
         <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px">
             <RadzenColumn Size="5">
@@ -23,8 +27,8 @@
                                 <RadzenGravatar Email="user@example.com" Style="width:24px;height:24px;"></RadzenGravatar>
                             </Template>
                             <ChildContent>
-                                <RadzenProfileMenuItem Text="我的账户" Icon="person" Path="/account/manage"></RadzenProfileMenuItem>
-                                <RadzenProfileMenuItem Text="退出" Icon="logout" Path="/account/logout"></RadzenProfileMenuItem>
+                                <RadzenProfileMenuItem Text="@L["MyAccount"]" Icon="person" Path="/account/manage"></RadzenProfileMenuItem>
+                                <RadzenProfileMenuItem Text="@L["LoggedOutTitle"]" Icon="logout" Path="/account/logout"></RadzenProfileMenuItem>
                             </ChildContent>
                         </RadzenProfileMenu>
                     </div>
@@ -40,4 +44,9 @@
 
     [Parameter]
     public EventCallback<EventArgs> ThemeToggle { get; set; }
+
+    public Header()
+    {
+        LocalizationResource = typeof(AccountResource);
+    }
 }
