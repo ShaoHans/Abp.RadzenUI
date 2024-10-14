@@ -1,7 +1,5 @@
 ﻿using Abp.RadzenUI;
-using Abp.RadzenUI.Components;
 using Abp.RadzenUI.Localization;
-
 using CRM.Blazor.Web.Components.Pages;
 using CRM.Blazor.Web.Menus;
 using CRM.EntityFrameworkCore;
@@ -279,12 +277,8 @@ public class CRMBlazorWebModule : AbpModule
         app.UseCorrelationId();
         app.UseRouting();
         app.UseStaticFiles();
-        app.UseStatusCodePagesWithRedirects("/404");
+        app.UseRadzenUI(typeof(Home).Assembly);
         app.UseAntiforgery();
-        ((WebApplication)app)
-            .MapRazorComponents<App>()
-            .AddAdditionalAssemblies(typeof(Home).Assembly)
-            .AddInteractiveServerRenderMode();
         app.UseAbpSecurityHeaders();
         app.UseAuthentication();
         app.UseAbpOpenIddictValidation();
