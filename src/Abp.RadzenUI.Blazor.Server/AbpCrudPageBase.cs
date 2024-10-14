@@ -238,7 +238,7 @@ public abstract class AbpCrudPageBase<
         };
         parameters.Add("DialogFromOption", dialogFromOption);
 
-        bool result = await DialogService.OpenAsync<TDialog>(
+        bool? result = await DialogService.OpenAsync<TDialog>(
             title: title,
             parameters: parameters,
             options: func is not null
@@ -251,7 +251,7 @@ public abstract class AbpCrudPageBase<
                 }
         );
 
-        if (result)
+        if (result == true)
         {
             await _grid.Reload();
         }
@@ -299,7 +299,7 @@ public abstract class AbpCrudPageBase<
         parameters.Add("DialogFromOption", dialogFromOption);
 
         EditingEntityId = dto.Id;
-        bool result = await DialogService.OpenAsync<TDialog>(
+        bool? result = await DialogService.OpenAsync<TDialog>(
             title: title,
             parameters: parameters,
             options: func is not null
@@ -312,7 +312,7 @@ public abstract class AbpCrudPageBase<
                 }
         );
 
-        if (result)
+        if (result == true)
         {
             await _grid.Reload();
         }

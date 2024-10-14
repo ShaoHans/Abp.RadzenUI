@@ -637,6 +637,6 @@ svg.illustration {
     display: flex;
     justify-content: flex-end; /* 或者使用center来居中 */
     padding: 10px; /* 添加一些内边距 */
-    border-top: 1px solid var(--rz-primary); /* 设置横线颜色和宽度 */
+    border-top: 1px solid var(--rz-text-disabled-color); /* 设置横线颜色和宽度 */
     margin-bottom: 10px; /* 为横线和按钮之间增加间距 */
 }
