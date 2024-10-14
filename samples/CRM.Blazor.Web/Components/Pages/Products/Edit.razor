@@ -1,4 +1,5 @@
-﻿@using Volo.Abp.AspNetCore.Components
+﻿@using CRM.Enums
+@using Volo.Abp.AspNetCore.Components
 @inject IProductAppService AppService
 @inherits AbpComponentBase
 
@@ -31,7 +32,7 @@
                 <RadzenLabel Text="@L["DisplayName:Price"]" Component="Price" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenNumeric TValue="float" Name="Price" Format="¥" @bind-Value=@DialogFromOption.Model.Price InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "enter value" }})" />
+                <RadzenNumeric TValue="float" Name="Price" @bind-Value=@DialogFromOption.Model.Price Style="display: block; width: 100%;" />
                 <RadzenRequiredValidator Component="Price" Text="@L.Required("DisplayName:Price")" Style="position: absolute" />
             </RadzenColumn>
         </RadzenRow>
@@ -41,7 +42,7 @@
                 <RadzenLabel Text="@L["DisplayName:StockCount"]" Component="StockCount" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenNumeric TValue="int" Name="StockCount" @bind-Value=@DialogFromOption.Model.StockCount InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "enter value" }})" />
+                <RadzenNumeric TValue="int" Name="StockCount" @bind-Value=@DialogFromOption.Model.StockCount Style="display: block; width: 100%;" />
             </RadzenColumn>
         </RadzenRow>
 
@@ -50,7 +51,9 @@
                 <RadzenLabel Text="@L["DisplayName:Status"]" Component="Status" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenDropDown @bind-Value=@DialogFromOption.Model.Status Data=@_statues Style="width: 100%; max-width: 400px;" Name="Status" />
+                <RadzenDropDown TValue="string" Value=@DialogFromOption.Model.Status Data=@_statues
+                                ValueChanged="args=>ChangeStatus(args)"
+                                Style="width: 100%; max-width: 400px;" Name="Status" />
             </RadzenColumn>
         </RadzenRow>
 
@@ -84,5 +87,10 @@
     public Edit()
     {
         LocalizationResource = typeof(CRMResource);
+    }
+
+    void ChangeStatus(string v)
+    {
+        DialogFromOption.Model.Status = Enum.Parse<ProductStatus>(v); 
     }
 }

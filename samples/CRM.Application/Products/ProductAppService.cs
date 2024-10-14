@@ -49,7 +49,10 @@ public class ProductAppService
         var query = await base.CreateFilteredQueryAsync(input);
 
         query = query
-            .WhereIf(!string.IsNullOrEmpty(input.Filter), x => x.Name.Contains(input.Filter!))
+            .WhereIf(
+                !string.IsNullOrEmpty(input.Filter),
+                x => x.Name.Contains(input.Filter!) || x.Code.Contains(input.Filter!)
+            )
             .WhereIf(input.Status.HasValue, x => x.Status == input.Status);
 
         return query;

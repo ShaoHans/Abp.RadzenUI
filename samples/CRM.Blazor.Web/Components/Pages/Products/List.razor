@@ -16,7 +16,7 @@
             </RadzenStack>
         }
         <RadzenStack Orientation="Orientation.Vertical" style="margin-left: auto;" Gap="4px">
-            <SearchTextBox PlaceHoder="@($"{L["DisplayName:UserName"]}/{L["DisplayName:Email"]}/{L["DisplayName:PhoneNumber"]}")" 
+            <SearchTextBox PlaceHoder="@($"{L["DisplayName:Code"]}/{L["DisplayName:Name"]}")" 
                 @bind-Keyword="@_keyword" SearchAsync="@_grid.Reload" />
         </RadzenStack>
     </RadzenStack>
@@ -27,10 +27,11 @@
                 PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
                 Count="@_totalCount" IsLoading="@_isLoading">    
     <Columns>
-        <RadzenDataGridColumn Property="@nameof(ProductDto.Code)" Title="@L["DisplayName:Code"]" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(ProductDto.Code)" Title="@L["DisplayName:Code"]" Width="100px" />
         <RadzenDataGridColumn Property="@nameof(ProductDto.Name)" Title="@L["DisplayName:Name"]" Width="160px" />
-        <RadzenDataGridColumn Property="@nameof(ProductDto.Price)" Title="@L["DisplayName:Price"]" Width="160px" />
-        <RadzenDataGridColumn Property="@nameof(ProductDto.StockCount)" Title="@L["DisplayName:StockCount"]" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(ProductDto.Price)" Title="@L["DisplayName:Price"]" Width="100px" />
+        <RadzenDataGridColumn Property="@nameof(ProductDto.StockCount)" Title="@L["DisplayName:StockCount"]" Width="100px" />
+        <RadzenDataGridColumn Property="@nameof(ProductDto.Status)" Title="@L["DisplayName:Status"]" Width="100px" />
         <RadzenDataGridColumn Property="@nameof(ProductDto.CreationTime)" Filterable="false" Title="@L["CreationTime"]" Width="160px" />
         <RadzenDataGridColumn Title="@L["Actions"]" Width="160px" Filterable="false" Sortable="false">
             <Template>

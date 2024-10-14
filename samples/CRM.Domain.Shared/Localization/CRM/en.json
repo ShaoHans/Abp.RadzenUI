@@ -24,6 +24,7 @@
     "DisplayName:StockCount": "StockCount",
     "DisplayName:Status": "Status",
     "DisplayName:Description": "Description",
+    "DisplayName:CreationTime": "CreationTime",
     "ProductDeletionConfirmationMessage": "Are you sure you want to delete this {0} product?"
   }
 }
