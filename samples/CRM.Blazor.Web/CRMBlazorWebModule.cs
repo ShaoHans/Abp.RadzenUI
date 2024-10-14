@@ -1,5 +1,7 @@
 ﻿using Abp.RadzenUI;
 using Abp.RadzenUI.Components;
+using Abp.RadzenUI.Localization;
+
 using CRM.Blazor.Web.Components.Pages;
 using CRM.Blazor.Web.Menus;
 using CRM.EntityFrameworkCore;
@@ -132,6 +134,9 @@ public class CRMBlazorWebModule : AbpModule
 
         Configure<AbpLocalizationOptions>(options =>
         {
+            var crmResource = options.Resources.Get<CRMResource>();
+            crmResource.AddBaseTypes(typeof(AbpRadzenUIResource));
+
             options.Languages.Clear();
             options.Languages.Add(new LanguageInfo("en", "en", "English"));
             options.Languages.Add(new LanguageInfo("fr", "fr", "Français"));

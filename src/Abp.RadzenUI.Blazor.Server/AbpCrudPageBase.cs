@@ -224,20 +224,23 @@ public abstract class AbpCrudPageBase<
 
     protected virtual async Task OpenCreateDialogAsync<TDialog>(
         string title,
-        Func<DialogOptions>? func = null
+        Func<DialogOptions>? func = null,
+        Dictionary<string, object>? parameters = null
     )
         where TDialog : ComponentBase
     {
+        parameters ??= [];
         var dialogFromOption = new DialogFromOption<TCreateInput>
         {
             OnSubmit = CreateEntityAsync,
             OnCancel = CloseDialog,
             Model = await SetCreateDialogModelAsync(),
         };
+        parameters.Add("DialogFromOption", dialogFromOption);
 
         bool result = await DialogService.OpenAsync<TDialog>(
             title: title,
-            parameters: new Dictionary<string, object> { { "DialogFromOption", dialogFromOption } },
+            parameters: parameters,
             options: func is not null
                 ? func()
                 : new DialogOptions()
@@ -281,24 +284,24 @@ public abstract class AbpCrudPageBase<
     protected virtual async Task OpenEditDialogAsync<TDialog>(
         string title,
         TGetListOutputDto dto,
-        Func<DialogOptions>? func = null
+        Func<DialogOptions>? func = null,
+        Dictionary<string, object>? parameters = null
     )
         where TDialog : ComponentBase
     {
+        parameters ??= [];
         var dialogFromOption = new DialogFromOption<TUpdateInput>
         {
             OnSubmit = UpdateEntityAsync,
             OnCancel = CloseDialog,
             Model = await SetEditDialogModelAsync(dto),
         };
+        parameters.Add("DialogFromOption", dialogFromOption);
 
         EditingEntityId = dto.Id;
         bool result = await DialogService.OpenAsync<TDialog>(
             title: title,
-            parameters: new Dictionary<string, object>()
-            {
-                { "DialogFromOption", dialogFromOption },
-            },
+            parameters: parameters,
             options: func is not null
                 ? func()
                 : new DialogOptions()

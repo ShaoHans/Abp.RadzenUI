@@ -11,5 +11,6 @@ public class CRMApplicationAutoMapperProfile : Profile
         CreateMap<Product, ProductDto>();
         CreateMap<CreateProductDto, Product>();
         CreateMap<UpdateProductDto, Product>();
+        CreateMap<ProductDto, UpdateProductDto>();
     }
 }

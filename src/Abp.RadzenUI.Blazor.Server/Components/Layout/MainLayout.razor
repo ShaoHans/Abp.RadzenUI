@@ -14,7 +14,7 @@
                     <RadzenColumn Size="12">
                         <RadzenRow class="rz-mx-auto" Style="max-width: 1600px;">
                             <RadzenColumn Size="12">
-                                <CustomErrorBoundary>
+                                <CustomErrorBoundary @ref="errorBoundary">
                                     @Body
                                 </CustomErrorBoundary>
                             </RadzenColumn>
@@ -39,6 +39,7 @@
     bool menuSidebarExpanded = true;
     bool themeSidebarExpanded = false;
     bool rendered;
+    ErrorBoundary? errorBoundary;
 
     protected override void OnInitialized()
     {
@@ -52,5 +53,10 @@
             rendered = true;
             StateHasChanged();
         }
+    }
+
+    protected override void OnParametersSet()
+    {
+        errorBoundary?.Recover();
     }
 }

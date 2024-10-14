@@ -9,7 +9,7 @@
 @inject ILogger<CustomErrorBoundary> Logger
 @inject NotificationService NotificationService
 @inject NavigationManager NavigationManager
-@inject IStringLocalizer<CustomErrorBoundary> L
+@inject IStringLocalizer<AbpRadzenUIResource> L
 @inject IServiceProvider ScopedServices
 
 @if (CurrentException is null)
@@ -52,7 +52,7 @@ else if (ErrorContent is not null)
                         NotificationService.Error(L[businessException.Code!]);
                         break;
                     default:
-                        NotificationService.Error(ex.Message);
+                        NotificationService.Error(L["500Message"]);
                         break;
                 }
             }

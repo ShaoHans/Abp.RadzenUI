@@ -1,18 +1,17 @@
 ﻿using CRM.Localization;
 using Volo.Abp.AuditLogging;
 using Volo.Abp.BackgroundJobs;
+using Volo.Abp.BlobStoring.Database;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity;
 using Volo.Abp.Localization;
 using Volo.Abp.Localization.ExceptionHandling;
-using Volo.Abp.Validation.Localization;
 using Volo.Abp.Modularity;
+using Volo.Abp.OpenIddict;
 using Volo.Abp.PermissionManagement;
 using Volo.Abp.SettingManagement;
-using Volo.Abp.VirtualFileSystem;
-using Volo.Abp.OpenIddict;
-using Volo.Abp.BlobStoring.Database;
 using Volo.Abp.TenantManagement;
+using Volo.Abp.VirtualFileSystem;
 
 namespace CRM;
 
@@ -26,7 +25,7 @@ namespace CRM;
     typeof(AbpOpenIddictDomainSharedModule),
     typeof(AbpTenantManagementDomainSharedModule),
     typeof(BlobStoringDatabaseDomainSharedModule)
-    )]
+)]
 public class CRMDomainSharedModule : AbpModule
 {
     public override void PreConfigureServices(ServiceConfigurationContext context)
@@ -44,10 +43,7 @@ public class CRMDomainSharedModule : AbpModule
 
         Configure<AbpLocalizationOptions>(options =>
         {
-            options.Resources
-                .Add<CRMResource>("en")
-                .AddBaseTypes(typeof(AbpValidationResource))
-                .AddVirtualJson("/Localization/CRM");
+            options.Resources.Add<CRMResource>("en").AddVirtualJson("/Localization/CRM");
 
             options.DefaultResourceType = typeof(CRMResource);
         });

@@ -1,0 +1,87 @@
+﻿@using Volo.Abp.AspNetCore.Components
+@inject IProductAppService AppService
+@inherits AbpComponentBase
+
+<RadzenTemplateForm TItem="CreateProductDto" Data=@DialogFromOption.Model Submit=@DialogFromOption.OnSubmit>
+    <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
+
+        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
+                <RadzenLabel Text="@L["DisplayName:Code"]" Component="Code" />
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="8">
+                <RadzenTextBox Name="Code" @bind-Value=@DialogFromOption.Model.Code Style="display: block; width: 100%;" MaxLength="ProductConsts.MaxCodeLength" />
+                <RadzenRequiredValidator Component="Code" Text="@L.Required("DisplayName:Code")" Style="position: absolute" />
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
+                <RadzenLabel Text="@L["DisplayName:Name"]" Component="Name" />
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="8">
+                <RadzenTextBox Name="Name" @bind-Value=@DialogFromOption.Model.Name Style="display: block; width: 100%;" MaxLength="ProductConsts.MaxNameLength" />
+                <RadzenRequiredValidator Component="Name" Text="@L.Required("DisplayName:Name")" Style="position: absolute" />
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
+                <RadzenLabel Text="@L["DisplayName:Price"]" Component="Price" />
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="8">
+                <RadzenNumeric TValue="float" Name="Price" Format="¥" @bind-Value=@DialogFromOption.Model.Price InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "enter value" }})" />
+                <RadzenRequiredValidator Component="Price" Text="@L.Required("DisplayName:Price")" Style="position: absolute" />
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                <RadzenLabel Text="@L["DisplayName:StockCount"]" Component="StockCount" />
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="8">
+                <RadzenNumeric TValue="int" Name="StockCount" @bind-Value=@DialogFromOption.Model.StockCount InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "enter value" }})" />
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                <RadzenLabel Text="@L["DisplayName:Status"]" Component="Status" />
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="8">
+                <RadzenDropDown @bind-Value=@DialogFromOption.Model.Status Data=@_statues Style="width: 100%; max-width: 400px;" Name="Status" />
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                <RadzenLabel Text="@L["DisplayName:Description"]" Component="Description" />
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="8">
+                <RadzenTextArea Name="Description" @bind-Value=@DialogFromOption.Model.Description Style="display: block; width: 100%;" />
+            </RadzenColumn>
+        </RadzenRow>
+        
+    </RadzenStack>
+    <div class="dialog-footer">
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Right">
+            <RadzenButton Icon="cancel" Click="@DialogFromOption.OnCancel" Text="@L["Cancel"]" ButtonStyle="ButtonStyle.Light" />
+            <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="@L["Save"]"></RadzenButton>
+        </RadzenStack>
+    </div>
+</RadzenTemplateForm>
+
+@code {
+    [Parameter]
+    public DialogFromOption<CreateProductDto> DialogFromOption { get; set; } = default!;
+
+    IEnumerable<string> _statues = ["OnSale", "OutOfStock", "OutOfShelf", "Deleted"];
+
+    public Create()
+    {
+        LocalizationResource = typeof(CRMResource);
+    }
+}

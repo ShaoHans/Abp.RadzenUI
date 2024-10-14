@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using CRM.Permissions;
+using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 
@@ -21,11 +22,24 @@ public class ProductAppService
     public ProductAppService(IRepository<Product, Guid> repository)
         : base(repository)
     {
-        //GetPolicyName = CRMPermissions.Products.Default;
-        //GetListPolicyName = CRMPermissions.Products.Default;
-        //CreatePolicyName = CRMPermissions.Products.Create;
-        //UpdatePolicyName = CRMPermissions.Products.Update;
-        //DeletePolicyName = CRMPermissions.Products.Delete;
+        GetPolicyName = CRMPermissions.Products.Default;
+        GetListPolicyName = CRMPermissions.Products.Default;
+        CreatePolicyName = CRMPermissions.Products.Create;
+        UpdatePolicyName = CRMPermissions.Products.Update;
+        DeletePolicyName = CRMPermissions.Products.Delete;
+    }
+
+    public override async Task<ProductDto> CreateAsync(CreateProductDto input)
+    {
+        if (await Repository.CountAsync(x => x.Code == input.Code) > 0)
+        {
+            throw new BusinessException(CRMDomainErrorCodes.ProductCodeExist).WithData(
+                "productCode",
+                input.Code
+            );
+        }
+
+        return await base.CreateAsync(input);
     }
 
     protected override async Task<IQueryable<Product>> CreateFilteredQueryAsync(

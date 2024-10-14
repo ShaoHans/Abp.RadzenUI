@@ -37,6 +37,26 @@
     "Unspecified": "System",
     "SeeAllUsers": "查看所有用户",
     "TakePhoto": "拍摄照片",
-    "ChoosePhoto": "选择照片"
+    "ChoosePhoto": "选择照片",
+
+    "Menu:Product": "产品管理",
+    "Menu:Product.List": "列表",
+
+    "CRM:000001": "已存在编码为 {productCode} 的产品！",
+    "Permission:GroupName": "产品管理",
+    "Permission:Products": "产品",
+    "Permission:Products.Edit": "编辑",
+    "Permission:Products.Delete": "删除",
+    "Permission:Products.Create": "创建",
+    "NewProduct": "新增产品",
+    "Products": "产品",
+    "DisplayName:Name": "名称",
+    "DisplayName:Code": "编码",
+    "DisplayName:ImagePath": "图片名称",
+    "DisplayName:Price": "价格",
+    "DisplayName:StockCount": "库存数量",
+    "DisplayName:Status": "状态",
+    "DisplayName:Description": "描述",
+    "ProductDeletionConfirmationMessage": "您确定要删除 {0} 这个产品吗？"
   }
 }

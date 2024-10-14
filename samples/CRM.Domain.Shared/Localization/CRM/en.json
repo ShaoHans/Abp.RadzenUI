@@ -4,6 +4,26 @@
     "AppName": "CRM",
     "Menu:Home": "Home",
     "LongWelcomeMessage": "Welcome to the application. This is a startup project based on the ABP framework. For more information visit",
-    "Welcome": "Welcome"
+    "Welcome": "Welcome",
+
+    "Menu:Product": "Product Management",
+    "Menu:Product.List": "Products",
+
+    "CRM:000001": "A product with code {productCode} has already exists!",
+    "Permission:GroupName": "Product Management",
+    "Permission:Products": "Products",
+    "Permission:Products.Edit": "Edit",
+    "Permission:Products.Delete": "Delete",
+    "Permission:Products.Create": "Create",
+    "NewProduct": "New Product",
+    "Products": "Products",
+    "DisplayName:Name": "Name",
+    "DisplayName:Code": "Code",
+    "DisplayName:ImagePath": "Image Path",
+    "DisplayName:Price": "Price",
+    "DisplayName:StockCount": "StockCount",
+    "DisplayName:Status": "Status",
+    "DisplayName:Description": "Description",
+    "ProductDeletionConfirmationMessage": "Are you sure you want to delete this {0} product?"
   }
 }
