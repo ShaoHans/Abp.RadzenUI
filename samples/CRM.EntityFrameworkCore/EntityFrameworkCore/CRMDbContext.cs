@@ -14,6 +14,7 @@ using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.OpenIddict.EntityFrameworkCore;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
+using CRM.Products;
 
 namespace CRM.EntityFrameworkCore;
 
@@ -55,6 +56,9 @@ public class CRMDbContext :
     public DbSet<Tenant> Tenants { get; set; }
     public DbSet<TenantConnectionString> TenantConnectionStrings { get; set; }
 
+    // Business Modules
+    public DbSet<Product> Products { get; set; }
+
     #endregion
 
     public CRMDbContext(DbContextOptions<CRMDbContext> options)
@@ -87,5 +91,16 @@ public class CRMDbContext :
         //    b.ConfigureByConvention(); //auto configure for the base class props
         //    //...
         //});
+
+        builder.Entity<Product>(b =>
+        {
+            b.ToTable("Products", CRMConsts.DbSchema);
+            b.Property(p => p.Code).IsRequired().HasMaxLength(ProductConsts.MaxCodeLength);
+            b.Property(p => p.Name).IsRequired().HasMaxLength(ProductConsts.MaxNameLength);
+            b.Property(p => p.Price).IsRequired();
+            b.Property(p => p.StockCount).IsRequired();
+            b.Property(p => p.ImagePath).HasMaxLength(ProductConsts.MaxImagePathLength);
+            b.Property(p => p.Status).HasConversion<string>().HasMaxLength(100);
+        });
     }
 }
