@@ -1,5 +1,5 @@
-﻿using Abp.RadzenUI.Models;
-using Localization.Resources.AbpUi;
+﻿using Abp.RadzenUI.Localization;
+using Abp.RadzenUI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
@@ -127,6 +127,9 @@ public abstract class AbpCrudPageBase<
     [Inject]
     public IAbpEnumLocalizer AbpEnumLocalizer { get; set; } = default!;
 
+    [Inject]
+    public IStringLocalizer<AbpRadzenUIResource> UL { get; set; } = default!;
+
     protected RadzenDataGrid<TListViewModel> _grid = default!;
     protected IReadOnlyList<TListViewModel> _entities = [];
     protected int _totalCount;
@@ -229,22 +232,19 @@ public abstract class AbpCrudPageBase<
         {
             OnSubmit = CreateEntityAsync,
             OnCancel = CloseDialog,
-            Model = await SetCreateDialogModelAsync()
+            Model = await SetCreateDialogModelAsync(),
         };
 
         bool result = await DialogService.OpenAsync<TDialog>(
             title: title,
-            parameters: new Dictionary<string, object>
-            {
-                { "DialogFromOption", dialogFromOption },
-            },
+            parameters: new Dictionary<string, object> { { "DialogFromOption", dialogFromOption } },
             options: func is not null
                 ? func()
                 : new DialogOptions()
                 {
                     Draggable = true,
                     Width = "600px",
-                    Height = "450px"
+                    Height = "450px",
                 }
         );
 
@@ -269,7 +269,7 @@ public abstract class AbpCrudPageBase<
         try
         {
             await AppService.CreateAsync(model);
-            await Message.Success(L["SuccessfullySaved"]);
+            await Message.Success(UL["SavedSuccessfully"]);
             DialogService.Close(true);
         }
         catch (Exception ex)
@@ -289,7 +289,7 @@ public abstract class AbpCrudPageBase<
         {
             OnSubmit = UpdateEntityAsync,
             OnCancel = CloseDialog,
-            Model = await SetEditDialogModelAsync(dto)
+            Model = await SetEditDialogModelAsync(dto),
         };
 
         EditingEntityId = dto.Id;
@@ -297,7 +297,7 @@ public abstract class AbpCrudPageBase<
             title: title,
             parameters: new Dictionary<string, object>()
             {
-                { "DialogFromOption", dialogFromOption }
+                { "DialogFromOption", dialogFromOption },
             },
             options: func is not null
                 ? func()
@@ -305,7 +305,7 @@ public abstract class AbpCrudPageBase<
                 {
                     Draggable = true,
                     Width = "600px",
-                    Height = "450px"
+                    Height = "450px",
                 }
         );
 
@@ -322,7 +322,7 @@ public abstract class AbpCrudPageBase<
         try
         {
             await AppService.UpdateAsync(EditingEntityId, model);
-            await Message.Success(L["SuccessfullySaved"]);
+            await Message.Success(UL["SavedSuccessfully"]);
             DialogService.Close(true);
         }
         catch (Exception ex)
@@ -342,8 +342,8 @@ public abstract class AbpCrudPageBase<
             title: title,
             options: new ConfirmOptions()
             {
-                OkButtonText = L["Yes"],
-                CancelButtonText = L["Cancel"]
+                OkButtonText = UL["Yes"],
+                CancelButtonText = UL["Cancel"],
             }
         );
 
@@ -351,7 +351,7 @@ public abstract class AbpCrudPageBase<
         {
             await AppService.DeleteAsync(id);
             await _grid.Reload();
-            await Message.Success(L["SuccessfullyDeleted"]);
+            await Message.Success(UL["DeletedSuccessfully"]);
         }
     }
 
