@@ -3,7 +3,10 @@
 name: publish-nuget
 run-name: ${{ github.actor }} is publishing a nuget package 🚀
 
-on: [push]
+on:
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   publish-nuget-packages:
