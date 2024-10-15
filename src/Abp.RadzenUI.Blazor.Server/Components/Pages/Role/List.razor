@@ -15,7 +15,7 @@
             </RadzenStack>
         }
         <RadzenStack Orientation="Orientation.Vertical" style="margin-left: auto;" Gap="4px">
-            <SearchTextBox PlaceHoder="@L["DisplayName:RoleName"]" @bind-Keyword="@_keyword" SearchAsync="@_grid.Reload" />
+            <SearchTextBox PlaceHoder="@L["DisplayName:RoleName"]" @bind-Keyword="@GetListInput.Filter" SearchAsync="@_grid.Reload" />
         </RadzenStack>
     </RadzenStack>
 </RadzenCard>

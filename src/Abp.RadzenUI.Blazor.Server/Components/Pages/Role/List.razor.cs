@@ -1,4 +1,3 @@
-using Abp.RadzenUI;
 using Microsoft.AspNetCore.Authorization;
 using Radzen;
 using Volo.Abp.Identity;
@@ -31,12 +30,6 @@ public partial class List
         );
     }
 
-    protected override async Task UpdateGetListInputAsync(LoadDataArgs args)
-    {
-        GetListInput.Filter = _keyword;
-        await base.UpdateGetListInputAsync(args);
-    }
-
     protected override Task<IdentityRoleUpdateDto> SetEditDialogModelAsync(IdentityRoleDto dto)
     {
         return Task.FromResult(
@@ -44,7 +37,7 @@ public partial class List
             {
                 Name = dto.Name,
                 IsDefault = dto.IsDefault,
-                IsPublic = dto.IsPublic
+                IsPublic = dto.IsPublic,
             }
         );
     }
@@ -56,13 +49,13 @@ public partial class List
             parameters: new Dictionary<string, object>()
             {
                 { "ProviderName", "R" },
-                { "ProviderKey", role.Name }
+                { "ProviderKey", role.Name },
             },
             options: new DialogOptions()
             {
                 Draggable = true,
                 Width = "800px",
-                Height = "700px"
+                Height = "700px",
             }
         );
     }

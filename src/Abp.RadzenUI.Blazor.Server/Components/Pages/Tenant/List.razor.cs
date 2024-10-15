@@ -36,12 +36,6 @@ public partial class List
         );
     }
 
-    protected override async Task UpdateGetListInputAsync(LoadDataArgs args)
-    {
-        GetListInput.Filter = _keyword;
-        await base.UpdateGetListInputAsync(args);
-    }
-
     private DialogOptions SetDialogOptions(int heigth = 450, int width = 700)
     {
         return new DialogOptions

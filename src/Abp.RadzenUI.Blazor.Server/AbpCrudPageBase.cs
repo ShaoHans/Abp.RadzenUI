@@ -136,7 +136,6 @@ public abstract class AbpCrudPageBase<
     protected readonly IEnumerable<int> _pageSizeOptions = [10, 20, 30];
     protected readonly bool _showPagerSummary = true;
     protected bool _isLoading = true;
-    protected string? _keyword = null;
 
     protected TGetListInput GetListInput = new();
     protected TCreateViewModel NewEntity;

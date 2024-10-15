@@ -1,4 +1,3 @@
-using Abp.RadzenUI;
 using Microsoft.AspNetCore.Authorization;
 using Radzen;
 using Volo.Abp.Identity;
@@ -31,12 +30,6 @@ public partial class List
         );
     }
 
-    protected override async Task UpdateGetListInputAsync(LoadDataArgs args)
-    {
-        GetListInput.Filter = _keyword;
-        await base.UpdateGetListInputAsync(args);
-    }
-
     protected override async Task<IdentityUserCreateDto> SetCreateDialogModelAsync()
     {
         var model = await base.SetCreateDialogModelAsync();
@@ -59,7 +52,7 @@ public partial class List
             PhoneNumber = dto.PhoneNumber,
             IsActive = dto.IsActive,
             LockoutEnabled = dto.LockoutEnabled,
-            RoleNames = userRoles
+            RoleNames = userRoles,
         };
     }
 
@@ -69,7 +62,7 @@ public partial class List
         {
             Draggable = true,
             Width = "600px",
-            Height = "740px"
+            Height = "740px",
         };
     }
 
@@ -80,13 +73,13 @@ public partial class List
             parameters: new Dictionary<string, object>()
             {
                 { "ProviderName", "U" },
-                { "ProviderKey", user.Id.ToString() }
+                { "ProviderKey", user.Id.ToString() },
             },
             options: new DialogOptions()
             {
                 Draggable = true,
                 Width = "800px",
-                Height = "700px"
+                Height = "700px",
             }
         );
     }
