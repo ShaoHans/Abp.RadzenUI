@@ -1,0 +1,28 @@
+# 发布新的 nuget 包
+
+name: publish-nuget
+run-name: ${{ github.actor }} is publishing a nuget package 🚀
+
+on: [push]
+
+jobs:
+  publish-nuget-packages:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore dependencies
+      run: dotnet restore ./src/Abp.RadzenUI.Blazor.Server/Abp.RadzenUI.Blazor.Server.csproj
+    - name: Build
+      run: dotnet build --no-restore -c Release ./src/Abp.RadzenUI.Blazor.Server/Abp.RadzenUI.Blazor.Server.csproj
+    - name: Create the package
+      run: dotnet pack -c Release ./src/Abp.RadzenUI.Blazor.Server/Abp.RadzenUI.Blazor.Server.csproj
+    - name: Add nuget source
+      run: dotnet nuget add source --username ShaoHans --password ${{ secrets.NUGET_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/ShaoHans/index.json"
+    - name: Publish the package to Github Packages
+      run: dotnet nuget push ./src/Abp.RadzenUI.Blazor.Server/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_TOKEN }} --source github --skip-duplicate
