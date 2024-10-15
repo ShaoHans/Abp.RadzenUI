@@ -22,4 +22,4 @@ ABP framework theme developed using Radzen blazor components.
 ### 3.The other list page with datagrid filter
 ![image](https://github.com/user-attachments/assets/af15032f-7c95-4c96-82fe-b895082b02da)
 
-## 📦How to use
+## 🌱How to use
