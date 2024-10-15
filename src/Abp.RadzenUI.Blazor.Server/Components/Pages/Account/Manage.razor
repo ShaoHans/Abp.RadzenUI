@@ -7,11 +7,11 @@
 @inject NavigationManager NavigationManager
 @inherits AbpComponentBase
 
-<RadzenTabs @bind-SelectedIndex=@_selectedIndex Change="TabChange" TabPosition="TabPosition.Left" RenderMode="TabRenderMode.Client" >
+<RadzenTabs @bind-SelectedIndex=@_selectedIndex Change="TabChange" TabPosition="TabPosition.Left" RenderMode="TabRenderMode.Client">
     <Tabs>
         <RadzenTabsItem Text="@L["ProfileTab:Password"]">
             <RadzenTemplateForm TItem="ChangePasswordModel" Data=@ChangePasswordModel Submit="ChangePasswordAsync">
-                <RadzenStack Gap="2rem" >
+                <RadzenStack Gap="2rem">
                     <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                         <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
                             <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
@@ -129,7 +129,7 @@
     protected override async Task OnInitializedAsync()
     {
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-        var fragment = uri.Fragment.TrimStart('#'); 
+        var fragment = uri.Fragment.TrimStart('#');
 
         if (!string.IsNullOrEmpty(fragment))
         {

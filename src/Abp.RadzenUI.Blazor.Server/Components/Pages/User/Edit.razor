@@ -49,7 +49,7 @@
                 <RadzenLabel Text="@L["DisplayName:IsActive"]" Component="IsActive" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenCheckBox TValue="bool" @bind-Value=@DialogFromOption.Model.IsActive Name="IsActive"  />
+                <RadzenCheckBox TValue="bool" @bind-Value=@DialogFromOption.Model.IsActive Name="IsActive" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
@@ -57,7 +57,7 @@
                 <RadzenLabel Text="@L["DisplayName:LockoutEnabled"]" Component="LockoutEnabled" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenCheckBox TValue="bool" @bind-Value=@DialogFromOption.Model.LockoutEnabled Name="LockoutEnabled"  />
+                <RadzenCheckBox TValue="bool" @bind-Value=@DialogFromOption.Model.LockoutEnabled Name="LockoutEnabled" />
             </RadzenColumn>
         </RadzenRow>
         @if (HasManagePermissionsPermission)

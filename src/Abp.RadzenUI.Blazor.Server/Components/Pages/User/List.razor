@@ -25,7 +25,7 @@
 <RadzenDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true"
                 PagerHorizontalAlign="HorizontalAlign.Center"
                 PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
-                Count="@_totalCount" IsLoading="@_isLoading">    
+                Count="@_totalCount" IsLoading="@_isLoading">
     <Columns>
         <RadzenDataGridColumn Property="@nameof(IdentityUserDto.Id)" Title="ID" Width="80px" Visible="false" />
         <RadzenDataGridColumn Property="@nameof(IdentityUserDto.UserName)" Title="@L["DisplayName:UserName"]" Width="160px" />
@@ -34,14 +34,11 @@
         <RadzenDataGridColumn Title="@L["DisplayName:IsActive"]" Width="60px" Filterable="false" Sortable="false">
             <Template>
                 <BooleanIcon Value="@context.IsActive" />
-                @* <RadzenSwitch Value="@context.IsActive"  Disabled="true" Name="False" /> *@
-                @* <RadzenCheckBox TValue="bool" Value="@(context.IsActive)" ReadOnly="true" /> *@
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Title="@L["DisplayName:LockoutEnabled"]" Width="80px" Filterable="false" Sortable="false">
             <Template>
                 <BooleanIcon Value="@context.LockoutEnabled" />
-                @* <RadzenCheckBox TValue="bool" Value="@(context.LockoutEnabled)" ReadOnly="true" /> *@
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(IdentityUserDto.CreationTime)" Filterable="false" Title="@L["CreationTime"]" Width="160px" />
@@ -66,4 +63,3 @@
         </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
-    

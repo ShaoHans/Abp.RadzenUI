@@ -5,7 +5,7 @@
 @inject IIdentityUserAppService UserAppService
 @inherits AbpComponentBase
 
-<RadzenTemplateForm TItem="IdentityUserCreateDto" Data=@DialogFromOption.Model Submit=@DialogFromOption.OnSubmit >
+<RadzenTemplateForm TItem="IdentityUserCreateDto" Data=@DialogFromOption.Model Submit=@DialogFromOption.OnSubmit>
     <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
             <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
@@ -51,7 +51,7 @@
                 <RadzenLabel Text="@L["DisplayName:IsActive"]" Component="IsActive" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenCheckBox TValue="bool" @bind-Value=@DialogFromOption.Model.IsActive Name="IsActive"  />
+                <RadzenCheckBox TValue="bool" @bind-Value=@DialogFromOption.Model.IsActive Name="IsActive" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
@@ -59,7 +59,7 @@
                 <RadzenLabel Text="@L["DisplayName:LockoutEnabled"]" Component="LockoutEnabled" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenCheckBox TValue="bool" @bind-Value=@DialogFromOption.Model.LockoutEnabled Name="LockoutEnabled"  />
+                <RadzenCheckBox TValue="bool" @bind-Value=@DialogFromOption.Model.LockoutEnabled Name="LockoutEnabled" />
             </RadzenColumn>
         </RadzenRow>
         @if (HasManagePermissionsPermission)

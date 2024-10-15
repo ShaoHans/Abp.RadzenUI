@@ -10,7 +10,7 @@
 {
     <RadzenMenu class="rz-mx-2">
         <RadzenMenuItem Text="@_currentLanguage.DisplayName" Icon="language">
-            @foreach(var language in _otherLanguages)
+            @foreach (var language in _otherLanguages)
             {
                 <RadzenMenuItem Click="@((args)=>ChangeLanguage(language))" Text="@language.DisplayName" />
             }

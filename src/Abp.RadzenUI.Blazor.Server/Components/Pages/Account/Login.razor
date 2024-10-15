@@ -36,7 +36,7 @@
                     <RadzenColumn Size="8" class="rz-text-truncate">
                         <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">@TL["Tenant"]</RadzenText>
                         <RadzenText TextStyle="TextStyle.Body1">
-                            @if(CurrentTenant.Id == null)
+                            @if (CurrentTenant.Id == null)
                             {
                                 <span>@TL["NotSelected"]</span>
                             }
@@ -53,12 +53,9 @@
                 <Devider />
             }
 
-            @* <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mb-6">
-                @L["Login"]
-            </RadzenText> *@
             <RadzenTemplateForm Data=@("") Method="post" Action="/account/login">
                 <RadzenLogin AllowRegister="false" AllowResetPassword="false" AllowRememberMe="true" RememberMe="true"
-                             UserText="@L["UserName"]" PasswordText="@L["Password"]" 
+                             UserText="@L["UserName"]" PasswordText="@L["Password"]"
                              RememberMeText="@L["RememberMe"]" LoginText="@L["Login"]"
                              Username="admin" Password="2024@09$14&Start" />
             </RadzenTemplateForm>
@@ -98,7 +95,7 @@
             title: TL["SwitchTenant"],
             parameters: new Dictionary<string, object>
                 {
-                    { "TenantName",CurrentTenant?.Name??string.Empty}
+                    { "TenantName", CurrentTenant?.Name ?? string.Empty }
                 },
             options: new DialogOptions
                 {
