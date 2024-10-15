@@ -123,23 +123,6 @@ public class CRMBlazorWebModule : AbpModule
         ConfigureVirtualFileSystem(hostingEnvironment);
         ConfigureSwaggerServices(context.Services);
         ConfigureAutoApiControllers();
-        ConfigMenu();
-
-        Configure<AbpMultiTenancyOptions>(options =>
-        {
-            options.IsEnabled = MultiTenancyConsts.IsEnabled;
-        });
-
-        Configure<AbpLocalizationOptions>(options =>
-        {
-            var crmResource = options.Resources.Get<CRMResource>();
-            crmResource.AddBaseTypes(typeof(AbpRadzenUIResource));
-
-            options.Languages.Clear();
-            options.Languages.Add(new LanguageInfo("en", "en", "English"));
-            options.Languages.Add(new LanguageInfo("fr", "fr", "Français"));
-            options.Languages.Add(new LanguageInfo("zh-Hans", "zh-Hans", "简体中文"));
-        });
     }
 
     private void ConfigureAuthentication(
@@ -237,8 +220,10 @@ public class CRMBlazorWebModule : AbpModule
 
     private void ConfigureAbpRadzenUI()
     {
+        // Configure AbpRadzenUI
         Configure<AbpRadzenUIOptions>(options =>
         {
+            // this is very imporant to set current web application's pages to the AbpRadzenUI module
             options.RouterAdditionalAssemblies = [typeof(Home).Assembly];
             //options.TitleBar = new TitleBarOptions
             //{
@@ -246,10 +231,28 @@ public class CRMBlazorWebModule : AbpModule
             //    Title = "CRM"
             //};
         });
-    }
 
-    private void ConfigMenu()
-    {
+        // Configure AbpMultiTenancyOptions, this will affect login page that whether need to switch tenants
+        Configure<AbpMultiTenancyOptions>(options =>
+        {
+            options.IsEnabled = MultiTenancyConsts.IsEnabled;
+        });
+
+        // Configure AbpLocalizationOptions
+        Configure<AbpLocalizationOptions>(options =>
+        {
+            // set AbpRadzenUIResource as BaseTypes for your application's localization resources
+            var crmResource = options.Resources.Get<CRMResource>();
+            crmResource.AddBaseTypes(typeof(AbpRadzenUIResource));
+
+            // if you don't want to use the default language list, you can clear it and add your own languages
+            options.Languages.Clear();
+            options.Languages.Add(new LanguageInfo("en", "en", "English"));
+            options.Languages.Add(new LanguageInfo("fr", "fr", "Français"));
+            options.Languages.Add(new LanguageInfo("zh-Hans", "zh-Hans", "简体中文"));
+        });
+
+        // Configure your web application's navigation menu
         Configure<AbpNavigationOptions>(options =>
         {
             options.MenuContributors.Add(new CRMMenuContributor());
@@ -277,7 +280,10 @@ public class CRMBlazorWebModule : AbpModule
         app.UseCorrelationId();
         app.UseRouting();
         app.UseStaticFiles();
+
+        // Use RadzenUI middleware with current web application's pages assembly
         app.UseRadzenUI(typeof(Home).Assembly);
+
         app.UseAntiforgery();
         app.UseAbpSecurityHeaders();
         app.UseAuthentication();

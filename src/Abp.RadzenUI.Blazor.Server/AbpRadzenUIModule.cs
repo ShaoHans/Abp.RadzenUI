@@ -82,6 +82,8 @@ public class AbpRadzenUIModule : AbpModule
                 BlazorServerCurrentApplicationConfigurationCacheResetService
             >()
         );
+
+        // Replace the default IUiMessageService with Radzen.Blazor's implementation by NotificationService
         context.Services.Replace(
             ServiceDescriptor.Transient<IUiMessageService, RadzenUiMessageService>()
         );
