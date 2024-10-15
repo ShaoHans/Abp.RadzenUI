@@ -6,9 +6,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>Abp.RadzenUI</RootNamespace>
 		<PackageId>AbpRadzen.Blazor.Server.UI</PackageId>
-		<Version>0.0.3</Version>
+		<Version>0.0.4</Version>
 		<Authors>ShaoHans</Authors>
-		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageDescription>ABP framework theme developed using Radzen blazor components</PackageDescription>
 		<RepositoryUrl>https://github.com/ShaoHans/Abp-RadzenUI</RepositoryUrl>
