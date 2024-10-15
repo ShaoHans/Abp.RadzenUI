@@ -10,8 +10,8 @@
 		<Authors>ShaoHans</Authors>
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<!--<PackageDescription>PACKAGE_DESCRIPTION</PackageDescription>
-		<RepositoryUrl>https://github.com/OWNER/REPOSITORY</RepositoryUrl>-->
+		<PackageDescription>ABP framework theme developed using Radzen blazor components</PackageDescription>
+		<RepositoryUrl>https://github.com/ShaoHans/Abp-RadzenUI</RepositoryUrl>
 	</PropertyGroup>  
 
   <ItemGroup>
