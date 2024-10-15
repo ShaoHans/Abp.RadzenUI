@@ -7,8 +7,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{10EF6EF4-D99
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{1CDAD202-ED9B-4B3A-A0B6-9075F7885F4C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abp.RadzenUI.Blazor.Server", "src\Abp.RadzenUI.Blazor.Server\Abp.RadzenUI.Blazor.Server.csproj", "{58DA4FEA-1ED6-462A-AF80-6EE572ED1109}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CRM.Blazor.Web", "samples\CRM.Blazor.Web\CRM.Blazor.Web.csproj", "{319BE42C-0F1A-4943-8FD8-1A72F8EE0932}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CRM.Application", "samples\CRM.Application\CRM.Application.csproj", "{5DA78621-4CBC-4A95-8209-3E716DFF3A58}"
@@ -27,16 +25,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CRM.HttpApi.Client", "sampl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CRM.EntityFrameworkCore", "samples\CRM.EntityFrameworkCore\CRM.EntityFrameworkCore.csproj", "{190A6C4C-FEF7-4952-8CEC-5B3B4E3454D0}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abp.Blazor.Server.RadzenUI", "src\Abp.Blazor.Server.RadzenUI\Abp.Blazor.Server.RadzenUI.csproj", "{FE78CA9C-B638-4A81-B1EB-A32C9DB79104}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{58DA4FEA-1ED6-462A-AF80-6EE572ED1109}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{58DA4FEA-1ED6-462A-AF80-6EE572ED1109}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{58DA4FEA-1ED6-462A-AF80-6EE572ED1109}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{58DA4FEA-1ED6-462A-AF80-6EE572ED1109}.Release|Any CPU.Build.0 = Release|Any CPU
 		{319BE42C-0F1A-4943-8FD8-1A72F8EE0932}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{319BE42C-0F1A-4943-8FD8-1A72F8EE0932}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{319BE42C-0F1A-4943-8FD8-1A72F8EE0932}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -73,12 +69,15 @@ Global
 		{190A6C4C-FEF7-4952-8CEC-5B3B4E3454D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{190A6C4C-FEF7-4952-8CEC-5B3B4E3454D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{190A6C4C-FEF7-4952-8CEC-5B3B4E3454D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE78CA9C-B638-4A81-B1EB-A32C9DB79104}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE78CA9C-B638-4A81-B1EB-A32C9DB79104}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE78CA9C-B638-4A81-B1EB-A32C9DB79104}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE78CA9C-B638-4A81-B1EB-A32C9DB79104}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{58DA4FEA-1ED6-462A-AF80-6EE572ED1109} = {10EF6EF4-D998-402D-A7E6-40C8308EED8C}
 		{319BE42C-0F1A-4943-8FD8-1A72F8EE0932} = {1CDAD202-ED9B-4B3A-A0B6-9075F7885F4C}
 		{5DA78621-4CBC-4A95-8209-3E716DFF3A58} = {1CDAD202-ED9B-4B3A-A0B6-9075F7885F4C}
 		{E88695B2-9B44-4E6B-AC37-FDD7161A7142} = {1CDAD202-ED9B-4B3A-A0B6-9075F7885F4C}
@@ -88,6 +87,7 @@ Global
 		{ADE7627B-4104-401B-841A-A0E915222E57} = {1CDAD202-ED9B-4B3A-A0B6-9075F7885F4C}
 		{D1EBFCD4-EAC7-41F9-A295-A3086D3F47A9} = {1CDAD202-ED9B-4B3A-A0B6-9075F7885F4C}
 		{190A6C4C-FEF7-4952-8CEC-5B3B4E3454D0} = {1CDAD202-ED9B-4B3A-A0B6-9075F7885F4C}
+		{FE78CA9C-B638-4A81-B1EB-A32C9DB79104} = {10EF6EF4-D998-402D-A7E6-40C8308EED8C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {440DDE31-5D3A-4D00-934D-7A6E1F23132F}

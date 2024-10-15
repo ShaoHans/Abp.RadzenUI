@@ -15,7 +15,7 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\Abp.RadzenUI.Blazor.Server\Abp.RadzenUI.Blazor.Server.csproj" />
+		<ProjectReference Include="..\..\src\Abp.Blazor.Server.RadzenUI\Abp.Blazor.Server.RadzenUI.csproj" />
 		<ProjectReference Include="..\CRM.Application.Contracts\CRM.Application.Contracts.csproj" />
 		<ProjectReference Include="..\CRM.Application\CRM.Application.csproj" />
 		<ProjectReference Include="..\CRM.HttpApi\CRM.HttpApi.csproj" />

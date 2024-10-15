@@ -1,19 +1,22 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>Abp.RadzenUI</RootNamespace>
-		<PackageId>Abp.RadzenUI.Blazor.Server</PackageId>
-		<Version>1.0.0</Version>
+		<PackageId>AbpRadzen.Blazor.Server.UI</PackageId>
+		<Version>0.0.2</Version>
 		<Authors>ShaoHans</Authors>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<!--<PackageDescription>PACKAGE_DESCRIPTION</PackageDescription>
 		<RepositoryUrl>https://github.com/OWNER/REPOSITORY</RepositoryUrl>-->
 	</PropertyGroup>  
 
   <ItemGroup>
     <None Include="wwwroot\bootstrap\bootstrap.min.css.map" />
+		<None Include="..\..\README.md" Pack="true" PackagePath="."/>
   </ItemGroup>
 
 	<ItemGroup>
