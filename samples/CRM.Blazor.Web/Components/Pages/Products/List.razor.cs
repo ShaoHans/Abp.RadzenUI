@@ -20,7 +20,7 @@ public partial class List
 
     protected override async Task UpdateGetListInputAsync(LoadDataArgs args)
     {
-        GetListInput.Filter = _keyword;
+        GetListInput.Filter = args.Filter;
         await base.UpdateGetListInputAsync(args);
     }
 

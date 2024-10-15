@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using CRM.Permissions;
 using Volo.Abp;
@@ -48,12 +49,17 @@ public class ProductAppService
     {
         var query = await base.CreateFilteredQueryAsync(input);
 
-        query = query
-            .WhereIf(
-                !string.IsNullOrEmpty(input.Filter),
-                x => x.Name.Contains(input.Filter!) || x.Code.Contains(input.Filter!)
-            )
-            .WhereIf(input.Status.HasValue, x => x.Status == input.Status);
+        /*
+         the input.Filter is a string that contains a dynamic expression to filter the query.
+         For example: "Name.Contains('abc') && Price > 100"
+         We can use the Dynamic LINQ library to apply the filter to the query.
+         You need install the nuget package on your XXX.EntityFrameworkCore project: Microsoft.EntityFrameworkCore.DynamicLinq
+         and then use the namespace : using System.Linq.Dynamic.Core;
+         */
+        if (!string.IsNullOrEmpty(input.Filter))
+        {
+            query = query.Where(input.Filter);
+        }
 
         return query;
     }

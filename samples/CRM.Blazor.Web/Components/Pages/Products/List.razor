@@ -7,31 +7,24 @@
 
 <PageTitle>@L["Products"]</PageTitle>
 
-<RadzenCard class="rz-my-6">
-    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+<RadzenDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true" AllowFiltering="true"
+                PagerHorizontalAlign="HorizontalAlign.Center"
+                PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
+                Count="@_totalCount" IsLoading="@_isLoading">
+    <HeaderTemplate>
         @if (HasCreatePermission)
         {
             <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
                 <RadzenButton Icon="add" Text="@L["NewProduct"]" Click="@(async()=>{await OpenCreateDialogAsync<Create>(L["NewProduct"], SetDialogOptions);})" />
             </RadzenStack>
         }
-        <RadzenStack Orientation="Orientation.Vertical" style="margin-left: auto;" Gap="4px">
-            <SearchTextBox PlaceHoder="@($"{L["DisplayName:Code"]}/{L["DisplayName:Name"]}")" 
-                @bind-Keyword="@_keyword" SearchAsync="@_grid.Reload" />
-        </RadzenStack>
-    </RadzenStack>
-</RadzenCard>
-
-<RadzenDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true"
-                PagerHorizontalAlign="HorizontalAlign.Center"
-                PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
-                Count="@_totalCount" IsLoading="@_isLoading">    
+    </HeaderTemplate>
     <Columns>
         <RadzenDataGridColumn Property="@nameof(ProductDto.Code)" Title="@L["DisplayName:Code"]" Width="100px" />
-        <RadzenDataGridColumn Property="@nameof(ProductDto.Name)" Title="@L["DisplayName:Name"]" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(ProductDto.Name)" Title="@L["DisplayName:Name"]" Sortable="false" Width="160px" />
         <RadzenDataGridColumn Property="@nameof(ProductDto.Price)" Title="@L["DisplayName:Price"]" Width="100px" />
         <RadzenDataGridColumn Property="@nameof(ProductDto.StockCount)" Title="@L["DisplayName:StockCount"]" Width="100px" />
-        <RadzenDataGridColumn Property="@nameof(ProductDto.Status)" Title="@L["DisplayName:Status"]" Width="100px" />
+        <RadzenDataGridColumn Property="@nameof(ProductDto.Status)" Title="@L["DisplayName:Status"]" Sortable="false" Width="100px" />
         <RadzenDataGridColumn Property="@nameof(ProductDto.CreationTime)" Filterable="false" Title="@L["CreationTime"]" Width="160px" />
         <RadzenDataGridColumn Title="@L["Actions"]" Width="160px" Filterable="false" Sortable="false">
             <Template>
@@ -44,9 +37,8 @@
                 {
                     <RadzenButton Icon="delete" title="@L["Delete"]" ButtonStyle="ButtonStyle.Danger"
                                   Click=@(async () => await OpenDeleteConfirmDialogAsync(context.Id, L["Delete"], L["ProductDeletionConfirmationMessage",context.Name])) />
-                } 
+                }
             </Template>
         </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
-    
