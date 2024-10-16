@@ -91,7 +91,7 @@ public class AbpRadzenUIModule : AbpModule
         Configure<AbpBundlingOptions>(options =>
         {
             options.StyleBundles.Add(
-                "Blazor.Global",
+                BlazorRadzenThemeBundles.Styles.Global,
                 bundle =>
                 {
                     bundle.AddContributors(typeof(BlazorGlobalStyleContributor));
@@ -99,7 +99,7 @@ public class AbpRadzenUIModule : AbpModule
             );
 
             options.ScriptBundles.Add(
-                "Blazor.Global",
+                BlazorRadzenThemeBundles.Styles.Global,
                 bundle =>
                 {
                     bundle.AddContributors(typeof(BlazorGlobalScriptContributor));
