@@ -15,20 +15,17 @@ using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc.AntiForgery;
 using Volo.Abp.AspNetCore.Mvc.Localization;
-using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
-using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Caching.StackExchangeRedis;
-using Volo.Abp.EntityFrameworkCore.PostgreSql;
 using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
 using Volo.Abp.MultiTenancy;
+using Volo.Abp.OpenIddict;
 using Volo.Abp.Security.Claims;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation;
-using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
 
 namespace CRM.Blazor;
@@ -41,8 +38,6 @@ namespace CRM.Blazor;
     typeof(AbpAspNetCoreMultiTenancyModule),
     typeof(AbpAspNetCoreAuthenticationJwtBearerModule),
     typeof(AbpCachingStackExchangeRedisModule),
-    typeof(AbpEntityFrameworkCorePostgreSqlModule),
-    typeof(AbpAuditLoggingEntityFrameworkCoreModule),
     typeof(AbpAspNetCoreSerilogModule),
     typeof(AbpSwashbuckleModule)
 )]
@@ -75,22 +70,22 @@ public class CRMBlazorWebModule : AbpModule
             });
         });
 
-        //if (!hostingEnvironment.IsDevelopment())
-        //{
-        //    PreConfigure<AbpOpenIddictAspNetCoreOptions>(options =>
-        //    {
-        //        options.AddDevelopmentEncryptionAndSigningCertificate = false;
-        //    });
+        if (!hostingEnvironment.IsDevelopment())
+        {
+            PreConfigure<AbpOpenIddictAspNetCoreOptions>(options =>
+            {
+                options.AddDevelopmentEncryptionAndSigningCertificate = false;
+            });
 
-        //    PreConfigure<OpenIddictServerBuilder>(serverBuilder =>
-        //    {
-        //        serverBuilder.AddProductionEncryptionAndSigningCertificate(
-        //            "openiddict.pfx",
-        //            "9b26e3c2-ae0a-4c47-bb89-606fcd97cf0b"
-        //        );
-        //        serverBuilder.SetIssuer(new Uri(configuration["AuthServer:Authority"]!));
-        //    });
-        //}
+            PreConfigure<OpenIddictServerBuilder>(serverBuilder =>
+            {
+                serverBuilder.AddProductionEncryptionAndSigningCertificate(
+                    "openiddict.pfx",
+                    "9b26e3c2-ae0a-4c47-bb89-606fcd97cf0b"
+                );
+                serverBuilder.SetIssuer(new Uri(configuration["AuthServer:Authority"]!));
+            });
+        }
     }
 
     public override void ConfigureServices(ServiceConfigurationContext context)
@@ -110,25 +105,21 @@ public class CRMBlazorWebModule : AbpModule
                 options.DisableTransportSecurityRequirement = true;
             });
         }
+
         Configure<AbpAntiForgeryOptions>(options =>
         {
             options.AutoValidate = false;
         });
 
         ConfigureAbpRadzenUI();
-        ConfigureAuthentication(context, configuration);
-        ConfigureUrls(configuration);
-        ConfigureBundles();
+        ConfigureAuthentication(context);
         ConfigureAutoMapper();
         ConfigureVirtualFileSystem(hostingEnvironment);
         ConfigureSwaggerServices(context.Services);
         ConfigureAutoApiControllers();
     }
 
-    private void ConfigureAuthentication(
-        ServiceConfigurationContext context,
-        IConfiguration configuration
-    )
+    private void ConfigureAuthentication(ServiceConfigurationContext context)
     {
         context.Services.ForwardIdentityAuthenticationForBearer(
             OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme
@@ -137,22 +128,6 @@ public class CRMBlazorWebModule : AbpModule
         {
             options.IsDynamicClaimsEnabled = true;
         });
-    }
-
-    private void ConfigureUrls(IConfiguration configuration)
-    {
-        Configure<AppUrlOptions>(options =>
-        {
-            options.Applications["MVC"].RootUrl = configuration["App:SelfUrl"];
-            options.RedirectAllowedUrls.AddRange(
-                configuration["App:RedirectAllowedUrls"]?.Split(',') ?? Array.Empty<string>()
-            );
-        });
-    }
-
-    private void ConfigureBundles()
-    {
-        Configure<AbpBundlingOptions>(options => { });
     }
 
     private void ConfigureVirtualFileSystem(IWebHostEnvironment hostingEnvironment)
@@ -225,11 +200,16 @@ public class CRMBlazorWebModule : AbpModule
         {
             // this is very imporant to set current web application's pages to the AbpRadzenUI module
             options.RouterAdditionalAssemblies = [typeof(Home).Assembly];
-            //options.TitleBar = new TitleBarOptions
+            //options.TitleBar = new TitleBarSettings
             //{
             //    ShowLanguageMenu = false,
             //    Title = "CRM"
             //};
+            //options.LoginPage = new LoginPageSettings
+            //{
+            //    LogoPath = "xxx/xx.png"
+            //};
+            //options.DefaultTheme = "";
         });
 
         // Configure AbpMultiTenancyOptions, this will affect login page that whether need to switch tenants
@@ -263,11 +243,6 @@ public class CRMBlazorWebModule : AbpModule
     {
         var env = context.GetEnvironment();
         var app = context.GetApplicationBuilder();
-
-        //if (env.IsDevelopment())
-        //{
-        //    app.UseDeveloperExceptionPage();
-        //}
 
         app.UseAbpRequestLocalization();
 

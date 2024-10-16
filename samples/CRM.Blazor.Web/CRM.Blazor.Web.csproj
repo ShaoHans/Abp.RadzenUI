@@ -15,12 +15,12 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\Abp.Blazor.Server.RadzenUI\Abp.Blazor.Server.RadzenUI.csproj" />
+		<!--<ProjectReference Include="..\..\src\Abp.Blazor.Server.RadzenUI\Abp.Blazor.Server.RadzenUI.csproj" />-->
 		<ProjectReference Include="..\CRM.Application.Contracts\CRM.Application.Contracts.csproj" />
 		<ProjectReference Include="..\CRM.Application\CRM.Application.csproj" />
 		<ProjectReference Include="..\CRM.HttpApi\CRM.HttpApi.csproj" />
 		<ProjectReference Include="..\CRM.EntityFrameworkCore\CRM.EntityFrameworkCore.csproj" />
-		<!--<PackageReference Include="AbpRadzen.Blazor.Server.UI" Version="0.0.2" />-->
+		<PackageReference Include="AbpRadzen.Blazor.Server.UI" Version="0.0.7" />
 		<PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
 		<PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
 		<PackageReference Include="IdentityModel" Version="6.2.0" />
