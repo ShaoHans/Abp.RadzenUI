@@ -1,6 +1,8 @@
 ﻿@using Microsoft.Extensions.Hosting
+@using Microsoft.Extensions.Options
 @inject IHostEnvironment Env
 @inject ThemeService ThemeService
+@inject IOptions<AbpRadzenUIOptions> AbpRadzenUIOptions
 
 <!DOCTYPE html>
 <html lang="en" dir="@(ThemeService.RightToLeft == true ? "rtl" : "ltr")">
@@ -11,7 +13,7 @@
     <link href="_content/AbpRadzen.Blazor.Server.UI/css/site.css" rel="stylesheet" />
     <HeadOutlet @rendermode="InteractiveServer" />
     <link rel="preload" href="_content/AbpRadzen.Blazor.Server.UI/fonts/MaterialSymbolsOutlined.woff2" as="font" type="font/woff2">
-    <RadzenTheme Theme="material3-dark" @rendermode="InteractiveServer" />
+    <RadzenTheme Theme="@AbpRadzenUIOptions.Value.DefaultTheme" @rendermode="InteractiveServer" />
 </head>
 <body class="rz-scrollbars">
     <Routes @rendermode="InteractiveServer" />

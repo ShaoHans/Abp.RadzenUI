@@ -4,6 +4,8 @@ namespace Abp.RadzenUI;
 
 public class AbpRadzenUIOptions
 {
+    public string DefaultTheme { get; set; } = "material-dark";
+
     public List<Assembly> RouterAdditionalAssemblies { get; set; } = [];
 
     public TitleBarSettings TitleBar { get; set; } = new();
