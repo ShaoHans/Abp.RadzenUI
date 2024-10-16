@@ -200,6 +200,8 @@ public class CRMBlazorWebModule : AbpModule
         {
             // this is very imporant to set current web application's pages to the AbpRadzenUI module
             options.RouterAdditionalAssemblies = [typeof(Home).Assembly];
+
+            // other settings
             //options.TitleBar = new TitleBarSettings
             //{
             //    ShowLanguageMenu = false,
@@ -209,7 +211,11 @@ public class CRMBlazorWebModule : AbpModule
             //{
             //    LogoPath = "xxx/xx.png"
             //};
-            //options.DefaultTheme = "";
+            //options.Theme = new ThemeSettings
+            //{
+            //    Default = "material",
+            //    EnablePremiumTheme = true,
+            //};
         });
 
         // Configure AbpMultiTenancyOptions, this will affect login page that whether need to switch tenants
@@ -275,11 +281,8 @@ public class CRMBlazorWebModule : AbpModule
         });
         app.UseAuditing();
         app.UseAbpSerilogEnrichers();
-        app.UseRadzen404Page();
-        app.UseConfiguredEndpoints(builder =>
-        {
-            // Use RadzenUI
-            builder.MapRadzenUI();
-        });
+
+        // use RadzenUI
+        app.UseRadzenUI();
     }
 }

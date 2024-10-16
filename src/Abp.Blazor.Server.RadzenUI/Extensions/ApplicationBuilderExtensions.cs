@@ -1,10 +1,16 @@
-﻿namespace Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Routing;
+
+namespace Microsoft.AspNetCore.Builder;
 
 public static class ApplicationBuilderExtensions
 {
-    public static IApplicationBuilder UseRadzen404Page(this IApplicationBuilder app)
+    public static IApplicationBuilder UseRadzenUI(this IApplicationBuilder app)
     {
         app.UseStatusCodePagesWithRedirects("/404");
+        app.UseConfiguredEndpoints(builder =>
+        {
+            builder.MapRadzenUI();
+        });
         return app;
     }
 }

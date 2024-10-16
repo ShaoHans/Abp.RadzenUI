@@ -4,13 +4,13 @@ namespace Abp.RadzenUI;
 
 public class AbpRadzenUIOptions
 {
-    public string DefaultTheme { get; set; } = "material-dark";
-
     public List<Assembly> RouterAdditionalAssemblies { get; set; } = [];
 
     public TitleBarSettings TitleBar { get; set; } = new();
 
     public LoginPageSettings LoginPage { get; set; } = new();
+
+    public ThemeSettings Theme { get; set; } = new();
 }
 
 public class LoginPageSettings
@@ -34,4 +34,11 @@ public class TitleBarSettings
     /// Whether to display multilingual menus
     /// </summary>
     public bool ShowLanguageMenu = true;
+}
+
+public class ThemeSettings
+{
+    public string Default { get; set; } = "material-dark";
+
+    public bool EnablePremiumTheme { get; set; } = false;
 }
