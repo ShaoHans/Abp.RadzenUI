@@ -280,10 +280,6 @@ public class CRMBlazorWebModule : AbpModule
         app.UseCorrelationId();
         app.UseRouting();
         app.UseStaticFiles();
-
-        // Use RadzenUI middleware with current web application's pages assembly
-        app.UseRadzenUI(typeof(Home).Assembly);
-
         app.UseAntiforgery();
         app.UseAbpSecurityHeaders();
         app.UseAuthentication();
@@ -304,6 +300,11 @@ public class CRMBlazorWebModule : AbpModule
         });
         app.UseAuditing();
         app.UseAbpSerilogEnrichers();
-        app.UseConfiguredEndpoints();
+        app.UseRadzen404Page();
+        app.UseConfiguredEndpoints(builder =>
+        {
+            // Use RadzenUI
+            builder.MapRadzenUI();
+        });
     }
 }
