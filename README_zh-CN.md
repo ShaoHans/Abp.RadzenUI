@@ -2,7 +2,7 @@
 
 <div align="center">
 
-Abp RadzenUI is a UI theme built on the Abp framework and developed using the Radzen Blazor component.
+Abp RadzenUI 是使用[Radzen Blazor](https://github.com/radzenhq/radzen-blazor)组件库开发的基于[ABP](https://github.com/abpframework/abp)框架的Blazor Server模式的UI主题.
 
 ![build](https://github.com/ShaoHans/Abp.RadzenUI/actions/workflows/publish-nuget.yml/badge.svg)
 [![AbpRadzen.Blazor.Server.UI](https://img.shields.io/nuget/v/AbpRadzen.Blazor.Server.UI.svg?color=red)](https://www.nuget.org/packages/AbpRadzen.Blazor.Server.UI/)
@@ -11,54 +11,54 @@ Abp RadzenUI is a UI theme built on the Abp framework and developed using the Ra
 
 </div>
 
-English | [简体中文](README_zh-CN.md)
+[English](README.md) | 简体中文
 
-## 🎨Page display
+## 🎨部分页面展示
 
-### 1.The login page
+### 1.登录页面
 ![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/login.png)
 
-### 2.The list page
+### 2.列表页面
 ![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/list.png)
 
-### 3.The other list page with datagrid filter
+### 3.带有Filter的列表页面
 ![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/list-with-filter.png)
 
-## 🌱How to use
+## 🌱如何集成
 
-### 1. Create new solution by abp cli
+### 1. 使用ABP CLI工具创建一个新的Abp Blazor Server应用，例如项目名称叫CRM
 ```shell
 abp new CRM -u blazor-server -dbms PostgreSQL -m none --theme leptonx-lite -csf
 ```
 
-### 2. Install `AbpRadzen.Blazor.Server.UI` on your `CRM.Blazor` project
+### 2. 在 `CRM.Blazor` 项目安装`AbpRadzen.Blazor.Server.UI`包
 ```shell
 dotnet add package AbpRadzen.Blazor.Server.UI
 ```
 
-### 3. Remove the nuget packages and code associated with the leptonx-lite theme
-This is mainly the code in the `CRMBlazorModule` class and delete files in the Pages directory
+### 3. 移除`CRM.Blazor`项目中与`leptonx-lite`主题相关的nuget包和代码
+主要是 `CRMBlazorModule` 类中的代码，删除`Pages`目录中自带的razor页面文件
 
-### 4. Config Abp RadzenUI
-Add the `ConfigureAbpRadzenUI` method on your `ConfigService` method
+### 4. 对 Abp RadzenUI 进行配置
+将 `ConfigureAbpRadzenUI` 方法添加到`ConfigService`方法中
 ```csharp
 private void ConfigureAbpRadzenUI()
 {
     // Configure AbpRadzenUI
     Configure<AbpRadzenUIOptions>(options =>
     {
-        // this is very imporant to set current web application's pages to the AbpRadzenUI module
+        // 这句代码很重要，它会将你在Blazor Web项目中新建的razor页面组件添加到Router中，这样就可以访问到了
         options.RouterAdditionalAssemblies = [typeof(Home).Assembly];
 
-        // other settings
+        // 配置页面标题栏
         //options.TitleBar = new TitleBarSettings
         //{
-        //    ShowLanguageMenu = false,
-        //    Title = "CRM"
+        //    ShowLanguageMenu = false, // 是否显示多语言按钮菜单
+        //    Title = "CRM" // 标题栏名称：一般是系统名称
         //};
         //options.LoginPage = new LoginPageSettings
         //{
-        //    LogoPath = "xxx/xx.png"
+        //    LogoPath = "xxx/xx.png" // 登录页面的logo图片
         //};
         //options.Theme = new ThemeSettings
         //{
@@ -67,7 +67,7 @@ private void ConfigureAbpRadzenUI()
         //};
     });
 
-    // Configure AbpMultiTenancyOptions, this will affect login page that whether need to switch tenants
+    // 多租户配置, 这个会影响到登录页面是否展示租户信息
     Configure<AbpMultiTenancyOptions>(options =>
     {
         options.IsEnabled = MultiTenancyConsts.IsEnabled;
@@ -76,18 +76,18 @@ private void ConfigureAbpRadzenUI()
     // Configure AbpLocalizationOptions
     Configure<AbpLocalizationOptions>(options =>
     {
-        // set AbpRadzenUIResource as BaseTypes for your application's localization resources
+        // 配置多语言资源，需要继承AbpRadzenUIResource，它包含了需要用到的多语言信息
         var crmResource = options.Resources.Get<CRMResource>();
         crmResource.AddBaseTypes(typeof(AbpRadzenUIResource));
 
-        // if you don't want to use the default language list, you can clear it and add your own languages
+        // 配置多语言菜单中显示的语言
         options.Languages.Clear();
         options.Languages.Add(new LanguageInfo("en", "en", "English"));
         options.Languages.Add(new LanguageInfo("fr", "fr", "Français"));
         options.Languages.Add(new LanguageInfo("zh-Hans", "zh-Hans", "简体中文"));
     });
 
-    // Configure your web application's navigation menu
+    // 配置侧边栏菜单
     Configure<AbpNavigationOptions>(options =>
     {
         options.MenuContributors.Add(new CRMMenuContributor());
@@ -95,14 +95,15 @@ private void ConfigureAbpRadzenUI()
 }
 ```
 
-then add the following code on your `OnApplicationInitialization` method
+最后在`OnApplicationInitialization`方法的最后添加以下代码，使用RadzenUI
 ```csharp
 app.UseRadzenUI();
 ```
 
-yuo can refer to the sample code [CRMBlazorWebModule](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/CRMBlazorWebModule.cs)
+关于更多的配置可以参考本项目的示例代码：[CRMBlazorWebModule](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/CRMBlazorWebModule.cs)
 
-### 5. Config Menu
-When you add razor page and need config menu , you should edit the [CRMMenuContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/Menus/CRMMenuContributor.cs) class 
+### 5. 配置侧边栏菜单
+当你添加了新的razor页面组件后，需要在[CRMMenuContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/Menus/CRMMenuContributor.cs)类文件中进行配置，这样它就会显示在页面的侧边栏菜单中
 
-### 6. Don't forget migrate your database when you first run the app
+### 6. 第一次运行示例程序的时候不要忘了执行迁移代码
+
