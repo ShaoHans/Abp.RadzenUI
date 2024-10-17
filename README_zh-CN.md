@@ -24,6 +24,9 @@ Abp RadzenUI 是使用[Radzen Blazor](https://github.com/radzenhq/radzen-blazor)
 ### 3.带有Filter的列表页面
 ![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/list-with-filter.png)
 
+### 4.其他主题
+![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/switch-theme.png)
+
 ## 🌱如何集成
 
 ### 1. 使用ABP CLI工具创建一个新的Abp Blazor Server应用，例如项目名称叫CRM
