@@ -24,6 +24,9 @@ English | [简体中文](README_zh-CN.md)
 ### 3.The other list page with datagrid filter
 ![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/list-with-filter.png)
 
+### 4.Theme switch
+![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/switch-theme.png)
+
 ## 🌱How to use
 
 ### 1. Create new solution by abp cli
