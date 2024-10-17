@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>Abp.RadzenUI</RootNamespace>
 		<PackageId>AbpRadzen.Blazor.Server.UI</PackageId>
-		<Version>0.0.8</Version>
+		<Version>0.0.9</Version>
 		<Authors>ShaoHans</Authors>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -27,21 +27,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="Radzen.Blazor" Version="5.3.0" />
-		<PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
-		<PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
-		<PackageReference Include="IdentityModel" Version="6.2.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.4" />
-		<PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="8.0.4" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.4" />
-		<PackageReference Include="Volo.Abp.AspNetCore.Authentication.JwtBearer" Version="8.3.0" />
-		<PackageReference Include="Volo.Abp.AspNetCore.Authentication.OpenIdConnect" Version="8.3.0" />
 		<PackageReference Include="Volo.Abp.AspNetCore.Components.Server" Version="8.3.0" />
 		<PackageReference Include="Volo.Abp.Autofac" Version="8.3.0" />
-		<PackageReference Include="Volo.Abp.Caching.StackExchangeRedis" Version="8.3.0" />
-		<PackageReference Include="Volo.Abp.AspNetCore.Mvc.UI.MultiTenancy" Version="8.3.0" />
-		<PackageReference Include="Volo.Abp.EntityFrameworkCore.PostgreSql" Version="8.3.0" />
-		<PackageReference Include="Volo.Abp.AspNetCore.Serilog" Version="8.3.0" />
-		<PackageReference Include="Volo.Abp.Swashbuckle" Version="8.3.0" />
 		<PackageReference Include="Volo.Abp.PermissionManagement.EntityFrameworkCore" Version="8.3.0" />
 		<PackageReference Include="Volo.Abp.SettingManagement.EntityFrameworkCore" Version="8.3.0" />
 		<PackageReference Include="Volo.Abp.AuditLogging.EntityFrameworkCore" Version="8.3.0" />
