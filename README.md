@@ -11,6 +11,8 @@ Abp RadzenUI is a UI theme built on the Abp framework and developed using the Ra
 
 </div>
 
+English | [简体中文](README_zh-CN.md)
+
 ## 🎨Page display
 
 ### 1.The login page
