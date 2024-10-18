@@ -2,7 +2,7 @@
 
 <div align="center">
 
-Abp RadzenUI is a UI theme built on the Abp framework and developed using the Radzen Blazor component.
+Abp RadzenUI is a UI theme built on the [Abp](https://github.com/abpframework/abp) framework and developed using the [Radzen Blazor](https://github.com/radzenhq/radzen-blazor) component.
 
 ![build](https://github.com/ShaoHans/Abp.RadzenUI/actions/workflows/publish-nuget.yml/badge.svg)
 [![AbpRadzen.Blazor.Server.UI](https://img.shields.io/nuget/v/AbpRadzen.Blazor.Server.UI.svg?color=red)](https://www.nuget.org/packages/AbpRadzen.Blazor.Server.UI/)
