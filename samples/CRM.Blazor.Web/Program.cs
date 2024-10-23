@@ -11,6 +11,7 @@ public class Program
         {
             Log.Information("Starting web host.");
             var builder = WebApplication.CreateBuilder(args);
+            builder.AddServiceDefaults();
             builder
                 .Host.AddAppSettingsSecretsJson()
                 .UseAutofac()
@@ -35,6 +36,7 @@ public class Program
                 );
             await builder.AddApplicationAsync<CRMBlazorWebModule>();
             var app = builder.Build();
+            app.MapDefaultEndpoints();
             await app.InitializeApplicationAsync();
             await app.RunAsync();
             return 0;
