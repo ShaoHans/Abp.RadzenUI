@@ -211,11 +211,10 @@ public class CRMBlazorWebModule : AbpModule
             //{
             //    LogoPath = "xxx/xx.png"
             //};
-            //options.Theme = new ThemeSettings
-            //{
-            //    Default = "material",
-            //    EnablePremiumTheme = true,
-            //};
+            options.Theme = new ThemeSettings
+            {
+                EnablePremiumTheme = true,
+            };
         });
 
         // Configure AbpMultiTenancyOptions, this will affect login page that whether need to switch tenants
