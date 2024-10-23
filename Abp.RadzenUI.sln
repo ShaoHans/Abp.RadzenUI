@@ -27,9 +27,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CRM.EntityFrameworkCore", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abp.Blazor.Server.RadzenUI", "src\Abp.Blazor.Server.RadzenUI\Abp.Blazor.Server.RadzenUI.csproj", "{FE78CA9C-B638-4A81-B1EB-A32C9DB79104}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abp.RadzenUI.AppHost", "samples\Abp.RadzenUI.AppHost\Abp.RadzenUI.AppHost.csproj", "{D2BB6D89-6656-4165-BD5B-CEE54932F5D0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRM.Aspire.AppHost", "samples\CRM.Aspire.AppHost\CRM.Aspire.AppHost.csproj", "{7B3E16CD-1547-4B68-ACB5-BE354D720D47}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abp.RadzenUI.ServiceDefaults", "samples\Abp.RadzenUI.ServiceDefaults\Abp.RadzenUI.ServiceDefaults.csproj", "{7459518F-A434-468C-ADE2-44067A7ACF7B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CRM.Aspire.ServiceDefaults", "samples\CRM.Aspire.ServiceDefaults\CRM.Aspire.ServiceDefaults.csproj", "{5A7D6CD5-6EED-4DF4-8253-5FDFD2BD0CAA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -77,14 +77,14 @@ Global
 		{FE78CA9C-B638-4A81-B1EB-A32C9DB79104}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE78CA9C-B638-4A81-B1EB-A32C9DB79104}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE78CA9C-B638-4A81-B1EB-A32C9DB79104}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D2BB6D89-6656-4165-BD5B-CEE54932F5D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D2BB6D89-6656-4165-BD5B-CEE54932F5D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D2BB6D89-6656-4165-BD5B-CEE54932F5D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D2BB6D89-6656-4165-BD5B-CEE54932F5D0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7459518F-A434-468C-ADE2-44067A7ACF7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7459518F-A434-468C-ADE2-44067A7ACF7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7459518F-A434-468C-ADE2-44067A7ACF7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7459518F-A434-468C-ADE2-44067A7ACF7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B3E16CD-1547-4B68-ACB5-BE354D720D47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B3E16CD-1547-4B68-ACB5-BE354D720D47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B3E16CD-1547-4B68-ACB5-BE354D720D47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B3E16CD-1547-4B68-ACB5-BE354D720D47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A7D6CD5-6EED-4DF4-8253-5FDFD2BD0CAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A7D6CD5-6EED-4DF4-8253-5FDFD2BD0CAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A7D6CD5-6EED-4DF4-8253-5FDFD2BD0CAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A7D6CD5-6EED-4DF4-8253-5FDFD2BD0CAA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -100,6 +100,8 @@ Global
 		{D1EBFCD4-EAC7-41F9-A295-A3086D3F47A9} = {1CDAD202-ED9B-4B3A-A0B6-9075F7885F4C}
 		{190A6C4C-FEF7-4952-8CEC-5B3B4E3454D0} = {1CDAD202-ED9B-4B3A-A0B6-9075F7885F4C}
 		{FE78CA9C-B638-4A81-B1EB-A32C9DB79104} = {10EF6EF4-D998-402D-A7E6-40C8308EED8C}
+		{7B3E16CD-1547-4B68-ACB5-BE354D720D47} = {1CDAD202-ED9B-4B3A-A0B6-9075F7885F4C}
+		{5A7D6CD5-6EED-4DF4-8253-5FDFD2BD0CAA} = {1CDAD202-ED9B-4B3A-A0B6-9075F7885F4C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {440DDE31-5D3A-4D00-934D-7A6E1F23132F}
