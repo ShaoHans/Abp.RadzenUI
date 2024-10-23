@@ -5,8 +5,8 @@
 <RadzenComponents />
 
 <RadzenLayout Style="grid-template-columns: auto 1fr auto; grid-template-areas: 'rz-header rz-header rz-header' 'rz-sidebar rz-body rz-config-sidebar'">
-    <Header MenuToggle="@(() => menuSidebarExpanded = !menuSidebarExpanded)"
-            ThemeToggle="@(() => themeSidebarExpanded = !themeSidebarExpanded)" />
+    <Header MenuToggle="ToggleMenu"
+            ThemeToggle="ToggleTheme" />
     <RadzenBody>
         <ChildContent>
             <RadzenContentContainer Name="main">
@@ -25,7 +25,9 @@
         </ChildContent>
     </RadzenBody>
     <MenuSiderbar @bind-SidebarExpanded="menuSidebarExpanded" />
-    <ThemeSiderbar @bind-SidebarExpanded="themeSidebarExpanded" />
+    <CascadingValue Value="themeSidebarExpanded" Name="SidebarExpanded">
+        <ThemeSiderbar  />
+    </CascadingValue>
 </RadzenLayout>
 
 @if (!rendered)
@@ -58,5 +60,15 @@
     protected override void OnParametersSet()
     {
         errorBoundary?.Recover();
+    }
+
+    private void ToggleMenu()
+    {
+        menuSidebarExpanded = !menuSidebarExpanded;
+    }
+
+    private void ToggleTheme()
+    {
+        themeSidebarExpanded = !themeSidebarExpanded;
     }
 }
