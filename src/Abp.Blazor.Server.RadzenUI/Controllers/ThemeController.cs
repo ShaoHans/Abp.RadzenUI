@@ -7,9 +7,9 @@ namespace Abp.RadzenUI.Controllers;
 public class ThemeController : AbpControllerBase
 {
     [HttpGet("/theme/switch")]
-    public IActionResult SwitchAsync(string theme, string returnUrl = "~/")
+    public IActionResult SwitchAsync(string value, string returnUrl = "~/")
     {
-        AbpRadzenUICookieHelper.SetThemeCookie(HttpContext, theme);
+        AbpRadzenUICookieHelper.SetThemeCookie(HttpContext, value);
         return Redirect(returnUrl);
     }
 }
