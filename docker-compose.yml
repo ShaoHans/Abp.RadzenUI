@@ -1,0 +1,6 @@
+﻿services:
+  crm.blazor.web:
+    image: crm.blazor.web
+    build:
+      context: .
+      dockerfile: samples/CRM.Blazor.Web/Dockerfile
