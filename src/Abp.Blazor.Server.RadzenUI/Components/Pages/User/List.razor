@@ -22,13 +22,13 @@
     </RadzenStack>
 </RadzenCard>
 
+@* Freeze Header： Style="height:calc(100vh - 160px)" *@
 <RadzenDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true"
-                PagerHorizontalAlign="HorizontalAlign.Center"
+                PagerHorizontalAlign="HorizontalAlign.Center"                 
                 PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
                 Count="@_totalCount" IsLoading="@_isLoading">
     <Columns>
-        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.Id)" Title="ID" Width="80px" Visible="false" />
-        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.UserName)" Title="@L["DisplayName:UserName"]" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.UserName)" Frozen="true" Title="@L["DisplayName:UserName"]" Width="160px" />
         <RadzenDataGridColumn Property="@nameof(IdentityUserDto.Email)" Title="@L["DisplayName:Email"]" Width="160px" />
         <RadzenDataGridColumn Property="@nameof(IdentityUserDto.PhoneNumber)" Title="@L["DisplayName:PhoneNumber"]" Width="160px" />
         <RadzenDataGridColumn Title="@L["DisplayName:IsActive"]" Width="60px" Filterable="false" Sortable="false">
@@ -42,7 +42,7 @@
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(IdentityUserDto.CreationTime)" Filterable="false" Title="@L["CreationTime"]" Width="160px" />
-        <RadzenDataGridColumn Title="@L["Actions"]" Width="160px" Filterable="false" Sortable="false">
+        <RadzenDataGridColumn Title="@L["Actions"]" Width="160px" Frozen="true" Filterable="false" Sortable="false">
             <Template>
                 @if (HasUpdatePermission)
                 {
