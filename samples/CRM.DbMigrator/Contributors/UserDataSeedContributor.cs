@@ -7,17 +7,21 @@ using Volo.Abp.Identity;
 
 namespace CRM.DbMigrator.Contributors;
 
-public class UserDataSeedContributor(IIdentityDataSeeder identityDataSeeder)
-    : IDataSeedContributor,
-        ITransientDependency
+public class UserDataSeedContributor(
+    IIdentityUserRepository repository,
+    IIdentityDataSeeder identityDataSeeder
+) : IDataSeedContributor, ITransientDependency
 {
-    protected IIdentityDataSeeder IdentityDataSeeder { get; } = identityDataSeeder;
-
     public async Task SeedAsync(DataSeedContext context)
     {
+        if (await repository.GetCountAsync() > 20)
+        {
+            return;
+        }
+
         foreach (var u in GetIdentityUsers())
         {
-            await IdentityDataSeeder.SeedAsync(u.Email, "1q2w3E*", null, u.UserName);
+            await identityDataSeeder.SeedAsync(u.Email, "1q2w3E*", null, u.UserName);
         }
     }
 
@@ -26,7 +30,7 @@ public class UserDataSeedContributor(IIdentityDataSeeder identityDataSeeder)
         return new Faker<UserModel>()
             .RuleFor(u => u.UserName, f => f.Person.UserName)
             .RuleFor(u => u.Email, f => f.Person.Email)
-            .Generate(400);
+            .Generate(168);
     }
 }
 

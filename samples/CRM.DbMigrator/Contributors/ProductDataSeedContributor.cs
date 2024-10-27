@@ -32,7 +32,7 @@ internal class ProductDataSeedContributor(IRepository<Product> repository)
             .RuleFor(p => p.Price, f => Convert.ToSingle(f.Commerce.Price()))
             .RuleFor(p => p.StockCount, f => f.Random.Int(0, 1000))
             .RuleFor(p => p.Status, f => f.PickRandom<ProductStatus>())
-            .RuleFor(p => p.CreationTime, f => date.AddSeconds(-f.Random.Int()))
+            .RuleFor(p => p.CreationTime, f => date.AddSeconds(-f.Random.Int(0, 1000000)))
             .Generate(700);
     }
 }
