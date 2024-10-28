@@ -16,8 +16,7 @@ jobs:
 
     steps:
     - name: Get current date
-      id: date
-      run: echo "::set-output name=today::$(date +'%Y-%m-%d_%H-%M')"
+      run: echo "::set-env name=today::$(date +'%Y-%m-%d_%H-%M')"
 
     - uses: actions/checkout@v4
     - name: Setup .NET
@@ -40,7 +39,7 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
     - name: Get Image Tag
-      run: echo "::set-env name=tag::${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_NAMESPACE }}/crmblazorweb:${{ steps.date.outputs.today }}"
+      run: echo "::set-env name=tag::${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_NAMESPACE }}/crmblazorweb:$today"
     - name: Docker Tag
       run: docker tag crmblazorweb $tag
     - name: Docker Push
