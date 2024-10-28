@@ -9,6 +9,7 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+COPY ["README.md", "."]
 COPY ["samples/CRM.Blazor.Web/CRM.Blazor.Web.csproj", "samples/CRM.Blazor.Web/"]
 COPY ["src/Abp.Blazor.Server.RadzenUI/Abp.Blazor.Server.RadzenUI.csproj", "src/Abp.Blazor.Server.RadzenUI/"]
 COPY ["samples/CRM.Application.Contracts/CRM.Application.Contracts.csproj", "samples/CRM.Application.Contracts/"]
