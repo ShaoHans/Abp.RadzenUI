@@ -10,7 +10,6 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["samples/CRM.Blazor.Web/CRM.Blazor.Web.csproj", "samples/CRM.Blazor.Web/"]
-COPY ["src/Abp.Blazor.Server.RadzenUI/Abp.Blazor.Server.RadzenUI.csproj", "src/Abp.Blazor.Server.RadzenUI/"]
 COPY ["samples/CRM.Application.Contracts/CRM.Application.Contracts.csproj", "samples/CRM.Application.Contracts/"]
 COPY ["samples/CRM.Domain.Shared/CRM.Domain.Shared.csproj", "samples/CRM.Domain.Shared/"]
 COPY ["samples/CRM.Application/CRM.Application.csproj", "samples/CRM.Application/"]
