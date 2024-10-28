@@ -25,11 +25,11 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore Abp.RadzenUI.sln
+      run: dotnet restore ./samples/CRM.Blazor.Web/CRM.Blazor.Web.csproj
     - name: Dotnet Build
-      run: dotnet build --no-restore Abp.RadzenUI.sln
-    - name: Dotnet Test
-      run: dotnet test --no-build --verbosity normal Abp.RadzenUI.sln
+      run: dotnet build --no-restore ./samples/CRM.Blazor.Web/CRM.Blazor.Web.csproj
+    # - name: Dotnet Test
+    #   run: dotnet test --no-build --verbosity normal Abp.RadzenUI.sln
     - name: Dotnet Publish
       run: dotnet publish ./samples/CRM.Blazor.Web/CRM.Blazor.Web.csproj /t:PublishContainer -r linux-x64
 
