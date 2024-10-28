@@ -6,14 +6,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>CRM.Blazor.Web</RootNamespace>
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+		<UserSecretsId>64c4627c-4e94-4b4f-97d8-49f7a3a2ce3d</UserSecretsId>
+		<DockerfileContext>..\..</DockerfileContext>
 	</PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="Logs\**" />
     <Content Remove="Logs\**" />
-    <Content Include="..\..\.dockerignore">
-      <Link>.dockerignore</Link>
-    </Content>
     <EmbeddedResource Remove="Logs\**" />
     <None Remove="Logs\**" />
   </ItemGroup>
@@ -25,6 +24,7 @@
 		<ProjectReference Include="..\CRM.Aspire.ServiceDefaults\CRM.Aspire.ServiceDefaults.csproj" />
 		<ProjectReference Include="..\CRM.HttpApi\CRM.HttpApi.csproj" />
 		<ProjectReference Include="..\CRM.EntityFrameworkCore\CRM.EntityFrameworkCore.csproj" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.20.1" />
 		<!--<PackageReference Include="AbpRadzen.Blazor.Server.UI" Version="0.0.7" />-->
 		<PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
 		<PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
