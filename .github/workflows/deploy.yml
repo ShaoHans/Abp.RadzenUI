@@ -40,7 +40,7 @@ jobs:
           context: .
           file: ./samples/CRM.Blazor.Web/Dockerfile
           push: true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/arm64
           tags: |
             ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_NAMESPACE }}/crm:${{ steps.date.outputs.today }}
             ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_NAMESPACE }}/crm:latest
