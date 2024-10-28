@@ -9,14 +9,14 @@
 		<Version>0.1.1</Version>
 		<Authors>ShaoHans</Authors>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<!--<PackageReadmeFile>README.md</PackageReadmeFile>-->
 		<PackageDescription>ABP framework theme developed using Radzen blazor components</PackageDescription>
 		<RepositoryUrl>https://github.com/ShaoHans/Abp-RadzenUI</RepositoryUrl>
 	</PropertyGroup>  
 
   <ItemGroup>
     <None Include="wwwroot\bootstrap\bootstrap.min.css.map" />
-		<None Include="..\..\README.md" Pack="true" PackagePath="."/>
+		<!--<None Include="..\..\README.md" Pack="true" PackagePath="."/>-->
   </ItemGroup>
 
 	<ItemGroup>
