@@ -6,6 +6,15 @@ on:
   #release:
   #  types: [created, published] # 表示在创建新的 Release 时触发
 
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+      tags:
+        description: 'Manual trigger deploy'
+
 jobs:
   build_docker:
     name: Build docker
