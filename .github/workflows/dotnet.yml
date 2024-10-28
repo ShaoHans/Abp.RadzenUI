@@ -45,7 +45,7 @@ jobs:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: true  
       run: echo "::set-env name=tag::${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_NAMESPACE }}/crmblazorweb:$today"
     - name: Docker Tag
-      run: docker tag crmblazorweb $tag
+      run: docker tag crm-blazor-web:latest $tag
     - name: Docker Push
       run: docker push $tag
       
