@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "CRM.DbMigrator": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}
