@@ -1,6 +1,39 @@
 ﻿services:
+  postgres:
+    image: postgres:16.2
+    restart: always
+    environment:
+      POSTGRES_DB: CRM
+      POSTGRES_PASSWORD: 2024@09$14&Start
+      POSTGRES_USER: root
+    volumes:
+      - /opt/crm_demo/postgres/data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      - crm-network
+
+  redis:
+    image: redis:7.2
+    restart: always
+    command: redis-server --requirepass 2024@09$14&Start
+    ports:
+      - 6379:6379
+    networks:
+      - crm-network
+
   crm.blazor.web:
-    image: crm.blazor.web
-    build:
-      context: .
-      dockerfile: samples/CRM.Blazor.Web/Dockerfile
+    image: registry.cn-hangzhou.aliyuncs.com/abp_radzenui_demo/crmblazorweb:202410291419
+    restart: always
+    depends_on:
+      - redis
+      - postgres
+    ports:
+      - 80:8080
+    networks:
+      - crm-network
+    
+
+networks:
+  crm-network:
+    driver: bridge
