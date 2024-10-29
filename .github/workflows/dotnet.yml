@@ -8,6 +8,15 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+      tags:
+        description: 'Manual trigger deploy'
 
 jobs:
   build:
@@ -18,7 +27,7 @@ jobs:
     - name: Get current date
       env:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-      run: echo "::set-env name=today::$(date +'%Y-%m-%d_%H-%M')"
+      run: echo "::set-env name=today::$(date +'%Y%m%d%H%M')"
 
     - uses: actions/checkout@v4
     - name: Setup .NET
