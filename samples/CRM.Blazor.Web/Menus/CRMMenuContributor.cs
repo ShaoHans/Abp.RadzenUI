@@ -1,8 +1,10 @@
 ﻿using CRM.Localization;
 using CRM.MultiTenancy;
+using CRM.Permissions;
 
 using Microsoft.Extensions.Localization;
 
+using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.UI.Navigation;
 
 using static Abp.RadzenUI.Menus.RadzenUI;
@@ -70,7 +72,7 @@ public class CRMMenuContributor : IMenuContributor
                 l["Menu:Product.List"],
                 "/products",
                 order: 1
-            )
+            ).RequirePermissions(CRMPermissions.Products.Default)
         );
 
         context.Menu.Items.Add(productMenu);
