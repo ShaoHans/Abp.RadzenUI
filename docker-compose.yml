@@ -23,7 +23,7 @@
       - crm-network
 
   crm.blazor.web:
-    image: registry.cn-hangzhou.aliyuncs.com/abp_radzenui_demo/crmblazorweb:202410291419
+    image: registry.cn-hangzhou.aliyuncs.com/abp_radzenui_demo/crmblazorweb:latest
     restart: always
     environment:
       ASPNETCORE_ENVIRONMENT: Production
