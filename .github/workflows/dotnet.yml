@@ -52,9 +52,13 @@ jobs:
     - name: Get Image Tag
       env:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: true  
-      run: echo "::set-env name=tag::${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_NAMESPACE }}/crmblazorweb:$today"
-    - name: Docker Tag
-      run: docker tag crm-blazor-web:latest $tag
-    - name: Docker Push
-      run: docker push $tag
+      run: echo "::set-env name=tag::${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_NAMESPACE }}/crmblazorweb"
+    - name: Docker Tag Today
+      run: docker tag crm-blazor-web:latest $tag:$today
+    - name: Docker Push Today Tag
+      run: docker push $tag:$today
+    - name: Docker Tag Latest
+      run: docker tag crm-blazor-web:latest $tag:latest
+    - name: Docker Push Latest Tag
+      run: docker push $tag:latest
       
