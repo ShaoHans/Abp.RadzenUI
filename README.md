@@ -13,6 +13,13 @@ Abp RadzenUI is a UI theme built on the [Abp](https://github.com/abpframework/ab
 
 English | [简体中文](README_zh-CN.md)
 
+## ❤️Demo Site
+[http://49.65.124.146:20103/](http://49.65.124.146:20103/)
+
+UserName:  **test**
+
+Password:  **1q2w#E***
+
 ## 🎨Page display
 
 ### 1.The login page
