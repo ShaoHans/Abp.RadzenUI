@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <None Include="wwwroot\bootstrap\bootstrap.min.css.map" />
-		<None Include="..\..\README.md" Pack="true" PackagePath="."/>
+		<None Include="..\..\README.md" Pack="true" PackagePath="." />
   </ItemGroup>
 
 	<ItemGroup>
@@ -45,5 +45,9 @@
 	<ItemGroup>
 		<EmbeddedResource Include="Localization\UI\*.json" />
 		<Content Remove="Localization\UI\*.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Permissions\" />
 	</ItemGroup>
 </Project>
