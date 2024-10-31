@@ -13,6 +13,13 @@ Abp RadzenUI 是使用[Radzen Blazor](https://github.com/radzenhq/radzen-blazor)
 
 [English](README.md) | 简体中文
 
+## ❤️体验地址
+[http://49.65.124.146:20103/](http://49.65.124.146:20103/)
+
+用户名:  **test**
+
+密码:  **1q2w#E***
+
 ## 🎨部分页面展示
 
 ### 1.登录页面
