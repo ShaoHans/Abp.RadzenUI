@@ -32,6 +32,10 @@
                     color = "rz-color-danger";
                 }
                 <RadzenLabel class="@color">@context.HttpStatusCode</RadzenLabel>
+                @if (!string.IsNullOrEmpty(context.Exceptions))
+                {
+                    <RadzenButton Icon="info" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.ExtraSmall" MouseEnter="@(args => ShowTooltip(args,context.Exceptions, new TooltipOptions(){ Position = TooltipPosition.Bottom, Duration = null}))" />
+                }
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(AuditLogDto.ExecutionTime)" Title="@L["ExecutionTime"]" Width="160px" />
