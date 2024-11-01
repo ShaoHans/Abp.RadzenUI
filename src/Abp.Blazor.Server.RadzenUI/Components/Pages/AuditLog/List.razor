@@ -4,6 +4,7 @@
 @using Abp.RadzenUI.Permissions
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize(RadzenUIPermissions.AuditLogs.Default)]
+@inject TooltipService TooltipService
 @inherits AbpCrudPageBase<IAuditLogAppService, AuditLogDto, Guid, GetAuditLogsInput, EmptyCreateDto, EmptyUpdateDto>
 
 <PageTitle>@L["AuditLogs"]</PageTitle>
@@ -17,8 +18,32 @@
         <RadzenDataGridColumn Property="@nameof(AuditLogDto.UserName)" Title="@L["UserName"]" Sortable="false" Width="100px" />
         <RadzenDataGridColumn Property="@nameof(AuditLogDto.ClientIpAddress)" Title="@L["ClientIpAddress"]" Sortable="false" Width="100px" />
         <RadzenDataGridColumn Property="@nameof(AuditLogDto.HttpMethod)" Title="@L["HttpMethod"]" Sortable="false" Width="100px" />
-        <RadzenDataGridColumn Property="@nameof(AuditLogDto.HttpStatusCode)" Title="@L["HttpStatusCode"]" Sortable="false" Width="100px" />
-        <RadzenDataGridColumn Property="@nameof(AuditLogDto.ExecutionTime)" Filterable="false" Title="@L["ExecutionTime"]" Width="160px" />
-        <RadzenDataGridColumn Property="@nameof(AuditLogDto.ExecutionDuration)" Filterable="false" Title="@L["ExecutionDuration"]" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(AuditLogDto.HttpStatusCode)" Title="@L["HttpStatusCode"]" Sortable="false" Width="100px" >
+            <Template>
+                @{
+                    var color = "rz-color-info";
+                }
+                @if (context.HttpStatusCode >= 200 && context.HttpStatusCode < 400)
+                {
+                    color = "rz-color-success";
+                }
+                else if (context.HttpStatusCode >= 400 && context.HttpStatusCode <= 503)
+                {
+                    color = "rz-color-danger";
+                }
+                <RadzenLabel class="@color">@context.HttpStatusCode</RadzenLabel>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(AuditLogDto.ExecutionTime)" Title="@L["ExecutionTime"]" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(AuditLogDto.ExecutionDuration)" Filterable="false" Sortable="false" Title="@L["ExecutionDuration"]" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(AuditLogDto.BrowserInfo)" Filterable="false" Sortable="false" Title="@L["BrowserInfo"]" Width="160px">
+            <Template>
+                <RadzenLabel MouseEnter="@(args => ShowTooltip(args, context.BrowserInfo, new TooltipOptions(){ Position = TooltipPosition.Left, Duration = null }))">@context.BrowserInfo</RadzenLabel>
+            </Template>
+        </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
+
+@code {
+    void ShowTooltip(ElementReference elementReference, string? text, TooltipOptions? options = null) => TooltipService.Open(elementReference, text ?? "Nothing", options);
+}
