@@ -46,8 +46,4 @@
 		<EmbeddedResource Include="Localization\UI\*.json" />
 		<Content Remove="Localization\UI\*.json" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Permissions\" />
-	</ItemGroup>
 </Project>
