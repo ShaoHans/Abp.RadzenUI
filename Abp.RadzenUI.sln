@@ -27,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CRM.EntityFrameworkCore", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abp.Blazor.Server.RadzenUI", "src\Abp.Blazor.Server.RadzenUI\Abp.Blazor.Server.RadzenUI.csproj", "{FE78CA9C-B638-4A81-B1EB-A32C9DB79104}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRM.Aspire.AppHost", "samples\CRM.Aspire.AppHost\CRM.Aspire.AppHost.csproj", "{7B3E16CD-1547-4B68-ACB5-BE354D720D47}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CRM.Aspire.AppHost", "samples\CRM.Aspire.AppHost\CRM.Aspire.AppHost.csproj", "{7B3E16CD-1547-4B68-ACB5-BE354D720D47}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CRM.Aspire.ServiceDefaults", "samples\CRM.Aspire.ServiceDefaults\CRM.Aspire.ServiceDefaults.csproj", "{5A7D6CD5-6EED-4DF4-8253-5FDFD2BD0CAA}"
 EndProject

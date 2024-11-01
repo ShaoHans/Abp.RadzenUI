@@ -1,9 +1,9 @@
-﻿namespace Abp.RadzenUI.Application.Contracts.AuditLogs;
+﻿using Volo.Abp.Application.Dtos;
 
-public class AuditLogDto
+namespace Abp.RadzenUI.Application.Contracts.AuditLogs;
+
+public class AuditLogDto : EntityDto<Guid>
 {
-    public Guid Id { get; set; }
-
     public string? UserName { get; set; }
 
     public string? TenantName { get; set; }

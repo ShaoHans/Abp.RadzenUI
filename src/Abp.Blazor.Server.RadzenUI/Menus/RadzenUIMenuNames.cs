@@ -17,4 +17,8 @@ public class RadzenUI
         public const string Tenants = GroupName + ".Tenants";
     }
 
+    public static class AuditLoggingMenuNames
+    {
+        public const string Default = "AuditLogging";
+    }
 }

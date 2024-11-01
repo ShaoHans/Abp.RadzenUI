@@ -12,6 +12,7 @@ using Volo.Abp.AspNetCore.Components.Web;
 using Volo.Abp.AspNetCore.Components.Web.Configuration;
 using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
+using Volo.Abp.AuditLogging.Localization;
 using Volo.Abp.Autofac;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.ExceptionHandling.Localization;
@@ -54,7 +55,8 @@ public class AbpRadzenUIModule : AbpModule
                 .AddBaseTypes(
                     typeof(AbpValidationResource),
                     typeof(AbpUiResource),
-                    typeof(AbpExceptionHandlingResource)
+                    typeof(AbpExceptionHandlingResource),
+                    typeof(AuditLoggingResource)
                 )
                 .AddVirtualJson("/Localization/UI");
         });
@@ -109,6 +111,7 @@ public class AbpRadzenUIModule : AbpModule
             options.MenuContributors.Add(new DefaultRadzenMenuContributor());
             options.MenuContributors.Add(new AbpIdentityMenuContributor());
             options.MenuContributors.Add(new AbpTenantMenuContributor());
+            options.MenuContributors.Add(new AuditLoggingMenuContributor());
         });
     }
 }
