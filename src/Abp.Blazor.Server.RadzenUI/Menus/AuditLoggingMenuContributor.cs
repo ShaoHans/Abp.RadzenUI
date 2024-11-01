@@ -1,4 +1,6 @@
-﻿using Volo.Abp.AuditLogging.Localization;
+﻿using Abp.RadzenUI.Permissions;
+using Volo.Abp.AuditLogging.Localization;
+using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.UI.Navigation;
 using static Abp.RadzenUI.Menus.RadzenUI;
 
@@ -22,7 +24,7 @@ public class AuditLoggingMenuContributor : IMenuContributor
             l["Menu:AuditLogging"],
             url: "/auditlogs",
             icon: "description"
-        );
+        ).RequirePermissions(RadzenUIPermissions.AuditLogs.Default);
         administrationMenu.AddItem(auditLoggingMenuItem);
         return Task.CompletedTask;
     }
