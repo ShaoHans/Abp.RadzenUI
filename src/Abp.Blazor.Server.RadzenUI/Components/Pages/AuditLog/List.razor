@@ -16,7 +16,11 @@
     <Columns>
         <RadzenDataGridColumn Property="@nameof(AuditLogDto.Url)" Title="@L["Url"]" Frozen="true" Sortable="false" />
         <RadzenDataGridColumn Property="@nameof(AuditLogDto.UserName)" Title="@L["UserName"]" Sortable="false" />
-        <RadzenDataGridColumn Property="@nameof(AuditLogDto.ClientIpAddress)" Title="@L["ClientIpAddress"]" Sortable="false" />
+        <RadzenDataGridColumn Property="@nameof(AuditLogDto.ClientIpAddress)" Title="@L["ClientIpAddress"]" Sortable="false">
+            <Template>
+                <RadzenLabel>@context.ClientIpAddress?.Replace("::ffff:","")</RadzenLabel>
+            </Template>
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(AuditLogDto.HttpMethod)" Title="@L["HttpMethod"]" Sortable="false" />
         <RadzenDataGridColumn Property="@nameof(AuditLogDto.HttpStatusCode)" Title="@L["HttpStatusCode"]" Sortable="false" >
             <Template>
@@ -38,7 +42,7 @@
                 }
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(AuditLogDto.ExecutionTime)" Title="@L["ExecutionTime"]" />
+        <RadzenDataGridColumn Property="@nameof(AuditLogDto.ExecutionTime)" Title="@L["ExecutionTime"]" Width="200px" />
         <RadzenDataGridColumn Property="@nameof(AuditLogDto.ExecutionDuration)" Filterable="false" Sortable="false" Title="@L["ExecutionDuration"]" />
         <RadzenDataGridColumn Property="@nameof(AuditLogDto.BrowserInfo)" Filterable="false" Sortable="false" Title="@L["BrowserInfo"]">
             <Template>
