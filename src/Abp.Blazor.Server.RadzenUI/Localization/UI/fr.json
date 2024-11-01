@@ -9,6 +9,7 @@
     "SwitchTenantHint": "Laissez le champ de nom vide pour passer du côté hôte.",
     "SwitchTenant": "Changer le Tenant",
     "NotSelected": "Non séléctionné",
-    "Permission:GroupName": "RadzenUI"
+    "Permission:GroupName": "RadzenUI",
+    "Permission:AuditLogs": "Journaux d'audit"
   }
 }

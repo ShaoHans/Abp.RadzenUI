@@ -9,6 +9,7 @@
     "SwitchTenantHint": "将名称字段留空以切换到主机端。",
     "SwitchTenant": "切换租户",
     "NotSelected": "未选择",
-    "Permission:GroupName": "RadzenUI"
+    "Permission:GroupName": "RadzenUI",
+    "Permission:AuditLogs": "审计日志"
   }
 }

@@ -9,6 +9,7 @@
     "SwitchTenantHint": "Leave the name field blank to switch to the host side.",
     "SwitchTenant": "Switch tenant",
     "NotSelected": "Not selected",
-    "Permission:GroupName": "RadzenUI"
+    "Permission:GroupName": "RadzenUI",
+    "Permission:AuditLogs": "AuditLogs"
   }
 }
