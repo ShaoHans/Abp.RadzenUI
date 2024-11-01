@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc;
+using Volo.Abp.Auditing;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.AspNetCore;
 
@@ -22,6 +23,7 @@ public class AccountController : AbpControllerBase
     }
 
     [HttpPost("/account/login")]
+    [DisableAuditing]
     public async Task<IActionResult> LoginAsync(string username, string password, bool rememberMe)
     {
         var result = await _signInManager.PasswordSignInAsync(username, password, rememberMe, true);
