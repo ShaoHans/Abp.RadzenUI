@@ -1,6 +1,10 @@
 ﻿@page "/"
+@using CRM.Github
+@using CRM.Github.Dtos
 @using Volo.Abp.AspNetCore.Components
 @inherits AbpComponentBase
+@inject GitHubClient GitHubClient
+
 <PageTitle>Home</PageTitle>
 
 @if (CurrentUser is null || !CurrentUser.IsAuthenticated)
@@ -11,5 +15,47 @@ else
 {
     <h1>Hello, <RadzenLink Path="/account/manage#PersonalInfo" Text="@CurrentUser.UserName" /></h1>
 
-    <p>Welcome to your new app.</p>
+    @* <p>Welcome to your new app.</p> *@
+}
+
+<RadzenText TextStyle="TextStyle.DisplayH5" TextAlign="TextAlign.Center">@repository.Description</RadzenText>
+<RadzenDataList WrapItems="true" AllowPaging="false" Data="@stargazers" TItem="RepositoryStargazerDto">
+    <Template Context="stargazer">
+        <RadzenCard Style="flex: 1;">
+            <RadzenStack AlignItems="AlignItems.Center" Gap="1rem">
+                <RadzenImage Path="@stargazer.User.AvatarUrl" Style="width: 80px; height: 80px; border-radius: 50%" AlternateText="@stargazer.User.UserName" />
+                <RadzenStack Gap="0">
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" TextAlign="TextAlign.Center">@stargazer.User.UserName</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2" TextAlign="TextAlign.Center">@stargazer.StarredAt</RadzenText>
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenCard>
+    </Template>
+</RadzenDataList>
+
+<RadzenPager Density="@Density" HorizontalAlign="HorizontalAlign.Center" Count="@repository.StargazersCount" PageSize="@pageSize" PageNumbersCount="6" PageChanged="@PageChanged" />
+
+@code {
+    Density Density = Density.Compact;
+    int pageSize = 5;
+    List<RepositoryStargazerDto> stargazers = [];
+    RepositoryDto repository = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        repository = await GitHubClient.GetRepositoryAsync();
+        stargazers = await GetStargazersAsync(0, pageSize);
+    }
+
+    async Task PageChanged(PagerEventArgs args)
+    {
+        stargazers = await GetStargazersAsync(args.Skip, args.Top);
+    }
+
+    async Task<List<RepositoryStargazerDto>> GetStargazersAsync(int skip, int take)
+    {
+        return await GitHubClient.GetRepositoryStargazersAsync(take, (skip / take) + 1);
+    }
 }

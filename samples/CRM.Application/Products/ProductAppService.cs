@@ -29,7 +29,7 @@ public class ProductAppService
         UpdatePolicyName = CRMPermissions.Products.Update;
         DeletePolicyName = CRMPermissions.Products.Delete;
     }
-
+    
     public override async Task<ProductDto> CreateAsync(CreateProductDto input)
     {
         if (await Repository.CountAsync(x => x.Code == input.Code) > 0)

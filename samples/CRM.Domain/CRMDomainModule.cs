@@ -1,21 +1,22 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using System;
 using CRM.Localization;
 using CRM.MultiTenancy;
-using Volo.Abp.Localization;
-using Volo.Abp.Modularity;
-using Volo.Abp.MultiTenancy;
-using Volo.Abp.PermissionManagement.Identity;
-using Volo.Abp.SettingManagement;
-using Volo.Abp.BlobStoring.Database;
-using Volo.Abp.Caching;
-using Volo.Abp.OpenIddict;
-using Volo.Abp.PermissionManagement.OpenIddict;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Volo.Abp.AuditLogging;
 using Volo.Abp.BackgroundJobs;
+using Volo.Abp.BlobStoring.Database;
+using Volo.Abp.Caching;
 using Volo.Abp.Emailing;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity;
+using Volo.Abp.Localization;
+using Volo.Abp.Modularity;
+using Volo.Abp.MultiTenancy;
+using Volo.Abp.OpenIddict;
+using Volo.Abp.PermissionManagement.Identity;
+using Volo.Abp.PermissionManagement.OpenIddict;
+using Volo.Abp.SettingManagement;
 using Volo.Abp.TenantManagement;
 
 namespace CRM;
@@ -34,7 +35,7 @@ namespace CRM;
     typeof(AbpOpenIddictDomainModule),
     typeof(AbpTenantManagementDomainModule),
     typeof(BlobStoringDatabaseDomainModule)
-    )]
+)]
 public class CRMDomainModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
@@ -64,10 +65,20 @@ public class CRMDomainModule : AbpModule
             options.Languages.Add(new LanguageInfo("de-DE", "de-DE", "Deutsch"));
             options.Languages.Add(new LanguageInfo("es", "es", "Español"));
         });
-        
 
 #if DEBUG
         context.Services.Replace(ServiceDescriptor.Singleton<IEmailSender, NullEmailSender>());
 #endif
+
+        context.Services.AddHttpClient(
+            "GitHub",
+            httpClient =>
+            {
+                httpClient.BaseAddress = new Uri("https://api.github.com");
+                httpClient.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
+                httpClient.DefaultRequestHeaders.Add("User-Agent", "HttpRequestsSample");
+                httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer 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");
+            }
+        );
     }
 }
