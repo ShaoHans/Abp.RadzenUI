@@ -3,6 +3,7 @@ using CRM.Localization;
 using CRM.MultiTenancy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Volo.Abp;
 using Volo.Abp.AuditLogging;
 using Volo.Abp.BackgroundJobs;
 using Volo.Abp.BlobStoring.Database;
@@ -40,6 +41,9 @@ public class CRMDomainModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
+        var configuration = context.Services.GetConfiguration();
+        var environment = context.Services.GetAbpHostEnvironment();
+
         Configure<AbpMultiTenancyOptions>(options =>
         {
             options.IsEnabled = MultiTenancyConsts.IsEnabled;
@@ -76,7 +80,16 @@ public class CRMDomainModule : AbpModule
             {
                 httpClient.BaseAddress = new Uri("https://api.github.com");
                 httpClient.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
-                httpClient.DefaultRequestHeaders.Add("User-Agent", "HttpRequestsSample");
+                if (environment.IsDevelopment())
+                {
+                    // 调用github api接口会有频率限制
+                    httpClient.DefaultRequestHeaders.Add("User-Agent", "HttpRequestsSample");
+                }
+                else
+                {
+                    // 生产环境使用自己的GitHub账号生成的Token，可以无限调用github api接口
+                    httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {configuration["GitHub:Token"]}");
+                }
             }
         );
     }
