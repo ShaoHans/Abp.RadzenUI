@@ -18,6 +18,7 @@ public class GitHubClient(IHttpClientFactory httpClientFactory, ILogger<GitHubCl
     {
         try
         {
+            logger.LogInformation("GitHub Token is {0}",_httpClient.DefaultRequestHeaders.Authorization?.ToString());
             return await _httpClient.GetFromJsonAsync<RepositoryDto>("/repos/ShaoHans/Abp.RadzenUI")
                 ?? new();
         }
@@ -35,6 +36,7 @@ public class GitHubClient(IHttpClientFactory httpClientFactory, ILogger<GitHubCl
     {
         try
         {
+            logger.LogInformation("GitHub Token is {0}", _httpClient.DefaultRequestHeaders.Authorization?.ToString());
             _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "application/vnd.github.star+json");
             return (
                     await _httpClient.GetFromJsonAsync<List<RepositoryStargazerDto>>(
