@@ -77,7 +77,7 @@ public class CRMDomainModule : AbpModule
                 httpClient.BaseAddress = new Uri("https://api.github.com");
                 httpClient.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
                 httpClient.DefaultRequestHeaders.Add("User-Agent", "HttpRequestsSample");
-                httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer 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");
+                //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer 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");
             }
         );
     }
