@@ -7,7 +7,7 @@
 
 <PageTitle>Home</PageTitle>
 
-@if (CurrentUser is null || !CurrentUser.IsAuthenticated)
+@* @if (CurrentUser is null || !CurrentUser.IsAuthenticated)
 {
     <p>You are not logged in yet, please <RadzenLink Icon="login" Path="/login">log in</RadzenLink></p>
 }
@@ -15,18 +15,20 @@ else
 {
     <h1>Hello, <RadzenLink Path="/account/manage#PersonalInfo" Text="@CurrentUser.UserName" /></h1>
 
-    @* <p>Welcome to your new app.</p> *@
-}
+    <p>Welcome to your new app.</p>
+} *@
 
 <RadzenText TextStyle="TextStyle.DisplayH5" TextAlign="TextAlign.Center">@repository.Description</RadzenText>
 <RadzenDataList WrapItems="true" AllowPaging="false" Data="@stargazers" TItem="RepositoryStargazerDto">
     <Template Context="stargazer">
-        <RadzenCard Style="flex: 1;">
+        <RadzenCard Style="width:300px;">
             <RadzenStack AlignItems="AlignItems.Center" Gap="1rem">
                 <RadzenImage Path="@stargazer.User.AvatarUrl" Style="width: 80px; height: 80px; border-radius: 50%" AlternateText="@stargazer.User.UserName" />
                 <RadzenStack Gap="0">
-                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" TextAlign="TextAlign.Center">@stargazer.User.UserName</RadzenText>
-                    <RadzenText TextStyle="TextStyle.Body2" TextAlign="TextAlign.Center">@stargazer.StarredAt</RadzenText>
+                    <div class="rz-text-align-center">
+                        <RadzenLink Path="@stargazer.User.HomePageUrl" Target="_blank" Text="@stargazer.User.UserName" />
+                    </div>
+                    <RadzenText TextStyle="TextStyle.Body2" TextAlign="TextAlign.Center">Starred At:@stargazer.StarredAt</RadzenText>
                 </RadzenStack>
             </RadzenStack>
         </RadzenCard>
@@ -37,7 +39,7 @@ else
 
 @code {
     Density Density = Density.Compact;
-    int pageSize = 5;
+    int pageSize = 12;
     List<RepositoryStargazerDto> stargazers = [];
     RepositoryDto repository = new();
 
