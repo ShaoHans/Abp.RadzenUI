@@ -20,6 +20,6 @@ public class RepositoryStargazerUserDto
     [JsonPropertyName("avatar_url")]
     public string AvatarUrl { get; set; } = string.Empty;
 
-    [JsonPropertyName("url")]
-    public string HomePageUrl { get; set; } = string.Empty;
+    [JsonPropertyName("home_url")]
+    public string HomeUrl { get; set; } = string.Empty;
 }
