@@ -80,10 +80,12 @@ public class CRMDomainModule : AbpModule
             {
                 httpClient.BaseAddress = new Uri("https://api.github.com");
                 httpClient.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
+                httpClient.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
                 if (environment.IsDevelopment())
                 {
                     // 调用github api接口会有频率限制
-                    httpClient.DefaultRequestHeaders.Add("User-Agent", "HttpRequestsSample");
+                    //httpClient.DefaultRequestHeaders.Add("User-Agent", "HttpRequestsSample");
+                    httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {configuration["GitHub:Token"]}");
                 }
                 else
                 {
