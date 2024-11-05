@@ -79,6 +79,7 @@ public class CRMDomainModule : AbpModule
             httpClient =>
             {
                 httpClient.BaseAddress = new Uri("https://api.github.com");
+                httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36");
                 httpClient.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
                 httpClient.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
                 if (environment.IsDevelopment())
