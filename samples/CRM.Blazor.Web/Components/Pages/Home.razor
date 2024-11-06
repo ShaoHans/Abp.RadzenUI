@@ -9,9 +9,9 @@
 
 <RadzenText TextStyle="TextStyle.DisplayH5" TextAlign="TextAlign.Center">@repository.Description</RadzenText>
 
-<RadzenTabs>
+<RadzenTabs Change="TabChanged">
     <Tabs>
-        <RadzenTabsItem Text="Welcome">
+        <RadzenTabsItem Text="Welcome" >
             @if (CurrentUser is null || !CurrentUser.IsAuthenticated)
             {
                 <p>You are not logged in yet, please <RadzenLink Icon="login" Path="/login">log in</RadzenLink></p>
@@ -45,7 +45,7 @@
 
         <RadzenTabsItem Text="@($"Commits({commitCount})")">
             <RadzenDataGrid ColumnWidth="150px" TItem="CommitDto" AllowPaging="true" Style="height:calc(100vh - 160px)"
-                Count="@commitCount" PageSize="20" Data="@commits" LoadData="@LoadCommits">
+                            IsLoading="isLoading" Count="@commitCount" PageSize="20" Data="@commits" LoadData="@LoadCommits">
                 <Columns>
                     <RadzenDataGridColumn Property="@nameof(CommitDto.Committer.AvatarUrl)" Title="Avatar" Sortable="false" Filterable="false" Width="80px">
                         <Template Context="data">
@@ -81,33 +81,48 @@
     RepositoryDto repository = new();
     bool isLoading = true;
     int commitCount = 0;
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
         repository = await GitHubClient.GetRepositoryAsync();
-        stargazers = await GetStargazersAsync(0, pageSize);
-        commits = await GitHubClient.GetRepositoryCommitsAsync();
         commitCount = await GitHubClient.GetRepositoryCommitCountAsync();
     }
 
     async Task PageChanged(PagerEventArgs args)
     {
-        stargazers = await GetStargazersAsync(args.Skip, args.Top);
+        await GetStargazersAsync(args.Skip, args.Top);
     }
 
-    async Task<List<RepositoryStargazerDto>> GetStargazersAsync(int skip, int take)
+    async Task GetStargazersAsync(int skip, int take)
     {
         isLoading = true;
-        var result = await GitHubClient.GetRepositoryStargazersAsync(take, (skip / take) + 1);
+        stargazers = await GitHubClient.GetRepositoryStargazersAsync(take, (skip / take) + 1);
         isLoading = false;
-        return result;
     }
 
     async Task LoadCommits(LoadDataArgs args)
     {
+        isLoading = true;
         var skip = args.Skip ?? 0;
         var take = args.Top ?? 20;
         commits = await GitHubClient.GetRepositoryCommitsAsync(take, (skip / take) + 1);
+        isLoading = false;
+    }
+
+    async Task TabChanged(int index)
+    {
+        switch(index)
+        {
+            case 0:
+                break;
+            case 1:
+                await GetStargazersAsync(0, pageSize);
+                break;
+            case 2:
+                await LoadCommits(new LoadDataArgs());
+                break;
+        }
     }
 }
