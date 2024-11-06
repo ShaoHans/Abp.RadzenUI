@@ -40,6 +40,33 @@ else
             </RadzenDataList>
             <RadzenPager Density="@Density" HorizontalAlign="HorizontalAlign.Center" Count="@repository.StargazersCount" PageSize="@pageSize" PageNumbersCount="6" PageChanged="@PageChanged" />
         </RadzenTabsItem>
+
+        <RadzenTabsItem Text="Commits(186)">
+            <RadzenDataGrid ColumnWidth="150px" TItem="CommitDto" AllowFiltering="true" AllowPaging="true" Count="186" PageSize="20" AllowSorting="true" Data="@commits">
+                <Columns>
+                    <RadzenDataGridColumn Property="@nameof(CommitDto.Committer.AvatarUrl)" Title="Photo" Sortable="false" Filterable="false" Width="80px">
+                        <Template Context="data">
+                            <RadzenImage Path="@data.Committer.AvatarUrl" Style="width: 40px; height: 40px; border-radius: 8px;" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Property="@nameof(CommitDto.Commit.Committer.Name)" Title="Name">
+                        <Template Context="data">
+                            @data.Commit.Committer.Name
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Property="@nameof(CommitDto.Commit.Message)" Title="Message">
+                        <Template Context="data">
+                            <RadzenLink Path="@data.HtmlUrl" Target="_blank">@data.Commit.Message</RadzenLink>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Property="@nameof(CommitDto.Commit.Committer.Date)" Title="Date">
+                        <Template Context="data">
+                            @data.Commit.Committer.Date
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenTabsItem>
     </Tabs>
 </RadzenTabs>
 
@@ -47,6 +74,7 @@ else
     Density Density = Density.Compact;
     int pageSize = 12;
     List<RepositoryStargazerDto> stargazers = [];
+    List<CommitDto> commits = [];
     RepositoryDto repository = new();
     bool isLoading = true;
     protected override async Task OnInitializedAsync()
@@ -55,6 +83,7 @@ else
 
         repository = await GitHubClient.GetRepositoryAsync();
         stargazers = await GetStargazersAsync(0, pageSize);
+        commits = await GitHubClient.GetRepositoryCommitsAsync();
     }
 
     async Task PageChanged(PagerEventArgs args)

@@ -10,6 +10,9 @@ public class CommitDto
 
     [JsonPropertyName("committer")]
     public OutCommitterDto Committer { get; set; } = default!;
+
+    [JsonPropertyName("html_url")]
+    public string HtmlUrl { get; set; } = string.Empty;
 }
 
 public class CommitDetailDto
