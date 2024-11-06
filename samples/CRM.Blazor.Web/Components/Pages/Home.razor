@@ -41,10 +41,10 @@ else
             <RadzenPager Density="@Density" HorizontalAlign="HorizontalAlign.Center" Count="@repository.StargazersCount" PageSize="@pageSize" PageNumbersCount="6" PageChanged="@PageChanged" />
         </RadzenTabsItem>
 
-        <RadzenTabsItem Text="Commits(186)">
-            <RadzenDataGrid ColumnWidth="150px" TItem="CommitDto" AllowFiltering="true" AllowPaging="true" Count="186" PageSize="20" AllowSorting="true" Data="@commits">
+        <RadzenTabsItem Text="Commits(86)">
+            <RadzenDataGrid ColumnWidth="150px" TItem="CommitDto" AllowPaging="true" Count="86" PageSize="20" Data="@commits" LoadData="@LoadCommits">
                 <Columns>
-                    <RadzenDataGridColumn Property="@nameof(CommitDto.Committer.AvatarUrl)" Title="Photo" Sortable="false" Filterable="false" Width="80px">
+                    <RadzenDataGridColumn Property="@nameof(CommitDto.Committer.AvatarUrl)" Title="Avatar" Sortable="false" Filterable="false" Width="80px">
                         <Template Context="data">
                             <RadzenImage Path="@data.Committer.AvatarUrl" Style="width: 40px; height: 40px; border-radius: 8px;" />
                         </Template>
@@ -97,5 +97,12 @@ else
         var result = await GitHubClient.GetRepositoryStargazersAsync(take, (skip / take) + 1);
         isLoading = false;
         return result;
+    }
+
+    async Task LoadCommits(LoadDataArgs args)
+    {
+        var skip = args.Skip ?? 0;
+        var take = args.Top ?? 20;
+        commits = await GitHubClient.GetRepositoryCommitsAsync(take, (skip / take) + 1);
     }
 }
