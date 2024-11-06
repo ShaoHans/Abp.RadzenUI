@@ -82,17 +82,7 @@ public class CRMDomainModule : AbpModule
                 httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36");
                 httpClient.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
                 httpClient.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
-                if (environment.IsDevelopment())
-                {
-                    // 调用github api接口会有频率限制
-                    httpClient.DefaultRequestHeaders.Add("User-Agent", "HttpRequestsSample");
-                    httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {configuration["GitHub:Token"]}");
-                }
-                else
-                {
-                    // 生产环境使用自己的GitHub账号生成的Token，可以无限调用github api接口
-                    httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {configuration["GitHub:Token"]}");
-                }
+                httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {configuration["GitHub:Token"]}");
             }
         );
     }

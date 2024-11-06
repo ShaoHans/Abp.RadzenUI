@@ -61,7 +61,7 @@ else
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn Property="@nameof(CommitDto.Commit.Committer.Date)" Title="Date">
                         <Template Context="data">
-                            @data.Commit.Committer.Date
+                            @data.Commit.Committer.Date.ToLocalTime()
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
