@@ -19,7 +19,7 @@ else
 } *@
 
 <RadzenText TextStyle="TextStyle.DisplayH5" TextAlign="TextAlign.Center">@repository.Description</RadzenText>
-<RadzenDataList WrapItems="true" AllowPaging="false" Data="@stargazers" TItem="RepositoryStargazerDto">
+<RadzenDataList WrapItems="true" AllowPaging="false" IsLoading="@isLoading" Data="@stargazers" TItem="RepositoryStargazerDto">
     <Template Context="stargazer">
         <RadzenCard Style="width:300px;">
             <RadzenStack AlignItems="AlignItems.Center" Gap="1rem">
@@ -42,7 +42,7 @@ else
     int pageSize = 12;
     List<RepositoryStargazerDto> stargazers = [];
     RepositoryDto repository = new();
-
+    bool isLoading = true;
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
@@ -58,6 +58,9 @@ else
 
     async Task<List<RepositoryStargazerDto>> GetStargazersAsync(int skip, int take)
     {
-        return await GitHubClient.GetRepositoryStargazersAsync(take, (skip / take) + 1);
+        isLoading = true;
+        var result = await GitHubClient.GetRepositoryStargazersAsync(take, (skip / take) + 1);
+        isLoading = false;
+        return result;
     }
 }
