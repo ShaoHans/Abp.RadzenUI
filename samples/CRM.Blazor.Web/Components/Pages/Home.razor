@@ -19,23 +19,29 @@ else
 } *@
 
 <RadzenText TextStyle="TextStyle.DisplayH5" TextAlign="TextAlign.Center">@repository.Description</RadzenText>
-<RadzenDataList WrapItems="true" AllowPaging="false" IsLoading="@isLoading" Data="@stargazers" TItem="RepositoryStargazerDto">
-    <Template Context="stargazer">
-        <RadzenCard Style="width:300px;">
-            <RadzenStack AlignItems="AlignItems.Center" Gap="1rem">
-                <RadzenImage Path="@stargazer.User.AvatarUrl" Style="width: 80px; height: 80px; border-radius: 50%" AlternateText="@stargazer.User.UserName" />
-                <RadzenStack Gap="0">
-                    <div class="rz-text-align-center">
-                        <RadzenLink Path="@stargazer.User.HomeUrl" Target="_blank" Text="@stargazer.User.UserName" />
-                    </div>
-                    <RadzenText TextStyle="TextStyle.Body2" TextAlign="TextAlign.Center">Starred At:@stargazer.StarredAt</RadzenText>
-                </RadzenStack>
-            </RadzenStack>
-        </RadzenCard>
-    </Template>
-</RadzenDataList>
 
-<RadzenPager Density="@Density" HorizontalAlign="HorizontalAlign.Center" Count="@repository.StargazersCount" PageSize="@pageSize" PageNumbersCount="6" PageChanged="@PageChanged" />
+<RadzenTabs>
+    <Tabs>
+        <RadzenTabsItem Text="@($"Stars({repository.StargazersCount})")">
+            <RadzenDataList WrapItems="true" AllowPaging="false" IsLoading="@isLoading" Data="@stargazers" TItem="RepositoryStargazerDto">
+                <Template Context="stargazer">
+                    <RadzenCard Style="width:300px;">
+                        <RadzenStack AlignItems="AlignItems.Center" Gap="1rem">
+                            <RadzenImage Path="@stargazer.User.AvatarUrl" Style="width: 80px; height: 80px; border-radius: 50%" AlternateText="@stargazer.User.UserName" />
+                            <RadzenStack Gap="0">
+                                <div class="rz-text-align-center">
+                                    <RadzenLink Path="@stargazer.User.HomeUrl" Target="_blank" Text="@stargazer.User.UserName" />
+                                </div>
+                                <RadzenText TextStyle="TextStyle.Body2" TextAlign="TextAlign.Center">Starred At:@stargazer.StarredAt</RadzenText>
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenCard>
+                </Template>
+            </RadzenDataList>
+            <RadzenPager Density="@Density" HorizontalAlign="HorizontalAlign.Center" Count="@repository.StargazersCount" PageSize="@pageSize" PageNumbersCount="6" PageChanged="@PageChanged" />
+        </RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>
 
 @code {
     Density Density = Density.Compact;
