@@ -50,4 +50,24 @@ public class GitHubClient(IHttpClientFactory httpClientFactory, ILogger<GitHubCl
             return [];
         }
     }
+
+    public async Task<List<CommitDto>> GetRepositoryCommitsAsync(
+        int pageSize = 20,
+        int pageNumber = 1
+    )
+    {
+        try
+        {
+            return (
+                    await _httpClient.GetFromJsonAsync<List<CommitDto>>(
+                        $"/repos/ShaoHans/Abp.RadzenUI/commits?per_page={pageSize}&page={pageNumber}"
+                    )
+                ) ?? [];
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "get repos commits occur exception");
+            return [];
+        }
+    }
 }
