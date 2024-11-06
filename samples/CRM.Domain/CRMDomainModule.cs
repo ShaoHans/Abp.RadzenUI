@@ -86,6 +86,7 @@ public class CRMDomainModule : AbpModule
                 {
                     // 调用github api接口会有频率限制
                     httpClient.DefaultRequestHeaders.Add("User-Agent", "HttpRequestsSample");
+                    httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {configuration["GitHub:Token"]}");
                 }
                 else
                 {

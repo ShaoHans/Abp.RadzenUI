@@ -41,8 +41,8 @@ else
             <RadzenPager Density="@Density" HorizontalAlign="HorizontalAlign.Center" Count="@repository.StargazersCount" PageSize="@pageSize" PageNumbersCount="6" PageChanged="@PageChanged" />
         </RadzenTabsItem>
 
-        <RadzenTabsItem Text="Commits(86)">
-            <RadzenDataGrid ColumnWidth="150px" TItem="CommitDto" AllowPaging="true" Count="86" PageSize="20" Data="@commits" LoadData="@LoadCommits">
+        <RadzenTabsItem Text="@($"Commits({commitCount})")">
+            <RadzenDataGrid ColumnWidth="150px" TItem="CommitDto" AllowPaging="true" Count="@commitCount" PageSize="20" Data="@commits" LoadData="@LoadCommits">
                 <Columns>
                     <RadzenDataGridColumn Property="@nameof(CommitDto.Committer.AvatarUrl)" Title="Avatar" Sortable="false" Filterable="false" Width="80px">
                         <Template Context="data">
@@ -77,6 +77,7 @@ else
     List<CommitDto> commits = [];
     RepositoryDto repository = new();
     bool isLoading = true;
+    int commitCount = 0;
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
@@ -84,6 +85,7 @@ else
         repository = await GitHubClient.GetRepositoryAsync();
         stargazers = await GetStargazersAsync(0, pageSize);
         commits = await GitHubClient.GetRepositoryCommitsAsync();
+        commitCount = await GitHubClient.GetRepositoryCommitCountAsync();
     }
 
     async Task PageChanged(PagerEventArgs args)

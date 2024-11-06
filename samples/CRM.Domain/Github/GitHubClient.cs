@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CRM.Github.Dtos;
+using Microsoft.Extensions.FileSystemGlobbing.Internal;
 using Microsoft.Extensions.Logging;
 using Volo.Abp.DependencyInjection;
 
@@ -18,7 +21,10 @@ public class GitHubClient(IHttpClientFactory httpClientFactory, ILogger<GitHubCl
     {
         try
         {
-            logger.LogInformation("GitHub Token is {0}",_httpClient.DefaultRequestHeaders.Authorization?.ToString());
+            logger.LogInformation(
+                "GitHub Token is {0}",
+                _httpClient.DefaultRequestHeaders.Authorization?.ToString()
+            );
             return await _httpClient.GetFromJsonAsync<RepositoryDto>("/repos/ShaoHans/Abp.RadzenUI")
                 ?? new();
         }
@@ -36,8 +42,14 @@ public class GitHubClient(IHttpClientFactory httpClientFactory, ILogger<GitHubCl
     {
         try
         {
-            logger.LogInformation("GitHub Token is {0}", _httpClient.DefaultRequestHeaders.Authorization?.ToString());
-            _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "application/vnd.github.star+json");
+            logger.LogInformation(
+                "GitHub Token is {0}",
+                _httpClient.DefaultRequestHeaders.Authorization?.ToString()
+            );
+            _httpClient.DefaultRequestHeaders.TryAddWithoutValidation(
+                "Accept",
+                "application/vnd.github.star+json"
+            );
             return (
                     await _httpClient.GetFromJsonAsync<List<RepositoryStargazerDto>>(
                         $"/repos/ShaoHans/Abp.RadzenUI/stargazers?per_page={pageSize}&page={pageNumber}&sort=starred&direction=desc"
@@ -68,6 +80,28 @@ public class GitHubClient(IHttpClientFactory httpClientFactory, ILogger<GitHubCl
         {
             logger.LogError(ex, "get repos commits occur exception");
             return [];
+        }
+    }
+
+    public async Task<int> GetRepositoryCommitCountAsync()
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync(
+                "/repos/ShaoHans/Abp.RadzenUI/commits?per_page=1&page=1"
+            );
+            var link = response.Headers.GetValues("Link").First();
+            var matches = Regex.Matches(link, @"page=(\d+)");
+            if (matches.Count > 0)
+            {
+                return int.Parse(matches[^1].Groups[1].Value);
+            }
+            return 161;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "get repos commits occur exception");
+            return 161;
         }
     }
 }
