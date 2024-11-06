@@ -42,7 +42,8 @@ else
         </RadzenTabsItem>
 
         <RadzenTabsItem Text="@($"Commits({commitCount})")">
-            <RadzenDataGrid ColumnWidth="150px" TItem="CommitDto" AllowPaging="true" Count="@commitCount" PageSize="20" Data="@commits" LoadData="@LoadCommits">
+            <RadzenDataGrid ColumnWidth="150px" TItem="CommitDto" AllowPaging="true" Style="height:calc(100vh - 160px)"
+                Count="@commitCount" PageSize="20" Data="@commits" LoadData="@LoadCommits">
                 <Columns>
                     <RadzenDataGridColumn Property="@nameof(CommitDto.Committer.AvatarUrl)" Title="Avatar" Sortable="false" Filterable="false" Width="80px">
                         <Template Context="data">

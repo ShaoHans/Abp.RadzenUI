@@ -96,12 +96,12 @@ public class GitHubClient(IHttpClientFactory httpClientFactory, ILogger<GitHubCl
             {
                 return int.Parse(matches[^1].Groups[1].Value);
             }
-            return 161;
+            return 0;
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "get repos commits occur exception");
-            return 161;
+            return 0;
         }
     }
 }
