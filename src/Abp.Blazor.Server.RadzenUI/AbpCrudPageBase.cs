@@ -136,6 +136,7 @@ public abstract class AbpCrudPageBase<
     protected readonly IEnumerable<int> _pageSizeOptions = [10, 20, 30];
     protected readonly bool _showPagerSummary = true;
     protected bool _isLoading = true;
+    protected int _defaultPageSize = 10;
 
     protected TGetListInput GetListInput = new();
     protected TCreateViewModel NewEntity;
@@ -187,7 +188,7 @@ public abstract class AbpCrudPageBase<
 
         if (GetListInput is ILimitedResultRequest limitedResultRequestInput)
         {
-            limitedResultRequestInput.MaxResultCount = args.Top ?? 10;
+            limitedResultRequestInput.MaxResultCount = args.Top ?? _defaultPageSize;
         }
 
         return Task.CompletedTask;

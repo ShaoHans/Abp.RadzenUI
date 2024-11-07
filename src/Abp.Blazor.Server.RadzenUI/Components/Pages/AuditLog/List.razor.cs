@@ -16,6 +16,7 @@ public partial class List
     protected override async Task UpdateGetListInputAsync(LoadDataArgs args)
     {
         GetListInput.Filter = args.Filter;
+        _defaultPageSize = 20;
         await base.UpdateGetListInputAsync(args);
     }
 
