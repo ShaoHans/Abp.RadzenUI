@@ -16,7 +16,7 @@
   redis:
     image: redis:7.2
     restart: always
-    command: redis-server --requirepass 2024@09$14&Start
+    command: redis-server --requirepass 20241030Deploy
     ports:
       - 6379:6379
     networks:
