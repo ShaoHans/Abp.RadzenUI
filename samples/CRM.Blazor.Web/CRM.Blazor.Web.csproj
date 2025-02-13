@@ -24,21 +24,24 @@
 		<ProjectReference Include="..\CRM.Aspire.ServiceDefaults\CRM.Aspire.ServiceDefaults.csproj" />
 		<ProjectReference Include="..\CRM.HttpApi\CRM.HttpApi.csproj" />
 		<ProjectReference Include="..\CRM.EntityFrameworkCore\CRM.EntityFrameworkCore.csproj" />
-		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.20.1" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.1" />
 		<!--<PackageReference Include="AbpRadzen.Blazor.Server.UI" Version="0.1.1" />-->
-		<PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
-		<PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
+		<PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+		<PackageReference Include="Serilog.Sinks.Async" Version="2.1.0" />
 		<PackageReference Include="IdentityModel" Version="7.0.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.4" />
-		<PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="8.0.4" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.4" />
-		<PackageReference Include="Volo.Abp.AspNetCore.Authentication.JwtBearer" Version="8.3.0" />
-		<PackageReference Include="Volo.Abp.AspNetCore.Authentication.OpenIdConnect" Version="8.3.0" />
-		<PackageReference Include="Volo.Abp.AspNetCore.Components.Server" Version="8.3.0" />
-		<PackageReference Include="Volo.Abp.Autofac" Version="8.3.0" />
-		<PackageReference Include="Volo.Abp.Caching.StackExchangeRedis" Version="8.3.0" />
-		<PackageReference Include="Volo.Abp.AspNetCore.Serilog" Version="8.3.0" />
-		<PackageReference Include="Volo.Abp.Swashbuckle" Version="8.3.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="9.0.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.2">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Volo.Abp.AspNetCore.Authentication.JwtBearer" Version="9.0.5" />
+		<PackageReference Include="Volo.Abp.AspNetCore.Authentication.OpenIdConnect" Version="9.0.5" />
+		<PackageReference Include="Volo.Abp.AspNetCore.Components.Server" Version="9.0.5" />
+		<PackageReference Include="Volo.Abp.Autofac" Version="9.0.5" />
+		<PackageReference Include="Volo.Abp.Caching.StackExchangeRedis" Version="9.0.5" />
+		<PackageReference Include="Volo.Abp.AspNetCore.Serilog" Version="9.0.5" />
+		<PackageReference Include="Volo.Abp.Swashbuckle" Version="9.0.5" />
 	</ItemGroup>
 
 	<ItemGroup>
