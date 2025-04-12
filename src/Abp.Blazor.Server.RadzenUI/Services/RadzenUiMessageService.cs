@@ -4,14 +4,11 @@ using Volo.Abp.DependencyInjection;
 
 namespace Abp.RadzenUI.Services;
 
-public class RadzenUiMessageService : IUiMessageService, ITransientDependency
+public class RadzenUiMessageService(NotificationService notificationService)
+    : IUiMessageService,
+        ITransientDependency
 {
-    protected NotificationService NotificationService { get; }
-
-    public RadzenUiMessageService(NotificationService notificationService)
-    {
-        NotificationService = notificationService;
-    }
+    protected NotificationService NotificationService { get; } = notificationService;
 
     public Task Info(string message, string? title = null, Action<UiMessageOptions>? options = null)
     {

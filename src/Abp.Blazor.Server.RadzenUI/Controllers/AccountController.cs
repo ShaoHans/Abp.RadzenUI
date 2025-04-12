@@ -8,27 +8,18 @@ using Volo.Abp.Identity.AspNetCore;
 
 namespace Abp.RadzenUI.Controllers;
 
-public class AccountController : AbpControllerBase
+public class AccountController(
+    SignInManager<Volo.Abp.Identity.IdentityUser> signInManager,
+    IdentitySecurityLogManager identitySecurityLogManager
+) : AbpControllerBase
 {
-    private readonly SignInManager<Volo.Abp.Identity.IdentityUser> _signInManager;
-    private readonly IdentitySecurityLogManager _identitySecurityLogManager;
-
-    public AccountController(
-        SignInManager<Volo.Abp.Identity.IdentityUser> signInManager,
-        IdentitySecurityLogManager identitySecurityLogManager
-    )
-    {
-        _signInManager = signInManager;
-        _identitySecurityLogManager = identitySecurityLogManager;
-    }
-
     [HttpPost("/account/login")]
     [DisableAuditing]
     public async Task<IActionResult> LoginAsync(string username, string password, bool rememberMe)
     {
-        var result = await _signInManager.PasswordSignInAsync(username, password, rememberMe, true);
+        var result = await signInManager.PasswordSignInAsync(username, password, rememberMe, true);
 
-        await _identitySecurityLogManager.SaveAsync(
+        await identitySecurityLogManager.SaveAsync(
             new IdentitySecurityLogContext()
             {
                 Identity = IdentitySecurityLogIdentityConsts.Identity,
@@ -48,7 +39,7 @@ public class AccountController : AbpControllerBase
     [HttpGet("/account/logout")]
     public async Task<IActionResult> LogoutAsync()
     {
-        await _signInManager.SignOutAsync();
+        await signInManager.SignOutAsync();
         await HttpContext.SignOutAsync();
         return Redirect("~/Login");
     }

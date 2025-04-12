@@ -12,48 +12,35 @@ using Volo.Abp.Uow;
 
 namespace CRM.Data;
 
-public class CRMTenantDatabaseMigrationHandler :
-    IDistributedEventHandler<TenantCreatedEto>,
-    IDistributedEventHandler<TenantConnectionStringUpdatedEto>,
-    IDistributedEventHandler<ApplyDatabaseMigrationsEto>,
-    ITransientDependency
+public class CRMTenantDatabaseMigrationHandler(
+    IEnumerable<ICRMDbSchemaMigrator> dbSchemaMigrators,
+    ICurrentTenant currentTenant,
+    IUnitOfWorkManager unitOfWorkManager,
+    IDataSeeder dataSeeder,
+    ITenantStore tenantStore,
+    ILogger<CRMTenantDatabaseMigrationHandler> logger
+)
+    : IDistributedEventHandler<TenantCreatedEto>,
+        IDistributedEventHandler<TenantConnectionStringUpdatedEto>,
+        IDistributedEventHandler<ApplyDatabaseMigrationsEto>,
+        ITransientDependency
 {
-    private readonly IEnumerable<ICRMDbSchemaMigrator> _dbSchemaMigrators;
-    private readonly ICurrentTenant _currentTenant;
-    private readonly IUnitOfWorkManager _unitOfWorkManager;
-    private readonly IDataSeeder _dataSeeder;
-    private readonly ITenantStore _tenantStore;
-    private readonly ILogger<CRMTenantDatabaseMigrationHandler> _logger;
-
-    public CRMTenantDatabaseMigrationHandler(
-        IEnumerable<ICRMDbSchemaMigrator> dbSchemaMigrators,
-        ICurrentTenant currentTenant,
-        IUnitOfWorkManager unitOfWorkManager,
-        IDataSeeder dataSeeder,
-        ITenantStore tenantStore,
-        ILogger<CRMTenantDatabaseMigrationHandler> logger)
-    {
-        _dbSchemaMigrators = dbSchemaMigrators;
-        _currentTenant = currentTenant;
-        _unitOfWorkManager = unitOfWorkManager;
-        _dataSeeder = dataSeeder;
-        _tenantStore = tenantStore;
-        _logger = logger;
-    }
-
     public async Task HandleEventAsync(TenantCreatedEto eventData)
     {
         await MigrateAndSeedForTenantAsync(
             eventData.Id,
             eventData.Properties.GetOrDefault("AdminEmail") ?? CRMConsts.AdminEmailDefaultValue,
-            eventData.Properties.GetOrDefault("AdminPassword") ?? CRMConsts.AdminPasswordDefaultValue
+            eventData.Properties.GetOrDefault("AdminPassword")
+                ?? CRMConsts.AdminPasswordDefaultValue
         );
     }
 
     public async Task HandleEventAsync(TenantConnectionStringUpdatedEto eventData)
     {
-        if (eventData.ConnectionStringName != ConnectionStrings.DefaultConnectionStringName ||
-            eventData.NewValue.IsNullOrWhiteSpace())
+        if (
+            eventData.ConnectionStringName != ConnectionStrings.DefaultConnectionStringName
+            || eventData.NewValue.IsNullOrWhiteSpace()
+        )
         {
             return;
         }
@@ -87,20 +74,25 @@ public class CRMTenantDatabaseMigrationHandler :
     private async Task MigrateAndSeedForTenantAsync(
         Guid tenantId,
         string adminEmail,
-        string adminPassword)
+        string adminPassword
+    )
     {
         try
         {
-            using (_currentTenant.Change(tenantId))
+            using (currentTenant.Change(tenantId))
             {
                 // Create database tables if needed
-                using (var uow = _unitOfWorkManager.Begin(requiresNew: false, isTransactional: false))
+                using (
+                    var uow = unitOfWorkManager.Begin(requiresNew: false, isTransactional: false)
+                )
                 {
-                    var tenantConfiguration = await _tenantStore.FindAsync(tenantId);
-                    if (tenantConfiguration?.ConnectionStrings != null &&
-                        !tenantConfiguration.ConnectionStrings.Default.IsNullOrWhiteSpace())
+                    var tenantConfiguration = await tenantStore.FindAsync(tenantId);
+                    if (
+                        tenantConfiguration?.ConnectionStrings != null
+                        && !tenantConfiguration.ConnectionStrings.Default.IsNullOrWhiteSpace()
+                    )
                     {
-                        foreach (var migrator in _dbSchemaMigrators)
+                        foreach (var migrator in dbSchemaMigrators)
                         {
                             await migrator.MigrateAsync();
                         }
@@ -110,12 +102,18 @@ public class CRMTenantDatabaseMigrationHandler :
                 }
 
                 // Seed data
-                using (var uow = _unitOfWorkManager.Begin(requiresNew: false, isTransactional: true))
+                using (var uow = unitOfWorkManager.Begin(requiresNew: false, isTransactional: true))
                 {
-                    await _dataSeeder.SeedAsync(
+                    await dataSeeder.SeedAsync(
                         new DataSeedContext(tenantId)
-                            .WithProperty(IdentityDataSeedContributor.AdminEmailPropertyName, adminEmail)
-                            .WithProperty(IdentityDataSeedContributor.AdminPasswordPropertyName, adminPassword)
+                            .WithProperty(
+                                IdentityDataSeedContributor.AdminEmailPropertyName,
+                                adminEmail
+                            )
+                            .WithProperty(
+                                IdentityDataSeedContributor.AdminPasswordPropertyName,
+                                adminPassword
+                            )
                     );
 
                     await uow.CompleteAsync();
@@ -124,7 +122,7 @@ public class CRMTenantDatabaseMigrationHandler :
         }
         catch (Exception ex)
         {
-            _logger.LogException(ex);
+            logger.LogException(ex);
         }
     }
 }

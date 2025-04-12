@@ -2,21 +2,15 @@
 
 namespace Abp.RadzenUI.Models;
 
-public class PermissionTreeItemVm
+public class PermissionTreeItemVm(int depth, PermissionGrantInfoDto permission)
 {
-    public int Depth { get; set; }
+    public int Depth { get; set; } = depth;
 
-    public PermissionGrantInfoDto Permission { get; set; }
+    public PermissionGrantInfoDto Permission { get; set; } = permission;
 
     public PermissionTreeItemVm? Parent { get; set; }
 
     public List<PermissionTreeItemVm> Children { get; set; } = [];
-
-    public PermissionTreeItemVm(int depth, PermissionGrantInfoDto permission)
-    {
-        Depth = depth;
-        Permission = permission;
-    }
 
     public void SetParent(PermissionTreeItemVm? parent)
     {

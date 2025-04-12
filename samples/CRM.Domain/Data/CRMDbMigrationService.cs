@@ -15,28 +15,15 @@ using Volo.Abp.TenantManagement;
 
 namespace CRM.Data;
 
-public class CRMDbMigrationService : ITransientDependency
+public class CRMDbMigrationService(
+    IDataSeeder dataSeeder,
+    ITenantRepository tenantRepository,
+    ICurrentTenant currentTenant,
+    IEnumerable<ICRMDbSchemaMigrator> dbSchemaMigrators
+) : ITransientDependency
 {
-    public ILogger<CRMDbMigrationService> Logger { get; set; }
-
-    private readonly IDataSeeder _dataSeeder;
-    private readonly IEnumerable<ICRMDbSchemaMigrator> _dbSchemaMigrators;
-    private readonly ITenantRepository _tenantRepository;
-    private readonly ICurrentTenant _currentTenant;
-
-    public CRMDbMigrationService(
-        IDataSeeder dataSeeder,
-        ITenantRepository tenantRepository,
-        ICurrentTenant currentTenant,
-        IEnumerable<ICRMDbSchemaMigrator> dbSchemaMigrators)
-    {
-        _dataSeeder = dataSeeder;
-        _tenantRepository = tenantRepository;
-        _currentTenant = currentTenant;
-        _dbSchemaMigrators = dbSchemaMigrators;
-
-        Logger = NullLogger<CRMDbMigrationService>.Instance;
-    }
+    public ILogger<CRMDbMigrationService> Logger { get; set; } =
+        NullLogger<CRMDbMigrationService>.Instance;
 
     public async Task MigrateAsync()
     {
@@ -54,17 +41,17 @@ public class CRMDbMigrationService : ITransientDependency
 
         Logger.LogInformation($"Successfully completed host database migrations.");
 
-        var tenants = await _tenantRepository.GetListAsync(includeDetails: true);
+        var tenants = await tenantRepository.GetListAsync(includeDetails: true);
 
         var migratedDatabaseSchemas = new HashSet<string>();
         foreach (var tenant in tenants)
         {
-            using (_currentTenant.Change(tenant.Id))
+            using (currentTenant.Change(tenant.Id))
             {
-                if (tenant.ConnectionStrings.Any())
+                if (tenant.ConnectionStrings.Count != 0)
                 {
-                    var tenantConnectionStrings = tenant.ConnectionStrings
-                        .Select(x => x.Value)
+                    var tenantConnectionStrings = tenant
+                        .ConnectionStrings.Select(x => x.Value)
                         .ToList();
 
                     if (!migratedDatabaseSchemas.IsSupersetOf(tenantConnectionStrings))
@@ -78,7 +65,10 @@ public class CRMDbMigrationService : ITransientDependency
                 await SeedDataAsync(tenant);
             }
 
-            Logger.LogInformation($"Successfully completed {tenant.Name} tenant database migrations.");
+            Logger.LogInformation(
+                "Successfully completed {@Name} tenant database migrations.",
+                tenant.Name
+            );
         }
 
         Logger.LogInformation("Successfully completed all database migrations.");
@@ -88,9 +78,11 @@ public class CRMDbMigrationService : ITransientDependency
     private async Task MigrateDatabaseSchemaAsync(Tenant? tenant = null)
     {
         Logger.LogInformation(
-            $"Migrating schema for {(tenant == null ? "host" : tenant.Name + " tenant")} database...");
-        
-        foreach (var migrator in _dbSchemaMigrators)
+            "Migrating schema for {DatabaseType} database...",
+            tenant == null ? "host" : $"{tenant.Name} tenant"
+        );
+
+        foreach (var migrator in dbSchemaMigrators)
         {
             await migrator.MigrateAsync();
         }
@@ -98,13 +90,21 @@ public class CRMDbMigrationService : ITransientDependency
 
     private async Task SeedDataAsync(Tenant? tenant = null)
     {
-        Logger.LogInformation($"Executing {(tenant == null ? "host" : tenant.Name + " tenant")} database seed...");
-        
-        await _dataSeeder.SeedAsync(new DataSeedContext(tenant?.Id)
-            .WithProperty(IdentityDataSeedContributor.AdminEmailPropertyName,
-                CRMConsts.AdminEmailDefaultValue)
-            .WithProperty(IdentityDataSeedContributor.AdminPasswordPropertyName,
-                CRMConsts.AdminPasswordDefaultValue)
+        Logger.LogInformation(
+            "Executing {DatabaseType} database seed...",
+            tenant == null ? "host" : $"{tenant.Name} tenant"
+        );
+
+        await dataSeeder.SeedAsync(
+            new DataSeedContext(tenant?.Id)
+                .WithProperty(
+                    IdentityDataSeedContributor.AdminEmailPropertyName,
+                    CRMConsts.AdminEmailDefaultValue
+                )
+                .WithProperty(
+                    IdentityDataSeedContributor.AdminPasswordPropertyName,
+                    CRMConsts.AdminPasswordDefaultValue
+                )
         );
     }
 
@@ -136,23 +136,27 @@ public class CRMDbMigrationService : ITransientDependency
         }
         catch (Exception e)
         {
-            Logger.LogWarning("Couldn't determinate if any migrations exist : " + e.Message);
+            Logger.LogWarning(
+                "Couldn't determinate if any migrations exist : {@Message}",
+                e.Message
+            );
             return false;
         }
     }
 
-    private bool DbMigrationsProjectExists()
+    private static bool DbMigrationsProjectExists()
     {
         var dbMigrationsProjectFolder = GetEntityFrameworkCoreProjectFolderPath();
 
         return dbMigrationsProjectFolder != null;
     }
 
-    private bool MigrationsFolderExists()
+    private static bool MigrationsFolderExists()
     {
         var dbMigrationsProjectFolder = GetEntityFrameworkCoreProjectFolderPath();
 
-        return dbMigrationsProjectFolder != null && Directory.Exists(Path.Combine(dbMigrationsProjectFolder, "Migrations"));
+        return dbMigrationsProjectFolder != null
+            && Directory.Exists(Path.Combine(dbMigrationsProjectFolder, "Migrations"));
     }
 
     private void AddInitialMigration()
@@ -162,7 +166,10 @@ public class CRMDbMigrationService : ITransientDependency
         string argumentPrefix;
         string fileName;
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        if (
+            RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+            || RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
+        )
         {
             argumentPrefix = "-c";
             fileName = "/bin/bash";
@@ -173,7 +180,8 @@ public class CRMDbMigrationService : ITransientDependency
             fileName = "cmd.exe";
         }
 
-        var procStartInfo = new ProcessStartInfo(fileName,
+        var procStartInfo = new ProcessStartInfo(
+            fileName,
             $"{argumentPrefix} \"abp create-migration-and-run-migrator \"{GetEntityFrameworkCoreProjectFolderPath()}\"\""
         );
 
@@ -187,22 +195,18 @@ public class CRMDbMigrationService : ITransientDependency
         }
     }
 
-    private string? GetEntityFrameworkCoreProjectFolderPath()
+    private static string? GetEntityFrameworkCoreProjectFolderPath()
     {
-        var slnDirectoryPath = GetSolutionDirectoryPath();
-
-        if (slnDirectoryPath == null)
-        {
-            throw new Exception("Solution folder not found!");
-        }
-
+        var slnDirectoryPath =
+            GetSolutionDirectoryPath() ?? throw new Exception("Solution folder not found!");
         var srcDirectoryPath = Path.Combine(slnDirectoryPath, "src");
 
-        return Directory.GetDirectories(srcDirectoryPath)
+        return Directory
+            .GetDirectories(srcDirectoryPath)
             .FirstOrDefault(d => d.EndsWith(".EntityFrameworkCore"));
     }
 
-    private string? GetSolutionDirectoryPath()
+    private static string? GetSolutionDirectoryPath()
     {
         var currentDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
 
@@ -210,7 +214,12 @@ public class CRMDbMigrationService : ITransientDependency
         {
             currentDirectory = Directory.GetParent(currentDirectory.FullName);
 
-            if (currentDirectory != null && Directory.GetFiles(currentDirectory.FullName).FirstOrDefault(f => f.EndsWith(".sln")) != null)
+            if (
+                currentDirectory != null
+                && Directory
+                    .GetFiles(currentDirectory.FullName)
+                    .FirstOrDefault(f => f.EndsWith(".sln")) != null
+            )
             {
                 return currentDirectory.FullName;
             }

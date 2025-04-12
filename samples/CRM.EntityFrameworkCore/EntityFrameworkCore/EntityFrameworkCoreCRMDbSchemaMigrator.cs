@@ -1,22 +1,16 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CRM.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using CRM.Data;
 using Volo.Abp.DependencyInjection;
 
 namespace CRM.EntityFrameworkCore;
 
-public class EntityFrameworkCoreCRMDbSchemaMigrator
-    : ICRMDbSchemaMigrator, ITransientDependency
+public class EntityFrameworkCoreCRMDbSchemaMigrator(IServiceProvider serviceProvider)
+    : ICRMDbSchemaMigrator,
+        ITransientDependency
 {
-    private readonly IServiceProvider _serviceProvider;
-
-    public EntityFrameworkCoreCRMDbSchemaMigrator(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
-
     public async Task MigrateAsync()
     {
         /* We intentionally resolving the CRMDbContext
@@ -25,9 +19,6 @@ public class EntityFrameworkCoreCRMDbSchemaMigrator
          * current scope.
          */
 
-        await _serviceProvider
-            .GetRequiredService<CRMDbContext>()
-            .Database
-            .MigrateAsync();
+        await serviceProvider.GetRequiredService<CRMDbContext>().Database.MigrateAsync();
     }
 }
