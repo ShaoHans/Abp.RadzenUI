@@ -62,51 +62,8 @@
                     <RadzenImage Path="_content/AbpRadzen.Blazor.Server.UI/images/microsoft-logo.svg" Style="width: 19px;height: 19px;">
                     </RadzenImage>
                 </RadzenLink>
+                <RadzenButton Text="使用 Azure AD 登录" Click="@(() => LoginAzure())" Style="width:200px" />
             </RadzenTemplateForm>
         </RadzenCard>
     </RadzenColumn>
 </RadzenRow>
-
-
-@code {
-    [SupplyParameterFromQuery]
-    [Parameter]
-    public string? Error { get; set; }
-
-    public Login()
-    {
-        LocalizationResource = typeof(AccountResource);
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-
-        if (!string.IsNullOrWhiteSpace(Error))
-        {
-            await Message.Error(Error);
-        }
-
-        if (CurrentUser != null && CurrentUser.IsAuthenticated)
-        {
-            NavigationManager.NavigateTo("/");
-        }
-    }
-
-    async Task OpenTenantSwitchDialog()
-    {
-        await DialogService.OpenAsync<TenantSwitchDialog>(
-            title: TL["SwitchTenant"],
-            parameters: new Dictionary<string, object>
-                {
-                    { "TenantName", CurrentTenant?.Name ?? string.Empty }
-                },
-            options: new DialogOptions
-                {
-                    Draggable = true,
-                    Width = "550px",
-                    Height = "400px"
-                }
-        );
-    }
-}

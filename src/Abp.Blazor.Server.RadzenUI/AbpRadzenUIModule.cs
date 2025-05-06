@@ -1,10 +1,16 @@
-﻿using Abp.RadzenUI.Bundling;
+﻿using System.Security.Claims;
+using Abp.RadzenUI.Bundling;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Menus;
 using Abp.RadzenUI.Services;
 using Localization.Resources.AbpUi;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 using Radzen;
 using Volo.Abp.AspNetCore.Components.Messages;
 using Volo.Abp.AspNetCore.Components.Server.Configuration;
@@ -113,5 +119,48 @@ public class AbpRadzenUIModule : AbpModule
             options.MenuContributors.Add(new AbpTenantMenuContributor());
             options.MenuContributors.Add(new AuditLoggingMenuContributor());
         });
+    }
+
+    private void ConfigureAuthentication(
+        ServiceConfigurationContext context,
+        IConfiguration configuration
+    )
+    {
+        context
+            .Services.AddAuthentication()
+            .AddOpenIdConnect(
+                "AzureOpenId",
+                "Azure Active Directory",
+                options =>
+                {
+                    options.Authority =
+                        $"{configuration["AzureAd:Instance"]}{configuration["AzureAd:TenantId"]}/v2.0";
+                    options.ClientId = configuration["AzureAd:ClientId"];
+                    options.ClientSecret = configuration["AzureAd:ClientSecret"];
+                    options.CallbackPath = configuration["AzureAd:CallbackPath"];
+                    options.GetClaimsFromUserInfoEndpoint = true;
+                    options.SaveTokens = true;
+                    options.SignInScheme = IdentityConstants.ExternalScheme;
+
+                    // 验证发行者（Issuer）——仅允许来自指定 Azure 实例的 Token
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        IssuerValidator = (issuer, token, parameters) =>
+                        {
+                            if (
+                                issuer.StartsWith($"{configuration["AzureAd:Instance"]}")
+                                && issuer.EndsWith("/v2.0")
+                            )
+                            {
+                                return issuer;
+                            }
+                            throw new SecurityTokenInvalidIssuerException(
+                                $"Invalid issuer: {issuer}"
+                            );
+                        }
+                    };
+                }
+            );
     }
 }
