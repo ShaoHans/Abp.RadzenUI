@@ -49,6 +49,8 @@ public class AbpRadzenUIModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
+        var configuration = context.Services.GetConfiguration();
+
         Configure<AbpVirtualFileSystemOptions>(options =>
         {
             options.FileSets.AddEmbedded<AbpRadzenUIModule>("Abp.RadzenUI");
@@ -71,6 +73,8 @@ public class AbpRadzenUIModule : AbpModule
         {
             options.AddMaps<AbpRadzenUIModule>();
         });
+
+        ConfigureOidcAuthentication(context, configuration);
 
         // Add services to the container.
         context.Services.AddRazorComponents().AddInteractiveServerComponents();
@@ -121,46 +125,34 @@ public class AbpRadzenUIModule : AbpModule
         });
     }
 
-    private void ConfigureAuthentication(
+    private void ConfigureOidcAuthentication(
         ServiceConfigurationContext context,
         IConfiguration configuration
     )
     {
-        context
-            .Services.AddAuthentication()
-            .AddOpenIdConnect(
-                "AzureOpenId",
-                "Azure Active Directory",
-                options =>
-                {
-                    options.Authority =
-                        $"{configuration["AzureAd:Instance"]}{configuration["AzureAd:TenantId"]}/v2.0";
-                    options.ClientId = configuration["AzureAd:ClientId"];
-                    options.ClientSecret = configuration["AzureAd:ClientSecret"];
-                    options.CallbackPath = configuration["AzureAd:CallbackPath"];
-                    options.GetClaimsFromUserInfoEndpoint = true;
-                    options.SaveTokens = true;
-                    options.SignInScheme = IdentityConstants.ExternalScheme;
-
-                    // 验证发行者（Issuer）——仅允许来自指定 Azure 实例的 Token
-                    options.TokenValidationParameters = new TokenValidationParameters
+        if (configuration.GetSection("AzureAd").Exists())
+        {
+            context
+                .Services.AddAuthentication()
+                .AddOpenIdConnect(
+                    "AzureOpenId",
+                    "Azure Active Directory",
+                    options =>
                     {
-                        ValidateIssuer = true,
-                        IssuerValidator = (issuer, token, parameters) =>
-                        {
-                            if (
-                                issuer.StartsWith($"{configuration["AzureAd:Instance"]}")
-                                && issuer.EndsWith("/v2.0")
-                            )
-                            {
-                                return issuer;
-                            }
-                            throw new SecurityTokenInvalidIssuerException(
-                                $"Invalid issuer: {issuer}"
-                            );
-                        }
-                    };
-                }
-            );
+                        options.Authority =
+                            $"{configuration["AzureAd:Instance"]}{configuration["AzureAd:TenantId"]}/v2.0/";
+                        options.ClientId = configuration["AzureAd:ClientId"];
+                        options.ClientSecret = configuration["AzureAd:ClientSecret"];
+                        options.ResponseType = OpenIdConnectResponseType.Code;
+                        options.CallbackPath = configuration["AzureAd:CallbackPath"];
+                        options.RequireHttpsMetadata = false;
+                        options.SaveTokens = true;
+                        options.GetClaimsFromUserInfoEndpoint = true;
+                        options.SignInScheme = IdentityConstants.ExternalScheme;
+
+                        options.Scope.Add("email");
+                    }
+                );
+        }
     }
 }
