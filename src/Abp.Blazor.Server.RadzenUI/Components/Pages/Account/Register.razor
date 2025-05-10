@@ -32,16 +32,19 @@
                 @* <RadzenEmailValidator Component="EmailAddress" Text="@L["Volo.Abp.Identity:InvalidEmail",RegisterDto.EmailAddress]" Style="position: absolute" /> *@
             </RadzenColumn>
         </RadzenRow>
-        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.05rem">
-            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
-                <RadzenLabel Text="@L["DisplayName:Password"]" Component="Password" />
-            </RadzenColumn>
-            <RadzenColumn Size="12" SizeMD="8">
-                <RadzenPassword Name="Password" Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxPasswordLength" />
-                <RadzenRequiredValidator Component="Password" Text="@L.Required("DisplayName:Password")" Style="position: absolute" />
-            </RadzenColumn>
-        </RadzenRow>
+        @if (!IsExternalLogin)
+        {
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.05rem">
+                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                    <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
+                    <RadzenLabel Text="@L["DisplayName:Password"]" Component="Password" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8">
+                    <RadzenPassword Name="Password" Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxPasswordLength" />
+                    <RadzenRequiredValidator Component="Password" Text="@L.Required("DisplayName:Password")" Style="position: absolute" />
+                </RadzenColumn>
+            </RadzenRow>
+        }
     </RadzenStack>
     <RadzenStack class="rz-p-2" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
         <RadzenButton ButtonType="ButtonType.Submit" Text="@L["Register"]"></RadzenButton>
@@ -52,6 +55,10 @@
     [SupplyParameterFromQuery]
     [Parameter]
     public string? Error { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public bool IsExternalLogin { get; set; }
 
     [Inject]
     NavigationManager Navigation { get; set; }
