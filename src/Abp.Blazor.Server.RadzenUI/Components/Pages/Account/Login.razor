@@ -54,16 +54,18 @@
             }
 
             <RadzenTemplateForm Data=@("") Method="post" Action="/account/login">
-                <RadzenLogin AllowRegister="false" AllowResetPassword="false" AllowRememberMe="true" RememberMe="true"
+                <RadzenLogin AllowRegister="true" AllowResetPassword="false" AllowRememberMe="true" RememberMe="true"
                              UserText="@L["UserName"]" PasswordText="@L["Password"]"
-                             RememberMeText="@L["RememberMe"]" LoginText="@L["Login"]" />
-                <Devider />
-                <RadzenLink Path="https://www.radzen.com" Text="Go to url">
-                    <RadzenImage Path="_content/AbpRadzen.Blazor.Server.UI/images/microsoft-logo.svg" Style="width: 19px;height: 19px;">
-                    </RadzenImage>
-                </RadzenLink>
-                <RadzenButton Text="使用 Azure AD 登录" Click="@(() => LoginAzure())" Style="width:200px" />
+                             RememberMeText="@L["RememberMe"]" LoginText="@L["Login"]" 
+                             RegisterText="@L["Register"]" RegisterMessageText="@L["AreYouANewUser"]" />
             </RadzenTemplateForm>
+
+            <Devider />
+            <RadzenLink Path="https://www.radzen.com" Text="Go to url">
+                <RadzenImage Path="_content/AbpRadzen.Blazor.Server.UI/images/microsoft-logo.svg" Style="width: 19px;height: 19px;">
+                </RadzenImage>
+            </RadzenLink>
+            <RadzenButton Text="使用 Azure AD 登录" Click="@(() => LoginAzure())" Style="width:200px" />
         </RadzenCard>
     </RadzenColumn>
 </RadzenRow>
