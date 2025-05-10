@@ -9,16 +9,17 @@ namespace Abp.RadzenUI.Controllers;
 
 public class AbpRadzenControllerBase : AbpControllerBase
 {
-    protected IAppUrlProvider AppUrlProvider => LazyServiceProvider.LazyGetRequiredService<IAppUrlProvider>();
+    protected IAppUrlProvider AppUrlProvider =>
+        LazyServiceProvider.LazyGetRequiredService<IAppUrlProvider>();
 
     protected virtual IActionResult RedirectWithError(string url, string error)
     {
-        return Redirect($"{url}?error={error}");
+        return Redirect($"{url}{(url.Contains('?') ? "&" : "?")}error={error}");
     }
 
     protected virtual IActionResult RedirectWithError(string url, Exception ex)
     {
-        return Redirect($"{url}?error={GetErrorMessage(ex)}");
+        return Redirect($"{url}{(url.Contains('?') ? "&" : "?")}error={GetErrorMessage(ex)}");
     }
 
     protected virtual string GetErrorMessage(Exception ex)
@@ -38,12 +39,18 @@ public class AbpRadzenControllerBase : AbpControllerBase
         return error;
     }
 
-    protected virtual async Task<RedirectResult> RedirectSafelyAsync(string returnUrl, string? returnUrlHash = null)
+    protected virtual async Task<RedirectResult> RedirectSafelyAsync(
+        string returnUrl,
+        string? returnUrlHash = null
+    )
     {
         return Redirect(await GetRedirectUrlAsync(returnUrl, returnUrlHash));
     }
 
-    protected virtual async Task<string> GetRedirectUrlAsync(string returnUrl, string? returnUrlHash = null)
+    protected virtual async Task<string> GetRedirectUrlAsync(
+        string returnUrl,
+        string? returnUrlHash = null
+    )
     {
         returnUrl = await NormalizeReturnUrlAsync(returnUrl);
 

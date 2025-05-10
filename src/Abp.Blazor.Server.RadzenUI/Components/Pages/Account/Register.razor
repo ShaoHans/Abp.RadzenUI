@@ -20,7 +20,7 @@
                 <RadzenLabel Text="@L["DisplayName:UserName"]" Component="UserName" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenTextBox Name="UserName" Value="@_userName" Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxUserNameLength" />
+                <RadzenTextBox Name="UserName" Value="@UserName" Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxUserNameLength" />
                 <RadzenRequiredValidator Component="UserName" Text="@L.Required("DisplayName:UserName")" Style="position: absolute" />
             </RadzenColumn>
         </RadzenRow>
@@ -30,7 +30,7 @@
                 <RadzenLabel Text="@L["DisplayName:Email"]" Component="EmailAddress" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenTextBox Name="EmailAddress" Value="@_emailAddress" Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxEmailLength" />
+                <RadzenTextBox Name="EmailAddress" Value="@EmailAddress" Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxEmailLength" />
                 <RadzenRequiredValidator Component="EmailAddress" Text="@L.Required("DisplayName:Email")" Style="position: absolute" />
                 @* <RadzenEmailValidator Component="EmailAddress" Text="@L["Volo.Abp.Identity:InvalidEmail",RegisterDto.EmailAddress]" Style="position: absolute" /> *@
             </RadzenColumn>
@@ -48,6 +48,8 @@
                 </RadzenColumn>
             </RadzenRow>
         }
+        <input type="hidden" name="IsExternalLogin" value="@IsExternalLogin.ToString()" />
+        <input type="hidden" name="ExternalLoginAuthSchema" value="@ExternalLoginAuthSchema" />
     </RadzenStack>
     <RadzenStack class="rz-p-2" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
         <RadzenButton ButtonType="ButtonType.Submit" Text="@L["Register"]"></RadzenButton>
@@ -65,6 +67,18 @@
     [Parameter]
     public bool IsExternalLogin { get; set; }
 
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string ExternalLoginAuthSchema { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string UserName { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string EmailAddress { get; set; }
+
     [Inject]
     NavigationManager Navigation { get; set; }
 
@@ -74,9 +88,6 @@
     [Inject]
     IdentityUserManager UserManager { get; set; }
 
-    string _userName;
-    string _emailAddress;
-
     public Register()
     {
         LocalizationResource = typeof(AccountResource);
@@ -84,8 +95,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await TrySetUserInfoAsync();
-
         if (!string.IsNullOrWhiteSpace(Error))
         {
             await Message.Error(Error);
@@ -95,35 +104,5 @@
         {
             Navigation.NavigateTo("/");
         }
-    }
-
-    private async Task TrySetUserInfoAsync()
-    {
-        if (!IsExternalLogin)
-        {
-            return;
-        }
-
-        var externalLoginInfo = await SignInManager.GetExternalLoginInfoAsync();
-        if (externalLoginInfo == null)
-        {
-            return;
-        }
-
-        if (!externalLoginInfo.Principal.Identities.Any())
-        {
-            return;
-        }
-
-        var identity = externalLoginInfo.Principal.Identities.First();
-        var emailClaim = identity.FindFirst(AbpClaimTypes.Email) ?? identity.FindFirst(ClaimTypes.Email);
-
-        if (emailClaim == null)
-        {
-            return;
-        }
-
-        _userName = await UserManager.GetUserNameFromEmailAsync(emailClaim.Value);
-        _emailAddress = emailClaim.Value;
     }
 }
