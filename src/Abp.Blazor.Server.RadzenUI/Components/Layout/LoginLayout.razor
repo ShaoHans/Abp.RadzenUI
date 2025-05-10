@@ -34,7 +34,7 @@
                         <RadzenColumn Size="8" class="rz-text-truncate">
                             <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">@TL["Tenant"]</RadzenText>
                             <RadzenText TextStyle="TextStyle.Body1">
-                                @if (CurrentTenant.Id == null)
+                                @if (CurrentTenant?.Id == null)
                                 {
                                     <span>@TL["NotSelected"]</span>
                                 }
@@ -53,50 +53,23 @@
 
                 @Body
 
-                <Devider />
-                <RadzenLink Path="https://www.radzen.com" Text="Go to url">
-                    <RadzenImage Path="_content/AbpRadzen.Blazor.Server.UI/images/microsoft-logo.svg" Style="width: 19px;height: 19px;">
-                    </RadzenImage>
-                </RadzenLink>
-                <RadzenButton Text="使用 Azure AD 登录" Click="@(() => LoginAzure())" Style="width:200px" />
+                @if (ExternalProviders.Count > 0)
+                {
+                    <Devider />
+                    <RadzenLink Path="https://www.radzen.com" Text="Go to url">
+                        <RadzenImage Path="_content/AbpRadzen.Blazor.Server.UI/images/microsoft-logo.svg" Style="width: 19px;height: 19px;">
+                        </RadzenImage>
+                    </RadzenLink>
+                    @foreach (var provider in ExternalProviders)
+                    {
+                        <RadzenTemplateForm Data=@("") Method="post" Action="/account/externallogin">
+                            <input type="hidden" name="returnUrl" value="/" />
+                            <input type="hidden" name="provider" value="@provider.AuthenticationScheme" />
+                            <RadzenButton ButtonType="ButtonType.Submit" Text="@provider.DisplayName" Style="width:200px" />
+                        </RadzenTemplateForm>
+                    }
+                }
             </RadzenCard>
         </RadzenColumn>
     </RadzenRow>
 </RadzenLayout>
-
-@code{
-
-    [Inject]
-    ICurrentTenant CurrentTenant { get; set; }
-
-    [Inject]
-    NavigationManager Navigation { get; set; }
-
-    async Task OpenTenantSwitchDialog()
-    {
-        await DialogService.OpenAsync<Pages.Account.TenantSwitchDialog>(
-            title: TL["SwitchTenant"],
-            parameters: new Dictionary<string, object>
-                {
-                    { "TenantName", CurrentTenant?.Name ?? string.Empty }
-                },
-            options: new DialogOptions
-                {
-                    Draggable = true,
-                    Width = "550px",
-                    Height = "400px"
-                }
-        );
-    }
-
-    private void LoginAzure()
-    {
-        // 跳转到 ABP 的外部登录地址，provider=AzureOpenId 对应上面配置的方案名
-        var returnUrl = Navigation.Uri; // 登录后返回当前页面
-        var encoded = Uri.EscapeDataString(returnUrl);
-        Navigation.NavigateTo(
-            $"Account/ExternalLogin?provider=AzureOpenId&returnUrl={encoded}",
-            forceLoad: true
-        );
-    }
-}

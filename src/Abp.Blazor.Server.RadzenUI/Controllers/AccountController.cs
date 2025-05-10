@@ -60,14 +60,13 @@ public class AccountController(
     [HttpPost("/account/externallogin")]
     public async Task<IActionResult> ExternalLoginAsync(
         string provider,
-        string returnUrl,
-        string returnUrlHash
+        string returnUrl
     )
     {
         var redirectUrl = Url.Action(
             "ExternalLoginCallback",
             "Account",
-            new { returnUrl, returnUrlHash }
+            new { returnUrl }
         );
         var properties = signInManager.ConfigureExternalAuthenticationProperties(
             provider,
