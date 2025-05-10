@@ -52,24 +52,29 @@
                 }
 
                 @Body
-
-                @if (ExternalProviders.Count > 0)
-                {
-                    <Devider />
-                    <RadzenLink Path="https://www.radzen.com" Text="Go to url">
-                        <RadzenImage Path="_content/AbpRadzen.Blazor.Server.UI/images/microsoft-logo.svg" Style="width: 19px;height: 19px;">
-                        </RadzenImage>
-                    </RadzenLink>
-                    @foreach (var provider in ExternalProviders)
-                    {
-                        <RadzenTemplateForm Data=@("") Method="post" Action="/account/externallogin">
-                            <input type="hidden" name="returnUrl" value="/" />
-                            <input type="hidden" name="provider" value="@provider.AuthenticationScheme" />
-                            <RadzenButton ButtonType="ButtonType.Submit" Text="@provider.DisplayName" Style="width:200px" />
-                        </RadzenTemplateForm>
-                    }
-                }
             </RadzenCard>
         </RadzenColumn>
     </RadzenRow>
 </RadzenLayout>
+
+@code{
+    [Inject]
+    ICurrentTenant? CurrentTenant { get; set; }
+
+    async Task OpenTenantSwitchDialog()
+    {
+        await DialogService.OpenAsync<Pages.Account.TenantSwitchDialog>(
+            title: TL["SwitchTenant"],
+            parameters: new Dictionary<string, object>
+                    {
+                        { "TenantName", CurrentTenant?.Name ?? string.Empty }
+                    },
+            options: new DialogOptions
+                {
+                    Draggable = true,
+                    Width = "550px",
+                    Height = "400px"
+                }
+        );
+    }
+}

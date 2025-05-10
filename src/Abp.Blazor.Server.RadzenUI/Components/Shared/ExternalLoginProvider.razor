@@ -1,0 +1,46 @@
+﻿@using Microsoft.AspNetCore.Authentication
+
+@if (ExternalProviders.Count > 0)
+{
+    <Devider />
+    <RadzenLink Path="https://www.radzen.com" Text="Go to url">
+        <RadzenImage Path="_content/AbpRadzen.Blazor.Server.UI/images/microsoft-logo.svg" Style="width: 19px;height: 19px;">
+        </RadzenImage>
+    </RadzenLink>
+    @foreach (var provider in ExternalProviders)
+    {
+        <RadzenTemplateForm Data=@("") Method="post" Action="/account/externallogin">
+            <input type="hidden" name="returnUrl" value="/" />
+            <input type="hidden" name="provider" value="@provider.AuthenticationScheme" />
+            <RadzenButton ButtonType="ButtonType.Submit" Text="@provider.DisplayName" Style="width:200px" />
+        </RadzenTemplateForm>
+    }
+}
+
+@code {
+    [Inject]
+    IAuthenticationSchemeProvider SchemeProvider { get; set; } = default!;
+
+    List<ExternalProviderModel> ExternalProviders { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        ExternalProviders = await GetExternalProviders();
+    }
+
+    async Task<List<ExternalProviderModel>> GetExternalProviders()
+    {
+        var schemes = await SchemeProvider.GetAllSchemesAsync();
+
+        return
+            [
+            .. schemes
+            .Where(x => x.DisplayName != null)
+            .Select(x => new ExternalProviderModel
+                {
+                    DisplayName = x.DisplayName,
+                    AuthenticationScheme = x.Name
+                })
+        ];
+    }
+}
