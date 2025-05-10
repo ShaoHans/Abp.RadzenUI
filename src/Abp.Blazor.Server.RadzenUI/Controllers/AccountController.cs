@@ -36,6 +36,15 @@ public class AccountController(
         return Redirect($"~/Login?error=Login Failed:{result.GetResultAsString()}");
     }
 
+    [HttpPost("/account/externallogin")]
+    public async Task<IActionResult> ExternalLoginAsync(string provider, string returnUrl)
+    {
+        var properties = signInManager.ConfigureExternalAuthenticationProperties(provider, returnUrl);
+        properties.Items["scheme"] = provider;
+
+        return await Task.FromResult(Challenge(properties, provider));
+    }
+
     [HttpGet("/account/logout")]
     public async Task<IActionResult> LogoutAsync()
     {
