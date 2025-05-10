@@ -1,0 +1,108 @@
+﻿@page "/register"
+@using Abp.RadzenUI.Components.Layout
+@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@using Volo.Abp.Account.Localization
+@using Volo.Abp.AspNetCore.Components
+@using Volo.Abp.Identity
+@using Volo.Abp.Account
+@using Volo.Abp.Security.Claims
+@inherits AbpComponentBase
+@layout LoginLayout
+
+<PageTitle>@L["Register"]</PageTitle>
+
+<RadzenTemplateForm Data=@("") Method="post" Action="/account/register">
+    <RadzenStack Gap="2rem">
+        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.05rem">
+            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
+                <RadzenLabel Text="@L["DisplayName:UserName"]" Component="UserName" />
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="8">
+                <RadzenTextBox Name="UserName" Value="@UserName" Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxUserNameLength" />
+                <RadzenRequiredValidator Component="UserName" Text="@L.Required("DisplayName:UserName")" Style="position: absolute" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.05rem">
+            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
+                <RadzenLabel Text="@L["DisplayName:Email"]" Component="EmailAddress" />
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="8">
+                <RadzenTextBox Name="EmailAddress" Value="@EmailAddress" Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxEmailLength" />
+                <RadzenRequiredValidator Component="EmailAddress" Text="@L.Required("DisplayName:Email")" Style="position: absolute" />
+                @* <RadzenEmailValidator Component="EmailAddress" Text="@L["Volo.Abp.Identity:InvalidEmail",RegisterDto.EmailAddress]" Style="position: absolute" /> *@
+            </RadzenColumn>
+        </RadzenRow>
+        @if (!IsExternalLogin)
+        {
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.05rem">
+                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                    <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
+                    <RadzenLabel Text="@L["DisplayName:Password"]" Component="Password" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8">
+                    <RadzenPassword Name="Password" Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxPasswordLength" />
+                    <RadzenRequiredValidator Component="Password" Text="@L.Required("DisplayName:Password")" Style="position: absolute" />
+                </RadzenColumn>
+            </RadzenRow>
+        }
+        <input type="hidden" name="IsExternalLogin" value="@IsExternalLogin.ToString()" />
+        <input type="hidden" name="ExternalLoginAuthSchema" value="@ExternalLoginAuthSchema" />
+    </RadzenStack>
+    <RadzenStack class="rz-p-2" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+        <RadzenButton ButtonType="ButtonType.Submit" Text="@L["Register"]"></RadzenButton>
+    </RadzenStack>
+</RadzenTemplateForm>
+
+<ExternalLoginProvider />
+
+@code {
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string? Error { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public bool IsExternalLogin { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string ExternalLoginAuthSchema { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string UserName { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string EmailAddress { get; set; }
+
+    [Inject]
+    NavigationManager Navigation { get; set; }
+
+    [Inject]
+    SignInManager<Volo.Abp.Identity.IdentityUser> SignInManager { get; set; }
+
+    [Inject]
+    IdentityUserManager UserManager { get; set; }
+
+    public Register()
+    {
+        LocalizationResource = typeof(AccountResource);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(Error))
+        {
+            await Message.Error(Error);
+        }
+
+        if (CurrentUser != null && CurrentUser.IsAuthenticated)
+        {
+            Navigation.NavigateTo("/");
+        }
+    }
+}
