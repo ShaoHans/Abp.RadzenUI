@@ -9,9 +9,9 @@
 
 <RadzenTemplateForm Data=@("") Method="post" Action="/account/login">
     <RadzenLogin AllowRegister="true" AllowResetPassword="false" AllowRememberMe="true" RememberMe="true"
-                 UserText="@L["UserName"]" PasswordText="@L["Password"]"
-                 RememberMeText="@L["RememberMe"]" LoginText="@L["Login"]"
-                 RegisterText="@L["Register"]" RegisterMessageText="@L["AreYouANewUser"]" />
+    UserText="@L["UserName"]" PasswordText="@L["Password"]"
+    RememberMeText="@L["RememberMe"]" LoginText="@L["Login"]"
+    RegisterText="@L["Register"]" RegisterMessageText="@L["AreYouANewUser"]" Register="GoToRegister" />
 </RadzenTemplateForm>
 
 @code {
@@ -40,5 +40,10 @@
         {
             Navigation.NavigateTo("/");
         }
+    }
+
+    public void GoToRegister()
+    {
+        Navigation.NavigateTo("/register");
     }
 }
