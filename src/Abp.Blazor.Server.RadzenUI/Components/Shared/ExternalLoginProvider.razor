@@ -3,6 +3,7 @@
 @if (ExternalProviders.Count > 0)
 {
     <Devider />
+    <RadzenText TextStyle="TextStyle.Overline">或使用以下方式登录</RadzenText>
     @foreach (var provider in ExternalProviders)
     {
         <RadzenTemplateForm Data=@("") Method="post" Action="/account/externallogin" class="rz-mb-2">

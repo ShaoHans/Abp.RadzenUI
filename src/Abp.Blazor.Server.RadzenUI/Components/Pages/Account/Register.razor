@@ -6,17 +6,18 @@
 @using Volo.Abp.AspNetCore.Components
 @using Volo.Abp.Identity
 @using Volo.Abp.Account
+@using Volo.Abp.Identity.Localization
 @using Volo.Abp.Security.Claims
 @inherits AbpComponentBase
 @layout LoginLayout
 
 <PageTitle>@L["Register"]</PageTitle>
 
-<RadzenTemplateForm Data=@("") Method="post" Action="/account/register">
+<RadzenTemplateForm Data=@RegisterDto Method="post" Action="/account/register">
     <RadzenStack Gap="2rem">
         <RadzenFormField Text="@L["DisplayName:UserName"]" Variant="Variant.Flat">
             <ChildContent>
-                <RadzenTextBox AutoCompleteType="AutoCompleteType.Username" Name="Username" id="Username" MaxLength="IdentityUserConsts.MaxUserNameLength" />
+                <RadzenTextBox AutoCompleteType="AutoCompleteType.Username" Name="Username" id="Username" @bind-Value="@RegisterDto.UserName" MaxLength="IdentityUserConsts.MaxUserNameLength" />
             </ChildContent>
             <Helper>
                 <RadzenRequiredValidator Component="Username" Text="@L.Required("DisplayName:UserName")" />
@@ -24,18 +25,19 @@
         </RadzenFormField>
         <RadzenFormField Text="@L["DisplayName:Email"]" Variant="Variant.Flat">
             <ChildContent>
-                <RadzenTextBox AutoCompleteType="AutoCompleteType.Email" Name="EmailAddress" id="EmailAddress" MaxLength="IdentityUserConsts.MaxEmailLength" />
+                <RadzenTextBox AutoCompleteType="AutoCompleteType.Email" Name="EmailAddress" id="EmailAddress" @bind-Value="@RegisterDto.EmailAddress" MaxLength="IdentityUserConsts.MaxEmailLength" />
             </ChildContent>
             <Helper>
                 <RadzenRequiredValidator Component="EmailAddress" Text="@L.Required("DisplayName:Email")" />
+                <RadzenEmailValidator Component="EmailAddress" Text="@L["Volo.Abp.Identity:InvalidEmail", RegisterDto.EmailAddress]" />
             </Helper>
         </RadzenFormField>
-        
+
         @if (!IsExternalLogin)
         {
             <RadzenFormField Text="@L["DisplayName:Password"]" Variant="Variant.Flat">
                 <ChildContent>
-                    <RadzenPassword AutoCompleteType="AutoCompleteType.CurrentPassword" Name="Password" id="Password" />
+                    <RadzenPassword AutoCompleteType="AutoCompleteType.CurrentPassword" Name="Password" id="Password" @bind-Value="@RegisterDto.Password" />
                 </ChildContent>
                 <Helper>
                     <RadzenRequiredValidator Component="Password" Text="@L.Required("DisplayName:Password")" />
@@ -88,13 +90,18 @@
     [Inject]
     IdentityUserManager UserManager { get; set; }
 
+    RegisterDto RegisterDto { get; set; } = new ();
+
     public Register()
     {
-        LocalizationResource = typeof(AccountResource);
+        LocalizationResource = typeof(IdentityResource);
     }
 
     protected override async Task OnInitializedAsync()
     {
+        RegisterDto.UserName = UserName;
+        RegisterDto.EmailAddress = EmailAddress;
+
         if (!string.IsNullOrWhiteSpace(Error))
         {
             await Message.Error(Error);
