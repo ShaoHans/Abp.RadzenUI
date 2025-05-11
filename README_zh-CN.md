@@ -75,6 +75,9 @@ private void ConfigureAbpRadzenUI()
         //    Default = "material",
         //    EnablePremiumTheme = true,
         //};
+
+        // 配置第三方登录服务商icon
+        options.ExternalLogin.Providers.Add(new ExternalLoginProvider("AzureOpenId", "images/microsoft-logo.svg"));
     });
 
     // 多租户配置, 这个会影响到登录页面是否展示租户信息
@@ -115,5 +118,50 @@ app.UseRadzenUI();
 ### 5. 配置侧边栏菜单
 当你添加了新的razor页面组件后，需要在[CRMMenuContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/Menus/CRMMenuContributor.cs)类文件中进行配置，这样它就会显示在页面的侧边栏菜单中
 
-### 6. 第一次运行示例程序的时候不要忘了执行迁移代码
+### 6. 配置第三方登录
+如果你想集成第三方登录，比如AzureAD，配置很简单，只要你在配置文件中做以下配置，然后在你的Web项目的Module中进行以下配置，你就能使用第三方登录功能了。你能在sample示例中找到如何使用。
+```json
+"AzureAd": {
+  "Instance": "https://login.microsoftonline.com/",
+  "TenantId": "<your-tenant-id>",
+  "ClientId": "<your-client-id>",
+  "ClientSecret": "<your-client-secret>",
+  "CallbackPath": "/signin-azuread-oidc"
+}
+```
+
+```csharp
+private void ConfigureOidcAuthentication(
+    ServiceConfigurationContext context,
+    IConfiguration configuration
+)
+{
+    if (configuration.GetSection("AzureAd").Exists())
+    {
+        context
+            .Services.AddAuthentication()
+            .AddOpenIdConnect(
+                "AzureOpenId",
+                "Azure Active Directory",
+                options =>
+                {
+                    options.Authority =
+                        $"{configuration["AzureAd:Instance"]}{configuration["AzureAd:TenantId"]}/v2.0/";
+                    options.ClientId = configuration["AzureAd:ClientId"];
+                    options.ClientSecret = configuration["AzureAd:ClientSecret"];
+                    options.ResponseType = OpenIdConnectResponseType.Code;
+                    options.CallbackPath = configuration["AzureAd:CallbackPath"];
+                    options.RequireHttpsMetadata = false;
+                    options.SaveTokens = true;
+                    options.GetClaimsFromUserInfoEndpoint = true;
+                    options.SignInScheme = IdentityConstants.ExternalScheme;
+
+                    options.Scope.Add("email");
+                }
+            );
+    }
+}
+```
+
+### 7. 第一次运行示例程序的时候不要忘了执行迁移代码
 
