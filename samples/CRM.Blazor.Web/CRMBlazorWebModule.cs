@@ -253,6 +253,7 @@ public class CRMBlazorWebModule : AbpModule
                 EnablePremiumTheme = true,
             };
 
+            // configure external login provider icon
             options.ExternalLogin.Providers.Add(new ExternalLoginProvider("AzureOpenId", "images/microsoft-logo.svg"));
         });
 
