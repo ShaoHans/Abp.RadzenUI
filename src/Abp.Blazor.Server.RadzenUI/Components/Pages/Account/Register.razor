@@ -14,7 +14,24 @@
 
 <RadzenTemplateForm Data=@("") Method="post" Action="/account/register">
     <RadzenStack Gap="2rem">
-        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.05rem">
+        <RadzenFormField Text="@L["DisplayName:UserName"]" Variant="Variant.Flat">
+            <ChildContent>
+                <RadzenTextBox AutoCompleteType="AutoCompleteType.Username" Name="Username" id="Username" Value="@UserName" MaxLength="IdentityUserConsts.MaxUserNameLength" />
+            </ChildContent>
+            <Helper>
+                <RadzenRequiredValidator Component="Username" Text="@L.Required("DisplayName:UserName")" />
+            </Helper>
+        </RadzenFormField>
+        <RadzenFormField Text="@L["DisplayName:Email"]" Variant="Variant.Flat">
+            <ChildContent>
+                <RadzenTextBox AutoCompleteType="AutoCompleteType.Email" Name="EmailAddress" id="EmailAddress" Value="@EmailAddress" MaxLength="IdentityUserConsts.MaxEmailLength" />
+            </ChildContent>
+            <Helper>
+                <RadzenRequiredValidator Component="EmailAddress" Text="@L.Required("DisplayName:Email")" />
+            </Helper>
+        </RadzenFormField>
+
+        @* <RadzenRow AlignItems="AlignItems.Center" RowGap="0.05rem">
             <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
                 <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
                 <RadzenLabel Text="@L["DisplayName:UserName"]" Component="UserName" />
@@ -32,12 +49,11 @@
             <RadzenColumn Size="12" SizeMD="8">
                 <RadzenTextBox Name="EmailAddress" Value="@EmailAddress" Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxEmailLength" />
                 <RadzenRequiredValidator Component="EmailAddress" Text="@L.Required("DisplayName:Email")" Style="position: absolute" />
-                @* <RadzenEmailValidator Component="EmailAddress" Text="@L["Volo.Abp.Identity:InvalidEmail",RegisterDto.EmailAddress]" Style="position: absolute" /> *@
             </RadzenColumn>
-        </RadzenRow>
+        </RadzenRow> *@
         @if (!IsExternalLogin)
         {
-            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.05rem">
+            @* <RadzenRow AlignItems="AlignItems.Center" RowGap="0.05rem">
                 <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
                     <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
                     <RadzenLabel Text="@L["DisplayName:Password"]" Component="Password" />
@@ -46,7 +62,16 @@
                     <RadzenPassword Name="Password" Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxPasswordLength" />
                     <RadzenRequiredValidator Component="Password" Text="@L.Required("DisplayName:Password")" Style="position: absolute" />
                 </RadzenColumn>
-            </RadzenRow>
+            </RadzenRow> *@
+
+            <RadzenFormField Text="@L["DisplayName:Password"]" Variant="Variant.Flat">
+                <ChildContent>
+                    <RadzenPassword AutoCompleteType="AutoCompleteType.CurrentPassword" Name="Password" id="Password" MaxLength="IdentityUserConsts.MaxPasswordLength" />
+                </ChildContent>
+                <Helper>
+                    <RadzenRequiredValidator Component="Password" Text="@L.Required("DisplayName:Password")" />
+                </Helper>
+            </RadzenFormField>
         }
         <input type="hidden" name="IsExternalLogin" value="@IsExternalLogin.ToString()" />
         <input type="hidden" name="ExternalLoginAuthSchema" value="@ExternalLoginAuthSchema" />
