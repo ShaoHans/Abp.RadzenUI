@@ -3,7 +3,10 @@
 @if (ExternalProviders.Count > 0)
 {
     <Devider />
-    <RadzenText TextStyle="TextStyle.Overline">或使用以下方式登录</RadzenText>
+    @if (!string.IsNullOrEmpty(Text))
+    {
+        <RadzenText TextStyle="TextStyle.Overline">@Text</RadzenText>
+    }
     @foreach (var provider in ExternalProviders)
     {
         <RadzenTemplateForm Data=@("") Method="post" Action="/account/externallogin" class="rz-mb-2">
@@ -16,6 +19,9 @@
 }
 
 @code {
+    [Parameter]
+    public string Text { get; set; }
+
     [Inject]
     IAuthenticationSchemeProvider SchemeProvider { get; set; } = default!;
 

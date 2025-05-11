@@ -2,6 +2,7 @@
 @using Abp.RadzenUI.Components.Layout
 @using Microsoft.AspNetCore.Identity
 @using System.Security.Claims
+@using Microsoft.Extensions.Localization
 @using Volo.Abp.Account.Localization
 @using Volo.Abp.AspNetCore.Components
 @using Volo.Abp.Identity
@@ -29,7 +30,7 @@
             </ChildContent>
             <Helper>
                 <RadzenRequiredValidator Component="EmailAddress" Text="@L.Required("DisplayName:Email")" />
-                <RadzenEmailValidator Component="EmailAddress" Text="@L["Volo.Abp.Identity:InvalidEmail", RegisterDto.EmailAddress]" />
+                <RadzenEmailValidator Component="EmailAddress" Text="@TL["Volo.Abp.Identity:InvalidEmail", RegisterDto.EmailAddress]" />
             </Helper>
         </RadzenFormField>
 
@@ -58,7 +59,7 @@
     </div>
 </RadzenTemplateForm>
 
-<ExternalLoginProvider />
+<ExternalLoginProvider Text="@L["OrRegisterWith"]" />
 
 @code {
     [SupplyParameterFromQuery]
@@ -90,11 +91,14 @@
     [Inject]
     IdentityUserManager UserManager { get; set; }
 
+    [Inject]
+    IStringLocalizer<IdentityResource> TL { get; set; }
+
     RegisterDto RegisterDto { get; set; } = new ();
 
     public Register()
     {
-        LocalizationResource = typeof(IdentityResource);
+        LocalizationResource = typeof(AccountResource);
     }
 
     protected override async Task OnInitializedAsync()
