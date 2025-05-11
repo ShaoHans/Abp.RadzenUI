@@ -16,7 +16,7 @@
     <RadzenStack Gap="2rem">
         <RadzenFormField Text="@L["DisplayName:UserName"]" Variant="Variant.Flat">
             <ChildContent>
-                <RadzenTextBox AutoCompleteType="AutoCompleteType.Username" Name="Username" id="Username" Value="@UserName" MaxLength="IdentityUserConsts.MaxUserNameLength" />
+                <RadzenTextBox AutoCompleteType="AutoCompleteType.Username" Name="Username" id="Username" MaxLength="IdentityUserConsts.MaxUserNameLength" />
             </ChildContent>
             <Helper>
                 <RadzenRequiredValidator Component="Username" Text="@L.Required("DisplayName:UserName")" />
@@ -24,49 +24,18 @@
         </RadzenFormField>
         <RadzenFormField Text="@L["DisplayName:Email"]" Variant="Variant.Flat">
             <ChildContent>
-                <RadzenTextBox AutoCompleteType="AutoCompleteType.Email" Name="EmailAddress" id="EmailAddress" Value="@EmailAddress" MaxLength="IdentityUserConsts.MaxEmailLength" />
+                <RadzenTextBox AutoCompleteType="AutoCompleteType.Email" Name="EmailAddress" id="EmailAddress" MaxLength="IdentityUserConsts.MaxEmailLength" />
             </ChildContent>
             <Helper>
                 <RadzenRequiredValidator Component="EmailAddress" Text="@L.Required("DisplayName:Email")" />
             </Helper>
         </RadzenFormField>
-
-        @* <RadzenRow AlignItems="AlignItems.Center" RowGap="0.05rem">
-            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
-                <RadzenLabel Text="@L["DisplayName:UserName"]" Component="UserName" />
-            </RadzenColumn>
-            <RadzenColumn Size="12" SizeMD="8">
-                <RadzenTextBox Name="UserName" Value="@UserName" Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxUserNameLength" />
-                <RadzenRequiredValidator Component="UserName" Text="@L.Required("DisplayName:UserName")" Style="position: absolute" />
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.05rem">
-            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
-                <RadzenLabel Text="@L["DisplayName:Email"]" Component="EmailAddress" />
-            </RadzenColumn>
-            <RadzenColumn Size="12" SizeMD="8">
-                <RadzenTextBox Name="EmailAddress" Value="@EmailAddress" Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxEmailLength" />
-                <RadzenRequiredValidator Component="EmailAddress" Text="@L.Required("DisplayName:Email")" Style="position: absolute" />
-            </RadzenColumn>
-        </RadzenRow> *@
+        
         @if (!IsExternalLogin)
         {
-            @* <RadzenRow AlignItems="AlignItems.Center" RowGap="0.05rem">
-                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                    <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
-                    <RadzenLabel Text="@L["DisplayName:Password"]" Component="Password" />
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="8">
-                    <RadzenPassword Name="Password" Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxPasswordLength" />
-                    <RadzenRequiredValidator Component="Password" Text="@L.Required("DisplayName:Password")" Style="position: absolute" />
-                </RadzenColumn>
-            </RadzenRow> *@
-
             <RadzenFormField Text="@L["DisplayName:Password"]" Variant="Variant.Flat">
                 <ChildContent>
-                    <RadzenPassword AutoCompleteType="AutoCompleteType.CurrentPassword" Name="Password" id="Password" MaxLength="IdentityUserConsts.MaxPasswordLength" />
+                    <RadzenPassword AutoCompleteType="AutoCompleteType.CurrentPassword" Name="Password" id="Password" />
                 </ChildContent>
                 <Helper>
                     <RadzenRequiredValidator Component="Password" Text="@L.Required("DisplayName:Password")" />
