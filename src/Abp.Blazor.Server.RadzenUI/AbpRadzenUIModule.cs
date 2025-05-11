@@ -3,11 +3,8 @@ using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Menus;
 using Abp.RadzenUI.Services;
 using Localization.Resources.AbpUi;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Radzen;
 using Volo.Abp.AspNetCore.Components.Messages;
 using Volo.Abp.AspNetCore.Components.Server.Configuration;
@@ -71,8 +68,6 @@ public class AbpRadzenUIModule : AbpModule
             options.AddMaps<AbpRadzenUIModule>();
         });
 
-        ConfigureOidcAuthentication(context, configuration);
-
         // Add services to the container.
         context.Services.AddRazorComponents().AddInteractiveServerComponents();
 
@@ -120,36 +115,5 @@ public class AbpRadzenUIModule : AbpModule
             options.MenuContributors.Add(new AbpTenantMenuContributor());
             options.MenuContributors.Add(new AuditLoggingMenuContributor());
         });
-    }
-
-    private void ConfigureOidcAuthentication(
-        ServiceConfigurationContext context,
-        IConfiguration configuration
-    )
-    {
-        if (configuration.GetSection("AzureAd").Exists())
-        {
-            context
-                .Services.AddAuthentication()
-                .AddOpenIdConnect(
-                    "AzureOpenId",
-                    "Azure Active Directory",
-                    options =>
-                    {
-                        options.Authority =
-                            $"{configuration["AzureAd:Instance"]}{configuration["AzureAd:TenantId"]}/v2.0/";
-                        options.ClientId = configuration["AzureAd:ClientId"];
-                        options.ClientSecret = configuration["AzureAd:ClientSecret"];
-                        options.ResponseType = OpenIdConnectResponseType.Code;
-                        options.CallbackPath = configuration["AzureAd:CallbackPath"];
-                        options.RequireHttpsMetadata = false;
-                        options.SaveTokens = true;
-                        options.GetClaimsFromUserInfoEndpoint = true;
-                        options.SignInScheme = IdentityConstants.ExternalScheme;
-
-                        options.Scope.Add("email");
-                    }
-                );
-        }
     }
 }

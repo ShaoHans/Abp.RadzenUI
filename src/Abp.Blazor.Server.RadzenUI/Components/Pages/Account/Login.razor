@@ -1,7 +1,9 @@
 ﻿@page "/login"
 @using Abp.RadzenUI.Components.Layout
 @using Volo.Abp.Account.Localization
+@using Volo.Abp.Account.Settings
 @using Volo.Abp.AspNetCore.Components
+@using Volo.Abp.Settings
 @inherits AbpComponentBase
 @layout LoginLayout
 
@@ -13,7 +15,7 @@
                  PasswordText="@L["Password"]" PasswordRequired="@L.Required("DisplayName:Password")"
                  AllowResetPassword="false"
                  AllowRememberMe="true" RememberMe="true" RememberMeText="@L["RememberMe"]"
-                 AllowRegister="true" RegisterText="@L["Register"]" RegisterMessageText="@L["AreYouANewUser"]" Register="@OnRegister" />
+                 AllowRegister="@EnableLocalRegister" RegisterText="@L["Register"]" RegisterMessageText="@L["AreYouANewUser"]" Register="@OnRegister" />
 </RadzenTemplateForm>
 
 <ExternalLoginProvider Text="@L["OrLoginWith"]" />
@@ -26,6 +28,11 @@
     [Inject]
     NavigationManager Navigation { get; set; }
 
+    [Inject]
+    ISettingProvider SettingProvider { get; set; }
+
+    public bool EnableLocalRegister { get; set; }
+
     public Login()
     {
         LocalizationResource = typeof(AccountResource);
@@ -33,6 +40,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        EnableLocalRegister = await SettingProvider.IsTrueAsync(AccountSettingNames.IsSelfRegistrationEnabled);
         await base.OnInitializedAsync();
 
         if (!string.IsNullOrWhiteSpace(Error))

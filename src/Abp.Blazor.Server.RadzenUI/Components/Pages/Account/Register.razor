@@ -59,7 +59,10 @@
     </div>
 </RadzenTemplateForm>
 
-<ExternalLoginProvider Text="@L["OrRegisterWith"]" />
+@if (!IsExternalLogin)
+{
+    <ExternalLoginProvider Text="@L["OrRegisterWith"]" />
+}
 
 @code {
     [SupplyParameterFromQuery]
