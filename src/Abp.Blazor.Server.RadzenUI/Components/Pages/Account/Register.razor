@@ -1,0 +1,127 @@
+﻿@page "/register"
+@using Abp.RadzenUI.Components.Layout
+@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@using Microsoft.Extensions.Localization
+@using Volo.Abp.Account.Localization
+@using Volo.Abp.AspNetCore.Components
+@using Volo.Abp.Identity
+@using Volo.Abp.Account
+@using Volo.Abp.Identity.Localization
+@using Volo.Abp.Security.Claims
+@inherits AbpComponentBase
+@layout LoginLayout
+
+<PageTitle>@L["Register"]</PageTitle>
+
+<RadzenTemplateForm Data=@RegisterDto Method="post" Action="/account/register">
+    <RadzenStack Gap="2rem">
+        <RadzenFormField Text="@L["DisplayName:UserName"]" Variant="Variant.Flat">
+            <ChildContent>
+                <RadzenTextBox AutoCompleteType="AutoCompleteType.Username" Name="Username" id="Username" @bind-Value="@RegisterDto.UserName" MaxLength="IdentityUserConsts.MaxUserNameLength" />
+            </ChildContent>
+            <Helper>
+                <RadzenRequiredValidator Component="Username" Text="@L.Required("DisplayName:UserName")" />
+            </Helper>
+        </RadzenFormField>
+        <RadzenFormField Text="@L["DisplayName:Email"]" Variant="Variant.Flat">
+            <ChildContent>
+                <RadzenTextBox AutoCompleteType="AutoCompleteType.Email" Name="EmailAddress" id="EmailAddress" @bind-Value="@RegisterDto.EmailAddress" MaxLength="IdentityUserConsts.MaxEmailLength" />
+            </ChildContent>
+            <Helper>
+                <RadzenRequiredValidator Component="EmailAddress" Text="@L.Required("DisplayName:Email")" />
+                <RadzenEmailValidator Component="EmailAddress" Text="@TL["Volo.Abp.Identity:InvalidEmail", RegisterDto.EmailAddress]" />
+            </Helper>
+        </RadzenFormField>
+
+        @if (!IsExternalLogin)
+        {
+            <RadzenFormField Text="@L["DisplayName:Password"]" Variant="Variant.Flat">
+                <ChildContent>
+                    <RadzenPassword AutoCompleteType="AutoCompleteType.CurrentPassword" Name="Password" id="Password" @bind-Value="@RegisterDto.Password" />
+                </ChildContent>
+                <Helper>
+                    <RadzenRequiredValidator Component="Password" Text="@L.Required("DisplayName:Password")" />
+                </Helper>
+            </RadzenFormField>
+        }
+        <input type="hidden" name="IsExternalLogin" value="@IsExternalLogin.ToString()" />
+        <input type="hidden" name="ExternalLoginAuthSchema" value="@ExternalLoginAuthSchema" />
+    </RadzenStack>
+    <RadzenStack class="rz-p-4" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+        <RadzenButton ButtonType="ButtonType.Submit" Text="@L["Register"]" Style="width:100%"></RadzenButton>
+    </RadzenStack>
+    <div class="rz-login">
+        <div class="rz-register">
+            @L["AlreadyRegistered"]
+            <RadzenButton ButtonType="ButtonType.Button" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Secondary" Shade="Shade.Lighter" Text="@L["Login"]" Click="@OnLogin" />
+        </div>
+    </div>
+</RadzenTemplateForm>
+
+@if (!IsExternalLogin)
+{
+    <ExternalLoginProvider Text="@L["OrRegisterWith"]" />
+}
+
+@code {
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string? Error { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public bool IsExternalLogin { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string ExternalLoginAuthSchema { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string UserName { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string EmailAddress { get; set; }
+
+    [Inject]
+    NavigationManager Navigation { get; set; }
+
+    [Inject]
+    SignInManager<Volo.Abp.Identity.IdentityUser> SignInManager { get; set; }
+
+    [Inject]
+    IdentityUserManager UserManager { get; set; }
+
+    [Inject]
+    IStringLocalizer<IdentityResource> TL { get; set; }
+
+    RegisterDto RegisterDto { get; set; } = new ();
+
+    public Register()
+    {
+        LocalizationResource = typeof(AccountResource);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        RegisterDto.UserName = UserName;
+        RegisterDto.EmailAddress = EmailAddress;
+
+        if (!string.IsNullOrWhiteSpace(Error))
+        {
+            await Message.Error(Error);
+        }
+
+        if (CurrentUser != null && CurrentUser.IsAuthenticated)
+        {
+            Navigation.NavigateTo("/");
+        }
+    }
+
+    public void OnLogin()
+    {
+        Navigation.NavigateTo("/login");
+    }
+}

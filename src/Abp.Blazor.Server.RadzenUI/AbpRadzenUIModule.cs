@@ -43,6 +43,8 @@ public class AbpRadzenUIModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
+        var configuration = context.Services.GetConfiguration();
+
         Configure<AbpVirtualFileSystemOptions>(options =>
         {
             options.FileSets.AddEmbedded<AbpRadzenUIModule>("Abp.RadzenUI");

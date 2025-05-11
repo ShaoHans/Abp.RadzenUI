@@ -6,6 +6,8 @@ using CRM.EntityFrameworkCore;
 using CRM.Localization;
 using CRM.MultiTenancy;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.OpenApi.Models;
 using OpenIddict.Server.AspNetCore;
 using OpenIddict.Validation.AspNetCore;
@@ -113,6 +115,10 @@ public class CRMBlazorWebModule : AbpModule
 
         ConfigureAbpRadzenUI();
         ConfigureAuthentication(context);
+
+        // configure external login
+        ConfigureOidcAuthentication(context, configuration);
+
         ConfigureAutoMapper();
         ConfigureVirtualFileSystem(hostingEnvironment);
         ConfigureSwaggerServices(context.Services);
@@ -128,6 +134,37 @@ public class CRMBlazorWebModule : AbpModule
         {
             options.IsDynamicClaimsEnabled = true;
         });
+    }
+
+    private void ConfigureOidcAuthentication(
+        ServiceConfigurationContext context,
+        IConfiguration configuration
+    )
+    {
+        if (configuration.GetSection("AzureAd").Exists())
+        {
+            context
+                .Services.AddAuthentication()
+                .AddOpenIdConnect(
+                    "AzureOpenId",
+                    "Azure Active Directory",
+                    options =>
+                    {
+                        options.Authority =
+                            $"{configuration["AzureAd:Instance"]}{configuration["AzureAd:TenantId"]}/v2.0/";
+                        options.ClientId = configuration["AzureAd:ClientId"];
+                        options.ClientSecret = configuration["AzureAd:ClientSecret"];
+                        options.ResponseType = OpenIdConnectResponseType.Code;
+                        options.CallbackPath = configuration["AzureAd:CallbackPath"];
+                        options.RequireHttpsMetadata = false;
+                        options.SaveTokens = true;
+                        options.GetClaimsFromUserInfoEndpoint = true;
+                        options.SignInScheme = IdentityConstants.ExternalScheme;
+
+                        options.Scope.Add("email");
+                    }
+                );
+        }
     }
 
     private void ConfigureVirtualFileSystem(IWebHostEnvironment hostingEnvironment)
@@ -215,6 +252,8 @@ public class CRMBlazorWebModule : AbpModule
             {
                 EnablePremiumTheme = true,
             };
+
+            options.ExternalLogin.Providers.Add(new ExternalLoginProvider("AzureOpenId", "images/microsoft-logo.svg"));
         });
 
         // Configure AbpMultiTenancyOptions, this will affect login page that whether need to switch tenants

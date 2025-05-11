@@ -1,0 +1,53 @@
+﻿@using Microsoft.AspNetCore.Authentication
+@using Microsoft.Extensions.Options
+@inject IOptions<AbpRadzenUIOptions> RadzenUIOptions
+
+@if (ExternalProviders.Count > 0)
+{
+    <Devider />
+    @if (!string.IsNullOrEmpty(Text))
+    {
+        <RadzenText TextStyle="TextStyle.Overline">@Text</RadzenText>
+    }
+    @foreach (var provider in ExternalProviders)
+    {
+        <RadzenTemplateForm Data=@("") Method="post" Action="/account/externallogin" class="rz-mb-2">
+            <input type="hidden" name="returnUrl" value="/" />
+            <input type="hidden" name="provider" value="@provider.AuthenticationScheme" />
+            <RadzenButton ButtonType="ButtonType.Submit" Text="@provider.DisplayName" Style="width:100%"
+                          Image="@provider.IconPath" />
+        </RadzenTemplateForm>
+    }
+}
+
+@code {
+    [Parameter]
+    public string Text { get; set; }
+
+    [Inject]
+    IAuthenticationSchemeProvider SchemeProvider { get; set; } = default!;
+
+    List<ExternalProviderModel> ExternalProviders { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        ExternalProviders = await GetExternalProviders();
+    }
+
+    async Task<List<ExternalProviderModel>> GetExternalProviders()
+    {
+        var schemes = await SchemeProvider.GetAllSchemesAsync();
+
+        return
+                [
+            .. schemes
+                .Where(x => x.DisplayName != null)
+                .Select(x => new ExternalProviderModel
+                {
+                    DisplayName = x.DisplayName,
+                    AuthenticationScheme = x.Name,
+                    IconPath = RadzenUIOptions.Value.ExternalLogin.Providers.FirstOrDefault(p => p.AuthenticationScheme == x.Name)?.IconPath
+                })
+        ];
+    }
+}

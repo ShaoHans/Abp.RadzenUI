@@ -11,6 +11,8 @@ public class AbpRadzenUIOptions
     public LoginPageSettings LoginPage { get; set; } = new();
 
     public ThemeSettings Theme { get; set; } = new();
+
+    public ExternalLoginSettings ExternalLogin { get; set; } = new();
 }
 
 public class LoginPageSettings
@@ -41,4 +43,22 @@ public class ThemeSettings
     public string Default { get; set; } = "material-dark";
 
     public bool EnablePremiumTheme { get; set; } = false;
+}
+
+public class ExternalLoginSettings
+{
+    public List<ExternalLoginProvider> Providers { get; set; } = [];
+}
+
+public class ExternalLoginProvider
+{
+    public string AuthenticationScheme { get; set; } = default!;
+
+    public string IconPath { get; set; } = string.Empty;
+
+    public ExternalLoginProvider(string authenticationScheme, string iconPath)
+    {
+        AuthenticationScheme = authenticationScheme;
+        IconPath = iconPath;
+    }
 }
