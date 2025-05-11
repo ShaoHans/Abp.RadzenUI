@@ -3,16 +3,13 @@
 @if (ExternalProviders.Count > 0)
 {
     <Devider />
-    <RadzenLink Path="https://www.radzen.com" Text="Go to url">
-        <RadzenImage Path="_content/AbpRadzen.Blazor.Server.UI/images/microsoft-logo.svg" Style="width: 19px;height: 19px;">
-        </RadzenImage>
-    </RadzenLink>
     @foreach (var provider in ExternalProviders)
     {
-        <RadzenTemplateForm Data=@("") Method="post" Action="/account/externallogin">
+        <RadzenTemplateForm Data=@("") Method="post" Action="/account/externallogin" class="rz-mb-2">
             <input type="hidden" name="returnUrl" value="/" />
             <input type="hidden" name="provider" value="@provider.AuthenticationScheme" />
-            <RadzenButton ButtonType="ButtonType.Submit" Text="@provider.DisplayName" Style="width:200px" />
+            <RadzenButton ButtonType="ButtonType.Submit" Text="@provider.DisplayName" Style="width:100%"
+                          Image="_content/AbpRadzen.Blazor.Server.UI/images/microsoft-logo.svg" />
         </RadzenTemplateForm>
     }
 }

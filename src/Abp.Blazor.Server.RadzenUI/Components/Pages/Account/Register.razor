@@ -51,9 +51,15 @@
         <input type="hidden" name="IsExternalLogin" value="@IsExternalLogin.ToString()" />
         <input type="hidden" name="ExternalLoginAuthSchema" value="@ExternalLoginAuthSchema" />
     </RadzenStack>
-    <RadzenStack class="rz-p-2" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
-        <RadzenButton ButtonType="ButtonType.Submit" Text="@L["Register"]"></RadzenButton>
+    <RadzenStack class="rz-p-4" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+        <RadzenButton ButtonType="ButtonType.Submit" Text="@L["Register"]" Style="width:100%"></RadzenButton>
     </RadzenStack>
+    <div class="rz-login">
+        <div class="rz-register">
+            @L["AlreadyRegistered"]
+            <RadzenButton ButtonType="ButtonType.Button" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Secondary" Shade="Shade.Lighter" Text="@L["Login"]" Click="@OnLogin" />
+        </div>
+    </div>
 </RadzenTemplateForm>
 
 <ExternalLoginProvider />
@@ -104,5 +110,10 @@
         {
             Navigation.NavigateTo("/");
         }
+    }
+
+    public void OnLogin()
+    {
+        Navigation.NavigateTo("/login");
     }
 }
