@@ -75,6 +75,9 @@ private void ConfigureAbpRadzenUI()
         //    Default = "material",
         //    EnablePremiumTheme = true,
         //};
+
+        // configure external login provider icon
+        options.ExternalLogin.Providers.Add(new ExternalLoginProvider("AzureOpenId", "images/microsoft-logo.svg"));
     });
 
     // Configure AbpMultiTenancyOptions, this will affect login page that whether need to switch tenants
@@ -115,4 +118,50 @@ yuo can refer to the sample code [CRMBlazorWebModule](https://github.com/ShaoHan
 ### 5. Config Menu
 When you add razor page and need config menu , you should edit the [CRMMenuContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/Menus/CRMMenuContributor.cs) class 
 
-### 6. Don't forget migrate your database when you first run the app
+### 6. Config External Login
+If you want to integrate third-party authentication such as Azure AD, it's quite straightforward. Simply update your configuration file as shown below, and add the necessary setup in your web project’s module. Once completed, third-party login functionality will be enabled and ready to use.You can refer to the sample project to see how it is implemented in practice.
+```json
+"AzureAd": {
+  "Instance": "https://login.microsoftonline.com/",
+  "TenantId": "<your-tenant-id>",
+  "ClientId": "<your-client-id>",
+  "ClientSecret": "<your-client-secret>",
+  "CallbackPath": "/signin-azuread-oidc"
+}
+```
+
+```csharp
+private void ConfigureOidcAuthentication(
+    ServiceConfigurationContext context,
+    IConfiguration configuration
+)
+{
+    if (configuration.GetSection("AzureAd").Exists())
+    {
+        context
+            .Services.AddAuthentication()
+            .AddOpenIdConnect(
+                "AzureOpenId",
+                "Azure Active Directory",
+                options =>
+                {
+                    options.Authority =
+                        $"{configuration["AzureAd:Instance"]}{configuration["AzureAd:TenantId"]}/v2.0/";
+                    options.ClientId = configuration["AzureAd:ClientId"];
+                    options.ClientSecret = configuration["AzureAd:ClientSecret"];
+                    options.ResponseType = OpenIdConnectResponseType.Code;
+                    options.CallbackPath = configuration["AzureAd:CallbackPath"];
+                    options.RequireHttpsMetadata = false;
+                    options.SaveTokens = true;
+                    options.GetClaimsFromUserInfoEndpoint = true;
+                    options.SignInScheme = IdentityConstants.ExternalScheme;
+
+                    options.Scope.Add("email");
+                }
+            );
+    }
+}
+```
+
+
+### 7. Don't forget migrate your database when you first run the app
