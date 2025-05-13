@@ -22,6 +22,7 @@ using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
+using Volo.Abp.SettingManagement.Localization;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
 using Volo.Abp.UI.Navigation;
 using Volo.Abp.Validation.Localization;
@@ -58,7 +59,8 @@ public class AbpRadzenUIModule : AbpModule
                     typeof(AbpValidationResource),
                     typeof(AbpUiResource),
                     typeof(AbpExceptionHandlingResource),
-                    typeof(AuditLoggingResource)
+                    typeof(AuditLoggingResource),
+                    typeof(AbpSettingManagementResource)
                 )
                 .AddVirtualJson("/Localization/UI");
         });
