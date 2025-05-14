@@ -21,4 +21,9 @@ public class RadzenUI
     {
         public const string Default = "AuditLogging";
     }
+
+    public static class SettingManagementMenus
+    {
+        public const string GroupName = "SettingManagement";
+    }
 }

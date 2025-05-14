@@ -1,4 +1,5 @@
-﻿using Abp.RadzenUI.Bundling;
+﻿using Abp.RadzenUI.Blazor.SettingManagement;
+using Abp.RadzenUI.Bundling;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Menus;
 using Abp.RadzenUI.Services;
@@ -116,6 +117,13 @@ public class AbpRadzenUIModule : AbpModule
             options.MenuContributors.Add(new AbpIdentityMenuContributor());
             options.MenuContributors.Add(new AbpTenantMenuContributor());
             options.MenuContributors.Add(new AuditLoggingMenuContributor());
+            options.MenuContributors.Add(new SettingManagementMenuContributor());
+        });
+
+        Configure<SettingManagementComponentOptions>(options =>
+        {
+            options.Contributors.Add(new EmailingPageContributor());
+            options.Contributors.Add(new TimeZonePageContributor());
         });
     }
 }
