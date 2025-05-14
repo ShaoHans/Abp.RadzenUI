@@ -1,5 +1,16 @@
-﻿<h3>TimeZoneSettingGroupViewComponent</h3>
+﻿@using Volo.Abp.AspNetCore.Components
+@inherits AbpComponentBase
 
-@code {
+<RadzenTemplateForm Data="@TimezoneSettings">
+    <RadzenRow AlignItems="AlignItems.Center">
+        <RadzenColumn Size="12" SizeMD="4">
+            <RadzenLabel Text="@L["DisplayName:Timezone"]" Component="Timezone" />
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="8">
+            <RadzenDropDown @bind-Value="@TimezoneSettings.Timezone" Placeholder="select timezone" AllowFiltering=true
+                            Data="@TimezoneSettings.TimeZoneItems" Style="width: 100%;" TextProperty="Name" ValueProperty="Value" Name="Timezone">
+            </RadzenDropDown>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenTemplateForm>
 
-}
