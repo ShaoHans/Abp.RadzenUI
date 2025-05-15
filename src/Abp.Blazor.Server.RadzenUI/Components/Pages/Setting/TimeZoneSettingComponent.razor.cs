@@ -1,6 +1,5 @@
 using Abp.RadzenUI.Models;
 using Microsoft.AspNetCore.Components;
-using Volo.Abp.AspNetCore.Components.Messages;
 using Volo.Abp.AspNetCore.Components.Web.Configuration;
 using Volo.Abp.SettingManagement;
 using Volo.Abp.SettingManagement.Localization;
@@ -14,9 +13,6 @@ public partial class TimeZoneSettingComponent
 
     [Inject]
     private ICurrentApplicationConfigurationCacheResetService CurrentApplicationConfigurationCacheResetService { get; set; } = default!;
-
-    [Inject]
-    protected IUiMessageService UiMessageService { get; set; } = default!;
 
     protected UpdateTimezoneSettingsVM TimezoneSettings = new();
 
@@ -46,7 +42,7 @@ public partial class TimeZoneSettingComponent
         {
             await TimeZoneSettingsAppService.UpdateAsync(TimezoneSettings.Timezone);
             await CurrentApplicationConfigurationCacheResetService.ResetAsync();
-            await Notify.Success(L["SavedSuccessfully"]);
+            await Message.Success(L["SavedSuccessfully"]);
         }
         catch (Exception ex)
         {

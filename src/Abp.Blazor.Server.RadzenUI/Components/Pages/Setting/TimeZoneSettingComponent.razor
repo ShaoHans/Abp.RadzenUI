@@ -1,16 +1,23 @@
 ﻿@using Volo.Abp.AspNetCore.Components
 @inherits AbpComponentBase
 
-<RadzenTemplateForm Data="@TimezoneSettings">
-    <RadzenRow AlignItems="AlignItems.Center">
-        <RadzenColumn Size="12" SizeMD="4">
-            <RadzenLabel Text="@L["DisplayName:Timezone"]" Component="Timezone" />
-        </RadzenColumn>
-        <RadzenColumn Size="12" SizeMD="8">
-            <RadzenDropDown @bind-Value="@TimezoneSettings.Timezone" Placeholder="select timezone" AllowFiltering=true
-                            Data="@TimezoneSettings.TimeZoneItems" Style="width: 100%;" TextProperty="Name" ValueProperty="Value" Name="Timezone">
-            </RadzenDropDown>
-        </RadzenColumn>
-    </RadzenRow>
+<RadzenTemplateForm TItem="UpdateTimezoneSettingsVM" Data="@TimezoneSettings" Submit="UpdateSettingsAsync">
+    <RadzenStack Gap="2rem">
+        <RadzenRow AlignItems="AlignItems.Center" RowGap="1rem">
+            <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
+                <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
+                <RadzenLabel Text="@L["DisplayName:Timezone"]" Component="@nameof(UpdateTimezoneSettingsVM.Timezone)" />
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="8">
+                <RadzenDropDown @bind-Value="@TimezoneSettings.Timezone" Placeholder="select timezone" AllowFiltering=true
+                                Data="@TimezoneSettings.TimeZoneItems" Style="width: 100%;" TextProperty="Name" ValueProperty="Value" Name="Timezone">
+                </RadzenDropDown>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow AlignItems="AlignItems.Center" RowGap="1rem">
+            <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
+                <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="@L["Save"]"></RadzenButton>
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenStack>
 </RadzenTemplateForm>
-

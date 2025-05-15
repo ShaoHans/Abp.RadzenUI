@@ -52,7 +52,7 @@ public class SettingManagementMenuContributor : IMenuContributor
                 new ApplicationMenuItem(
                     SettingManagementMenus.GroupName,
                     l["Settings"],
-                    "/settingmanagement",
+                    "/setting/manage",
                     icon: "settings"
                 ).RequireFeatures(SettingManagementFeatures.Enable)
             );
