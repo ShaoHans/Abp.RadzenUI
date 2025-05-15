@@ -1,9 +1,7 @@
-using System.ComponentModel.DataAnnotations;
 using Abp.RadzenUI.Models;
 using Microsoft.AspNetCore.Components;
-using Volo.Abp.AspNetCore.Components.Messages;
+using Radzen;
 using Volo.Abp.AspNetCore.Components.Web.Configuration;
-using Volo.Abp.Auditing;
 using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.SettingManagement;
 using Volo.Abp.SettingManagement.Localization;
@@ -21,6 +19,9 @@ public partial class EmailSettingComponent
     [Inject]
     private ICurrentApplicationConfigurationCacheResetService CurrentApplicationConfigurationCacheResetService { get; set; } =
         default!;
+
+    [Inject]
+    protected DialogService DialogService { get; set; } = default!;
 
     protected UpdateEmailSettingsVM EmailSettings = new();
 
@@ -69,41 +70,23 @@ public partial class EmailSettingComponent
         }
     }
 
-    //protected virtual async Task OpenSendTestEmailModalAsync()
-    //{
-    //    try
-    //    {
-    //        var emailSettings = await EmailSettingsAppService.GetAsync();
-    //        SendTestEmailInput = new SendTestEmailVM
-    //        {
-    //            SenderEmailAddress = emailSettings.DefaultFromAddress,
-    //            TargetEmailAddress = CurrentUser.Email!,
-    //            Subject = L["TestEmailSubject", new Random().Next(1000, 9999)],
-    //            Body = L["TestEmailBody"]
-    //        };
-
-    //        await SendTestEmailModal.Show();
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        await HandleErrorAsync(ex);
-    //    }
-    //}
-
-    //protected virtual Task CloseSendTestEmailModalAsync()
-    //{
-    //    return InvokeAsync(SendTestEmailModal.Hide);
-    //}
-
-    protected virtual async Task SendTestEmailAsync()
+    protected virtual async Task OpenSendTestEmailModalAsync()
     {
         try
         {
-            await EmailSettingsAppService.SendTestEmailAsync(
-                ObjectMapper.Map<SendTestEmailVM, SendTestEmailInput>(SendTestEmailInput)
+            await DialogService.OpenAsync<SendTestEmail>(
+                L["SendTestEmail"],
+                parameters: new Dictionary<string, object>
+                {
+                    { "DefaultFromAddress",EmailSettings.DefaultFromAddress}
+                },
+                options: new DialogOptions
+                {
+                    Draggable = true,
+                    Width = "600px",
+                    Height = "550px"
+                }
             );
-
-            await Message.Success(L["SentSuccessfully"]);
         }
         catch (Exception ex)
         {

@@ -100,6 +100,13 @@
             <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
                 <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="@L["Save"]"></RadzenButton>
             </RadzenColumn>
+            @if (HasSendTestEmailPermission)
+            {
+                <RadzenColumn Size="12" SizeMD="8" class="rz-text-align-start">
+                    <RadzenButton ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Base" Icon="send"
+                                  Text="@L["SendTestEmail"]" Click="OpenSendTestEmailModalAsync"></RadzenButton>
+                </RadzenColumn>
+            }
         </RadzenRow>
     </RadzenStack>
 </RadzenTemplateForm>
