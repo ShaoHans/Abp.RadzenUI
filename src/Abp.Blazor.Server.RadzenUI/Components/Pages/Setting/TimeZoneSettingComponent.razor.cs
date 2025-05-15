@@ -1,5 +1,5 @@
+using Abp.RadzenUI.Models;
 using Microsoft.AspNetCore.Components;
-using Volo.Abp;
 using Volo.Abp.AspNetCore.Components.Messages;
 using Volo.Abp.AspNetCore.Components.Web.Configuration;
 using Volo.Abp.SettingManagement;
@@ -7,7 +7,7 @@ using Volo.Abp.SettingManagement.Localization;
 
 namespace Abp.RadzenUI.Components.Pages.Setting;
 
-public partial class TimeZoneSettingGroupViewComponent
+public partial class TimeZoneSettingComponent
 {
     [Inject]
     protected ITimeZoneSettingsAppService TimeZoneSettingsAppService { get; set; } = default!;
@@ -18,16 +18,16 @@ public partial class TimeZoneSettingGroupViewComponent
     [Inject]
     protected IUiMessageService UiMessageService { get; set; } = default!;
 
-    protected UpdateTimezoneSettingsViewModel TimezoneSettings = new();
+    protected UpdateTimezoneSettingsVM TimezoneSettings = new();
 
-    public TimeZoneSettingGroupViewComponent()
+    public TimeZoneSettingComponent()
     {
         LocalizationResource = typeof(AbpSettingManagementResource);
     }
 
     protected async override Task OnInitializedAsync()
     {
-        TimezoneSettings = new UpdateTimezoneSettingsViewModel()
+        TimezoneSettings = new UpdateTimezoneSettingsVM()
         {
             Timezone = await TimeZoneSettingsAppService.GetAsync(),
             TimeZoneItems = await TimeZoneSettingsAppService.GetTimezonesAsync()
@@ -52,12 +52,5 @@ public partial class TimeZoneSettingGroupViewComponent
         {
             await HandleErrorAsync(ex);
         }
-    }
-
-    public class UpdateTimezoneSettingsViewModel
-    {
-        public string Timezone { get; set; } = default!;
-
-        public List<NameValue> TimeZoneItems { get; set; } = [];
     }
 }

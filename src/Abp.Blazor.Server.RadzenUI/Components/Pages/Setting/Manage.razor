@@ -1,10 +1,12 @@
 ﻿@page "/settingmanagement"
 @using Abp.RadzenUI.Blazor.SettingManagement
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.Extensions.Localization
 @using Microsoft.Extensions.Options
 @using Volo.Abp.AspNetCore.Components
 @using Volo.Abp.SettingManagement.Localization
 @inherits AbpComponentBase
+@attribute [Authorize]
 
 <PageTitle>@L["Settings"]</PageTitle>
 
