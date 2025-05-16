@@ -24,7 +24,7 @@ public class AccountController(
     IOptions<IdentityOptions> identityOptions
 ) : AbpRadzenControllerBase
 {
-    [HttpPost("/account/login")]
+    [HttpPost("/account/locallogin")]
     [DisableAuditing]
     public async Task<IActionResult> LoginAsync(string username, string password, bool rememberMe)
     {
@@ -51,11 +51,11 @@ public class AccountController(
                 return Redirect("~/");
             }
 
-            return RedirectWithError("~/login", result.GetResultAsString());
+            return RedirectWithError("~/account/login", result.GetResultAsString());
         }
         catch (Exception ex)
         {
-            return RedirectWithError("~/login", ex);
+            return RedirectWithError("~/account/login", ex);
         }
     }
 
@@ -75,7 +75,7 @@ public class AccountController(
         }
         catch (Exception ex)
         {
-            return RedirectWithError("~/login", ex);
+            return RedirectWithError("~/account/login", ex);
         }
     }
 
@@ -91,7 +91,7 @@ public class AccountController(
             if (!remoteError.IsNullOrEmpty())
             {
                 Logger.LogWarning("External login callback error: {remoteError}", remoteError);
-                return RedirectWithError("~/login", remoteError);
+                return RedirectWithError("~/account/login", remoteError);
             }
 
             await identityOptions.SetAsync();
@@ -100,7 +100,7 @@ public class AccountController(
             if (loginInfo == null)
             {
                 Logger.LogWarning("External login info is not available");
-                return RedirectWithError("~/login", "External login info is not available");
+                return RedirectWithError("~/account/login", "External login info is not available");
             }
 
             var result = await signInManager.ExternalLoginSignInAsync(
@@ -125,7 +125,7 @@ public class AccountController(
             {
                 Logger.LogWarning("External login callback error: user is locked out!");
                 return RedirectWithError(
-                    "~/login",
+                    "~/account/login",
                     "External login callback error: user is locked out!"
                 );
             }
@@ -134,7 +134,7 @@ public class AccountController(
             {
                 Logger.LogWarning("External login callback error: user is not allowed!");
                 return RedirectWithError(
-                    "~/login",
+                    "~/account/login",
                     "External login callback error: user is not allowed!"
                 );
             }
@@ -163,7 +163,7 @@ public class AccountController(
             if (email.IsNullOrWhiteSpace())
             {
                 return Redirect(
-                    $"~/register?IsExternalLogin=true&ExternalLoginAuthSchema={loginInfo.LoginProvider}&ReturnUrl={returnUrl}"
+                    $"~/account/register?IsExternalLogin=true&ExternalLoginAuthSchema={loginInfo.LoginProvider}&ReturnUrl={returnUrl}"
                 );
             }
 
@@ -172,7 +172,7 @@ public class AccountController(
             {
                 var (userName, emailAddress) = await TryGetUserInfoAsync();
                 return Redirect(
-                    $"~/register?IsExternalLogin=true&ExternalLoginAuthSchema={loginInfo.LoginProvider}&ReturnUrl={returnUrl}&UserName={userName}&EmailAddress={emailAddress}"
+                    $"~/account/register?IsExternalLogin=true&ExternalLoginAuthSchema={loginInfo.LoginProvider}&ReturnUrl={returnUrl}&UserName={userName}&EmailAddress={emailAddress}"
                 );
             }
 
@@ -186,7 +186,7 @@ public class AccountController(
                 {
                     Logger.LogWarning("Add Login Error:{@Errors}", identityResult.Errors);
                     return RedirectWithError(
-                        "~/login",
+                        "~/account/login",
                         identityResult
                             .Errors.Select(e => $"[{e.Code}] {e.Description}")
                             .JoinAsString(", ")
@@ -211,7 +211,7 @@ public class AccountController(
         }
         catch (Exception ex)
         {
-            return RedirectWithError("~/login", ex);
+            return RedirectWithError("~/account/login", ex);
         }
     }
 
@@ -220,10 +220,10 @@ public class AccountController(
     {
         await signInManager.SignOutAsync();
         await HttpContext.SignOutAsync();
-        return Redirect("~/Login");
+        return Redirect("~/account/login");
     }
 
-    [HttpPost("/account/register")]
+    [HttpPost("/account/localregister")]
     public async Task<IActionResult> RegisterAsync(
         string userName,
         string emailAddress,
@@ -240,7 +240,7 @@ public class AccountController(
                 if (externalLoginInfo == null)
                 {
                     Logger.LogWarning("External login info is not available");
-                    return RedirectWithError("~/login", "External login info is not available");
+                    return RedirectWithError("~/account/login", "External login info is not available");
                 }
                 if (userName.IsNullOrWhiteSpace())
                 {
@@ -263,7 +263,7 @@ public class AccountController(
         catch (Exception ex)
         {
             return RedirectWithError(
-                $"~/register?IsExternalLogin={isExternalLogin}&ExternalLoginAuthSchema={externalLoginAuthSchema}&ReturnUrl=/&UserName={userName}&EmailAddress={emailAddress}",
+                $"~/account/register?IsExternalLogin={isExternalLogin}&ExternalLoginAuthSchema={externalLoginAuthSchema}&ReturnUrl=/&UserName={userName}&EmailAddress={emailAddress}",
                 ex
             );
         }

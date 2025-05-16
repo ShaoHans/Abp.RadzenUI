@@ -14,7 +14,7 @@
         <RadzenTabsItem Text="Welcome" >
             @if (CurrentUser is null || !CurrentUser.IsAuthenticated)
             {
-                <p>You are not logged in yet, please <RadzenLink Icon="login" Path="/login">log in</RadzenLink></p>
+                <p>You are not logged in yet, please <RadzenLink Icon="login" Path="/account/login">log in</RadzenLink></p>
             }
             else
             {

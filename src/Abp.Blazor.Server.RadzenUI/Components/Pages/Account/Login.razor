@@ -1,4 +1,4 @@
-﻿@page "/login"
+﻿@page "/account/login"
 @using Abp.RadzenUI.Components.Layout
 @using Volo.Abp.Account.Localization
 @using Volo.Abp.Account.Settings
@@ -9,7 +9,7 @@
 
 <PageTitle>@L["Login"]</PageTitle>
 
-<RadzenTemplateForm Data=@("") Method="post" Action="/account/login">
+<RadzenTemplateForm Data=@("") Method="post" Action="/account/locallogin">
     <RadzenLogin LoginText="@L["Login"]"
                  UserText="@L["UserName"]" UserRequired="@L.Required("DisplayName:UserName")"
                  PasswordText="@L["Password"]" PasswordRequired="@L.Required("DisplayName:Password")"
@@ -56,6 +56,6 @@
 
     public void OnRegister()
     {
-        Navigation.NavigateTo("/register");
+        Navigation.NavigateTo("/account/register");
     }
 }

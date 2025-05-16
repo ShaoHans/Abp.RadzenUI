@@ -1,4 +1,4 @@
-﻿@page "/register"
+﻿@page "/account/register"
 @using Abp.RadzenUI.Components.Layout
 @using Microsoft.AspNetCore.Identity
 @using System.Security.Claims
@@ -14,7 +14,7 @@
 
 <PageTitle>@L["Register"]</PageTitle>
 
-<RadzenTemplateForm Data=@RegisterDto Method="post" Action="/account/register">
+<RadzenTemplateForm Data=@RegisterDto Method="post" Action="/account/localregister">
     <RadzenStack Gap="2rem">
         <RadzenFormField Text="@L["DisplayName:UserName"]" Variant="Variant.Flat">
             <ChildContent>
@@ -122,6 +122,6 @@
 
     public void OnLogin()
     {
-        Navigation.NavigateTo("/login");
+        Navigation.NavigateTo("/account/login");
     }
 }

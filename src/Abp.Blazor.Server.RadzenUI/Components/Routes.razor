@@ -11,7 +11,7 @@
                 <NotAuthorized>
                     @if ((context.User?.Identity?.IsAuthenticated ?? false) == false)
                     {
-                        Nav.NavigateTo("/login");
+                        Nav.NavigateTo("/account/login");
                     }
                     else
                     {
