@@ -4,6 +4,7 @@ using AutoMapper;
 using Volo.Abp.Account;
 using Volo.Abp.AuditLogging;
 using Volo.Abp.AutoMapper;
+using Volo.Abp.SettingManagement;
 
 namespace Abp.RadzenUI;
 
@@ -18,5 +19,9 @@ public class AbpRadzenUIAutoMapperProfile : Profile
 
         CreateMap<PersonalInfoModel, UpdateProfileDto>().MapExtraProperties();
         CreateMap<AuditLog, AuditLogDto>();
+
+        CreateMap<UpdateEmailSettingsVM, UpdateEmailSettingsDto>();
+        CreateMap<EmailSettingsDto, UpdateEmailSettingsVM>();
+        CreateMap<SendTestEmailVM, SendTestEmailInput>();
     }
 }

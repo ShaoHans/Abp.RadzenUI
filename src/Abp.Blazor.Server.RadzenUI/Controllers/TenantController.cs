@@ -30,6 +30,6 @@ public class TenantController : AbpControllerBase
     public IActionResult SwitchAsync(Guid? tenantId = null)
     {
         AbpMultiTenancyCookieHelper.SetTenantCookie(HttpContext, tenantId, Options.TenantKey);
-        return Redirect("~/Login");
+        return Redirect("~/account/login");
     }
 }

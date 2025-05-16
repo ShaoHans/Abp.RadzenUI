@@ -14,7 +14,7 @@
         <RadzenTabsItem Text="Welcome" >
             @if (CurrentUser is null || !CurrentUser.IsAuthenticated)
             {
-                <p>You are not logged in yet, please <RadzenLink Icon="login" Path="/login">log in</RadzenLink></p>
+                <p>You are not logged in yet, please <RadzenLink Icon="login" Path="/account/login">log in</RadzenLink></p>
             }
             else
             {
@@ -45,7 +45,7 @@
 
         <RadzenTabsItem Text="@($"Commits({commitCount})")">
             <RadzenDataGrid ColumnWidth="150px" TItem="CommitDto" AllowPaging="true" Style="height:calc(100vh - 160px)"
-                            IsLoading="isLoading" Count="@commitCount" PageSize="20" Data="@commits" LoadData="@LoadCommits">
+            IsLoading="isLoading" Count="@commitCount" PageSize="20" Data="@commits" LoadData="@LoadCommits">
                 <Columns>
                     <RadzenDataGridColumn Property="@nameof(CommitDto.Committer.AvatarUrl)" Title="Avatar" Sortable="false" Filterable="false" Width="80px">
                         <Template Context="data">
@@ -86,8 +86,11 @@
     {
         await base.OnInitializedAsync();
 
-        repository = await GitHubClient.GetRepositoryAsync();
-        commitCount = await GitHubClient.GetRepositoryCommitCountAsync();
+        Task.Run(async () =>
+        {
+            repository = await GitHubClient.GetRepositoryAsync();
+            commitCount = await GitHubClient.GetRepositoryCommitCountAsync();
+        });
     }
 
     async Task PageChanged(PagerEventArgs args)

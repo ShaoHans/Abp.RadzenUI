@@ -1,0 +1,66 @@
+﻿@page "/setting/manage"
+@using Abp.RadzenUI.Blazor.SettingManagement
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Extensions.Localization
+@using Microsoft.Extensions.Options
+@using Volo.Abp.AspNetCore.Components
+@using Volo.Abp.SettingManagement.Localization
+@inherits AbpComponentBase
+@attribute [Authorize]
+
+<PageTitle>@L["Settings"]</PageTitle>
+
+<RadzenTabs @bind-SelectedIndex=@_selectedIndex TabPosition="TabPosition.Left" RenderMode="TabRenderMode.Client">
+    <Tabs>
+        @foreach (var group in SettingComponentCreationContext.Groups)
+        {
+            <RadzenTabsItem Text="@group.DisplayName">
+                @RenderComponent(group)
+            </RadzenTabsItem>
+        }
+    </Tabs>
+</RadzenTabs>
+
+@code {
+    [Inject]
+    protected IServiceProvider ServiceProvider { get; set; }
+    [Inject]
+    protected IOptions<SettingManagementComponentOptions> Options { get; set; }
+
+    protected SettingComponentCreationContext SettingComponentCreationContext { get; set; }
+
+    int _selectedIndex = 0;
+
+    public Manage()
+    {
+        LocalizationResource = typeof(AbpSettingManagementResource);
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        SettingComponentCreationContext = new SettingComponentCreationContext(ServiceProvider);
+
+        foreach (var contributor in Options.Value.Contributors)
+        {
+            await contributor.ConfigureAsync(SettingComponentCreationContext);
+        }
+        SettingComponentCreationContext.Normalize();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Yield();
+            await InvokeAsync(StateHasChanged);
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    protected RenderFragment RenderComponent(SettingComponentGroup settingGroup) => builder =>
+    {
+        builder.OpenComponent(0, settingGroup.ComponentType);
+        builder.CloseComponent();
+    };
+}
