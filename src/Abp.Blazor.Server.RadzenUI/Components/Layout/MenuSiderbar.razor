@@ -2,9 +2,6 @@
 @inject IMenuManager MenuManager
 
 <RadzenSidebar @bind-Expanded="@SidebarExpanded" class="demos-sidebar" style="display: flex; flex-direction: column">
-    @* <div style="padding: 1rem">
-        <RadzenTextBox id="find" Placeholder="Find menu ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" class="rz-search-input" aria-label="find" />
-    </div> *@
     <div style="flex: 1; overflow: auto">
         <RadzenPanelMenu Match="NavLinkMatch.Prefix">
             @foreach (var menu in _applicationMenu?.Items ?? [])
@@ -36,13 +33,20 @@
 
     RenderFragment BuildMenuTree(ApplicationMenuItem menuItem) => __builder =>
     {
-        <RadzenPanelMenuItem Icon="@menuItem.Icon" Text="@menuItem.DisplayName" Path="@menuItem.Url">
-            <ChildContent>
-                @foreach (var child in menuItem.Items ?? [])
-                {
-                    @BuildMenuTree(child);
-                }
-            </ChildContent>
-        </RadzenPanelMenuItem>
+        @if(menuItem.Items.IsNullOrEmpty())
+        {
+            <RadzenPanelMenuItem Icon="@menuItem.Icon" Text="@menuItem.DisplayName" Path="@menuItem.Url" />
+        }
+        else
+        {
+            <RadzenPanelMenuItem Icon="@menuItem.Icon" Text="@menuItem.DisplayName" Expanded=true>
+                <ChildContent>
+                    @foreach (var child in menuItem.Items)
+                    {
+                        @BuildMenuTree(child);
+                    }
+                </ChildContent>
+            </RadzenPanelMenuItem>
+        }
     };
 }
