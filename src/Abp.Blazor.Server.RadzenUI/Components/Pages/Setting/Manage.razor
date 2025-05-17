@@ -10,7 +10,7 @@
 
 <PageTitle>@L["Settings"]</PageTitle>
 
-<RadzenTabs @bind-SelectedIndex=@_selectedIndex TabPosition="TabPosition.Left" RenderMode="TabRenderMode.Client">
+<RadzenTabs @bind-SelectedIndex=@_selectedIndex TabPosition="TabPosition.Left" RenderMode="TabRenderMode.Server">
     <Tabs>
         @foreach (var group in SettingComponentCreationContext.Groups)
         {
