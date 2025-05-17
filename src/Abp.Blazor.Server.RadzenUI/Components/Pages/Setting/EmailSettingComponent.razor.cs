@@ -23,7 +23,7 @@ public partial class EmailSettingComponent
     [Inject]
     protected DialogService DialogService { get; set; } = default!;
 
-    protected UpdateEmailSettingsVM EmailSettings = new();
+    protected UpdateEmailSettingsVm EmailSettings = new();
 
     protected SendTestEmailVM SendTestEmailInput = new();
 
@@ -38,7 +38,7 @@ public partial class EmailSettingComponent
     {
         try
         {
-            EmailSettings = ObjectMapper.Map<EmailSettingsDto, UpdateEmailSettingsVM>(
+            EmailSettings = ObjectMapper.Map<EmailSettingsDto, UpdateEmailSettingsVm>(
                 await EmailSettingsAppService.GetAsync()
             );
             HasSendTestEmailPermission = await PermissionChecker.IsGrantedAsync(
@@ -57,7 +57,7 @@ public partial class EmailSettingComponent
         try
         {
             await EmailSettingsAppService.UpdateAsync(
-                ObjectMapper.Map<UpdateEmailSettingsVM, UpdateEmailSettingsDto>(EmailSettings)
+                ObjectMapper.Map<UpdateEmailSettingsVm, UpdateEmailSettingsDto>(EmailSettings)
             );
 
             await CurrentApplicationConfigurationCacheResetService.ResetAsync();

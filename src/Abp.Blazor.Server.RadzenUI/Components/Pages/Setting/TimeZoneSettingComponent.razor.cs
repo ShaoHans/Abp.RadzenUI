@@ -14,7 +14,7 @@ public partial class TimeZoneSettingComponent
     [Inject]
     private ICurrentApplicationConfigurationCacheResetService CurrentApplicationConfigurationCacheResetService { get; set; } = default!;
 
-    protected UpdateTimezoneSettingsVM TimezoneSettings = new();
+    protected UpdateTimezoneSettingsVm TimezoneSettings = new();
 
     public TimeZoneSettingComponent()
     {
@@ -23,7 +23,7 @@ public partial class TimeZoneSettingComponent
 
     protected async override Task OnInitializedAsync()
     {
-        TimezoneSettings = new UpdateTimezoneSettingsVM()
+        TimezoneSettings = new UpdateTimezoneSettingsVm()
         {
             Timezone = await TimeZoneSettingsAppService.GetAsync(),
             TimeZoneItems = await TimeZoneSettingsAppService.GetTimezonesAsync()

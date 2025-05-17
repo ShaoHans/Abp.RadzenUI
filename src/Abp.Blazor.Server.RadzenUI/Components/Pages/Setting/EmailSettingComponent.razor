@@ -4,63 +4,63 @@
 @inherits AbpComponentBase
 @inject IStringLocalizer<IdentityResource> IL
 
-<RadzenTemplateForm TItem="UpdateEmailSettingsVM" Data=@EmailSettings Submit="UpdateSettingsAsync">
+<RadzenTemplateForm TItem="UpdateEmailSettingsVm" Data=@EmailSettings Submit="UpdateSettingsAsync">
     <RadzenStack Gap="2rem">
         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
             <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
                 <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
-                <RadzenLabel Text="@L["DefaultFromDisplayName"]" Component="@nameof(UpdateEmailSettingsVM.DefaultFromDisplayName)" />
+                <RadzenLabel Text="@L["DefaultFromDisplayName"]" Component="@nameof(UpdateEmailSettingsVm.DefaultFromDisplayName)" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenTextBox Name="@nameof(UpdateEmailSettingsVM.DefaultFromDisplayName)" @bind-Value="@EmailSettings.DefaultFromDisplayName" />
-                <RadzenRequiredValidator Component="@nameof(UpdateEmailSettingsVM.DefaultFromDisplayName)" Text="@L.Required("DefaultFromDisplayName")" Style="position: absolute" />
+                <RadzenTextBox Name="@nameof(UpdateEmailSettingsVm.DefaultFromDisplayName)" @bind-Value="@EmailSettings.DefaultFromDisplayName" />
+                <RadzenRequiredValidator Component="@nameof(UpdateEmailSettingsVm.DefaultFromDisplayName)" Text="@L.Required("DefaultFromDisplayName")" Style="position: absolute" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
             <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
                 <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
-                <RadzenLabel Text="@L["DefaultFromAddress"]" Component="@nameof(UpdateEmailSettingsVM.DefaultFromAddress)" />
+                <RadzenLabel Text="@L["DefaultFromAddress"]" Component="@nameof(UpdateEmailSettingsVm.DefaultFromAddress)" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenTextBox Name="@nameof(UpdateEmailSettingsVM.DefaultFromAddress)" @bind-Value="@EmailSettings.DefaultFromAddress" />
-                <RadzenRequiredValidator Component="@nameof(UpdateEmailSettingsVM.DefaultFromAddress)" Text="@L.Required("DefaultFromAddress")" Style="position: absolute" />
-                <RadzenEmailValidator Component="@nameof(UpdateEmailSettingsVM.DefaultFromAddress)" Text="@IL["Volo.Abp.Identity:InvalidEmail",EmailSettings.DefaultFromAddress]" Style="position: absolute" />
+                <RadzenTextBox Name="@nameof(UpdateEmailSettingsVm.DefaultFromAddress)" @bind-Value="@EmailSettings.DefaultFromAddress" />
+                <RadzenRequiredValidator Component="@nameof(UpdateEmailSettingsVm.DefaultFromAddress)" Text="@L.Required("DefaultFromAddress")" Style="position: absolute" />
+                <RadzenEmailValidator Component="@nameof(UpdateEmailSettingsVm.DefaultFromAddress)" Text="@IL["Volo.Abp.Identity:InvalidEmail",EmailSettings.DefaultFromAddress]" Style="position: absolute" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
             <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
                 <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
-                <RadzenLabel Text="@L["SmtpHost"]" Component="@nameof(UpdateEmailSettingsVM.SmtpHost)" />
+                <RadzenLabel Text="@L["SmtpHost"]" Component="@nameof(UpdateEmailSettingsVm.SmtpHost)" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenTextBox Name="@nameof(UpdateEmailSettingsVM.SmtpHost)" @bind-Value="@EmailSettings.SmtpHost" />
-                <RadzenRequiredValidator Component="@nameof(UpdateEmailSettingsVM.SmtpHost)" Text="@L.Required("SmtpHost")" Style="position: absolute" />
+                <RadzenTextBox Name="@nameof(UpdateEmailSettingsVm.SmtpHost)" @bind-Value="@EmailSettings.SmtpHost" />
+                <RadzenRequiredValidator Component="@nameof(UpdateEmailSettingsVm.SmtpHost)" Text="@L.Required("SmtpHost")" Style="position: absolute" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
             <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
                 <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
-                <RadzenLabel Text="@L["SmtpPort"]" Component="@nameof(UpdateEmailSettingsVM.SmtpPort)" />
+                <RadzenLabel Text="@L["SmtpPort"]" Component="@nameof(UpdateEmailSettingsVm.SmtpPort)" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenNumeric TValue="int" Name="@nameof(UpdateEmailSettingsVM.SmtpPort)" @bind-Value="@EmailSettings.SmtpPort" />
-                <RadzenRequiredValidator Component="@nameof(UpdateEmailSettingsVM.SmtpPort)" Text="@L.Required("SmtpPort")" Style="position: absolute" />
+                <RadzenNumeric TValue="int" Name="@nameof(UpdateEmailSettingsVm.SmtpPort)" @bind-Value="@EmailSettings.SmtpPort" />
+                <RadzenRequiredValidator Component="@nameof(UpdateEmailSettingsVm.SmtpPort)" Text="@L.Required("SmtpPort")" Style="position: absolute" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
             <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
-                <RadzenLabel Text="@L["SmtpEnableSsl"]" Component="@nameof(UpdateEmailSettingsVM.SmtpEnableSsl)" />
+                <RadzenLabel Text="@L["SmtpEnableSsl"]" Component="@nameof(UpdateEmailSettingsVm.SmtpEnableSsl)" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenCheckBox TValue="bool" Name="@nameof(UpdateEmailSettingsVM.SmtpEnableSsl)" @bind-Value="@EmailSettings.SmtpEnableSsl" />
+                <RadzenCheckBox TValue="bool" Name="@nameof(UpdateEmailSettingsVm.SmtpEnableSsl)" @bind-Value="@EmailSettings.SmtpEnableSsl" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
             <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
-                <RadzenLabel Text="@L["SmtpUseDefaultCredentials"]" Component="@nameof(UpdateEmailSettingsVM.SmtpUseDefaultCredentials)" />
+                <RadzenLabel Text="@L["SmtpUseDefaultCredentials"]" Component="@nameof(UpdateEmailSettingsVm.SmtpUseDefaultCredentials)" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenCheckBox TValue="bool" Name="@nameof(UpdateEmailSettingsVM.SmtpUseDefaultCredentials)" @bind-Value="@EmailSettings.SmtpUseDefaultCredentials" />
+                <RadzenCheckBox TValue="bool" Name="@nameof(UpdateEmailSettingsVm.SmtpUseDefaultCredentials)" @bind-Value="@EmailSettings.SmtpUseDefaultCredentials" />
             </RadzenColumn>
         </RadzenRow>
         @if (!EmailSettings.SmtpUseDefaultCredentials)
@@ -68,31 +68,31 @@
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
                     <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
-                    <RadzenLabel Text="@L["SmtpDomain"]" Component="@nameof(UpdateEmailSettingsVM.SmtpDomain)" />
+                    <RadzenLabel Text="@L["SmtpDomain"]" Component="@nameof(UpdateEmailSettingsVm.SmtpDomain)" />
                 </RadzenColumn>
                 <RadzenColumn Size="12" SizeMD="8">
-                    <RadzenTextBox Name="@nameof(UpdateEmailSettingsVM.SmtpDomain)" @bind-Value="@EmailSettings.SmtpDomain" />
-                    <RadzenRequiredValidator Component="@nameof(UpdateEmailSettingsVM.SmtpDomain)" Text="@L.Required("SmtpDomain")" Style="position: absolute" />
+                    <RadzenTextBox Name="@nameof(UpdateEmailSettingsVm.SmtpDomain)" @bind-Value="@EmailSettings.SmtpDomain" />
+                    <RadzenRequiredValidator Component="@nameof(UpdateEmailSettingsVm.SmtpDomain)" Text="@L.Required("SmtpDomain")" Style="position: absolute" />
                 </RadzenColumn>
             </RadzenRow>
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
                     <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
-                    <RadzenLabel Text="@L["SmtpUserName"]" Component="@nameof(UpdateEmailSettingsVM.SmtpUserName)" />
+                    <RadzenLabel Text="@L["SmtpUserName"]" Component="@nameof(UpdateEmailSettingsVm.SmtpUserName)" />
                 </RadzenColumn>
                 <RadzenColumn Size="12" SizeMD="8">
-                    <RadzenTextBox Name="@nameof(UpdateEmailSettingsVM.SmtpUserName)" @bind-Value="@EmailSettings.SmtpUserName" />
-                    <RadzenRequiredValidator Component="@nameof(UpdateEmailSettingsVM.SmtpUserName)" Text="@L.Required("SmtpUserName")" Style="position: absolute" />
+                    <RadzenTextBox Name="@nameof(UpdateEmailSettingsVm.SmtpUserName)" @bind-Value="@EmailSettings.SmtpUserName" />
+                    <RadzenRequiredValidator Component="@nameof(UpdateEmailSettingsVm.SmtpUserName)" Text="@L.Required("SmtpUserName")" Style="position: absolute" />
                 </RadzenColumn>
             </RadzenRow>
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
                     <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
-                    <RadzenLabel Text="@L["SmtpPassword"]" Component="@nameof(UpdateEmailSettingsVM.SmtpPassword)" />
+                    <RadzenLabel Text="@L["SmtpPassword"]" Component="@nameof(UpdateEmailSettingsVm.SmtpPassword)" />
                 </RadzenColumn>
                 <RadzenColumn Size="12" SizeMD="8">
-                    <RadzenPassword Name="@nameof(UpdateEmailSettingsVM.SmtpPassword)" @bind-Value="@EmailSettings.SmtpPassword" />
-                    <RadzenRequiredValidator Component="@nameof(UpdateEmailSettingsVM.SmtpPassword)" Text="@L.Required("SmtpPassword")" Style="position: absolute" />
+                    <RadzenPassword Name="@nameof(UpdateEmailSettingsVm.SmtpPassword)" @bind-Value="@EmailSettings.SmtpPassword" />
+                    <RadzenRequiredValidator Component="@nameof(UpdateEmailSettingsVm.SmtpPassword)" Text="@L.Required("SmtpPassword")" Style="position: absolute" />
                 </RadzenColumn>
             </RadzenRow>
         }
