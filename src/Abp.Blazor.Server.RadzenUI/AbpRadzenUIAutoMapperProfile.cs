@@ -20,8 +20,8 @@ public class AbpRadzenUIAutoMapperProfile : Profile
         CreateMap<PersonalInfoModel, UpdateProfileDto>().MapExtraProperties();
         CreateMap<AuditLog, AuditLogDto>();
 
-        CreateMap<UpdateEmailSettingsVM, UpdateEmailSettingsDto>();
-        CreateMap<EmailSettingsDto, UpdateEmailSettingsVM>();
+        CreateMap<UpdateEmailSettingsVm, UpdateEmailSettingsDto>();
+        CreateMap<EmailSettingsDto, UpdateEmailSettingsVm>();
         CreateMap<SendTestEmailVM, SendTestEmailInput>();
     }
 }

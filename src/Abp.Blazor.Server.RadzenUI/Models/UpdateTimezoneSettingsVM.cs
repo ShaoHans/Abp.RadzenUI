@@ -2,7 +2,7 @@
 
 namespace Abp.RadzenUI.Models;
 
-public class UpdateTimezoneSettingsVM
+public class UpdateTimezoneSettingsVm
 {
     public string Timezone { get; set; } = default!;
 

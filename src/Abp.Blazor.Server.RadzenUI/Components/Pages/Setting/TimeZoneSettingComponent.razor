@@ -1,12 +1,12 @@
 ﻿@using Volo.Abp.AspNetCore.Components
 @inherits AbpComponentBase
 
-<RadzenTemplateForm TItem="UpdateTimezoneSettingsVM" Data="@TimezoneSettings" Submit="UpdateSettingsAsync">
+<RadzenTemplateForm TItem="UpdateTimezoneSettingsVm" Data="@TimezoneSettings" Submit="UpdateSettingsAsync">
     <RadzenStack Gap="2rem">
         <RadzenRow AlignItems="AlignItems.Center" RowGap="1rem">
             <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
                 <RadzenBadge Text="*" BadgeStyle="BadgeStyle.Danger" />
-                <RadzenLabel Text="@L["DisplayName:Timezone"]" Component="@nameof(UpdateTimezoneSettingsVM.Timezone)" />
+                <RadzenLabel Text="@L["DisplayName:Timezone"]" Component="@nameof(UpdateTimezoneSettingsVm.Timezone)" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
                 <RadzenDropDown @bind-Value="@TimezoneSettings.Timezone" Placeholder="select timezone" AllowFiltering=true

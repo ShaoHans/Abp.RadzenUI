@@ -3,7 +3,7 @@ using Volo.Abp.Auditing;
 
 namespace Abp.RadzenUI.Models;
 
-public class UpdateEmailSettingsVM
+public class UpdateEmailSettingsVm
 {
     [MaxLength(256)]
     [Display(Name = "SmtpHost")]

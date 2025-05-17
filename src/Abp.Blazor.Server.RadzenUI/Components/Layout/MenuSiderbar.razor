@@ -19,7 +19,7 @@
     [Parameter]
     public EventCallback<bool> SidebarExpandedChanged { get; set; }
 
-    ApplicationMenu _applicationMenu = default!;
+    ApplicationMenu _applicationMenu;
 
     protected override async Task OnInitializedAsync()
     {
@@ -33,19 +33,17 @@
 
     RenderFragment BuildMenuTree(ApplicationMenuItem menuItem) => __builder =>
     {
-        @if(menuItem.Items.IsNullOrEmpty())
+        @if (menuItem.Items.IsNullOrEmpty())
         {
-            <RadzenPanelMenuItem Icon="@menuItem.Icon" Text="@menuItem.DisplayName" Path="@menuItem.Url" />
+            <RadzenPanelMenuItem aria-label="@menuItem.Name" Icon="@menuItem.Icon" Text="@menuItem.DisplayName" Path="@menuItem.Url" />
         }
         else
         {
-            <RadzenPanelMenuItem Icon="@menuItem.Icon" Text="@menuItem.DisplayName" Expanded=true>
-                <ChildContent>
-                    @foreach (var child in menuItem.Items)
-                    {
-                        @BuildMenuTree(child);
-                    }
-                </ChildContent>
+            <RadzenPanelMenuItem aria-label="@menuItem.Name" Icon="@menuItem.Icon" Text="@menuItem.DisplayName">
+                @foreach (var child in menuItem.Items)
+                {
+                    @BuildMenuTree(child);
+                }
             </RadzenPanelMenuItem>
         }
     };
