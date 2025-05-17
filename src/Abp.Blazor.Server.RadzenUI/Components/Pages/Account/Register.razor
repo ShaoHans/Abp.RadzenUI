@@ -50,9 +50,12 @@
         <input type="hidden" name="IsExternalLogin" value="@IsExternalLogin.ToString()" />
         <input type="hidden" name="ExternalLoginAuthSchema" value="@ExternalLoginAuthSchema" />
     </RadzenStack>
-    <RadzenStack class="rz-p-4" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
-        <RadzenButton ButtonType="ButtonType.Submit" Text="@L["Register"]" Style="width:100%"></RadzenButton>
-    </RadzenStack>
+    @if (IsExternalLogin || EnableLocalRegister)
+    {
+        <RadzenStack class="rz-p-4" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+            <RadzenButton ButtonType="ButtonType.Submit" Text="@L["Register"]" Style="width:100%"></RadzenButton>
+        </RadzenStack>
+    }
     <div class="rz-login">
         <div class="rz-register">
             @L["AlreadyRegistered"]
@@ -114,10 +117,6 @@
     protected override async Task OnInitializedAsync()
     {
         EnableLocalRegister = await SettingProvider.IsTrueAsync(AccountSettingNames.IsSelfRegistrationEnabled);
-        if (!EnableLocalRegister)
-        {
-            Navigation.NavigateTo("/account/login");
-        }
 
         RegisterDto.UserName = UserName;
         RegisterDto.EmailAddress = EmailAddress;
