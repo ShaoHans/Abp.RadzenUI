@@ -4,11 +4,13 @@
 @using System.Security.Claims
 @using Microsoft.Extensions.Localization
 @using Volo.Abp.Account.Localization
+@using Volo.Abp.Account.Settings
 @using Volo.Abp.AspNetCore.Components
 @using Volo.Abp.Identity
 @using Volo.Abp.Account
 @using Volo.Abp.Identity.Localization
 @using Volo.Abp.Security.Claims
+@using Volo.Abp.Settings
 @inherits AbpComponentBase
 @layout LoginLayout
 
@@ -97,7 +99,12 @@
     [Inject]
     IStringLocalizer<IdentityResource> TL { get; set; }
 
+    [Inject]
+    ISettingProvider SettingProvider { get; set; }
+
     RegisterDto RegisterDto { get; set; } = new ();
+    public bool EnableLocalRegister { get; set; }
+
 
     public Register()
     {
@@ -106,6 +113,12 @@
 
     protected override async Task OnInitializedAsync()
     {
+        EnableLocalRegister = await SettingProvider.IsTrueAsync(AccountSettingNames.IsSelfRegistrationEnabled);
+        if (!EnableLocalRegister)
+        {
+            Navigation.NavigateTo("/account/login");
+        }
+
         RegisterDto.UserName = UserName;
         RegisterDto.EmailAddress = EmailAddress;
 
