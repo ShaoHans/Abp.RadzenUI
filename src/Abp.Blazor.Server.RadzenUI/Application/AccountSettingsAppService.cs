@@ -1,10 +1,13 @@
 ﻿using Abp.RadzenUI.Application.Contracts.Settings;
+using Abp.RadzenUI.Permissions;
+using Microsoft.AspNetCore.Authorization;
 using Volo.Abp.Account.Settings;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.SettingManagement;
 
 namespace Abp.RadzenUI.Application;
 
+[Authorize(SettingManagementExtensionPermissions.Account)]
 public class AccountSettingsAppService(ISettingManager settingManager)
     : SettingManagementAppServiceBase,
         IAccountSettingsAppService

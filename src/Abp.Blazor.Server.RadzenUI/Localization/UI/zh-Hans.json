@@ -11,6 +11,7 @@
     "NotSelected": "未选择",
     "Permission:GroupName": "RadzenUI",
     "Permission:AuditLogs": "审计日志",
+    "Permission:SettingManagement_Account": "账户认证方式",
     "Menu:AccountSetting": "账户"
   }
 }
