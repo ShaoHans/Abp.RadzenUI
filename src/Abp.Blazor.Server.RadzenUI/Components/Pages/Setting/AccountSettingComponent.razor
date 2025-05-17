@@ -12,7 +12,8 @@
                 <RadzenLabel Text="@IL["DisplayName:Abp.Account.IsSelfRegistrationEnabled"]" Component="@nameof(AccountSettingsDto.IsSelfRegistrationEnabled)" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="6">
-                <RadzenCheckBox TValue="bool" Name="@nameof(AccountSettingsDto.IsSelfRegistrationEnabled)" @bind-Value="@AccountSettings.IsSelfRegistrationEnabled" />
+                <RadzenCheckBox TValue="bool" Name="@nameof(AccountSettingsDto.IsSelfRegistrationEnabled)" @bind-Value="@AccountSettings.IsSelfRegistrationEnabled" Style="display:block" />
+                <RadzenLabel Text="@IL["Description:Abp.Account.IsSelfRegistrationEnabled"]" class="rz-color-primary" Style="position: absolute" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
@@ -20,7 +21,8 @@
                 <RadzenLabel Text="@IL["DisplayName:Abp.Account.EnableLocalLogin"]" Component="@nameof(AccountSettingsDto.EnableLocalLogin)" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="6">
-                <RadzenCheckBox TValue="bool" Name="@nameof(AccountSettingsDto.EnableLocalLogin)" @bind-Value="@AccountSettings.EnableLocalLogin" />
+                <RadzenCheckBox TValue="bool" Name="@nameof(AccountSettingsDto.EnableLocalLogin)" @bind-Value="@AccountSettings.EnableLocalLogin" Style="display:block" />
+                <RadzenLabel Text="@IL["Description:Abp.Account.EnableLocalLogin"]" class="rz-color-primary" Style="position: absolute" />
             </RadzenColumn>
         </RadzenRow>
         
