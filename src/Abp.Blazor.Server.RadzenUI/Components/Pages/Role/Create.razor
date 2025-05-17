@@ -11,7 +11,7 @@
                 <RadzenLabel Text="@L["DisplayName:RoleName"]" Component="Name" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenTextBox Name="Name" @bind-Value=@DialogFromOption.Model.Name MaxLength="IdentityRoleConsts.MaxNameLength" />
+                <RadzenTextBox Name="Name" @bind-Value=@DialogFromOption.Model.Name MaxLength="IdentityRoleConsts.MaxNameLength" Style="display: block; width: 100%;" />
                 <RadzenRequiredValidator Component="Name" Text="@L.Required("DisplayName:RoleName")" Style="position: absolute" />
             </RadzenColumn>
         </RadzenRow>
