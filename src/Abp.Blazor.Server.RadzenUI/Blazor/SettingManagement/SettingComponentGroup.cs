@@ -1,34 +1,26 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Volo.Abp;
 
 namespace Abp.RadzenUI.Blazor.SettingManagement;
 
-public class SettingComponentGroup
+public class SettingComponentGroup(
+    [Required] string id,
+    [Required] string displayName,
+    [Required] Type componentType,
+    object? parameter = null,
+    int order = SettingComponentGroup.DefaultOrder
+)
 {
     public const int DefaultOrder = 1000;
 
-    public string Id { get; set; } = default!;
+    public string Id { get; set; } = id;
 
-    public string DisplayName { get; set; } = default!;
+    public string Key { get; set; } = id.Replace('.', '-').Replace('/', '-').ToLower();
 
-    public Type ComponentType { get; set; } = default!;
+    public string DisplayName { get; set; } = displayName;
 
-    public object? Parameter { get; set; }
+    public Type ComponentType { get; set; } = componentType;
 
-    public int Order { get; set; }
+    public object? Parameter { get; set; } = parameter;
 
-    public SettingComponentGroup(
-        [Required] string id,
-        [Required] string displayName,
-        [Required] Type componentType,
-        object? parameter = null,
-        int order = DefaultOrder
-    )
-    {
-        Id = id;
-        DisplayName = displayName;
-        ComponentType = componentType;
-        Parameter = parameter;
-        Order = order;
-    }
+    public int Order { get; set; } = order;
 }

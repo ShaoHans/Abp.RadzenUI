@@ -10,7 +10,7 @@
 
 <PageTitle>@L["Settings"]</PageTitle>
 
-<RadzenTabs @bind-SelectedIndex=@_selectedIndex TabPosition="TabPosition.Left" RenderMode="TabRenderMode.Server">
+<RadzenTabs @bind-SelectedIndex=@_selectedIndex Change="@TabChange" TabPosition="TabPosition.Left" RenderMode="TabRenderMode.Client">
     <Tabs>
         @foreach (var group in SettingComponentCreationContext.Groups)
         {
@@ -26,6 +26,8 @@
     protected IServiceProvider ServiceProvider { get; set; }
     [Inject]
     protected IOptions<SettingManagementComponentOptions> Options { get; set; }
+    [Inject]
+    protected NavigationManager Nav { get; set; }
 
     protected SettingComponentCreationContext SettingComponentCreationContext { get; set; }
 
@@ -45,17 +47,38 @@
             await contributor.ConfigureAsync(SettingComponentCreationContext);
         }
         SettingComponentCreationContext.Normalize();
+
+        SetSelectedTabIndex();
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    void SetSelectedTabIndex()
     {
-        if (firstRender)
+        var uri = Nav.ToAbsoluteUri(Nav.Uri);
+        var fragment = uri.Fragment.TrimStart('#');
+        if (string.IsNullOrEmpty(fragment))
         {
-            await Task.Yield();
-            await InvokeAsync(StateHasChanged);
+            fragment = SettingComponentCreationContext.Groups.FirstOrDefault()?.Key;
         }
 
-        await base.OnAfterRenderAsync(firstRender);
+        if (!string.IsNullOrEmpty(fragment))
+        {
+            for (int i = 0; i < SettingComponentCreationContext.Groups.Count; i++)
+            {
+                if (SettingComponentCreationContext.Groups[i].Key.Equals(fragment, StringComparison.OrdinalIgnoreCase))
+                {
+                    _selectedIndex = i;
+                    TabChange(_selectedIndex);
+                    break;
+                }
+            }
+        }
+    }
+
+    void TabChange(int index)
+    {
+        _selectedIndex = index;
+        var uri = Nav.ToAbsoluteUri(Nav.Uri);
+        Nav.NavigateTo($"{uri.AbsolutePath}#{SettingComponentCreationContext.Groups[index].Key}");
     }
 
     protected RenderFragment RenderComponent(SettingComponentGroup settingGroup) => builder =>

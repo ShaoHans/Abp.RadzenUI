@@ -11,11 +11,6 @@ public class SettingComponentCreationContext(IServiceProvider serviceProvider)
 
     public void Normalize()
     {
-        Order();
-    }
-
-    private void Order()
-    {
         Groups = [.. Groups.OrderBy(item => item.Order).ThenBy(item => item.DisplayName)];
     }
 }
