@@ -10,6 +10,8 @@
     "SwitchTenant": "Switch tenant",
     "NotSelected": "Not selected",
     "Permission:GroupName": "RadzenUI",
-    "Permission:AuditLogs": "AuditLogs"
+    "Permission:AuditLogs": "AuditLogs",
+    "Permission:SettingManagement_Account": "Account authentication method",
+    "Menu:AccountSetting": "Account"
   }
 }

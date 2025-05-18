@@ -4,11 +4,13 @@
 @using System.Security.Claims
 @using Microsoft.Extensions.Localization
 @using Volo.Abp.Account.Localization
+@using Volo.Abp.Account.Settings
 @using Volo.Abp.AspNetCore.Components
 @using Volo.Abp.Identity
 @using Volo.Abp.Account
 @using Volo.Abp.Identity.Localization
 @using Volo.Abp.Security.Claims
+@using Volo.Abp.Settings
 @inherits AbpComponentBase
 @layout LoginLayout
 
@@ -48,9 +50,12 @@
         <input type="hidden" name="IsExternalLogin" value="@IsExternalLogin.ToString()" />
         <input type="hidden" name="ExternalLoginAuthSchema" value="@ExternalLoginAuthSchema" />
     </RadzenStack>
-    <RadzenStack class="rz-p-4" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
-        <RadzenButton ButtonType="ButtonType.Submit" Text="@L["Register"]" Style="width:100%"></RadzenButton>
-    </RadzenStack>
+    @if (IsExternalLogin || EnableLocalRegister)
+    {
+        <RadzenStack class="rz-p-4" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+            <RadzenButton ButtonType="ButtonType.Submit" Text="@L["Register"]" Style="width:100%"></RadzenButton>
+        </RadzenStack>
+    }
     <div class="rz-login">
         <div class="rz-register">
             @L["AlreadyRegistered"]
@@ -97,7 +102,12 @@
     [Inject]
     IStringLocalizer<IdentityResource> TL { get; set; }
 
+    [Inject]
+    ISettingProvider SettingProvider { get; set; }
+
     RegisterDto RegisterDto { get; set; } = new ();
+    public bool EnableLocalRegister { get; set; }
+
 
     public Register()
     {
@@ -106,6 +116,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        EnableLocalRegister = await SettingProvider.IsTrueAsync(AccountSettingNames.IsSelfRegistrationEnabled);
+
         RegisterDto.UserName = UserName;
         RegisterDto.EmailAddress = EmailAddress;
 

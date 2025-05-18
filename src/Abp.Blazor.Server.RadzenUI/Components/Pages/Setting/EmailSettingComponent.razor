@@ -12,7 +12,7 @@
                 <RadzenLabel Text="@L["DefaultFromDisplayName"]" Component="@nameof(UpdateEmailSettingsVm.DefaultFromDisplayName)" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenTextBox Name="@nameof(UpdateEmailSettingsVm.DefaultFromDisplayName)" @bind-Value="@EmailSettings.DefaultFromDisplayName" />
+                <RadzenTextBox Name="@nameof(UpdateEmailSettingsVm.DefaultFromDisplayName)" @bind-Value="@EmailSettings.DefaultFromDisplayName" Style="display:block" />
                 <RadzenRequiredValidator Component="@nameof(UpdateEmailSettingsVm.DefaultFromDisplayName)" Text="@L.Required("DefaultFromDisplayName")" Style="position: absolute" />
             </RadzenColumn>
         </RadzenRow>
@@ -22,7 +22,7 @@
                 <RadzenLabel Text="@L["DefaultFromAddress"]" Component="@nameof(UpdateEmailSettingsVm.DefaultFromAddress)" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenTextBox Name="@nameof(UpdateEmailSettingsVm.DefaultFromAddress)" @bind-Value="@EmailSettings.DefaultFromAddress" />
+                <RadzenTextBox Name="@nameof(UpdateEmailSettingsVm.DefaultFromAddress)" @bind-Value="@EmailSettings.DefaultFromAddress" Style="display:block" />
                 <RadzenRequiredValidator Component="@nameof(UpdateEmailSettingsVm.DefaultFromAddress)" Text="@L.Required("DefaultFromAddress")" Style="position: absolute" />
                 <RadzenEmailValidator Component="@nameof(UpdateEmailSettingsVm.DefaultFromAddress)" Text="@IL["Volo.Abp.Identity:InvalidEmail",EmailSettings.DefaultFromAddress]" Style="position: absolute" />
             </RadzenColumn>
@@ -33,7 +33,7 @@
                 <RadzenLabel Text="@L["SmtpHost"]" Component="@nameof(UpdateEmailSettingsVm.SmtpHost)" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenTextBox Name="@nameof(UpdateEmailSettingsVm.SmtpHost)" @bind-Value="@EmailSettings.SmtpHost" />
+                <RadzenTextBox Name="@nameof(UpdateEmailSettingsVm.SmtpHost)" @bind-Value="@EmailSettings.SmtpHost" Style="display:block" />
                 <RadzenRequiredValidator Component="@nameof(UpdateEmailSettingsVm.SmtpHost)" Text="@L.Required("SmtpHost")" Style="position: absolute" />
             </RadzenColumn>
         </RadzenRow>
@@ -52,7 +52,7 @@
                 <RadzenLabel Text="@L["SmtpEnableSsl"]" Component="@nameof(UpdateEmailSettingsVm.SmtpEnableSsl)" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenCheckBox TValue="bool" Name="@nameof(UpdateEmailSettingsVm.SmtpEnableSsl)" @bind-Value="@EmailSettings.SmtpEnableSsl" />
+                <RadzenCheckBox TValue="bool" Name="@nameof(UpdateEmailSettingsVm.SmtpEnableSsl)" @bind-Value="@EmailSettings.SmtpEnableSsl" Style="display:block" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
@@ -60,7 +60,7 @@
                 <RadzenLabel Text="@L["SmtpUseDefaultCredentials"]" Component="@nameof(UpdateEmailSettingsVm.SmtpUseDefaultCredentials)" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenCheckBox TValue="bool" Name="@nameof(UpdateEmailSettingsVm.SmtpUseDefaultCredentials)" @bind-Value="@EmailSettings.SmtpUseDefaultCredentials" />
+                <RadzenCheckBox TValue="bool" Name="@nameof(UpdateEmailSettingsVm.SmtpUseDefaultCredentials)" @bind-Value="@EmailSettings.SmtpUseDefaultCredentials" Style="display:block" />
             </RadzenColumn>
         </RadzenRow>
         @if (!EmailSettings.SmtpUseDefaultCredentials)
@@ -71,7 +71,7 @@
                     <RadzenLabel Text="@L["SmtpDomain"]" Component="@nameof(UpdateEmailSettingsVm.SmtpDomain)" />
                 </RadzenColumn>
                 <RadzenColumn Size="12" SizeMD="8">
-                    <RadzenTextBox Name="@nameof(UpdateEmailSettingsVm.SmtpDomain)" @bind-Value="@EmailSettings.SmtpDomain" />
+                    <RadzenTextBox Name="@nameof(UpdateEmailSettingsVm.SmtpDomain)" @bind-Value="@EmailSettings.SmtpDomain" Style="display:block" />
                     <RadzenRequiredValidator Component="@nameof(UpdateEmailSettingsVm.SmtpDomain)" Text="@L.Required("SmtpDomain")" Style="position: absolute" />
                 </RadzenColumn>
             </RadzenRow>
@@ -81,7 +81,7 @@
                     <RadzenLabel Text="@L["SmtpUserName"]" Component="@nameof(UpdateEmailSettingsVm.SmtpUserName)" />
                 </RadzenColumn>
                 <RadzenColumn Size="12" SizeMD="8">
-                    <RadzenTextBox Name="@nameof(UpdateEmailSettingsVm.SmtpUserName)" @bind-Value="@EmailSettings.SmtpUserName" />
+                    <RadzenTextBox Name="@nameof(UpdateEmailSettingsVm.SmtpUserName)" @bind-Value="@EmailSettings.SmtpUserName" Style="display:block" />
                     <RadzenRequiredValidator Component="@nameof(UpdateEmailSettingsVm.SmtpUserName)" Text="@L.Required("SmtpUserName")" Style="position: absolute" />
                 </RadzenColumn>
             </RadzenRow>
@@ -91,7 +91,7 @@
                     <RadzenLabel Text="@L["SmtpPassword"]" Component="@nameof(UpdateEmailSettingsVm.SmtpPassword)" />
                 </RadzenColumn>
                 <RadzenColumn Size="12" SizeMD="8">
-                    <RadzenPassword Name="@nameof(UpdateEmailSettingsVm.SmtpPassword)" @bind-Value="@EmailSettings.SmtpPassword" />
+                    <RadzenPassword Name="@nameof(UpdateEmailSettingsVm.SmtpPassword)" @bind-Value="@EmailSettings.SmtpPassword" Style="display:block" />
                     <RadzenRequiredValidator Component="@nameof(UpdateEmailSettingsVm.SmtpPassword)" Text="@L.Required("SmtpPassword")" Style="position: absolute" />
                 </RadzenColumn>
             </RadzenRow>
