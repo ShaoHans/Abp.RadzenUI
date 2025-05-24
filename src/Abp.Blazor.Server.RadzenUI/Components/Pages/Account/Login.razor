@@ -11,11 +11,11 @@
 
 <RadzenTemplateForm Data=@("") Method="post" Action="/account/locallogin">
     <RadzenLogin LoginText="@L["Login"]"
-                 UserText="@L["UserName"]" UserRequired="@L.Required("DisplayName:UserName")"
-                 PasswordText="@L["Password"]" PasswordRequired="@L.Required("DisplayName:Password")"
-                 AllowResetPassword="false"
-                 AllowRememberMe="true" RememberMe="true" RememberMeText="@L["RememberMe"]"
-                 AllowRegister="@EnableLocalRegister" RegisterText="@L["Register"]" RegisterMessageText="@L["AreYouANewUser"]" Register="@OnRegister" />
+    UserText="@L["UserName"]" UserRequired="@L.Required("DisplayName:UserName")"
+    PasswordText="@L["Password"]" PasswordRequired="@L.Required("DisplayName:Password")"
+    AllowResetPassword="false"
+    AllowRememberMe="true" RememberMe="true" RememberMeText="@L["RememberMe"]"
+    AllowRegister="@EnableLocalRegister" RegisterText="@L["Register"]" RegisterMessageText="@L["AreYouANewUser"]" Register="@OnRegister" />
 </RadzenTemplateForm>
 
 <ExternalLoginProvider Text="@L["OrLoginWith"]" />
@@ -26,10 +26,10 @@
     public string? Error { get; set; }
 
     [Inject]
-    NavigationManager Navigation { get; set; }
+    NavigationManager Navigation { get; set; } = default!;
 
     [Inject]
-    ISettingProvider SettingProvider { get; set; }
+    ISettingProvider SettingProvider { get; set; } = default!;
 
     public bool EnableLocalRegister { get; set; }
 

@@ -86,7 +86,7 @@
     {
         await base.OnInitializedAsync();
 
-        Task.Run(async () =>
+        _ = Task.Run(async () =>
         {
             repository = await GitHubClient.GetRepositoryAsync();
             commitCount = await GitHubClient.GetRepositoryCommitCountAsync();

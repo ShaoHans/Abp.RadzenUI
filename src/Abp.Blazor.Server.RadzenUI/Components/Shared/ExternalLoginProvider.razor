@@ -1,6 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Authentication
 @using Microsoft.Extensions.Options
-@inject IOptions<AbpRadzenUIOptions> RadzenUIOptions
 
 @if (ExternalProviders.Count > 0)
 {
@@ -15,17 +14,20 @@
             <input type="hidden" name="returnUrl" value="/" />
             <input type="hidden" name="provider" value="@provider.AuthenticationScheme" />
             <RadzenButton ButtonType="ButtonType.Submit" Text="@provider.DisplayName" Style="width:100%"
-                          Image="@provider.IconPath" />
+            Image="@provider.IconPath" />
         </RadzenTemplateForm>
     }
 }
 
 @code {
     [Parameter]
-    public string Text { get; set; }
+    public string Text { get; set; } = string.Empty;
 
     [Inject]
     IAuthenticationSchemeProvider SchemeProvider { get; set; } = default!;
+
+    [Inject]
+    IOptions<AbpRadzenUIOptions> RadzenUIOptions { get; set; } = default!;
 
     List<ExternalProviderModel> ExternalProviders { get; set; } = [];
 
@@ -46,7 +48,7 @@
                 {
                     DisplayName = x.DisplayName,
                     AuthenticationScheme = x.Name,
-                    IconPath = RadzenUIOptions.Value.ExternalLogin.Providers.FirstOrDefault(p => p.AuthenticationScheme == x.Name)?.IconPath
+                    IconPath = RadzenUIOptions.Value.ExternalLogin?.Providers?.FirstOrDefault(p => p.AuthenticationScheme == x.Name)?.IconPath ?? string.Empty
                 })
         ];
     }

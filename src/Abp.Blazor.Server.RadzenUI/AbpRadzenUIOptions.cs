@@ -50,15 +50,9 @@ public class ExternalLoginSettings
     public List<ExternalLoginProvider> Providers { get; set; } = [];
 }
 
-public class ExternalLoginProvider
+public class ExternalLoginProvider(string authenticationScheme, string iconPath)
 {
-    public string AuthenticationScheme { get; set; } = default!;
+    public string AuthenticationScheme { get; set; } = authenticationScheme;
 
-    public string IconPath { get; set; } = string.Empty;
-
-    public ExternalLoginProvider(string authenticationScheme, string iconPath)
-    {
-        AuthenticationScheme = authenticationScheme;
-        IconPath = iconPath;
-    }
+    public string IconPath { get; set; } = iconPath;
 }

@@ -61,13 +61,13 @@
 
 @code {
     [Parameter]
-    public string DefaultFromAddress { get; set; }
+    public string DefaultFromAddress { get; set; } = string.Empty;
 
     [Inject]
     protected IEmailSettingsAppService EmailSettingsAppService { get; set; } = default!;
 
     [Inject]
-    protected DialogService DialogService { get; set; }
+    protected DialogService DialogService { get; set; } = default!;
 
     public SendTestEmailVM SendTestEmailInput { get; set; } = new();
 
@@ -81,7 +81,7 @@
         SendTestEmailInput = new SendTestEmailVM
             {
                 SenderEmailAddress = DefaultFromAddress,
-                TargetEmailAddress = CurrentUser.Email,
+                TargetEmailAddress = CurrentUser.Email ?? string.Empty,
                 Subject = L["TestEmailSubject", new Random().Next(1000, 9999)],
                 Body = L["TestEmailBody"]
             };

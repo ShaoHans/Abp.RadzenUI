@@ -19,7 +19,7 @@
     [Parameter]
     public EventCallback<bool> SidebarExpandedChanged { get; set; }
 
-    ApplicationMenu _applicationMenu;
+    ApplicationMenu _applicationMenu = default!;
 
     protected override async Task OnInitializedAsync()
     {

@@ -23,13 +23,15 @@
 
 @code {
     [Inject]
-    protected IServiceProvider ServiceProvider { get; set; }
-    [Inject]
-    protected IOptions<SettingManagementComponentOptions> Options { get; set; }
-    [Inject]
-    protected NavigationManager Nav { get; set; }
+    protected IServiceProvider ServiceProvider { get; set; } = default!;
 
-    protected SettingComponentCreationContext SettingComponentCreationContext { get; set; }
+    [Inject]
+    protected IOptions<SettingManagementComponentOptions> Options { get; set; } = default!;
+
+    [Inject]
+    protected NavigationManager Nav { get; set; } = default!;
+
+    public SettingComponentCreationContext SettingComponentCreationContext { get; set; }
 
     int _selectedIndex = 0;
 

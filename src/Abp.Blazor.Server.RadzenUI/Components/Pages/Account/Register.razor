@@ -80,30 +80,30 @@
 
     [SupplyParameterFromQuery]
     [Parameter]
-    public string ExternalLoginAuthSchema { get; set; }
+    public string ExternalLoginAuthSchema { get; set; } = string.Empty;
 
     [SupplyParameterFromQuery]
     [Parameter]
-    public string UserName { get; set; }
+    public string UserName { get; set; } = string.Empty;
 
     [SupplyParameterFromQuery]
     [Parameter]
-    public string EmailAddress { get; set; }
+    public string EmailAddress { get; set; } = string.Empty;
 
     [Inject]
-    NavigationManager Navigation { get; set; }
+    NavigationManager Navigation { get; set; } = default!;
 
     [Inject]
-    SignInManager<Volo.Abp.Identity.IdentityUser> SignInManager { get; set; }
+    SignInManager<Volo.Abp.Identity.IdentityUser> SignInManager { get; set; } = default!;
 
     [Inject]
-    IdentityUserManager UserManager { get; set; }
+    IdentityUserManager UserManager { get; set; } = default!;
 
     [Inject]
-    IStringLocalizer<IdentityResource> TL { get; set; }
+    IStringLocalizer<IdentityResource> TL { get; set; } = default!;
 
     [Inject]
-    ISettingProvider SettingProvider { get; set; }
+    ISettingProvider SettingProvider { get; set; } = default!;
 
     RegisterDto RegisterDto { get; set; } = new ();
     public bool EnableLocalRegister { get; set; }

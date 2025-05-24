@@ -1,12 +1,9 @@
 ﻿using CRM.Localization;
 using CRM.MultiTenancy;
 using CRM.Permissions;
-
 using Microsoft.Extensions.Localization;
-
 using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.UI.Navigation;
-
 using static Abp.RadzenUI.Menus.RadzenUI;
 
 namespace CRM.Blazor.Web.Menus;
@@ -21,19 +18,13 @@ public class CRMMenuContributor : IMenuContributor
         }
     }
 
-    private Task ConfigureMainMenuAsync(MenuConfigurationContext context)
+    private static Task ConfigureMainMenuAsync(MenuConfigurationContext context)
     {
         var l = context.GetLocalizer<CRMResource>();
 
         context.Menu.Items.Insert(
             0,
-            new ApplicationMenuItem(
-                CRMMenus.Home,
-                l["Menu:Home"],
-                "/",
-                icon: "home",
-                order: 1
-            )
+            new ApplicationMenuItem(CRMMenus.Home, l["Menu:Home"], "/", icon: "home", order: 1)
         );
 
         ConfigProductMenu(context, l);
@@ -58,14 +49,14 @@ public class CRMMenuContributor : IMenuContributor
         return Task.CompletedTask;
     }
 
-    private void ConfigProductMenu(MenuConfigurationContext context, IStringLocalizer l)
+    private static void ConfigProductMenu(MenuConfigurationContext context, IStringLocalizer l)
     {
         var productMenu = new ApplicationMenuItem(
-                CRMMenus.Product,
-                l["Menu:Product"],
-                icon: "inventory_2",
-                order: 2
-            );
+            CRMMenus.Product,
+            l["Menu:Product"],
+            icon: "inventory_2",
+            order: 2
+        );
 
         productMenu.AddItem(
             new ApplicationMenuItem(
