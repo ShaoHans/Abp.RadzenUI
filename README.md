@@ -162,6 +162,16 @@ private void ConfigureOidcAuthentication(
     }
 }
 ```
+### 7. Configuration Settings Page
+In the process of system development, we often need to configure certain system or business parameters, such as email service providers, SMS service providers, etc. Usually, corresponding pages are developed to configure these parameters. The Abp framework provides [Settings](https://abp.io/docs/latest/framework/infrastructure/settings?_redirected=B8ABF606AA1BDF5C629883DF1061649A), which makes it convenient to save and manage such settings. Based on this, this UI component allows you to easily create configuration pages for unified management. By following the steps below, your custom configuration component will be automatically added as a tab item on the settings page:
+
+#### (1) Create your parameter configuration service, for example: [AccountSettingsAppService](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Application/AccountSettingsAppService.cs)
+
+#### (2) Create your parameter configuration Blazor component, for example: [AccountSettingComponent](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Components/Pages/Setting/AccountSettingComponent.razor)
+
+#### (3) Define your parameter configuration Contributor by implementing the interface `ISettingComponentContributor`. This contributor is mainly used to add your parameter configuration Blazor component, for example: [AccountPageContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Blazor/SettingManagement/AccountPageContributor.cs)
+
+#### (4) Finally, add your Contributor to the Module configuration
 
 
-### 7. Don't forget migrate your database when you first run the app
+### 8. Don't forget migrate your database when you first run the app

@@ -163,5 +163,20 @@ private void ConfigureOidcAuthentication(
 }
 ```
 
-### 7. 第一次运行示例程序的时候不要忘了执行迁移代码
+### 7. 配置参数设置页面
+在系统开发过程中，我们经常需要进行一些系统参数或业务参数的配置，例如邮箱服务商、短信服务商等等，通常会开发对应页面进行参数的配置，Abp框架提供了[Settings](https://abp.io/docs/latest/framework/infrastructure/settings?_redirected=B8ABF606AA1BDF5C629883DF1061649A)可以方便对参数进行保存设置，在此基础上，本UI组件可以方便的对这些配置建立页面统一管理，遵循以下步骤将自动将你创建的配置组件添加到设置页面的tab项中：
+#### （1）创建你的参数配置服务，例如：[AccountSettingsAppService](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Application/AccountSettingsAppService.cs)
+#### （2）创建你的参数配置blazor组件，例如：[AccountSettingComponent](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Components/Pages/Setting/AccountSettingComponent.razor)
+#### （3）定义你的参数配置Contributor，实现接口ISettingComponentContributor，该Contributor主要是添加你的参数配置blazor组件，例如：[AccountPageContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Blazor/SettingManagement/AccountPageContributor.cs)
+#### （4）最后将你的Contributor添加到Module配置中
+```chsarp
+Configure<SettingManagementComponentOptions>(options =>
+{
+    options.Contributors.Add(new EmailingPageContributor());
+    options.Contributors.Add(new TimeZonePageContributor());
+    options.Contributors.Add(new AccountPageContributor());
+});
+```
+
+### 8. 第一次运行示例程序的时候不要忘了执行迁移代码
 
