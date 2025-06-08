@@ -18,31 +18,31 @@
     <RadzenTheme Theme="@_theme" @rendermode="InteractiveServer" />
 </head>
 <body class="rz-scrollbars">
-<Routes @rendermode="InteractiveServer" />
-<div id="blazor-error-ui">
-    @if (Env.IsDevelopment())
-    {
-        <text>
-            An unhandled exception has occurred. See browser dev tools for details.
-        </text>
-    }
-    else
-    {
-        <text>
-            An error has occurred. This app may no longer respond until reloaded.
-        </text>
-    }
-    <a href="/" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
-</div>
+    <Routes @rendermode="InteractiveServer" />
+    <div id="blazor-error-ui">
+        @if (Env.IsDevelopment())
+        {
+            <text>
+                An unhandled exception has occurred. See browser dev tools for details.
+            </text>
+        }
+        else
+        {
+            <text>
+                An error has occurred. This app may no longer respond until reloaded.
+            </text>
+        }
+        <a href="/" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
 
-<script src="_framework/blazor.web.js"></script>
-<script async src="_content/AbpRadzen.Blazor.Server.UI/js/highlight.pack.js"></script>
-<script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)"></script>
+    <script src="_framework/blazor.web.js"></script>
+    <script async src="_content/AbpRadzen.Blazor.Server.UI/js/highlight.pack.js"></script>
+    <script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)"></script>
 </body>
 </html>
 
-@code{
+@code {
     string _theme = "material-dark";
 
     protected override void OnInitialized()
