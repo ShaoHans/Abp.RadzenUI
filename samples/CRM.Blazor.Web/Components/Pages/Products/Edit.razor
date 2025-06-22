@@ -51,7 +51,7 @@
                 <RadzenLabel Text="@L["DisplayName:Status"]" Component="Status" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenDropDown TValue="string" Value=@DialogFromOption.Model.Status Data=@_statues
+                <RadzenDropDown TValue="string" Value=@DialogFromOption.Model.Status.ToString() Data=@_statues
                                 ValueChanged="args=>ChangeStatus(args)"
                                 Style="width: 100%; max-width: 400px;" Name="Status" />
             </RadzenColumn>
