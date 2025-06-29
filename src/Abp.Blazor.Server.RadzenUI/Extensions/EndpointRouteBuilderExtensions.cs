@@ -15,6 +15,7 @@ public static class EndpointRouteBuilderExtensions
         return builder
             .MapRazorComponents<App>()
             .AddInteractiveServerRenderMode()
+            .AddInteractiveWebAssemblyRenderMode()
             .AddAdditionalAssemblies(
                 [
                     .. builder

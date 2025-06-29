@@ -72,7 +72,9 @@ public class AbpRadzenUIModule : AbpModule
         });
 
         // Add services to the container.
-        context.Services.AddRazorComponents().AddInteractiveServerComponents();
+        context.Services.AddRazorComponents()
+            .AddInteractiveServerComponents()
+            .AddInteractiveWebAssemblyComponents();
 
         // Add Radzen.Blazor services
         context.Services.AddRadzenComponents();

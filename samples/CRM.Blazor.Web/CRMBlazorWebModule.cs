@@ -311,8 +311,8 @@ public class CRMBlazorWebModule : AbpModule
         }
 
         app.UseCorrelationId();
-        app.UseRouting();
         app.UseStaticFiles();
+        app.UseRouting();
         app.UseAntiforgery();
         app.UseAbpSecurityHeaders();
         app.UseAuthentication();

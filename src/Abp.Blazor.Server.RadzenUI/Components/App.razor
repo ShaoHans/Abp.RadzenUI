@@ -13,12 +13,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
     <link href="_content/AbpRadzen.Blazor.Server.UI/css/site.css" rel="stylesheet" />
-    <HeadOutlet @rendermode="InteractiveServer" />
+    <HeadOutlet @rendermode="InteractiveAuto" />
     <link rel="preload" href="_content/AbpRadzen.Blazor.Server.UI/fonts/MaterialSymbolsOutlined.woff2" as="font" type="font/woff2">
-    <RadzenTheme Theme="@_theme" @rendermode="InteractiveServer" />
+    <RadzenTheme Theme="@_theme" @rendermode="InteractiveAuto" />
 </head>
 <body class="rz-scrollbars">
-    <Routes @rendermode="InteractiveServer" />
+    <Routes @rendermode="InteractiveAuto" />
     <div id="blazor-error-ui">
         @if (Env.IsDevelopment())
         {
