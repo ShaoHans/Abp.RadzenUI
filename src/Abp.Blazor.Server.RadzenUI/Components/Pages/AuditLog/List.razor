@@ -43,7 +43,11 @@
                 }
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(AuditLogDto.ExecutionTime)" Title="@L["ExecutionTime"]" Width="200px" />
+        <RadzenDataGridColumn Property="@nameof(AuditLogDto.ExecutionTime)" Title="@L["ExecutionTime"]" Width="200px" >
+            <Template>
+                <RadzenLabel>@context.ExecutionTime.ToLocalTime()</RadzenLabel>
+            </Template>
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(AuditLogDto.ExecutionDuration)" Filterable="false" Sortable="false" Title="@L["ExecutionDuration"]" />
         <RadzenDataGridColumn Property="@nameof(AuditLogDto.BrowserInfo)" Filterable="false" Sortable="false" Title="@L["BrowserInfo"]">
             <Template>
