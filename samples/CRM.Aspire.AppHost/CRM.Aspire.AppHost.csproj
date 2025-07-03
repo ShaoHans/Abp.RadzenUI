@@ -16,8 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CRM.Blazor.Web\CRM.Blazor.Web.csproj" />
     <ProjectReference Include="..\CRM.DbMigrator\CRM.DbMigrator.csproj" />
+    <ProjectReference Include="..\hosts\blazor-server\CRM.Blazor.Web\CRM.Blazor.Web.csproj" />
   </ItemGroup>
 
 </Project>

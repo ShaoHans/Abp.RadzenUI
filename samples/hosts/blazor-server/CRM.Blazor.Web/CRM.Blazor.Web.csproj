@@ -18,12 +18,11 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\Abp.Blazor.Server.RadzenUI\Abp.Blazor.Server.RadzenUI.csproj" />
-		<ProjectReference Include="..\CRM.Application.Contracts\CRM.Application.Contracts.csproj" />
-		<ProjectReference Include="..\CRM.Application\CRM.Application.csproj" />
-		<ProjectReference Include="..\CRM.Aspire.ServiceDefaults\CRM.Aspire.ServiceDefaults.csproj" />
-		<ProjectReference Include="..\CRM.HttpApi\CRM.HttpApi.csproj" />
-		<ProjectReference Include="..\CRM.EntityFrameworkCore\CRM.EntityFrameworkCore.csproj" />
+		<ProjectReference Include="..\..\..\..\src\Abp.Blazor.Server.RadzenUI\Abp.Blazor.Server.RadzenUI.csproj" />
+		<ProjectReference Include="..\..\..\CRM.Application\CRM.Application.csproj" />
+		<ProjectReference Include="..\..\..\CRM.Application.Contracts\CRM.Application.Contracts.csproj" />
+		<ProjectReference Include="..\..\..\CRM.HttpApi\CRM.HttpApi.csproj" />
+		<ProjectReference Include="..\..\..\CRM.EntityFrameworkCore\CRM.EntityFrameworkCore.csproj" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.2" />
 		<!--<PackageReference Include="AbpRadzen.Blazor.Server.UI" Version="0.1.1" />-->
 		<PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />

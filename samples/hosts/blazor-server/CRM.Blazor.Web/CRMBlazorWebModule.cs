@@ -184,29 +184,30 @@ public class CRMBlazorWebModule : AbpModule
     {
         if (hostingEnvironment.IsDevelopment())
         {
+            var contentRootPath = Path.GetFullPath(Path.Combine(hostingEnvironment.ContentRootPath, "..", "..")); ;
             Configure<AbpVirtualFileSystemOptions>(options =>
             {
                 options.FileSets.ReplaceEmbeddedByPhysical<CRMDomainSharedModule>(
                     Path.Combine(
-                        hostingEnvironment.ContentRootPath,
+                        contentRootPath,
                         $"..{Path.DirectorySeparatorChar}CRM.Domain.Shared"
                     )
                 );
                 options.FileSets.ReplaceEmbeddedByPhysical<CRMDomainModule>(
                     Path.Combine(
-                        hostingEnvironment.ContentRootPath,
+                        contentRootPath,
                         $"..{Path.DirectorySeparatorChar}CRM.Domain"
                     )
                 );
                 options.FileSets.ReplaceEmbeddedByPhysical<CRMApplicationContractsModule>(
                     Path.Combine(
-                        hostingEnvironment.ContentRootPath,
+                        contentRootPath   ,
                         $"..{Path.DirectorySeparatorChar}CRM.Application.Contracts"
                     )
                 );
                 options.FileSets.ReplaceEmbeddedByPhysical<CRMApplicationModule>(
                     Path.Combine(
-                        hostingEnvironment.ContentRootPath,
+                        contentRootPath,
                         $"..{Path.DirectorySeparatorChar}CRM.Application"
                     )
                 );
