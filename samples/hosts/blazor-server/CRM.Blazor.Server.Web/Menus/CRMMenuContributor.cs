@@ -6,7 +6,7 @@ using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.UI.Navigation;
 using static Abp.RadzenUI.Menus.RadzenUI;
 
-namespace CRM.Blazor.Web.Menus;
+namespace CRM.Blazor.Server.Web.Menus;
 
 public class CRMMenuContributor : IMenuContributor
 {

@@ -4,7 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-		<RootNamespace>CRM.Blazor.Web</RootNamespace>
+		<RootNamespace>CRM.Blazor.Server.Web</RootNamespace>
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 		<UserSecretsId>64c4627c-4e94-4b4f-97d8-49f7a3a2ce3d</UserSecretsId>
 		<DockerfileContext>..\..</DockerfileContext>

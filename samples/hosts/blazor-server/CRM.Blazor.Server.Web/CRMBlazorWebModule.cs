@@ -1,7 +1,7 @@
 ﻿using Abp.RadzenUI;
 using Abp.RadzenUI.Localization;
-using CRM.Blazor.Web.Components.Pages;
-using CRM.Blazor.Web.Menus;
+using CRM.Blazor.Server.Web.Components.Pages;
+using CRM.Blazor.Server.Web.Menus;
 using CRM.EntityFrameworkCore;
 using CRM.Localization;
 using CRM.MultiTenancy;

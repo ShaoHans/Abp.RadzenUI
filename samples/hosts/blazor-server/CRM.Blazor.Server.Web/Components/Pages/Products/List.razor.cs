@@ -4,7 +4,7 @@ using CRM.Permissions;
 using CRM.Products;
 using Radzen;
 
-namespace CRM.Blazor.Web.Components.Pages.Products;
+namespace CRM.Blazor.Server.Web.Components.Pages.Products;
 
 public partial class List
 {

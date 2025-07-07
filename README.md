@@ -23,16 +23,16 @@ Password:  **1q2w#E***
 ## 🎨Page display
 
 ### 1.The login page
-![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/login.png)
+![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Server.Web/wwwroot/images/login.png)
 
 ### 2.The list page
-![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/list.png)
+![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Server.Web/wwwroot/images/list.png)
 
 ### 3.The other list page with datagrid filter
-![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/list-with-filter.png)
+![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Server.Web/wwwroot/images/list-with-filter.png)
 
 ### 4.Theme switch
-![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/switch-theme.png)
+![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Server.Web/wwwroot/images/switch-theme.png)
 
 ## 🌱How to use
 
@@ -113,10 +113,10 @@ then add the following code on your `OnApplicationInitialization` method
 app.UseRadzenUI();
 ```
 
-yuo can refer to the sample code [CRMBlazorWebModule](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/CRMBlazorWebModule.cs)
+yuo can refer to the sample code [CRMBlazorWebModule](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Server.Web/CRMBlazorWebModule.cs)
 
 ### 5. Config Menu
-When you add razor page and need config menu , you should edit the [CRMMenuContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/Menus/CRMMenuContributor.cs) class 
+When you add razor page and need config menu , you should edit the [CRMMenuContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Server.Web/Menus/CRMMenuContributor.cs) class 
 
 ### 6. Config External Login
 If you want to integrate third-party authentication such as Azure AD, it's quite straightforward. Simply update your configuration file as shown below, and add the necessary setup in your web project’s module. Once completed, third-party login functionality will be enabled and ready to use.You can refer to the sample project to see how it is implemented in practice.
