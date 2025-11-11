@@ -173,13 +173,13 @@
 
         if (ChangePasswordModel.NewPassword != ChangePasswordModel.NewPasswordConfirm)
         {
-            await Message.Error(L["NewPasswordConfirmFailed"]);
+            await Notify.Error(L["NewPasswordConfirmFailed"]);
             return;
         }
 
         if (ChangePasswordModel.CurrentPassword == ChangePasswordModel.NewPassword)
         {
-            await Message.Error(L["NewPasswordSameAsOld"]);
+            await Notify.Error(L["NewPasswordSameAsOld"]);
             return;
         }
 
@@ -192,7 +192,7 @@
                 });
 
             ChangePasswordModel.Clear();
-            await Message.Success(L["PasswordChanged"]);
+            await Notify.Success(L["PasswordChanged"]);
             NavigationManager.Refresh();
         }
         catch (Exception ex)
@@ -209,7 +209,7 @@
             ObjectMapper.Map<PersonalInfoModel, UpdateProfileDto>(PersonalInfoModel)
             );
 
-            await Message.Success(L["PersonalSettingsSaved"]);
+            await Notify.Success(L["PersonalSettingsSaved"]);
             NavigationManager.Refresh();
         }
         catch (Exception ex)
