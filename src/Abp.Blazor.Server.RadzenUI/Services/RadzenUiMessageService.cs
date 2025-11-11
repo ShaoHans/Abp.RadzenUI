@@ -4,50 +4,71 @@ using Volo.Abp.DependencyInjection;
 
 namespace Abp.RadzenUI.Services;
 
-public class RadzenUiMessageService(NotificationService notificationService)
+public class RadzenUiMessageService(DialogService dialogService)
     : IUiMessageService,
         ITransientDependency
 {
-    protected NotificationService NotificationService { get; } = notificationService;
+    protected DialogService DialogService { get; } = dialogService;
 
-    public Task Info(string message, string? title = null, Action<UiMessageOptions>? options = null)
+    public async Task Info(string message, string? title = null, Action<UiMessageOptions>? options = null)
     {
-        NotificationService.Info(message, title);
-        return Task.CompletedTask;
+        var opts = new UiMessageOptions();
+        options?.Invoke(opts);
+        
+        await DialogService.Alert(message, title ?? "Information", new AlertOptions
+        {
+            OkButtonText = opts.ConfirmButtonText ?? "OK"
+        });
     }
 
-    public Task Success(
-        string message,
-        string? title = null,
-        Action<UiMessageOptions>? options = null
-    )
+    public async Task Success(string message, string? title = null, Action<UiMessageOptions>? options = null)
     {
-        NotificationService.Success(message, title);
-        return Task.CompletedTask;
+        var opts = new UiMessageOptions();
+        options?.Invoke(opts);
+        
+        await DialogService.Alert(message, title ?? "Success", new AlertOptions
+        {
+            OkButtonText = opts.ConfirmButtonText ?? "OK"
+        });
     }
 
-    public Task Warn(string message, string? title = null, Action<UiMessageOptions>? options = null)
+    public async Task Warn(string message, string? title = null, Action<UiMessageOptions>? options = null)
     {
-        NotificationService.Warning(message, title);
-        return Task.CompletedTask;
+        var opts = new UiMessageOptions();
+        options?.Invoke(opts);
+        
+        await DialogService.Alert(message, title ?? "Warning", new AlertOptions
+        {
+            OkButtonText = opts.ConfirmButtonText ?? "OK"
+        });
     }
 
-    public Task Error(
-        string message,
-        string? title = null,
-        Action<UiMessageOptions>? options = null
-    )
+    public async Task Error(string message, string? title = null, Action<UiMessageOptions>? options = null)
     {
-        NotificationService.Error(message, title);
-        return Task.CompletedTask;
+        var opts = new UiMessageOptions();
+        options?.Invoke(opts);
+
+        // We use the title to convey error.
+        await DialogService.Alert(message, title ?? "Error", new AlertOptions
+        {
+            OkButtonText = opts.ConfirmButtonText ?? "OK"
+        });
     }
 
-    public Task<bool> Confirm(
-        string message,
-        string? title = null,
-        Action<UiMessageOptions>? options = null
-    )
+    public async Task<bool> Confirm(string message, string? title = null, Action<UiMessageOptions>? options = null)
     {
-        return Task.FromResult(true);
+        var opts = new UiMessageOptions();
+        options?.Invoke(opts);
+
+        var result = await DialogService.Confirm(
+            message,
+            title ?? "Confirmation",
+            new ConfirmOptions
+            {
+                OkButtonText = opts.ConfirmButtonText ?? "OK",
+                CancelButtonText = opts.CancelButtonText ?? "Cancel"
+            });
+        
+        return result ?? false;
     }
 }
