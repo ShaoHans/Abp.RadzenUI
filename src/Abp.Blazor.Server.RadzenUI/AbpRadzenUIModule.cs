@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Radzen;
 using Volo.Abp.AspNetCore.Components.Messages;
+using Volo.Abp.AspNetCore.Components.Notifications;
 using Volo.Abp.AspNetCore.Components.Server.Configuration;
 using Volo.Abp.AspNetCore.Components.Web;
 using Volo.Abp.AspNetCore.Components.Web.Configuration;
@@ -89,6 +90,9 @@ public class AbpRadzenUIModule : AbpModule
         // Replace the default IUiMessageService with Radzen.Blazor's implementation by NotificationService
         context.Services.Replace(
             ServiceDescriptor.Transient<IUiMessageService, RadzenUiMessageService>()
+        );
+        context.Services.Replace(
+            ServiceDescriptor.Transient<IUiNotificationService, RadzenUiNotificationService>()
         );
 
         Configure<AbpBundlingOptions>(options =>
