@@ -96,7 +96,7 @@
                 ObjectMapper.Map<SendTestEmailVM, SendTestEmailInput>(SendTestEmailInput)
             );
 
-            await Message.Success(L["SentSuccessfully"]);
+            await Notify.Success(L["SentSuccessfully"]);
             DialogService.Close();
         }
         catch (Exception ex)

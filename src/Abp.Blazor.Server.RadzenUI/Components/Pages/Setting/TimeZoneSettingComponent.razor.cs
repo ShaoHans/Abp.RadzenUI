@@ -42,7 +42,7 @@ public partial class TimeZoneSettingComponent
         {
             await TimeZoneSettingsAppService.UpdateAsync(TimezoneSettings.Timezone);
             await CurrentApplicationConfigurationCacheResetService.ResetAsync();
-            await Message.Success(L["SavedSuccessfully"]);
+            await Notify.Success(L["SavedSuccessfully"]);
         }
         catch (Exception ex)
         {

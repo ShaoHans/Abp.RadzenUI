@@ -230,12 +230,12 @@
             await PermissionAppService.UpdateAsync(ProviderName, ProviderKey, updateDto);
             await CacheResetService.ResetAsync();
 
-            await Message.Success(L["SuccessfullySaved"]);
+            await Notify.Success(L["SuccessfullySaved"]);
             DialogService.Close(true);
         }
         catch (Exception ex)
         {
-            await Message.Error(ex.Message);
+            await Notify.Error(ex.Message);
         }
     }
 }

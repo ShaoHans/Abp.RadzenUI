@@ -38,7 +38,7 @@ public partial class AccountSettingComponent
                 }
             );
             await CurrentApplicationConfigurationCacheResetService.ResetAsync();
-            await Message.Success(L["SavedSuccessfully"]);
+            await Notify.Success(L["SavedSuccessfully"]);
         }
         catch (Exception ex)
         {

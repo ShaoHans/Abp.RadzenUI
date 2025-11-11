@@ -272,7 +272,7 @@ public abstract class AbpCrudPageBase<
         try
         {
             await AppService.CreateAsync(model);
-            await Message.Success(UL["SavedSuccessfully"]);
+            await Notify.Success(UL["SavedSuccessfully"]);
             DialogService.Close(true);
         }
         catch (Exception ex)
@@ -325,7 +325,7 @@ public abstract class AbpCrudPageBase<
         try
         {
             await AppService.UpdateAsync(EditingEntityId, model);
-            await Message.Success(UL["SavedSuccessfully"]);
+            await Notify.Success(UL["SavedSuccessfully"]);
             DialogService.Close(true);
         }
         catch (Exception ex)
@@ -354,7 +354,7 @@ public abstract class AbpCrudPageBase<
         {
             await AppService.DeleteAsync(id);
             await _grid.Reload();
-            await Message.Success(UL["DeletedSuccessfully"]);
+            await Notify.Success(UL["DeletedSuccessfully"]);
         }
     }
 
