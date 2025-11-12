@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>Abp.RadzenUI</RootNamespace>
 		<PackageId>AbpRadzen.Blazor.Server.UI</PackageId>
 		<Version>0.3.8</Version>
@@ -12,12 +12,12 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageDescription>ABP framework theme developed using Radzen blazor components</PackageDescription>
 		<RepositoryUrl>https://github.com/ShaoHans/Abp-RadzenUI</RepositoryUrl>
-	</PropertyGroup>  
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Include="wwwroot\bootstrap\bootstrap.min.css.map" />
+	<ItemGroup>
+		<None Include="wwwroot\bootstrap\bootstrap.min.css.map" />
 		<None Include="..\..\README.md" Pack="true" PackagePath="." />
-  </ItemGroup>
+	</ItemGroup>
 
 	<ItemGroup>
 		<Content Update="wwwroot\**\*.*">
