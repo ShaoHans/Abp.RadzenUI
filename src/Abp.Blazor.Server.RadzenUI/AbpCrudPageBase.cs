@@ -8,6 +8,7 @@ using Radzen.Blazor;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.AspNetCore.Components;
+using Volo.Abp.AspNetCore.Components.ExceptionHandling;
 using Volo.Abp.Authorization;
 using Volo.Abp.Localization;
 
@@ -423,5 +424,19 @@ public abstract class AbpCrudPageBase<
         }
 
         await AuthorizationService.CheckAsync(policyName);
+    }
+
+    protected override async Task HandleErrorAsync(Exception exception)
+    {
+        if (!base.IsDisposed)
+        {
+            await InvokeAsync(async () =>
+            {
+                await UserExceptionInformer.InformAsync(new UserExceptionInformerContext(exception));
+            });
+
+            // Call StateHasChanged separately within the InvokeAsync context
+            await InvokeAsync(StateHasChanged);
+        }
     }
 }
