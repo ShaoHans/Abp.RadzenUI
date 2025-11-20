@@ -4,9 +4,9 @@ namespace Abp.RadzenUI.Models;
 
 public class PersonalInfoModel : ExtensibleObject
 {
-    public string UserName { get; set; } = default!;
+    public string? UserName { get; set; } = default!;
 
-    public string Email { get; set; } = default!;
+    public string? Email { get; set; } = default!;
 
     public string? Name { get; set; }
 
@@ -18,5 +18,5 @@ public class PersonalInfoModel : ExtensibleObject
 
     public bool EmailConfirmed { get; set; }
 
-    public string ConcurrencyStamp { get; set; } = default!;
+    public string? ConcurrencyStamp { get; set; } = default!;
 }
