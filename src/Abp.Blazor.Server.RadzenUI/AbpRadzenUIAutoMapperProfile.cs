@@ -1,27 +1,70 @@
 using Abp.RadzenUI.Application.Contracts.AuditLogs;
 using Abp.RadzenUI.Models;
-using AutoMapper;
+using Riok.Mapperly.Abstractions;
 using Volo.Abp.Account;
 using Volo.Abp.AuditLogging;
-using Volo.Abp.AutoMapper;
+using Volo.Abp.Mapperly;
 using Volo.Abp.SettingManagement;
 
 namespace Abp.RadzenUI;
 
-public class AbpRadzenUIAutoMapperProfile : Profile
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+[MapExtraProperties]
+public partial class ProfileDtoToPersonalInfoModelMapper : MapperBase<ProfileDto, PersonalInfoModel>
 {
-    public AbpRadzenUIAutoMapperProfile()
-    {
-        CreateMap<ProfileDto, PersonalInfoModel>()
-            .MapExtraProperties()
-            .Ignore(x => x.PhoneNumberConfirmed)
-            .Ignore(x => x.EmailConfirmed);
+    [MapperIgnoreTarget(nameof(PersonalInfoModel.PhoneNumberConfirmed))]
+    [MapperIgnoreTarget(nameof(PersonalInfoModel.EmailConfirmed))]
+    public override partial PersonalInfoModel Map(ProfileDto source);
 
-        CreateMap<PersonalInfoModel, UpdateProfileDto>().MapExtraProperties();
-        CreateMap<AuditLog, AuditLogDto>();
+    [MapperIgnoreTarget(nameof(PersonalInfoModel.PhoneNumberConfirmed))]
+    [MapperIgnoreTarget(nameof(PersonalInfoModel.EmailConfirmed))]
+    public override partial void Map(ProfileDto source, PersonalInfoModel destination);
+}
 
-        CreateMap<UpdateEmailSettingsVm, UpdateEmailSettingsDto>();
-        CreateMap<EmailSettingsDto, UpdateEmailSettingsVm>();
-        CreateMap<SendTestEmailVM, SendTestEmailInput>();
-    }
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+[MapExtraProperties]
+public partial class PersonalInfoModelToUpdateProfileDtoMapper
+    : MapperBase<PersonalInfoModel, UpdateProfileDto>
+{
+    public override partial UpdateProfileDto Map(PersonalInfoModel source);
+
+    public override partial void Map(PersonalInfoModel source, UpdateProfileDto destination);
+}
+
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+public partial class AuditLogToAuditLogDtoMapper : MapperBase<AuditLog, AuditLogDto>
+{
+    public override partial AuditLogDto Map(AuditLog source);
+
+    public override partial void Map(AuditLog source, AuditLogDto destination);
+}
+
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+public partial class UpdateEmailSettingsVmToUpdateEmailSettingsDtoMapper
+    : MapperBase<UpdateEmailSettingsVm, UpdateEmailSettingsDto>
+{
+    public override partial UpdateEmailSettingsDto Map(UpdateEmailSettingsVm source);
+
+    public override partial void Map(
+        UpdateEmailSettingsVm source,
+        UpdateEmailSettingsDto destination
+    );
+}
+
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+public partial class EmailSettingsDtoToUpdateEmailSettingsVmMapper
+    : MapperBase<EmailSettingsDto, UpdateEmailSettingsVm>
+{
+    public override partial UpdateEmailSettingsVm Map(EmailSettingsDto source);
+
+    public override partial void Map(EmailSettingsDto source, UpdateEmailSettingsVm destination);
+}
+
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+public partial class SendTestEmailVMToSendTestEmailInputMapper
+    : MapperBase<SendTestEmailVM, SendTestEmailInput>
+{
+    public override partial SendTestEmailInput Map(SendTestEmailVM source);
+
+    public override partial void Map(SendTestEmailVM source, SendTestEmailInput destination);
 }

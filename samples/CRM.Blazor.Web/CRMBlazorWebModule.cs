@@ -19,9 +19,7 @@ using Volo.Abp.AspNetCore.Mvc.AntiForgery;
 using Volo.Abp.AspNetCore.Mvc.Localization;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
-using Volo.Abp.AspNetCore.SignalR;
 using Volo.Abp.Auditing;
-using Volo.Abp.AutoMapper;
 using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
@@ -33,7 +31,7 @@ using Volo.Abp.Timing;
 using Volo.Abp.UI.Navigation;
 using Volo.Abp.VirtualFileSystem;
 
-namespace CRM.Blazor;
+namespace CRM.Blazor.Web;
 
 [DependsOn(
     typeof(CRMApplicationModule),
@@ -122,7 +120,6 @@ public class CRMBlazorWebModule : AbpModule
         // configure external login
         ConfigureOidcAuthentication(context, configuration);
 
-        ConfigureAutoMapper();
         ConfigureVirtualFileSystem(hostingEnvironment);
         ConfigureSwaggerServices(context.Services);
         ConfigureAutoApiControllers();
@@ -138,7 +135,7 @@ public class CRMBlazorWebModule : AbpModule
         });
     }
 
-    private void ConfigureAuthentication(ServiceConfigurationContext context)
+    private static void ConfigureAuthentication(ServiceConfigurationContext context)
     {
         context.Services.ForwardIdentityAuthenticationForBearer(
             OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme
@@ -149,7 +146,7 @@ public class CRMBlazorWebModule : AbpModule
         });
     }
 
-    private void ConfigureOidcAuthentication(
+    private static void ConfigureOidcAuthentication(
         ServiceConfigurationContext context,
         IConfiguration configuration
     )
@@ -217,7 +214,7 @@ public class CRMBlazorWebModule : AbpModule
         }
     }
 
-    private void ConfigureSwaggerServices(IServiceCollection services)
+    private static void ConfigureSwaggerServices(IServiceCollection services)
     {
         services.AddAbpSwaggerGen(options =>
         {
@@ -232,14 +229,6 @@ public class CRMBlazorWebModule : AbpModule
         Configure<AbpAspNetCoreMvcOptions>(options =>
         {
             options.ConventionalControllers.Create(typeof(CRMApplicationModule).Assembly);
-        });
-    }
-
-    private void ConfigureAutoMapper()
-    {
-        Configure<AbpAutoMapperOptions>(options =>
-        {
-            options.AddMaps<CRMBlazorWebModule>();
         });
     }
 
@@ -261,13 +250,12 @@ public class CRMBlazorWebModule : AbpModule
             //{
             //    LogoPath = "xxx/xx.png"
             //};
-            options.Theme = new ThemeSettings
-            {
-                EnablePremiumTheme = true,
-            };
+            options.Theme = new ThemeSettings { EnablePremiumTheme = true, };
 
             // configure external login provider icon
-            options.ExternalLogin.Providers.Add(new ExternalLoginProvider("AzureOpenId", "images/microsoft-logo.svg"));
+            options.ExternalLogin.Providers.Add(
+                new ExternalLoginProvider("AzureOpenId", "images/microsoft-logo.svg")
+            );
         });
 
         // Configure AbpMultiTenancyOptions, this will affect login page that whether need to switch tenants

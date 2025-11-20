@@ -16,7 +16,6 @@ using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.Localization;
 using Volo.Abp.Autofac;
-using Volo.Abp.AutoMapper;
 using Volo.Abp.ExceptionHandling.Localization;
 using Volo.Abp.Identity.AspNetCore;
 using Volo.Abp.Identity.EntityFrameworkCore;
@@ -67,10 +66,7 @@ public class AbpRadzenUIModule : AbpModule
                 .AddVirtualJson("/Localization/UI");
         });
 
-        Configure<AbpAutoMapperOptions>(options =>
-        {
-            options.AddMaps<AbpRadzenUIModule>();
-        });
+        context.Services.AddMapperlyObjectMapper();
 
         // Add services to the container.
         context.Services.AddRazorComponents().AddInteractiveServerComponents();
