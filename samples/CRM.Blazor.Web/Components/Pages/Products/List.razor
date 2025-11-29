@@ -8,13 +8,13 @@
 <PageTitle>@L["Products"]</PageTitle>
 
 <RadzenDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true" AllowFiltering="true"
-                PagerHorizontalAlign="HorizontalAlign.Center"
+                PagerHorizontalAlign="HorizontalAlign.Center" Style="height:calc(100vh - 160px)"
                 PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
                 Count="@_totalCount" IsLoading="@_isLoading">
     <HeaderTemplate>
         @if (HasCreatePermission)
         {
-            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
                 <RadzenButton Icon="add" Text="@L["NewProduct"]" Click="@(async()=>{await OpenCreateDialogAsync<Create>(L["NewProduct"], SetDialogOptions);})" />
             </RadzenStack>
         }

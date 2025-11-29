@@ -6,24 +6,23 @@
 
 <PageTitle>@L["Roles"]</PageTitle>
 
-<RadzenCard class="rz-my-6">
-    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
-        @if (HasCreatePermission)
-        {
-            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-                <RadzenButton Icon="add" Text="@L["NewRole"]" Click="@(async()=>await OpenCreateDialogAsync<Create>(@L["NewRole"]))" />
-            </RadzenStack>
-        }
-        <RadzenStack Orientation="Orientation.Vertical" style="margin-left: auto;" Gap="4px">
-            <SearchTextBox PlaceHoder="@L["DisplayName:RoleName"]" @bind-Keyword="@GetListInput.Filter" SearchAsync="@_grid.Reload" />
-        </RadzenStack>
-    </RadzenStack>
-</RadzenCard>
-
 <RadzenDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true"
-                PagerHorizontalAlign="HorizontalAlign.Center"
+                PagerHorizontalAlign="HorizontalAlign.Center" Style="height:calc(100vh - 160px)"
                 PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary"
                 LoadData="LoadDataAsync" Count="@_totalCount" IsLoading="@_isLoading">
+    <HeaderTemplate>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+            @if (HasCreatePermission)
+            {
+                <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                    <RadzenButton Icon="add" Text="@L["NewRole"]" Click="@(async () => await OpenCreateDialogAsync<Create>(@L["NewRole"]))" />
+                </RadzenStack>
+            }
+            <RadzenStack Orientation="Orientation.Vertical" style="margin-left: auto;" Gap="4px">
+                <SearchTextBox PlaceHoder="@L["DisplayName:RoleName"]" @bind-Keyword="@GetListInput.Filter" SearchAsync="@_grid.Reload" />
+            </RadzenStack>
+        </RadzenStack>
+    </HeaderTemplate>
     <Columns>
         <RadzenDataGridColumn Title="@L["DisplayName:RoleName"]" Property="@nameof(IdentityRoleDto.Name)">
             <Template>

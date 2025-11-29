@@ -7,26 +7,25 @@
 
 <PageTitle>@L["Users"]</PageTitle>
 
-<RadzenCard class="rz-my-6">
-    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
-        @if (HasCreatePermission)
-        {
-            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-                <RadzenButton Icon="add" Text="@L["NewUser"]" Click="@(async()=>{await OpenCreateDialogAsync<Create>(L["NewUser"], SetDialogOptions);})" />
-            </RadzenStack>
-        }
-        <RadzenStack Orientation="Orientation.Vertical" style="margin-left: auto;" Gap="4px">
-            <SearchTextBox PlaceHoder="@($"{L["DisplayName:UserName"]}/{L["DisplayName:Email"]}/{L["DisplayName:PhoneNumber"]}")"
-                           @bind-Keyword="@GetListInput.Filter" SearchAsync="@_grid.Reload" />
-        </RadzenStack>
-    </RadzenStack>
-</RadzenCard>
-
 @* Freeze Header： Style="height:calc(100vh - 160px)" *@
 <RadzenDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true"
-                PagerHorizontalAlign="HorizontalAlign.Center"                 
+                PagerHorizontalAlign="HorizontalAlign.Center" Style="height:calc(100vh - 160px)"
                 PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
                 Count="@_totalCount" IsLoading="@_isLoading">
+    <HeaderTemplate>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+            @if (HasCreatePermission)
+            {
+                <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                    <RadzenButton Icon="add" Text="@L["NewUser"]" Click="@(async () => { await OpenCreateDialogAsync<Create>(L["NewUser"], SetDialogOptions); })" />
+                </RadzenStack>
+            }
+            <RadzenStack Orientation="Orientation.Vertical" style="margin-left: auto;" Gap="4px">
+                <SearchTextBox PlaceHoder="@($"{L["DisplayName:UserName"]}/{L["DisplayName:Email"]}/{L["DisplayName:PhoneNumber"]}")"
+                               @bind-Keyword="@GetListInput.Filter" SearchAsync="@_grid.Reload" />
+            </RadzenStack>
+        </RadzenStack>
+    </HeaderTemplate>
     <Columns>
         <RadzenDataGridColumn Property="@nameof(IdentityUserDto.UserName)" Frozen="true" Title="@L["DisplayName:UserName"]" Width="160px" />
         <RadzenDataGridColumn Property="@nameof(IdentityUserDto.Email)" Title="@L["DisplayName:Email"]" Width="160px" />
