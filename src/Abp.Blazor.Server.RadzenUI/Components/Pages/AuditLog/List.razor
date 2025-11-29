@@ -51,7 +51,7 @@
         <RadzenDataGridColumn Property="@nameof(AuditLogDto.ExecutionDuration)" Filterable="false" Sortable="false" Title="@L["ExecutionDuration"]" />
         <RadzenDataGridColumn Property="@nameof(AuditLogDto.BrowserInfo)" Filterable="false" Sortable="false" Title="@L["BrowserInfo"]">
             <Template>
-                <RadzenLabel MouseEnter="@(args => ShowTooltip(args, context.BrowserInfo, new TooltipOptions(){ Position = TooltipPosition.Left, Duration = null }))">@context.BrowserInfo</RadzenLabel>
+                <RadzenLabel title="@context.BrowserInfo">@context.BrowserInfo</RadzenLabel>
             </Template>
         </RadzenDataGridColumn>
     </Columns>
