@@ -10,21 +10,25 @@
         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
             <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
                 <RequiredMark />
-                <RadzenLabel Text="@L["DisplayName:UserName"]" Component="UserName" />
+                <RadzenLabel Text="@L["DisplayName:UserName"]" Component="RealUserNameField" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenTextBox Name="UserName" @bind-Value=@DialogFromOption.Model.UserName Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxUserNameLength" />
-                <RadzenRequiredValidator Component="UserName" Text="@L.Required("DisplayName:UserName")" Style="position: absolute" />
+                <!-- Fake field to stop browser autofill -->
+                <input type="text" name="fake_username" autocomplete="username" style="display:none">
+                <RadzenTextBox Name="RealUserNameField" @bind-Value=@DialogFromOption.Model.UserName Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxUserNameLength" />
+                <RadzenRequiredValidator Component="RealUserNameField" Text="@L.Required("DisplayName:UserName")" Style="position: absolute" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
             <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
                 <RequiredMark />
-                <RadzenLabel Text="@L["DisplayName:Password"]" Component="Password" />
+                <RadzenLabel Text="@L["DisplayName:Password"]" Component="RealPasswordField" />
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
-                <RadzenPassword Name="Password" @bind-Value=@DialogFromOption.Model.Password Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxPasswordLength" />
-                <RadzenRequiredValidator Component="Password" Text="@L.Required("DisplayName:Password")" Style="position: absolute" />
+                <!-- Fake field to stop browser autofill -->
+                <input type="password" name="fake_password" autocomplete="new-password" style="display:none">
+                <RadzenPassword Name="RealPasswordField" @bind-Value=@DialogFromOption.Model.Password Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxPasswordLength" />
+                <RadzenRequiredValidator Component="RealPasswordField" Text="@L.Required("DisplayName:Password")" Style="position: absolute" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
