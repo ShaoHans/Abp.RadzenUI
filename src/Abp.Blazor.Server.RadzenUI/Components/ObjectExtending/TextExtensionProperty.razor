@@ -1,0 +1,18 @@
+﻿@typeparam TEntity
+@typeparam TResourceType
+@using Volo.Abp.Localization
+@inherits ExtensionPropertyComponentBase<TEntity, TResourceType>
+
+@if (PropertyInfo != null && Entity != null)
+{
+    <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+        <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+            <RadzenLabel Text="@PropertyInfo.GetLocalizedDisplayName(StringLocalizerFactory)" Component="@PropertyInfo.Name" />
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="8">
+            <RadzenColumn Size="12" SizeMD="8">
+                <RadzenTextBox Name="@nameof(PropertyInfo.Name)" Style="display: block; width: 100%;" />
+            </RadzenColumn>
+        </RadzenColumn>
+    </RadzenRow>
+}

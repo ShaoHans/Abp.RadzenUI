@@ -126,5 +126,7 @@ public class AbpRadzenUIModule : AbpModule
             options.Contributors.Add(new TimeZonePageContributor());
             options.Contributors.Add(new AccountPageContributor());
         });
+
+        context.Services.AddSingleton(typeof(AbpBlazorMessageLocalizerHelper<>));
     }
 }
