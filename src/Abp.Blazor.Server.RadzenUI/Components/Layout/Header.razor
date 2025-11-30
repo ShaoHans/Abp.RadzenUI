@@ -34,11 +34,14 @@
                         <div>
                             <RadzenProfileMenu class="rz-mx-2">
                                 <Template>
-                                    <RadzenGravatar Email="@CurrentUser.Email" Style="width:24px;height:24px;"></RadzenGravatar>
+                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-me-2">
+                                        <RadzenGravatar Email="@CurrentUser.Email" Style="width:24px;height:24px;"></RadzenGravatar>
+                                        <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0 rz-display-none rz-display-md-block" Style="line-height: 1; color: inherit;">@CurrentUser.UserName</RadzenText>
+                                    </RadzenStack>
                                 </Template>
                                 <ChildContent>
-                                    <RadzenProfileMenuItem Text="@CurrentUser.UserName"></RadzenProfileMenuItem>
-                                    <Devider />
+                                    @* <RadzenProfileMenuItem Text="@CurrentUser.UserName"></RadzenProfileMenuItem>
+                                    <Devider /> *@
                                     <RadzenProfileMenuItem Text="@L["MyAccount"]" Icon="person" Path="/account/manage"></RadzenProfileMenuItem>
                                     <RadzenProfileMenuItem Text="@L["LoggedOutTitle"]" Icon="logout" Path="/account/logout"></RadzenProfileMenuItem>
                                 </ChildContent>
