@@ -1,8 +1,11 @@
-﻿@using Microsoft.AspNetCore.Authorization
+﻿@using Abp.RadzenUI.Components.ObjectExtending
+@using Microsoft.AspNetCore.Authorization
 @using Volo.Abp.AspNetCore.Components
+@using Volo.Abp.AspNetCore.Components.Web
 @using Volo.Abp.Identity
 @using Volo.Abp.Identity.Localization
 @inject IIdentityUserAppService UserAppService
+@inject AbpBlazorMessageLocalizerHelper<IdentityResource> LH
 @inherits AbpComponentBase
 
 <RadzenTemplateForm TItem="IdentityUserUpdateDto" Data=@DialogFromOption.Model Submit=@DialogFromOption.OnSubmit>
@@ -60,6 +63,8 @@
                 <RadzenCheckBox TValue="bool" @bind-Value=@DialogFromOption.Model.LockoutEnabled Name="LockoutEnabled" />
             </RadzenColumn>
         </RadzenRow>
+        <ExtensionProperties TEntityType="IdentityUserUpdateDto" TResourceType="IdentityResource" Entity="@DialogFromOption.Model" LH="@LH" />
+
         @if (HasManagePermissionsPermission)
         {
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">

@@ -20,6 +20,14 @@ public static class CRMDtoExtensions
                     propertyInfo.Attributes.Add(new RequiredAttribute());
                 }
             );
+
+            ObjectExtensionManager.Instance.AddOrUpdateProperty<IdentityUserUpdateDto, string>(
+                "HireDate",
+                propertyInfo =>
+                {
+                    propertyInfo.Attributes.Add(new RequiredAttribute());
+                }
+            );
         });
     }
 }
