@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Volo.Abp.Identity;
 using Volo.Abp.ObjectExtending;
 using Volo.Abp.Threading;
@@ -12,7 +13,13 @@ public static class CRMDtoExtensions
     {
         OneTimeRunner.Run(() =>
         {
-            ObjectExtensionManager.Instance.AddOrUpdateProperty<IdentityUserCreateDto, string>("HireDate");
+            ObjectExtensionManager.Instance.AddOrUpdateProperty<IdentityUserCreateDto, string>(
+                "HireDate",
+                propertyInfo =>
+                {
+                    propertyInfo.Attributes.Add(new RequiredAttribute());
+                }
+            );
         });
     }
 }

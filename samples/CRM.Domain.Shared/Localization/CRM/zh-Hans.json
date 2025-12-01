@@ -58,6 +58,7 @@
     "DisplayName:Status": "状态",
     "DisplayName:Description": "描述",
     "DisplayName:CreationTime": "创建时间",
+    "DisplayName:HireDate": "入职日期",
     "ProductDeletionConfirmationMessage": "您确定要删除 {0} 这个产品吗？"
   }
 }

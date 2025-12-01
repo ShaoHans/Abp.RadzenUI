@@ -1,17 +1,17 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
+using Volo.Abp.AspNetCore.Components;
 using Volo.Abp.AspNetCore.Components.Web;
-using Volo.Abp.Data;
 using Volo.Abp.Localization;
 using Volo.Abp.ObjectExtending;
 
 namespace Abp.RadzenUI.Components.ObjectExtending;
 
-public abstract class ExtensionPropertyComponentBase<TEntity, TResourceType> : OwningComponentBase
-    //where TEntity : IHasExtraProperties
+public abstract class ExtensionPropertyComponentBase<TEntity, TResourceType> : AbpComponentBase
+//where TEntity : IHasExtraProperties
 {
-    [Inject]
-    public IStringLocalizerFactory StringLocalizerFactory { get; set; } = default!;
+    //[Inject]
+    //public IStringLocalizerFactory StringLocalizerFactory { get; set; } = default!;
 
     [Inject]
     public IAbpEnumLocalizer AbpEnumLocalizer { get; set; } = default!;
