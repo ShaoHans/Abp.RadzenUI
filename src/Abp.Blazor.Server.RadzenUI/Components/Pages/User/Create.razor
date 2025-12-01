@@ -14,7 +14,7 @@
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
                 <!-- Fake field to stop browser autofill -->
-                <input type="text" name="fake_username" autocomplete="username" style="display:none">
+                <input type="text" name="fake_username" autocomplete="username" style="display:none" />
                 <RadzenTextBox Name="RealUserNameField" @bind-Value=@DialogFromOption.Model.UserName Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxUserNameLength" />
                 <RadzenRequiredValidator Component="RealUserNameField" Text="@L.Required("DisplayName:UserName")" Style="position: absolute" />
             </RadzenColumn>
@@ -26,7 +26,7 @@
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
                 <!-- Fake field to stop browser autofill -->
-                <input type="password" name="fake_password" autocomplete="new-password" style="display:none">
+                <input type="password" name="fake_password" autocomplete="new-password" style="display:none" />
                 <RadzenPassword Name="RealPasswordField" @bind-Value=@DialogFromOption.Model.Password Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxPasswordLength" />
                 <RadzenRequiredValidator Component="RealPasswordField" Text="@L.Required("DisplayName:Password")" Style="position: absolute" />
             </RadzenColumn>
