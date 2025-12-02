@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Radzen;
+using Volo.Abp.ObjectExtending;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.Localization;
 
@@ -24,7 +25,9 @@ public partial class List
 
     protected override Task<TenantUpdateDto> SetEditDialogModelAsync(TenantDto dto)
     {
-        return Task.FromResult(new TenantUpdateDto { Name = dto.Name });
+        var updateDto = new TenantUpdateDto { Name = dto.Name };
+        dto.MapExtraPropertiesTo(updateDto);
+        return Task.FromResult(updateDto);
     }
 
     protected override async Task SetPermissionsAsync()

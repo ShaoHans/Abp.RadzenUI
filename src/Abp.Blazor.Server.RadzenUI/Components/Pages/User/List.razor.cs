@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Radzen;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.Localization;
+using Volo.Abp.ObjectExtending;
 
 namespace Abp.RadzenUI.Components.Pages.User;
 
@@ -45,7 +46,7 @@ public partial class List
     {
         var userRoles =
             (await AppService.GetRolesAsync(dto.Id)).Items?.Select(r => r.Name).ToArray() ?? [];
-        return new IdentityUserUpdateDto
+        var updateDto = new IdentityUserUpdateDto
         {
             UserName = dto.UserName,
             Email = dto.Email,
@@ -54,6 +55,10 @@ public partial class List
             LockoutEnabled = dto.LockoutEnabled,
             RoleNames = userRoles,
         };
+
+        dto.MapExtraPropertiesTo(updateDto);
+
+        return updateDto;
     }
 
     private DialogOptions SetDialogOptions()
