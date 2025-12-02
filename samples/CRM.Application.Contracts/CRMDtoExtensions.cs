@@ -18,6 +18,7 @@ public static class CRMDtoExtensions
                 propertyInfo =>
                 {
                     propertyInfo.Attributes.Add(new RequiredAttribute());
+                    propertyInfo.CheckPairDefinitionOnMapping = false;
                 }
             );
 
@@ -26,6 +27,7 @@ public static class CRMDtoExtensions
                 propertyInfo =>
                 {
                     propertyInfo.Attributes.Add(new RequiredAttribute());
+                    propertyInfo.CheckPairDefinitionOnMapping = false;
                 }
             );
         });
