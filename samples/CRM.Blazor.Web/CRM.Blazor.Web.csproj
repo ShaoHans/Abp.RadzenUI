@@ -26,7 +26,7 @@
 		<ProjectReference Include="..\CRM.EntityFrameworkCore\CRM.EntityFrameworkCore.csproj" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
 		<!--<PackageReference Include="AbpRadzen.Blazor.Server.UI" Version="0.1.1" />-->
-		<PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+		<PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
 		<PackageReference Include="Serilog.Sinks.Async" Version="2.1.0" />
 		<PackageReference Include="IdentityModel" Version="7.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
