@@ -628,14 +628,14 @@ svg.illustration {
 }
 
 .dialog-footer {
-    position: absolute;
+    position: sticky;
     bottom: 0;
-    width: calc(100% - 30px);
+    background: var(--rz-dialog-background-color, #1e1e1e);
+    padding: 10px 15px;
+    border-top: 1px solid var(--rz-text-disabled-color);
     display: flex;
-    justify-content: flex-end; /* 或者使用center来居中 */
-    padding: 10px; /* 添加一些内边距 */
-    border-top: 1px solid var(--rz-text-disabled-color); /* 设置横线颜色和宽度 */
-    margin-bottom: 10px; /* 为横线和按钮之间增加间距 */
+    justify-content: flex-end;
+    z-index: 10;
 }
 
 /**覆盖框架的 display:flex */

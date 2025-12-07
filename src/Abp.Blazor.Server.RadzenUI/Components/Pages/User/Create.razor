@@ -16,7 +16,7 @@
                 <!-- Fake field to stop browser autofill -->
                 <input type="text" name="fake_username" autocomplete="username" style="display:none" />
                 <RadzenTextBox Name="RealUserNameField" @bind-Value=@DialogFromOption.Model.UserName Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxUserNameLength" />
-                <RadzenRequiredValidator Component="RealUserNameField" Text="@L.Required("DisplayName:UserName")" Style="position: absolute" />
+                <RadzenRequiredValidator Component="RealUserNameField" Text="@L.Required("DisplayName:UserName")" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
@@ -28,7 +28,7 @@
                 <!-- Fake field to stop browser autofill -->
                 <input type="password" name="fake_password" autocomplete="new-password" style="display:none" />
                 <RadzenPassword Name="RealPasswordField" @bind-Value=@DialogFromOption.Model.Password Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxPasswordLength" />
-                <RadzenRequiredValidator Component="RealPasswordField" Text="@L.Required("DisplayName:Password")" Style="position: absolute" />
+                <RadzenRequiredValidator Component="RealPasswordField" Text="@L.Required("DisplayName:Password")" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
@@ -38,8 +38,8 @@
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
                 <RadzenTextBox Name="Email" @bind-Value=@DialogFromOption.Model.Email Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxEmailLength" />
-                <RadzenRequiredValidator Component="Email" Text="@L.Required("DisplayName:Email")" Style="position: absolute" />
-                <RadzenEmailValidator Component="Email" Text="@L["Volo.Abp.Identity:InvalidEmail",DialogFromOption.Model.Email]" Style="position: absolute" />
+                <RadzenRequiredValidator Component="Email" Text="@L.Required("DisplayName:Email")" />
+                <RadzenEmailValidator Component="Email" Text="@L["Volo.Abp.Identity:InvalidEmail",DialogFromOption.Model.Email]" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
