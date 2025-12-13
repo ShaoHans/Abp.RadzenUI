@@ -20,7 +20,7 @@
                     <RadzenButton Icon="add" Text="@L["NewUser"]" Click="@(async () => { await OpenCreateDialogAsync<Create>(L["NewUser"], SetDialogOptions); })" />
                 </RadzenStack>
             }
-            <RadzenStack Orientation="Orientation.Vertical" style="margin-left: auto;" Gap="4px">
+            <RadzenStack Orientation="Orientation.Vertical" style="margin-left: auto;width:20%" Gap="4px">
                 <SearchTextBox PlaceHoder="@($"{L["DisplayName:UserName"]}/{L["DisplayName:Email"]}/{L["DisplayName:PhoneNumber"]}")"
                                @bind-Keyword="@GetListInput.Filter" SearchAsync="@_grid.Reload" />
             </RadzenStack>
