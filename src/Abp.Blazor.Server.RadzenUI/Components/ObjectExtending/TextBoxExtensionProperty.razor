@@ -16,13 +16,11 @@
             <RadzenLabel Text="@PropertyInfo.GetLocalizedDisplayName(StringLocalizerFactory)" Component="@PropertyInfo.Name" />
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="8">
-            <RadzenColumn Size="12" SizeMD="8">
-                <RadzenTextBox Name="@PropertyInfo.Name" @bind-Value="@Value" Style="display: block; width: 100%;" />
-                @if (isRequired)
-                {
-                    <RadzenRequiredValidator Component="@PropertyInfo.Name" Text="@L.Required(PropertyInfo.GetLocalizedDisplayName(StringLocalizerFactory))" />
-                }
-            </RadzenColumn>
+            <RadzenTextBox Name="@PropertyInfo.Name" @bind-Value="@Value" Style="display: block; width: 100%;" />
+            @if (isRequired)
+            {
+                <RadzenRequiredValidator Component="@PropertyInfo.Name" Text="@L.Required(PropertyInfo.GetLocalizedDisplayName(StringLocalizerFactory))" />
+            }
         </RadzenColumn>
     </RadzenRow>
 }
