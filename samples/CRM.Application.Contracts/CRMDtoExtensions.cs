@@ -18,6 +18,7 @@ public static class CRMDtoExtensions
                 propertyInfo =>
                 {
                     propertyInfo.Attributes.Add(new RequiredAttribute());
+                    propertyInfo.Attributes.Add(new DataTypeAttribute(DataType.DateTime));
                     propertyInfo.CheckPairDefinitionOnMapping = false;
                 }
             );
@@ -27,6 +28,7 @@ public static class CRMDtoExtensions
                 propertyInfo =>
                 {
                     propertyInfo.Attributes.Add(new RequiredAttribute());
+                    propertyInfo.Attributes.Add(new DataTypeAttribute(DataType.DateTime));
                     propertyInfo.CheckPairDefinitionOnMapping = false;
                 }
             );
