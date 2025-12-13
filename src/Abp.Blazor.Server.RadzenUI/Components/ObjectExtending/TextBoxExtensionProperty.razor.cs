@@ -2,7 +2,7 @@ using Volo.Abp.Data;
 
 namespace Abp.RadzenUI.Components.ObjectExtending;
 
-public partial class TextExtensionProperty<TEntity, TResourceType>
+public partial class TextBoxExtensionProperty<TEntity, TResourceType>
     where TEntity : IHasExtraProperties
 {
     protected string? Value
