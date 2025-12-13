@@ -20,7 +20,7 @@
                 <RadzenTextBox Name="@PropertyInfo.Name" @bind-Value="@Value" Style="display: block; width: 100%;" />
                 @if (isRequired)
                 {
-                    <RadzenRequiredValidator Component="@PropertyInfo.Name" Text="@L.Required(PropertyInfo.GetLocalizedDisplayName(StringLocalizerFactory))" Style="position: absolute" />
+                    <RadzenRequiredValidator Component="@PropertyInfo.Name" Text="@L.Required(PropertyInfo.GetLocalizedDisplayName(StringLocalizerFactory))" />
                 }
             </RadzenColumn>
         </RadzenColumn>
