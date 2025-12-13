@@ -26,7 +26,7 @@
     </HeaderTemplate>
     <Columns>
         <RadzenDataGridColumn Property="@nameof(TenantDto.Id)" Title="ID" Width="80px" Visible="false" />
-        <RadzenDataGridColumn Property="@nameof(TenantDto.Name)" Title="@L["DisplayName:TenantName"]" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(TenantDto.Name)" Title="@L["DisplayName:TenantName"]" />
         <RadzenDataGridColumn Title="@L["Actions"]" Width="160px" Filterable="false" Sortable="false">
             <Template>
                 @if (HasUpdatePermission)
