@@ -12,7 +12,7 @@
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
                 <RadzenTextBox Name="TenantName" @bind-Value=@DialogFromOption.Model.Name Style="display: block; width: 100%;" MaxLength="TenantConsts.MaxNameLength" />
-                <RadzenRequiredValidator Component="TenantName" Text="@L.Required("DisplayName:TenantName")" Style="position: absolute" />
+                <RadzenRequiredValidator Component="TenantName" Text="@L.Required("DisplayName:TenantName")" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
@@ -22,8 +22,8 @@
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
                 <RadzenTextBox Name="AdminEmailAddress" @bind-Value=@DialogFromOption.Model.AdminEmailAddress Style="display: block; width: 100%;" MaxLength="TenantConsts.MaxAdminEmailAddressLength" />
-                <RadzenRequiredValidator Component="AdminEmailAddress" Text="@L.Required("DisplayName:AdminEmailAddress")" Style="position: absolute" />
-                <RadzenEmailValidator Component="AdminEmailAddress" Text="@L.ValidEmail("DisplayName:AdminEmailAddress")" Style="position: absolute" />
+                <RadzenRequiredValidator Component="AdminEmailAddress" Text="@L.Required("DisplayName:AdminEmailAddress")" />
+                <RadzenEmailValidator Component="AdminEmailAddress" Text="@L.ValidEmail("DisplayName:AdminEmailAddress")" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
@@ -33,7 +33,7 @@
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
                 <RadzenPassword Name="AdminPassword" @bind-Value=@DialogFromOption.Model.AdminPassword Style="display: block; width: 100%;" />
-                <RadzenRequiredValidator Component="AdminPassword" Text="@L.Required("DisplayName:AdminPassword")" Style="position: absolute" />
+                <RadzenRequiredValidator Component="AdminPassword" Text="@L.Required("DisplayName:AdminPassword")" />
             </RadzenColumn>
         </RadzenRow>
     </RadzenStack>

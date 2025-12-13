@@ -22,7 +22,7 @@
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
                 <RadzenTextBox Name="Name" @bind-Value=@DialogFromOption.Model.Name Style="display: block; width: 100%;" MaxLength="ProductConsts.MaxNameLength" />
-                <RadzenRequiredValidator Component="Name" Text="@L.Required("DisplayName:Name")" Style="position: absolute" />
+                <RadzenRequiredValidator Component="Name" Text="@L.Required("DisplayName:Name")" />
             </RadzenColumn>
         </RadzenRow>
 
@@ -33,7 +33,7 @@
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
                 <RadzenNumeric TValue="float" Name="Price" @bind-Value=@DialogFromOption.Model.Price Style="display: block; width: 100%;" />
-                <RadzenRequiredValidator Component="Price" Text="@L.Required("DisplayName:Price")" Style="position: absolute" />
+                <RadzenRequiredValidator Component="Price" Text="@L.Required("DisplayName:Price")" />
             </RadzenColumn>
         </RadzenRow>
 

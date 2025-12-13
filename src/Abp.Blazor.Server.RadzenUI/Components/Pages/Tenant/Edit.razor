@@ -12,7 +12,7 @@
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
                 <RadzenTextBox Name="TenantName" @bind-Value=@DialogFromOption.Model.Name Style="display: block; width: 100%;" MaxLength="TenantConsts.MaxNameLength" />
-                <RadzenRequiredValidator Component="TenantName" Text="@L.Required("DisplayName:TenantName")" Style="position: absolute" />
+                <RadzenRequiredValidator Component="TenantName" Text="@L.Required("DisplayName:TenantName")" />
             </RadzenColumn>
         </RadzenRow>
     </RadzenStack>
