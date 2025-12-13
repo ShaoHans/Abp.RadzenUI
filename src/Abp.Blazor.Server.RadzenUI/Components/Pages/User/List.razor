@@ -9,7 +9,7 @@
 
 @* Freeze Header： Style="height:calc(100vh - 160px)" *@
 <RadzenDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true"
-                PagerHorizontalAlign="HorizontalAlign.Center" Style="height:calc(100vh - 160px)"
+                PagerHorizontalAlign="HorizontalAlign.Center" Style="height:calc(100vh - 150px)"
                 PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
                 Count="@_totalCount" IsLoading="@_isLoading">
     <HeaderTemplate>
@@ -41,7 +41,7 @@
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(IdentityUserDto.CreationTime)" Filterable="false" Title="@L["CreationTime"]" Width="160px" />
-        <RadzenDataGridColumn Title="@L["Actions"]" Width="160px" Frozen="true" Filterable="false" Sortable="false">
+        <RadzenDataGridColumn Title="@L["Actions"]" Width="120px" Frozen="true" Filterable="false" Sortable="false">
             <Template>
                 @if ((context.UserName != "admin" || CurrentUser.UserName == "admin") && HasUpdatePermission)
                 {
