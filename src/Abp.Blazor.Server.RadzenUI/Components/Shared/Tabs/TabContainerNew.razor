@@ -6,10 +6,12 @@
 @using Radzen
 @using Radzen.Blazor
 @using System.Text.Json
+@using Volo.Abp.UI.Navigation
 @inject TabService TabService
 @inject TabJsInterop TabJsInterop
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
+@inject IMenuManager MenuManager
 
 <div class="tab-container">
     <RadzenTabs @ref="tabs" @bind-SelectedIndex="selectedTabIndex" Change="OnTabChange">
@@ -18,7 +20,7 @@
             {
                 var tabIndex = i;
                 var tab = TabService.Tabs[tabIndex];
-                <RadzenTabsItem Text="@tab.Title" Icon="tab" Remove="@(async () => await CloseTabAsync(tab.Url))">
+                <RadzenTabsItem Text="@tab.Title" Icon="tab" CloseIcon="close" Remove="@(async () => await CloseTabAsync(tab.Url))">
                     <div @oncontextmenu="@((Microsoft.AspNetCore.Components.Web.MouseEventArgs args) => OpenContextMenu(args, tab.Url))">
                         @TabPageContent
                     </div>
@@ -62,7 +64,8 @@
         // Add current page as a tab if not already present
         var currentUri = Navigation.ToAbsoluteUri(Navigation.Uri);
         var currentUrl = currentUri.AbsolutePath + currentUri.Fragment;
-        TabService.AddTab(GetTitleFromCurrentPage(), currentUrl);
+        var title = await GetTitleFromCurrentPageAsync();
+        TabService.AddTab(title, currentUrl);
 
         await base.OnInitializedAsync();
     }
@@ -129,6 +132,14 @@
         InvokeAsync(() =>
         {
             if (_isDisposed) return;
+
+            // Select the newly added tab
+            var tabIndex = TabService.Tabs.IndexOf(tab);
+            if (tabIndex >= 0)
+            {
+                selectedTabIndex = tabIndex;
+            }
+
             StateHasChanged();
             // Navigate to the new tab's URL
             Navigation.NavigateTo(GetFullUrl(tab), forceLoad: false);
@@ -173,7 +184,7 @@
         }
     }
 
-    private void OnLocationChanged(object sender, LocationChangedEventArgs e)
+    private async void OnLocationChanged(object sender, LocationChangedEventArgs e)
     {
         if (_isDisposed) return;
 
@@ -185,28 +196,86 @@
         if (existingTab != null)
         {
             TabService.SetActiveTab(url);
+            // Select the existing tab
+            var tabIndex = TabService.Tabs.IndexOf(existingTab);
+            if (tabIndex >= 0)
+            {
+                selectedTabIndex = tabIndex;
+            }
         }
         else
         {
             // Add as a new tab
-            TabService.AddTab(GetTitleFromCurrentPage(), url);
+            var title = await GetTitleFromCurrentPageAsync();
+            TabService.AddTab(title, url);
         }
 
         InvokeAsync(StateHasChanged);
     }
 
-    private string GetTitleFromCurrentPage()
+    private async Task<string> GetTitleFromCurrentPageAsync()
     {
-        // This is a simplified approach - in a real implementation,
-        // you might want to extract the title from the page content
-        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
-        var path = uri.AbsolutePath.Trim('/');
+        try
+        {
+            // Get the current URL
+            var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+            var currentUrl = uri.AbsolutePath.Trim('/');
 
-        if (string.IsNullOrEmpty(path))
-            return "Home";
+            if (string.IsNullOrEmpty(currentUrl))
+                return "Home";
 
-        // Capitalize first letter and replace slashes with spaces
-        return char.ToUpper(path[0]) + path.Substring(1).Replace("/", " > ");
+            // Get menu items
+            var menu = await MenuManager.GetAsync(StandardMenus.Main);
+
+            // Search for menu item with matching URL
+            foreach (var item in menu.Items)
+            {
+                var title = FindMenuItemByURL(item, currentUrl);
+                if (!string.IsNullOrEmpty(title))
+                {
+                    return title;
+                }
+            }
+
+            // If no matching menu item found, fall back to path-based title
+            return char.ToUpper(currentUrl[0]) + currentUrl.Substring(1).Replace("/", " > ");
+        }
+        catch
+        {
+            // Fallback to path-based title generation
+            var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+            var path = uri.AbsolutePath.Trim('/');
+
+            if (string.IsNullOrEmpty(path))
+                return "Home";
+
+            return char.ToUpper(path[0]) + path.Substring(1).Replace("/", " > ");
+        }
+    }
+
+    private string FindMenuItemByURL(ApplicationMenuItem menuItem, string url)
+    {
+        // Check if this menu item matches the URL
+        if (!string.IsNullOrEmpty(menuItem.Url) &&
+            menuItem.Url.Trim('/').Equals(url, StringComparison.OrdinalIgnoreCase))
+        {
+            return menuItem.DisplayName;
+        }
+
+        // Recursively check child menu items
+        if (menuItem.Items != null)
+        {
+            foreach (var childItem in menuItem.Items)
+            {
+                var result = FindMenuItemByURL(childItem, url);
+                if (!string.IsNullOrEmpty(result))
+                {
+                    return result;
+                }
+            }
+        }
+
+        return null;
     }
 
     private async Task CloseTabAsync(string url)

@@ -21,6 +21,9 @@
     public async Task Open(MouseEventArgs args, string url)
     {
         tabUrl = url;
+
+        // We'll have to rely on the context menu opening without explicit menu items
+        // The menu items might need to be defined differently in Radzen
         await contextMenu.Open(args, null);
     }
 
