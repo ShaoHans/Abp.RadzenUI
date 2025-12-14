@@ -1,0 +1,27 @@
+﻿@typeparam TEntity
+@typeparam TResourceType
+@using Volo.Abp.AspNetCore.Components
+@using Volo.Abp.Localization
+@inherits ExtensionPropertyComponentBase<TEntity, TResourceType>
+
+@if (PropertyInfo != null && Entity != null)
+{
+    var isRequired = PropertyInfo.IsRequired();
+    <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+        <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+            @if (isRequired)
+            {
+                <RequiredMark />
+            }
+            <RadzenLabel Text="@PropertyInfo.GetLocalizedDisplayName(StringLocalizerFactory)" Component="@PropertyInfo.Name" />
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="8">
+            <RadzenDatePicker Name="@PropertyInfo.Name" @bind-Value="@Value" Style="display: block; width: 100%;"
+                              ShowTime="true" />
+            @if (isRequired)
+            {
+                <RadzenRequiredValidator Component="@PropertyInfo.Name" Text="@L.Required(PropertyInfo.GetLocalizedDisplayName(StringLocalizerFactory))" />
+            }
+        </RadzenColumn>
+    </RadzenRow>
+}
