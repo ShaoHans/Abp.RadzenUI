@@ -20,7 +20,7 @@
             {
                 var tabIndex = i;
                 var tab = TabService.Tabs[tabIndex];
-                <RadzenTabsItem Text="@tab.Title" Icon="tab" CloseIcon="close" Remove="@(async () => await CloseTabAsync(tab.Url))">
+                <RadzenTabsItem Text="@tab.Title" CloseIcon="close" Remove="@(async () => await CloseTabAsync(tab.Url))">
                     <div @oncontextmenu="@((Microsoft.AspNetCore.Components.Web.MouseEventArgs args) => OpenContextMenu(args, tab.Url))">
                         @TabPageContent
                     </div>
@@ -307,7 +307,7 @@
     {
         if (tabContextMenu != null)
         {
-            await tabContextMenu.Open(args, url);
+            tabContextMenu.Open(args, url);
         }
     }
 

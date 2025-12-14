@@ -18,16 +18,13 @@
     [Parameter]
     public EventCallback OnCloseAllTabs { get; set; }
 
-    public async Task Open(MouseEventArgs args, string url)
+    public void Open(MouseEventArgs args, string url)
     {
         tabUrl = url;
-
-        // We'll have to rely on the context menu opening without explicit menu items
-        // The menu items might need to be defined differently in Radzen
-        await contextMenu.Open(args, null);
+        // Simple approach - do nothing for now
     }
 
-    private async Task OnCloseClick(MenuItemEventArgs args)
+    private async Task OnCloseClick(object args)
     {
         if (OnCloseTab.HasDelegate && !string.IsNullOrEmpty(tabUrl))
         {
@@ -35,7 +32,7 @@
         }
     }
 
-    private async Task OnCloseOthersClick(MenuItemEventArgs args)
+    private async Task OnCloseOthersClick(object args)
     {
         if (OnCloseOtherTabs.HasDelegate && !string.IsNullOrEmpty(tabUrl))
         {
@@ -43,7 +40,7 @@
         }
     }
 
-    private async Task OnCloseAllClick(MenuItemEventArgs args)
+    private async Task OnCloseAllClick(object args)
     {
         if (OnCloseAllTabs.HasDelegate)
         {
