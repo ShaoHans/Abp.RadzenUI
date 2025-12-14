@@ -17,7 +17,7 @@
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="8">
             <RadzenDatePicker Name="@PropertyInfo.Name" @bind-Value="@Value" Style="display: block; width: 100%;"
-                 />
+                              DateFormat="yyyy-MM-dd" />
             @if (isRequired)
             {
                 <RadzenRequiredValidator Component="@PropertyInfo.Name" Text="@L.Required(PropertyInfo.GetLocalizedDisplayName(StringLocalizerFactory))" />

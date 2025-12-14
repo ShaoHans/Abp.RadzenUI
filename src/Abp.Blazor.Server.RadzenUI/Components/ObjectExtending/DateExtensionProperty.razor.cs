@@ -5,11 +5,11 @@ namespace Abp.RadzenUI.Components.ObjectExtending;
 public partial class DateExtensionProperty<TEntity, TResourceType>
     where TEntity : IHasExtraProperties
 {
-    protected DateOnly? Value
+    protected DateTime? Value
     {
         get
         {
-            return PropertyInfo.GetInputValueOrDefault<DateOnly?>(
+            return PropertyInfo.GetInputValueOrDefault<DateTime?>(
                 Entity.GetProperty(PropertyInfo.Name)
             );
         }

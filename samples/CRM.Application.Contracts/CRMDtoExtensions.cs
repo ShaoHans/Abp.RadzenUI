@@ -13,25 +13,25 @@ public static class CRMDtoExtensions
     {
         OneTimeRunner.Run(() =>
         {
-            ObjectExtensionManager.Instance.AddOrUpdateProperty<IdentityUserCreateDto, string>(
-                "HireDate",
-                propertyInfo =>
-                {
-                    propertyInfo.Attributes.Add(new RequiredAttribute());
-                    propertyInfo.Attributes.Add(new DataTypeAttribute(DataType.DateTime));
-                    propertyInfo.CheckPairDefinitionOnMapping = false;
-                }
-            );
+            //ObjectExtensionManager.Instance.AddOrUpdateProperty<IdentityUserCreateDto, string>(
+            //    "HireDate",
+            //    propertyInfo =>
+            //    {
+            //        propertyInfo.Attributes.Add(new RequiredAttribute());
+            //        propertyInfo.Attributes.Add(new DataTypeAttribute(DataType.Date));
+            //        propertyInfo.CheckPairDefinitionOnMapping = false;
+            //    }
+            //);
 
-            ObjectExtensionManager.Instance.AddOrUpdateProperty<IdentityUserUpdateDto, string>(
-                "HireDate",
-                propertyInfo =>
-                {
-                    propertyInfo.Attributes.Add(new RequiredAttribute());
-                    propertyInfo.Attributes.Add(new DataTypeAttribute(DataType.DateTime));
-                    propertyInfo.CheckPairDefinitionOnMapping = false;
-                }
-            );
+            //ObjectExtensionManager.Instance.AddOrUpdateProperty<IdentityUserUpdateDto, string>(
+            //    "HireDate",
+            //    propertyInfo =>
+            //    {
+            //        propertyInfo.Attributes.Add(new RequiredAttribute());
+            //        propertyInfo.Attributes.Add(new DataTypeAttribute(DataType.Date));
+            //        propertyInfo.CheckPairDefinitionOnMapping = false;
+            //    }
+            //);
         });
     }
 }

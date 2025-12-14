@@ -32,17 +32,17 @@ public partial class ExtensionProperties<TEntityType, TResourceType> : Component
             );
     }
 
-    //private RenderFragment ExtensionPropertyRender(ObjectExtensionPropertyInfo propertyInfo) =>
-    //    builder =>
-    //    {
-    //        var inputType = propertyInfo.GetInputType();
-    //        builder.OpenComponent(
-    //            0,
-    //            inputType.MakeGenericType(typeof(TEntityType), typeof(TResourceType))
-    //        );
-    //        builder.AddAttribute(1, "PropertyInfo", propertyInfo);
-    //        builder.AddAttribute(2, "Entity", Entity);
-    //        builder.AddAttribute(3, "LH", LH);
-    //        builder.CloseComponent();
-    //    };
+    private RenderFragment ExtensionPropertyRender(ObjectExtensionPropertyInfo propertyInfo) =>
+        builder =>
+        {
+            var inputType = propertyInfo.GetInputType();
+            builder.OpenComponent(
+                0,
+                inputType.MakeGenericType(typeof(TEntityType), typeof(TResourceType))
+            );
+            builder.AddAttribute(1, "PropertyInfo", propertyInfo);
+            builder.AddAttribute(2, "Entity", Entity);
+            builder.AddAttribute(3, "LH", LH);
+            builder.CloseComponent();
+        };
 }
