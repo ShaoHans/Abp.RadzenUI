@@ -1,0 +1,256 @@
+@using Abp.Blazor.Server.RadzenUI.Services
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.JSInterop
+@using Radzen
+@using Radzen.Blazor
+@using System.Text.Json
+@inject TabService TabService
+@inject TabJsInterop TabJsInterop
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+<div class="tab-container">
+    <RadzenTabs @ref="tabs" @bind-SelectedIndex="selectedTabIndex" Change="OnTabChange">
+        <Tabs>
+            @for (int i = 0; i < TabService.Tabs.Count; i++)
+            {
+                var tabIndex = i;
+                var tab = TabService.Tabs[tabIndex];
+                <RadzenTabsItem Text="@tab.Title" Icon="tab" Remove="@(async () => await CloseTabAsync(tab.Url))">
+                    <div @oncontextmenu="@((Microsoft.AspNetCore.Components.Web.MouseEventArgs args) => OpenContextMenu(args, tab.Url))">
+                        @TabPageContent
+                    </div>
+                </RadzenTabsItem>
+            }
+        </Tabs>
+    </RadzenTabs>
+
+    <TabContextMenuNew @ref="tabContextMenu" OnCloseTab="CloseTabAsync" OnCloseOtherTabs="CloseOtherTabsAsync" OnCloseAllTabs="CloseAllTabsAsync" />
+</div>
+
+@code {
+    private RadzenTabs tabs;
+    private TabContextMenuNew tabContextMenu;
+    private int selectedTabIndex = 0;
+    private bool _isDisposed = false;
+
+    // Store delegates for proper disposal
+    private Action<Abp.Blazor.Server.RadzenUI.Models.TabItem> _onTabAddedHandler;
+    private Action<Abp.Blazor.Server.RadzenUI.Models.TabItem> _onTabClosedHandler;
+    private Action _onTabsUpdatedHandler;
+
+    [Parameter]
+    public RenderFragment TabPageContent { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _onTabAddedHandler = new Action<Abp.Blazor.Server.RadzenUI.Models.TabItem>(HandleTabAdded);
+        _onTabClosedHandler = new Action<Abp.Blazor.Server.RadzenUI.Models.TabItem>(HandleTabClosed);
+        _onTabsUpdatedHandler = new Action(HandleTabsUpdated);
+
+        TabService.OnTabAdded += _onTabAddedHandler;
+        TabService.OnTabClosed += _onTabClosedHandler;
+        TabService.OnTabsUpdated += _onTabsUpdatedHandler;
+
+        Navigation.LocationChanged += OnLocationChanged;
+
+        // Load tabs from localStorage
+        await LoadTabsFromStorageAsync();
+
+        // Add current page as a tab if not already present
+        var currentUri = Navigation.ToAbsoluteUri(Navigation.Uri);
+        var currentUrl = currentUri.AbsolutePath + currentUri.Fragment;
+        TabService.AddTab(GetTitleFromCurrentPage(), currentUrl);
+
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Initialize tab interop
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                if (typeof window.tabInterop === 'undefined') {
+                    window.tabInterop = {
+                        saveTabs: function (tabsJson) {
+                            try {
+                                localStorage.setItem('tabs', tabsJson);
+                            } catch (e) {
+                                console.error('Failed to save tabs to localStorage:', e);
+                            }
+                        },
+                        loadTabs: function () {
+                            try {
+                                return localStorage.getItem('tabs') || '[]';
+                            } catch (e) {
+                                console.error('Failed to load tabs from localStorage:', e);
+                                return '[]';
+                            }
+                        },
+                        removeTabs: function () {
+                            try {
+                                localStorage.removeItem('tabs');
+                            } catch (e) {
+                                console.error('Failed to remove tabs from localStorage:', e);
+                            }
+                        }
+                    };
+                }
+            ");
+        }
+    }
+
+    private async Task LoadTabsFromStorageAsync()
+    {
+        if (_isDisposed) return;
+
+        try
+        {
+            var tabsJson = await TabJsInterop.LoadTabsAsync();
+            if (!string.IsNullOrEmpty(tabsJson) && tabsJson != "[]")
+            {
+                // We could deserialize and restore tabs here if needed
+                // For now, we'll let the normal navigation flow handle tab creation
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading tabs from storage: {ex.Message}");
+        }
+    }
+
+    private void HandleTabAdded(Abp.Blazor.Server.RadzenUI.Models.TabItem tab)
+    {
+        if (_isDisposed) return;
+
+        InvokeAsync(() =>
+        {
+            if (_isDisposed) return;
+            StateHasChanged();
+            // Navigate to the new tab's URL
+            Navigation.NavigateTo(GetFullUrl(tab), forceLoad: false);
+        });
+    }
+
+    private void HandleTabClosed(Abp.Blazor.Server.RadzenUI.Models.TabItem tab)
+    {
+        if (_isDisposed) return;
+
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void HandleTabsUpdated()
+    {
+        if (_isDisposed) return;
+
+        InvokeAsync(StateHasChanged);
+        // Save tabs to localStorage
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                if (_isDisposed) return;
+                var tabsJson = JsonSerializer.Serialize(TabService.Tabs);
+                await TabJsInterop.SaveTabsAsync(tabsJson);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving tabs to storage: {ex.Message}");
+            }
+        });
+    }
+
+    private void OnTabChange(int index)
+    {
+        if (index >= 0 && index < TabService.Tabs.Count)
+        {
+            var tab = TabService.Tabs[index];
+            TabService.SetActiveTab(tab.Url);
+            Navigation.NavigateTo(GetFullUrl(tab), forceLoad: false);
+        }
+    }
+
+    private void OnLocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        if (_isDisposed) return;
+
+        var uri = Navigation.ToAbsoluteUri(e.Location);
+        var url = uri.AbsolutePath + uri.Fragment;
+
+        // Check if this URL corresponds to an existing tab
+        var existingTab = TabService.Tabs.FirstOrDefault(t => t.Url == url);
+        if (existingTab != null)
+        {
+            TabService.SetActiveTab(url);
+        }
+        else
+        {
+            // Add as a new tab
+            TabService.AddTab(GetTitleFromCurrentPage(), url);
+        }
+
+        InvokeAsync(StateHasChanged);
+    }
+
+    private string GetTitleFromCurrentPage()
+    {
+        // This is a simplified approach - in a real implementation,
+        // you might want to extract the title from the page content
+        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+        var path = uri.AbsolutePath.Trim('/');
+
+        if (string.IsNullOrEmpty(path))
+            return "Home";
+
+        // Capitalize first letter and replace slashes with spaces
+        return char.ToUpper(path[0]) + path.Substring(1).Replace("/", " > ");
+    }
+
+    private async Task CloseTabAsync(string url)
+    {
+        TabService.CloseTab(url);
+    }
+
+    private async Task CloseOtherTabsAsync(string url)
+    {
+        TabService.CloseOtherTabs(url);
+    }
+
+    private async Task CloseAllTabsAsync()
+    {
+        TabService.CloseAllTabs();
+    }
+
+    private void SetActiveTab(string url)
+    {
+        TabService.SetActiveTab(url);
+    }
+
+    private string GetFullUrl(Abp.Blazor.Server.RadzenUI.Models.TabItem tab)
+    {
+        return tab.Url;
+    }
+
+    private async Task OpenContextMenu(Microsoft.AspNetCore.Components.Web.MouseEventArgs args, string url)
+    {
+        if (tabContextMenu != null)
+        {
+            await tabContextMenu.Open(args, url);
+        }
+    }
+
+    public void Dispose()
+    {
+        _isDisposed = true;
+        if (_onTabAddedHandler != null)
+            TabService.OnTabAdded -= _onTabAddedHandler;
+        if (_onTabClosedHandler != null)
+            TabService.OnTabClosed -= _onTabClosedHandler;
+        if (_onTabsUpdatedHandler != null)
+            TabService.OnTabsUpdated -= _onTabsUpdatedHandler;
+        Navigation.LocationChanged -= OnLocationChanged;
+    }
+}

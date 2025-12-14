@@ -15,5 +15,6 @@ public class BlazorGlobalScriptContributor : BundleContributor
             context.Files.AddIfNotContains("/_framework/blazor.server.js");
         }
         context.Files.AddIfNotContains("/_content/AbpRadzen.Blazor.Server.UI/js/highlight.pack.js");
+        context.Files.AddIfNotContains("/_content/AbpRadzen.Blazor.Server.UI/js/tabs.js");
     }
 }

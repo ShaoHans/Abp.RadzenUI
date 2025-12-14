@@ -1,0 +1,28 @@
+@using Abp.Blazor.Server.RadzenUI.Models
+@using Microsoft.AspNetCore.Components
+@using Radzen
+@using Radzen.Blazor
+
+<div class="tab-content">
+    @TabPageContent
+</div>
+
+@code {
+    [Parameter]
+    public TabItem Tab { get; set; }
+
+    [Parameter]
+    public RenderFragment TabPageContent { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnCloseTab { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnSetActiveTab { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnCloseOtherTabs { get; set; }
+
+    [Parameter]
+    public EventCallback OnCloseAllTabs { get; set; }
+}

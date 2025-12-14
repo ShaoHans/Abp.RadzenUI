@@ -1,0 +1,56 @@
+@page "/tabs-demo"
+@using Microsoft.AspNetCore.Components
+@using Radzen
+@inject NavigationManager NavigationManager
+
+<PageTitle>Tabs Demo</PageTitle>
+
+<h3>Tabs Demo Page</h3>
+
+<p>This page demonstrates the Tabs functionality with some interactive elements.</p>
+
+<div class="rz-form-group">
+    <label>Enter some text:</label>
+    <RadzenTextBox @bind-Value="inputText" />
+</div>
+
+<div class="rz-form-group mt-3">
+    <label>Counter: @counter</label><br/>
+    <RadzenButton Text="Increment" Click="IncrementCounter" />
+</div>
+
+<div class="mt-3">
+    <RadzenButton Text="Go to Test Tabs" Click="GoToTestTabs" />
+    <RadzenButton Text="Go to User Management" Click="GoToUserManagement" />
+    <RadzenButton Text="Go to Role Management" Click="GoToRoleManagement" />
+</div>
+
+<div class="mt-3">
+    <p>You entered: "@inputText"</p>
+    <p>This text and counter value should persist when you switch between tabs!</p>
+</div>
+
+@code {
+    string inputText = "";
+    int counter = 0;
+
+    void IncrementCounter()
+    {
+        counter++;
+    }
+
+    void GoToTestTabs()
+    {
+        NavigationManager.NavigateTo("/test-tabs");
+    }
+
+    void GoToUserManagement()
+    {
+        NavigationManager.NavigateTo("/user");
+    }
+
+    void GoToRoleManagement()
+    {
+        NavigationManager.NavigateTo("/role");
+    }
+}

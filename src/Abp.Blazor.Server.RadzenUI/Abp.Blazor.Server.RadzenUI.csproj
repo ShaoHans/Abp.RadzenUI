@@ -26,6 +26,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Content Update="wwwroot\js\tabs.js">
+			<PackagePath>staticwebassets\js\tabs.js</PackagePath>
+			<Pack>true</Pack>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Radzen.Blazor" Version="8.4.0" />
 		<PackageReference Include="Volo.Abp.AspNetCore.Components.Server" Version="10.0.0" />
 		<PackageReference Include="Volo.Abp.Autofac" Version="10.0.0" />

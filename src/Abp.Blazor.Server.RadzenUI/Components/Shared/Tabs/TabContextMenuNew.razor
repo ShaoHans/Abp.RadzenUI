@@ -1,0 +1,50 @@
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+@using Radzen
+@using Radzen.Blazor
+
+<RadzenContextMenu @ref="contextMenu" />
+
+@code {
+    private RadzenContextMenu contextMenu;
+    private string tabUrl;
+
+    [Parameter]
+    public EventCallback<string> OnCloseTab { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnCloseOtherTabs { get; set; }
+
+    [Parameter]
+    public EventCallback OnCloseAllTabs { get; set; }
+
+    public async Task Open(MouseEventArgs args, string url)
+    {
+        tabUrl = url;
+        await contextMenu.Open(args, null);
+    }
+
+    private async Task OnCloseClick(MenuItemEventArgs args)
+    {
+        if (OnCloseTab.HasDelegate && !string.IsNullOrEmpty(tabUrl))
+        {
+            await OnCloseTab.InvokeAsync(tabUrl);
+        }
+    }
+
+    private async Task OnCloseOthersClick(MenuItemEventArgs args)
+    {
+        if (OnCloseOtherTabs.HasDelegate && !string.IsNullOrEmpty(tabUrl))
+        {
+            await OnCloseOtherTabs.InvokeAsync(tabUrl);
+        }
+    }
+
+    private async Task OnCloseAllClick(MenuItemEventArgs args)
+    {
+        if (OnCloseAllTabs.HasDelegate)
+        {
+            await OnCloseAllTabs.InvokeAsync();
+        }
+    }
+}

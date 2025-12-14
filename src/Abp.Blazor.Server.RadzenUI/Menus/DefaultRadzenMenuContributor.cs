@@ -22,6 +22,31 @@ public class DefaultRadzenMenuContributor : IMenuContributor
                 )
             );
 
+        // Add test tabs menu items
+        var tabsGroup = new ApplicationMenuItem(
+            "TabsDemo",
+            "Tabs Demo",
+            icon: "tab"
+        );
+
+        tabsGroup.AddItem(
+            new ApplicationMenuItem(
+                "TestTabs",
+                "Test Tabs",
+                url: "/test-tabs"
+            )
+        );
+
+        tabsGroup.AddItem(
+            new ApplicationMenuItem(
+                "TabsDemoPage",
+                "Tabs Demo Page",
+                url: "/tabs-demo"
+            )
+        );
+
+        context.Menu.AddItem(tabsGroup);
+
         return Task.CompletedTask;
     }
 }
