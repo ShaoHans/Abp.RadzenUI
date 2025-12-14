@@ -152,8 +152,14 @@
         if (index >= 0 && index < TabService.Tabs.Count)
         {
             var tab = TabService.Tabs[index];
-            TabService.SetActiveTab(tab.Url);
-            Navigation.NavigateTo(GetFullUrl(tab), forceLoad: false);
+
+            // Check if this tab is already active to avoid unnecessary navigation
+            var activeTab = TabService.Tabs.FirstOrDefault(t => t.IsActive);
+            if (activeTab?.Url != tab.Url)
+            {
+                TabService.SetActiveTab(tab.Url);
+                Navigation.NavigateTo(GetFullUrl(tab), forceLoad: false);
+            }
         }
     }
 
@@ -168,12 +174,26 @@
         var existingTab = TabService.Tabs.FirstOrDefault(t => t.Url == url);
         if (existingTab != null)
         {
-            TabService.SetActiveTab(url);
-            // Select the existing tab
-            var tabIndex = TabService.Tabs.IndexOf(existingTab);
-            if (tabIndex >= 0)
+            // Check if this tab is already active to avoid unnecessary navigation
+            var activeTab = TabService.Tabs.FirstOrDefault(t => t.IsActive);
+            if (activeTab?.Url != url)
             {
-                selectedTabIndex = tabIndex;
+                TabService.SetActiveTab(url);
+                // Select the existing tab
+                var tabIndex = TabService.Tabs.IndexOf(existingTab);
+                if (tabIndex >= 0)
+                {
+                    selectedTabIndex = tabIndex;
+                }
+            }
+            else
+            {
+                // Tab is already active, just update the selected index to ensure UI consistency
+                var tabIndex = TabService.Tabs.IndexOf(existingTab);
+                if (tabIndex >= 0 && selectedTabIndex != tabIndex)
+                {
+                    selectedTabIndex = tabIndex;
+                }
             }
         }
         else
