@@ -1,6 +1,9 @@
-﻿@using Volo.Abp.AspNetCore.Components
+﻿@using Abp.RadzenUI.Components.ObjectExtending
+@using Volo.Abp.AspNetCore.Components
+@using Volo.Abp.AspNetCore.Components.Web
 @using Volo.Abp.TenantManagement
 @using Volo.Abp.TenantManagement.Localization
+@inject AbpBlazorMessageLocalizerHelper<AbpTenantManagementResource> LH
 @inherits AbpComponentBase
 
 <RadzenTemplateForm TItem="TenantCreateDto" Data=@DialogFromOption.Model Submit=@DialogFromOption.OnSubmit>
@@ -36,6 +39,7 @@
                 <RadzenRequiredValidator Component="AdminPassword" Text="@L.Required("DisplayName:AdminPassword")" />
             </RadzenColumn>
         </RadzenRow>
+        <ExtensionProperties TEntityType="TenantCreateDto" TResourceType="AbpTenantManagementResource" Entity="@DialogFromOption.Model" LH="@LH" />
     </RadzenStack>
     <div class="dialog-footer">
         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Right">
