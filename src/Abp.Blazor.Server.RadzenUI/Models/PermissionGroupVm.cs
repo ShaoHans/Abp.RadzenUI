@@ -26,7 +26,7 @@ public class PermissionGroupVm
 
         return result;
 
-        List<PermissionTreeItemVm> GetAllChildren(List<PermissionTreeItemVm> children)
+        static List<PermissionTreeItemVm> GetAllChildren(List<PermissionTreeItemVm> children)
         {
             var result = new List<PermissionTreeItemVm>();
             foreach (var child in children)
@@ -46,7 +46,7 @@ public class PermissionGroupVm
             GrantAllChildren(item.Children, isGranted);
         }
 
-        void GrantAllChildren(List<PermissionTreeItemVm> children, bool isGranted)
+        static void GrantAllChildren(List<PermissionTreeItemVm> children, bool isGranted)
         {
             foreach (var child in children)
             {

@@ -4,7 +4,7 @@ namespace Abp.RadzenUI.Utils;
 
 public static class AbpRadzenUICookieHelper
 {
-    private static string ThemeKey = ".AbpRadzenUI.Theme";
+    private static readonly string ThemeKey = ".AbpRadzenUI.Theme";
 
     public static void SetThemeCookie(HttpContext context, string theme)
     {

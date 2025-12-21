@@ -37,7 +37,7 @@ public partial class List
         });
     }
 
-    private DialogOptions SetDialogOptions()
+    private static DialogOptions SetDialogOptions()
     {
         return new DialogOptions
         {
