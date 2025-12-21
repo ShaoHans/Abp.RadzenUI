@@ -33,7 +33,7 @@ public class EmailingPageContributor : ISettingComponentContributor
         return await CheckPermissionsInternalAsync(context);
     }
 
-    private async Task<bool> CheckPermissionsInternalAsync(SettingComponentCreationContext context)
+    private static async Task<bool> CheckPermissionsInternalAsync(SettingComponentCreationContext context)
     {
         if (!await CheckFeatureAsync(context))
         {
@@ -45,7 +45,7 @@ public class EmailingPageContributor : ISettingComponentContributor
         return await authorizationService.IsGrantedAsync(SettingManagementPermissions.Emailing);
     }
 
-    private async Task<bool> CheckFeatureAsync(SettingComponentCreationContext context)
+    private static async Task<bool> CheckFeatureAsync(SettingComponentCreationContext context)
     {
         var currentTenant = context.ServiceProvider.GetRequiredService<ICurrentTenant>();
 

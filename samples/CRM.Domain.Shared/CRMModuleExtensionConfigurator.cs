@@ -1,13 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Volo.Abp.Identity;
-using Volo.Abp.ObjectExtending;
-using Volo.Abp.Threading;
+﻿using Volo.Abp.Threading;
 
 namespace CRM;
 
 public static class CRMModuleExtensionConfigurator
 {
-    private static readonly OneTimeRunner OneTimeRunner = new OneTimeRunner();
+    private static readonly OneTimeRunner OneTimeRunner = new();
 
     public static void Configure()
     {

@@ -11,7 +11,7 @@ using Volo.Abp.DependencyInjection;
 
 namespace CRM.Github;
 
-public class GitHubClient(IHttpClientFactory httpClientFactory, ILogger<GitHubClient> logger)
+public partial class GitHubClient(IHttpClientFactory httpClientFactory, ILogger<GitHubClient> logger)
     : ITransientDependency
 {
     private readonly HttpClient _httpClient = httpClientFactory.CreateClient("GitHub");
@@ -90,7 +90,7 @@ public class GitHubClient(IHttpClientFactory httpClientFactory, ILogger<GitHubCl
                 "/repos/ShaoHans/Abp.RadzenUI/commits?per_page=1&page=1"
             );
             var link = response.Headers.GetValues("Link").First();
-            var matches = Regex.Matches(link, @"page=(\d+)");
+            var matches = CommitLinkRegex().Matches(link);
             if (matches.Count > 0)
             {
                 return int.Parse(matches[^1].Groups[1].Value);
@@ -103,4 +103,7 @@ public class GitHubClient(IHttpClientFactory httpClientFactory, ILogger<GitHubCl
             return 0;
         }
     }
+
+    [GeneratedRegex(@"page=(\d+)")]
+    private static partial Regex CommitLinkRegex();
 }

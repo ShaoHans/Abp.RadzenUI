@@ -1,13 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Volo.Abp.Identity;
-using Volo.Abp.ObjectExtending;
-using Volo.Abp.Threading;
+﻿using Volo.Abp.Threading;
 
 namespace CRM.EntityFrameworkCore;
 
 public static class CRMEfCoreEntityExtensionMappings
 {
-    private static readonly OneTimeRunner OneTimeRunner = new OneTimeRunner();
+    private static readonly OneTimeRunner OneTimeRunner = new();
 
     public static void Configure()
     {
