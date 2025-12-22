@@ -62,6 +62,17 @@ public class AccountController(
     [HttpPost("/account/externallogin")]
     public async Task<IActionResult> ExternalLoginAsync(string provider, string returnUrl)
     {
+        return await ExternalLoginChallengeAsync(provider, returnUrl);
+    }
+
+    [HttpGet("/account/externallogin")]
+    public async Task<IActionResult> ExternalLoginGetAsync(string provider, string returnUrl)
+    {
+        return await ExternalLoginChallengeAsync(provider, returnUrl);
+    }
+
+    private async Task<IActionResult> ExternalLoginChallengeAsync(string provider, string returnUrl)
+    {
         try
         {
             var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { returnUrl });
@@ -220,7 +231,7 @@ public class AccountController(
     {
         await signInManager.SignOutAsync();
         await HttpContext.SignOutAsync();
-        return Redirect("~/account/login");
+        return Redirect("~/account/login?skipAutoLogin=true");
     }
 
     [HttpPost("/account/localregister")]
