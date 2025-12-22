@@ -39,7 +39,7 @@ public partial class List
         );
     }
 
-    private DialogOptions SetDialogOptions(int heigth = 450, int width = 700)
+    private static DialogOptions SetDialogOptions(int heigth = 450, int width = 700)
     {
         return new DialogOptions
         {

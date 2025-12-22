@@ -9,7 +9,7 @@ public class RadzenUIPermissionDefinitionProvider : PermissionDefinitionProvider
     public override void Define(IPermissionDefinitionContext context)
     {
         var radzenUIGroup = context.AddGroup(RadzenUIPermissions.GroupName, L("Permission:GroupName"));
-        var auditLogs = radzenUIGroup.AddPermission(RadzenUIPermissions.AuditLogs.Default, L("Permission:AuditLogs"));
+        radzenUIGroup.AddPermission(RadzenUIPermissions.AuditLogs.Default, L("Permission:AuditLogs"));
     }
 
     private static LocalizableString L(string name)

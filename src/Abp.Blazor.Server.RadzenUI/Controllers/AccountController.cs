@@ -101,7 +101,7 @@ public class AccountController(
         {
             if (!remoteError.IsNullOrEmpty())
             {
-                Logger.LogWarning("External login callback error: {remoteError}", remoteError);
+                Logger.LogWarning("External login callback error: {@remoteError}", remoteError);
                 return RedirectWithError("~/account/login", remoteError);
             }
 

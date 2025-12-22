@@ -1,11 +1,10 @@
-﻿using Volo.Abp.GlobalFeatures;
-using Volo.Abp.Threading;
+﻿using Volo.Abp.Threading;
 
 namespace CRM;
 
 public static class CRMGlobalFeatureConfigurator
 {
-    private static readonly OneTimeRunner OneTimeRunner = new OneTimeRunner();
+    private static readonly OneTimeRunner OneTimeRunner = new();
 
     public static void Configure()
     {
