@@ -645,14 +645,16 @@ svg.illustration {
 
 html, body {
     height: 100%;
-    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* 整体页面不滚动 */
 }
 
 .rz-layout {
-    overflow: hidden !important;
+    height: 100vh; /* 占满全屏 */
 }
 
-.rz-body,
-.rz-content {
-    overflow: hidden !important;
+.rz-body {
+    overflow: auto; /* 只在内容超出时滚动 */
 }
+
