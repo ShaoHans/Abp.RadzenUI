@@ -1,5 +1,7 @@
 ﻿@page "/account/login"
 @using Abp.RadzenUI.Components.Layout
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.Extensions.Options
 @using Volo.Abp.Account.Localization
 @using Volo.Abp.Account.Settings
 @using Volo.Abp.AspNetCore.Components
@@ -9,21 +11,35 @@
 
 <PageTitle>@L["Login"]</PageTitle>
 
-<RadzenTemplateForm Data=@("") Method="post" Action="/account/locallogin">
-    <RadzenLogin LoginText="@L["Login"]"
-    UserText="@L["UserName"]" UserRequired="@L.Required("DisplayName:UserName")"
-    PasswordText="@L["Password"]" PasswordRequired="@L.Required("DisplayName:Password")"
-    AllowResetPassword="false"
-    AllowRememberMe="true" RememberMe="true" RememberMeText="@L["RememberMe"]"
-    AllowRegister="@EnableLocalRegister" RegisterText="@L["Register"]" RegisterMessageText="@L["AreYouANewUser"]" Register="@OnRegister" />
-</RadzenTemplateForm>
+@if (!IsExternalLoginOnly)
+{
+    @if (EnableLocalLogin)
+    {
+        <RadzenTemplateForm Data=@("") Method="post" Action="/account/locallogin">
+            <RadzenLogin LoginText="@L["Login"]"
+            UserText="@L["UserName"]" UserRequired="@L.Required("DisplayName:UserName")"
+            PasswordText="@L["Password"]" PasswordRequired="@L.Required("DisplayName:Password")"
+            AllowResetPassword="false"
+            AllowRememberMe="true" RememberMe="true" RememberMeText="@L["RememberMe"]"
+            AllowRegister="@EnableLocalRegister" RegisterText="@L["Register"]" RegisterMessageText="@L["AreYouANewUser"]" Register="@OnRegister" />
+        </RadzenTemplateForm>
+    }
 
-<ExternalLoginProvider Text="@L["OrLoginWith"]" />
+    <ExternalLoginProvider Text="@(EnableLocalLogin ? L["OrLoginWith"] : "")" ReturnUrl="@ReturnUrl" />
+}
 
 @code {
     [SupplyParameterFromQuery]
     [Parameter]
     public string? Error { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public bool SkipAutoLogin { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string? ReturnUrl { get; set; }
 
     [Inject]
     NavigationManager Navigation { get; set; } = default!;
@@ -31,7 +47,21 @@
     [Inject]
     ISettingProvider SettingProvider { get; set; } = default!;
 
+    [Inject]
+    IAuthenticationSchemeProvider SchemeProvider { get; set; } = default!;
+
+    [Inject]
+    IOptions<AbpRadzenUIOptions> RadzenUIOptions { get; set; } = default!;
+
     public bool EnableLocalRegister { get; set; }
+
+    public bool EnableLocalLogin { get; set; } = true;
+
+    List<ExternalProviderModel> ExternalProviders { get; set; } = [];
+
+    bool IsExternalLoginOnly => !EnableLocalLogin && ExternalProviders.Count == 1;
+
+    string? ExternalLoginScheme => IsExternalLoginOnly ? ExternalProviders.First().AuthenticationScheme : null;
 
     public Login()
     {
@@ -40,7 +70,10 @@
 
     protected override async Task OnInitializedAsync()
     {
+        EnableLocalLogin = await SettingProvider.IsTrueAsync(AccountSettingNames.EnableLocalLogin);
         EnableLocalRegister = await SettingProvider.IsTrueAsync(AccountSettingNames.IsSelfRegistrationEnabled);
+        ExternalProviders = await GetExternalProviders();
+
         await base.OnInitializedAsync();
 
         if (!string.IsNullOrWhiteSpace(Error))
@@ -51,7 +84,32 @@
         if (CurrentUser != null && CurrentUser.IsAuthenticated)
         {
             Navigation.NavigateTo("/");
+            return;
         }
+
+        if (IsExternalLoginOnly && !SkipAutoLogin)
+        {
+            var returnUrl = Uri.EscapeDataString(ReturnUrl ?? "/");
+            Navigation.NavigateTo($"/account/externallogin?provider={ExternalLoginScheme}&returnUrl={returnUrl}", forceLoad: true);
+            return;
+        }
+    }
+
+    async Task<List<ExternalProviderModel>> GetExternalProviders()
+    {
+        var schemes = await SchemeProvider.GetAllSchemesAsync();
+
+        return
+        [
+            .. schemes
+                .Where(x => x.DisplayName != null)
+                .Select(x => new ExternalProviderModel
+                {
+                    DisplayName = x.DisplayName,
+                    AuthenticationScheme = x.Name,
+                    IconPath = RadzenUIOptions.Value.ExternalLogin?.Providers?.FirstOrDefault(p => p.AuthenticationScheme == x.Name)?.IconPath ?? string.Empty
+                })
+        ];
     }
 
     public void OnRegister()

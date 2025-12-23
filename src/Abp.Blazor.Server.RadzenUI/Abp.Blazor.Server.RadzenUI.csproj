@@ -6,7 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>Abp.RadzenUI</RootNamespace>
 		<PackageId>AbpRadzen.Blazor.Server.UI</PackageId>
-		<Version>0.4.6</Version>
+		<Version>0.4.7</Version>
 		<Authors>ShaoHans</Authors>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -33,7 +33,7 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-		<PackageReference Include="Radzen.Blazor" Version="8.4.1" />
+		<PackageReference Include="Radzen.Blazor" Version="8.4.2" />
 		<PackageReference Include="Volo.Abp.AspNetCore.Components.Server" Version="10.0.1" />
 		<PackageReference Include="Volo.Abp.Autofac" Version="10.0.1" />
 		<PackageReference Include="Volo.Abp.PermissionManagement.EntityFrameworkCore" Version="10.0.1" />

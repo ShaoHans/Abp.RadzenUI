@@ -66,7 +66,7 @@
 
 @if (!IsExternalLogin)
 {
-    <ExternalLoginProvider Text="@L["OrRegisterWith"]" />
+    <ExternalLoginProvider Text="@L["OrRegisterWith"]" ReturnUrl="@ReturnUrl" />
 }
 
 @code {
@@ -89,6 +89,10 @@
     [SupplyParameterFromQuery]
     [Parameter]
     public string EmailAddress { get; set; } = string.Empty;
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string? ReturnUrl { get; set; }
 
     [Inject]
     NavigationManager Navigation { get; set; } = default!;

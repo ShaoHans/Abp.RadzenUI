@@ -11,7 +11,7 @@
     @foreach (var provider in ExternalProviders)
     {
         <RadzenTemplateForm Data=@("") Method="post" Action="/account/externallogin" class="rz-mb-2">
-            <input type="hidden" name="returnUrl" value="/" />
+            <input type="hidden" name="returnUrl" value="@(ReturnUrl ?? "/")" />
             <input type="hidden" name="provider" value="@provider.AuthenticationScheme" />
             <RadzenButton ButtonType="ButtonType.Submit" Text="@provider.DisplayName" Style="width:100%"
             Image="@provider.IconPath" />
@@ -22,6 +22,9 @@
 @code {
     [Parameter]
     public string Text { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? ReturnUrl { get; set; }
 
     [Inject]
     IAuthenticationSchemeProvider SchemeProvider { get; set; } = default!;
