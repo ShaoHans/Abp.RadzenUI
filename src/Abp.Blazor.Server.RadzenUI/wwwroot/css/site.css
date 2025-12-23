@@ -642,3 +642,17 @@ svg.illustration {
 .rz-data-grid .rz-group-header {
     display: block;
 }
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+.rz-layout {
+    overflow: hidden !important;
+}
+
+.rz-body,
+.rz-content {
+    overflow: hidden !important;
+}
