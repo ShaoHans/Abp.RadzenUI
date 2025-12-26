@@ -40,7 +40,7 @@
                 <BooleanIcon Value="@context.LockoutEnabled" />
             </Template>
         </RadzenDataGridColumn>
-        @* <ExtraPropertiesColumns TItem="IdentityUserDto" /> *@
+        @(RadzenColumnHelper.ExtraPropertiesColumns<IdentityUserDto>(_extraColumns, StringLocalizerFactory))
         <RadzenDataGridColumn Property="@nameof(IdentityUserDto.CreationTime)" Filterable="false" Title="@L["CreationTime"]" Width="160px" />
         <RadzenDataGridColumn Title="@L["Actions"]" Width="120px" Frozen="true" Filterable="false" Sortable="false">
             <Template>

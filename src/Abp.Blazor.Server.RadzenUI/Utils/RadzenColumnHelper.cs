@@ -54,7 +54,7 @@ public static class RadzenColumnHelper
 
     public static RenderFragment ExtraPropertiesColumns<TItem>(
         IReadOnlyList<ExtraPropertyColumnMeta> metas,
-        IStringLocalizer l
+        IStringLocalizerFactory stringLocalizerFactory
     )
         where TItem : class, IHasExtraProperties
     {
@@ -64,7 +64,16 @@ public static class RadzenColumnHelper
             {
                 builder.OpenComponent<RadzenDataGridColumn<TItem>>(0);
 
-                builder.AddAttribute(1, "Title", meta.Title ?? l[meta.LocalizationKey]);
+                builder.AddAttribute(
+                    1,
+                    "Title",
+                    meta.Title
+                        ?? UiLocalizationHelper.GetDisplayName(
+                            meta.Name,
+                            meta.LocalizationKey,
+                            stringLocalizerFactory
+                        )
+                );
                 builder.AddAttribute(2, "Sortable", false);
                 builder.AddAttribute(3, "Filterable", false);
 
