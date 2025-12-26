@@ -58,6 +58,8 @@ public static class CRMDtoExtensions
                 {
                     propertyInfo.Configuration.Add("Width", "200px");
                     propertyInfo.Configuration.Add("LocalizationKey", "DisplayName:TenantDisplayName");
+                    propertyInfo.Configuration.Add("Title", "DisplayName");
+                    propertyInfo.Configuration.Add("FormatString", "");
                     propertyInfo.CheckPairDefinitionOnMapping = false;
                 }
             );
