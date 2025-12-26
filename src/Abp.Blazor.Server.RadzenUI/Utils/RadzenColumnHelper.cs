@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.Globalization;
+using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 using Radzen.Blazor;
 using Volo.Abp.Data;
@@ -94,9 +95,38 @@ public static class RadzenColumnHelper
                         context =>
                             tb =>
                             {
-                                if (context.ExtraProperties.TryGetValue(meta.Name, out var value))
+                                if (
+                                    context.ExtraProperties.TryGetValue(meta.Name, out var value)
+                                    && value != null
+                                )
                                 {
-                                    tb.AddContent(0, value);
+                                    string text;
+
+                                    if (!string.IsNullOrEmpty(meta.FormatString))
+                                    {
+                                        try
+                                        {
+                                            text = string.Format(
+                                                CultureInfo.CurrentUICulture,
+                                                meta.FormatString,
+                                                value
+                                            );
+                                        }
+                                        catch
+                                        {
+                                            text = value.ToString()!;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        text = value.ToString()!;
+                                    }
+
+                                    tb.AddContent(0, text);
+                                }
+                                else
+                                {
+                                    tb.AddContent(0, string.Empty);
                                 }
                             }
                     )
