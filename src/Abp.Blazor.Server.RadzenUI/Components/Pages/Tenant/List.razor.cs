@@ -27,7 +27,7 @@ public partial class List
 
     protected override void OnInitialized()
     {
-        _extraColumns = RadzenColumnHelper.GetExtraPropertyMetas<TenantDto>(L);
+        _extraColumns = RadzenColumnHelper.GetExtraPropertyMetas<TenantDto>();
     }
 
     protected override Task<TenantUpdateDto> SetEditDialogModelAsync(TenantDto dto)

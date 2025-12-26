@@ -9,15 +9,16 @@ namespace Abp.RadzenUI.Utils;
 public sealed class ExtraPropertyColumnMeta
 {
     public string Name { get; init; } = default!;
-    public string Title { get; init; } = default!;
+    public string LocalizationKey { get; init; } = default!;
+    public string? Title { get; init; }
     public string? Width { get; init; }
 
-    public string? FormatString { get; set; }
+    public string? FormatString { get; init; }
 }
 
 public static class RadzenColumnHelper
 {
-    public static List<ExtraPropertyColumnMeta> GetExtraPropertyMetas<TItem>(IStringLocalizer l)
+    public static List<ExtraPropertyColumnMeta> GetExtraPropertyMetas<TItem>()
     {
         return
         [
@@ -25,21 +26,19 @@ public static class RadzenColumnHelper
                 .Instance.GetProperties<TItem>()
                 .Select(prop =>
                 {
-                    var title = prop.Name;
-
-                    if (prop.Configuration != null)
-                    {
-                        if (prop.Configuration.TryGetValue("LocalizationKey", out var lk))
-                            title = l[lk.ToString()!];
-
-                        if (prop.Configuration.TryGetValue("Title", out var t))
-                            title = t.ToString()!;
-                    }
+                    var key =
+                        prop.Configuration?.TryGetValue("LocalizationKey", out var lk) == true
+                            ? lk.ToString()!
+                            : $"DisplayName:{typeof(TItem).Name}.{prop.Name}";
 
                     return new ExtraPropertyColumnMeta
                     {
                         Name = prop.Name,
-                        Title = title,
+                        LocalizationKey = key,
+                        Title =
+                            prop.Configuration?.TryGetValue("Title", out var t) == true
+                                ? t.ToString()
+                                : null,
                         Width =
                             prop.Configuration?.TryGetValue("Width", out var w) == true
                                 ? w.ToString()
@@ -54,7 +53,8 @@ public static class RadzenColumnHelper
     }
 
     public static RenderFragment ExtraPropertiesColumns<TItem>(
-        IReadOnlyList<ExtraPropertyColumnMeta> metas
+        IReadOnlyList<ExtraPropertyColumnMeta> metas,
+        IStringLocalizer l
     )
         where TItem : class, IHasExtraProperties
     {
@@ -64,7 +64,7 @@ public static class RadzenColumnHelper
             {
                 builder.OpenComponent<RadzenDataGridColumn<TItem>>(0);
 
-                builder.AddAttribute(1, "Title", meta.Title);
+                builder.AddAttribute(1, "Title", meta.Title ?? l[meta.LocalizationKey]);
                 builder.AddAttribute(2, "Sortable", false);
                 builder.AddAttribute(3, "Filterable", false);
 
