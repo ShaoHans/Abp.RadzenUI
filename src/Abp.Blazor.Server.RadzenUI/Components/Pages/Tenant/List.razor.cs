@@ -52,7 +52,7 @@ public partial class List
         {
             Draggable = true,
             Width = $"{width}px",
-            Height = $"{heigth}px",
+            //Height = $"{heigth}px",
         };
     }
 }

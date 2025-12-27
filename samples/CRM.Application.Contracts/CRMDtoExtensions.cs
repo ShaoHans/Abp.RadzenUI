@@ -46,35 +46,35 @@ public static class CRMDtoExtensions
             //    }
             //);
 
-            //ObjectExtensionManager.Instance.AddOrUpdateProperty<TenantCreateDto, string>(
-            //    "TenantDisplayName",
-            //    propertyInfo =>
-            //    {
-            //        propertyInfo.Attributes.Add(new DataTypeAttribute(DataType.Text));
-            //        propertyInfo.CheckPairDefinitionOnMapping = false;
-            //    }
-            //);
+            ObjectExtensionManager.Instance.AddOrUpdateProperty<TenantCreateDto, string>(
+                "TenantDisplayName",
+                propertyInfo =>
+                {
+                    propertyInfo.Attributes.Add(new DataTypeAttribute(DataType.Text));
+                    propertyInfo.CheckPairDefinitionOnMapping = false;
+                }
+            );
 
-            //ObjectExtensionManager.Instance.AddOrUpdateProperty<TenantUpdateDto, string>(
-            //    "TenantDisplayName",
-            //    propertyInfo =>
-            //    {
-            //        propertyInfo.Attributes.Add(new DataTypeAttribute(DataType.Text));
-            //        propertyInfo.CheckPairDefinitionOnMapping = false;
-            //    }
-            //);
+            ObjectExtensionManager.Instance.AddOrUpdateProperty<TenantUpdateDto, string>(
+                "TenantDisplayName",
+                propertyInfo =>
+                {
+                    propertyInfo.Attributes.Add(new DataTypeAttribute(DataType.Text));
+                    propertyInfo.CheckPairDefinitionOnMapping = false;
+                }
+            );
 
-            //ObjectExtensionManager.Instance.AddOrUpdateProperty<TenantDto, string>(
-            //    "TenantDisplayName",
-            //    propertyInfo =>
-            //    {
-            //        propertyInfo.Configuration.Add("Width", "200px");
-            //        propertyInfo.Configuration.Add("LocalizationKey", "DisplayName:TenantDisplayName");
-            //        //propertyInfo.Configuration.Add("Title", "DisplayName");
-            //        propertyInfo.Configuration.Add("FormatString", "");
-            //        propertyInfo.CheckPairDefinitionOnMapping = false;
-            //    }
-            //);
+            ObjectExtensionManager.Instance.AddOrUpdateProperty<TenantDto, string>(
+                "TenantDisplayName",
+                propertyInfo =>
+                {
+                    propertyInfo.Configuration.Add("Width", "200px");
+                    propertyInfo.Configuration.Add("LocalizationKey", "DisplayName:TenantDisplayName");
+                    //propertyInfo.Configuration.Add("Title", "DisplayName");
+                    propertyInfo.Configuration.Add("FormatString", "");
+                    propertyInfo.CheckPairDefinitionOnMapping = false;
+                }
+            );
         });
     }
 }
