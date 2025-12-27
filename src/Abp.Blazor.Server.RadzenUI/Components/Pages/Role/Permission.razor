@@ -8,7 +8,7 @@
 @inherits AbpComponentBase
 
 <RadzenStack JustifyContent="JustifyContent.SpaceBetween"
-             Style="max-height:500px">
+             Style="max-height:calc(100vh - 200px)">
     <div style="flex: 1; overflow: auto">
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start">
             <RadzenCheckBox TValue="bool" Name="GrantAll" Disabled="_selectAllDisabled" Value="@(_groups.All(x => x.GrantAll))" ValueChanged="GrantAll" />

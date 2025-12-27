@@ -43,7 +43,6 @@ public partial class List
         {
             Draggable = true,
             Width = "600px",
-            Height = "740px",
         };
     }
 }
