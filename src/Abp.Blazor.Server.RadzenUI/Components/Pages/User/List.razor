@@ -46,17 +46,17 @@
             <Template>
                 @if ((context.UserName != "admin" || CurrentUser.UserName == "admin") && HasUpdatePermission)
                 {
-                    <RadzenButton Icon="edit" title="@L["Edit"]" ButtonStyle="ButtonStyle.Success"
+                    <RadzenButton Icon="edit" title="@L["Edit"]" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small"
                                   Click="@(async () => await OpenEditDialogAsync<Edit>(@L["Edit"], context, SetDialogOptions))" />
                 }
                 @if ((context.UserName != "admin" || CurrentUser.UserName == "admin") && HasManagePermissionsPermission)
                 {
-                    <RadzenButton Icon="productivity" title="@L["Permissions"]" ButtonStyle="ButtonStyle.Warning"
+                    <RadzenButton Icon="productivity" title="@L["Permissions"]" ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small"
                                   Click="@(async () => await OpenAssignPermissionDialog(context))" />
                 }
                 @if (context.UserName != "admin" && HasDeletePermission)
                 {
-                    <RadzenButton Icon="delete" title="@L["Delete"]" ButtonStyle="ButtonStyle.Danger"
+                    <RadzenButton Icon="delete" title="@L["Delete"]" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small"
                                   Click=@(async () => await OpenDeleteConfirmDialogAsync(context.Id, L["Delete"], L["UserDeletionConfirmationMessage",context.UserName])) />
                 }
             </Template>
