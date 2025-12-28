@@ -5,7 +5,7 @@
 @using Volo.Abp.Identity
 @inject IProfileAppService ProfileAppService
 @inject NavigationManager NavigationManager
-@inherits AbpComponentBase
+@inherits AbpRadzenUIComponentBase
 
 <RadzenTabs @bind-SelectedIndex=@_selectedIndex Change="TabChange" TabPosition="TabPosition.Left" RenderMode="TabRenderMode.Client">
     <Tabs>

@@ -3,7 +3,7 @@
 @using Volo.Abp.Identity.Localization
 @using Volo.Abp.SettingManagement
 @using Volo.Abp.SettingManagement.Localization
-@inherits AbpComponentBase
+@inherits AbpRadzenUIComponentBase
 @inject IStringLocalizer<IdentityResource> IL
 
 <RadzenTemplateForm TItem="SendTestEmailVM" Data=@SendTestEmailInput Submit="SendTestEmailAsync">
@@ -95,7 +95,6 @@
             await EmailSettingsAppService.SendTestEmailAsync(
                 ObjectMapper.Map<SendTestEmailVM, SendTestEmailInput>(SendTestEmailInput)
             );
-
             await Notify.Success(L["SentSuccessfully"]);
             DialogService.Close();
         }
