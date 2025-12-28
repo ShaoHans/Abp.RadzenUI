@@ -1,8 +1,7 @@
-using CRM.Blazor.Web;
 using Serilog;
 using Serilog.Events;
 
-namespace CRM.Blazor;
+namespace CRM.Blazor.Web;
 
 public class Program
 {

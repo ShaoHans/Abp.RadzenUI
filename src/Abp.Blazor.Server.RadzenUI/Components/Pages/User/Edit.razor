@@ -6,7 +6,7 @@
 @using Volo.Abp.Identity.Localization
 @inject IIdentityUserAppService UserAppService
 @inject AbpBlazorMessageLocalizerHelper<IdentityResource> LH
-@inherits AbpComponentBase
+@inherits AbpRadzenUIComponentBase
 
 <RadzenTemplateForm TItem="IdentityUserUpdateDto" Data=@DialogFromOption.Model Submit=@DialogFromOption.OnSubmit Style="max-height:calc(100vh - 200px); display: flex;flex-direction:column">
     <div style="flex: 1; overflow: auto">

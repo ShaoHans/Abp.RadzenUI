@@ -101,7 +101,7 @@ public abstract class AbpCrudPageBase<
     TListViewModel,
     TCreateViewModel,
     TUpdateViewModel
-> : AbpComponentBase
+> : AbpRadzenUIComponentBase
     where TAppService : ICrudAppService<
             TGetOutputDto,
             TGetListOutputDto,
@@ -424,19 +424,5 @@ public abstract class AbpCrudPageBase<
         }
 
         await AuthorizationService.CheckAsync(policyName);
-    }
-
-    protected override async Task HandleErrorAsync(Exception exception)
-    {
-        if (!base.IsDisposed)
-        {
-            await InvokeAsync(async () =>
-            {
-                await UserExceptionInformer.InformAsync(new UserExceptionInformerContext(exception));
-            });
-
-            // Call StateHasChanged separately within the InvokeAsync context
-            await InvokeAsync(StateHasChanged);
-        }
     }
 }

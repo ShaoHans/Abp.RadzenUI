@@ -1,7 +1,7 @@
 ﻿@using CRM.Enums
 @using Volo.Abp.AspNetCore.Components
 @inject IProductAppService AppService
-@inherits AbpComponentBase
+@inherits AbpRadzenUIComponentBase
 
 <RadzenTemplateForm TItem="CreateProductDto" Data=@DialogFromOption.Model Submit=@DialogFromOption.OnSubmit Style="max-height:calc(100vh - 200px); display: flex;flex-direction:column">
     <div style="flex: 1; overflow: auto">

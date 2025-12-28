@@ -2,7 +2,7 @@
 @using Volo.Abp.AspNetCore.Components
 @using Microsoft.Extensions.Localization
 @using Abp.RadzenUI.Application.Contracts.Settings
-@inherits AbpComponentBase
+@inherits AbpRadzenUIComponentBase
 @inject IStringLocalizer<AccountResource> IL
 
 <RadzenTemplateForm TItem="AccountSettingsDto" Data=@AccountSettings Submit="UpdateSettingsAsync">
