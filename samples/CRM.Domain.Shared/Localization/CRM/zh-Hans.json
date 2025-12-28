@@ -59,6 +59,7 @@
     "DisplayName:Description": "描述",
     "DisplayName:CreationTime": "创建时间",
     "DisplayName:HireDate": "入职日期",
+    "DisplayName:TenantDisplayName": "显示名称",
     "ProductDeletionConfirmationMessage": "您确定要删除 {0} 这个产品吗？"
   }
 }

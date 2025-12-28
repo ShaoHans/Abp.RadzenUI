@@ -248,7 +248,7 @@ public abstract class AbpCrudPageBase<
                 {
                     Draggable = true,
                     Width = "600px",
-                    Height = "450px",
+                    //Height = "450px",
                 }
         );
 
@@ -309,7 +309,7 @@ public abstract class AbpCrudPageBase<
                 {
                     Draggable = true,
                     Width = "600px",
-                    Height = "450px",
+                    //Height = "450px",
                 }
         );
 

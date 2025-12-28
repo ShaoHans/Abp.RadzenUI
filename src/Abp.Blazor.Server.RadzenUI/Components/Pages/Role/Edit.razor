@@ -3,41 +3,41 @@
 @using Volo.Abp.Identity.Localization
 @inherits AbpComponentBase
 
-<RadzenTemplateForm TItem="IdentityRoleUpdateDto" Data=@DialogFromOption.Model Submit=@DialogFromOption.OnSubmit>
-    <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
-        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                <RequiredMark />
-                <RadzenLabel Text="@L["DisplayName:RoleName"]" Component="Name" />
-            </RadzenColumn>
-            <RadzenColumn Size="12" SizeMD="8">
-                <RadzenTextBox Name="Name" @bind-Value=@DialogFromOption.Model.Name MaxLength="IdentityRoleConsts.MaxNameLength" />
-                <RadzenRequiredValidator Component="Name" Text="@L.Required("DisplayName:RoleName")" />
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                <RadzenLabel Text="@L["DisplayName:IsDefault"]" Component="IsDefault" />
-            </RadzenColumn>
-            <RadzenColumn Size="12" SizeMD="8">
-                <RadzenCheckBox TValue="bool" @bind-Value=@DialogFromOption.Model.IsDefault Name="IsDefault" />
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                <RadzenLabel Text="@L["DisplayName:IsPublic"]" Component="IsPublic" />
-            </RadzenColumn>
-            <RadzenColumn Size="12" SizeMD="8">
-                <RadzenCheckBox TValue="bool" @bind-Value=@DialogFromOption.Model.IsPublic Name="IsPublic" />
-            </RadzenColumn>
-        </RadzenRow>
-    </RadzenStack>
-    <div class="dialog-footer">
-        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Right">
-            <RadzenButton Icon="cancel" Click="@DialogFromOption.OnCancel" Text="@L["Cancel"]" ButtonStyle="ButtonStyle.Light" />
-            <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="@L["Save"]"></RadzenButton>
+<RadzenTemplateForm TItem="IdentityRoleUpdateDto" Data=@DialogFromOption.Model Submit=@DialogFromOption.OnSubmit Style="max-height:calc(100vh - 200px); display: flex;flex-direction:column">
+    <div style="flex: 1; overflow: auto">
+        <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                    <RequiredMark />
+                    <RadzenLabel Text="@L["DisplayName:RoleName"]" Component="Name" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8">
+                    <RadzenTextBox Name="Name" @bind-Value=@DialogFromOption.Model.Name MaxLength="IdentityRoleConsts.MaxNameLength" />
+                    <RadzenRequiredValidator Component="Name" Text="@L.Required("DisplayName:RoleName")" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                    <RadzenLabel Text="@L["DisplayName:IsDefault"]" Component="IsDefault" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8">
+                    <RadzenCheckBox TValue="bool" @bind-Value=@DialogFromOption.Model.IsDefault Name="IsDefault" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                    <RadzenLabel Text="@L["DisplayName:IsPublic"]" Component="IsPublic" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8">
+                    <RadzenCheckBox TValue="bool" @bind-Value=@DialogFromOption.Model.IsPublic Name="IsPublic" />
+                </RadzenColumn>
+            </RadzenRow>
         </RadzenStack>
     </div>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Right">
+        <RadzenButton Icon="cancel" Click="@DialogFromOption.OnCancel" Text="@L["Cancel"]" ButtonStyle="ButtonStyle.Light" />
+        <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="@L["Save"]"></RadzenButton>
+    </RadzenStack>
 </RadzenTemplateForm>
 
 @code {

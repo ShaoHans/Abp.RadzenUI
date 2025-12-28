@@ -1,0 +1,139 @@
+﻿using System.Globalization;
+using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
+using Radzen.Blazor;
+using Volo.Abp.Data;
+using Volo.Abp.ObjectExtending;
+
+namespace Abp.RadzenUI.Utils;
+
+public sealed class ExtraPropertyColumnMeta
+{
+    public string Name { get; init; } = default!;
+    public string LocalizationKey { get; init; } = default!;
+    public string? Title { get; init; }
+    public string? Width { get; init; }
+
+    public string? FormatString { get; init; }
+}
+
+public static class RadzenColumnHelper
+{
+    public static List<ExtraPropertyColumnMeta> GetExtraPropertyMetas<TItem>()
+    {
+        return
+        [
+            .. ObjectExtensionManager
+                .Instance.GetProperties<TItem>()
+                .Select(prop =>
+                {
+                    var key =
+                        prop.Configuration?.TryGetValue("LocalizationKey", out var lk) == true
+                            ? lk.ToString()!
+                            : $"DisplayName:{typeof(TItem).Name}.{prop.Name}";
+
+                    return new ExtraPropertyColumnMeta
+                    {
+                        Name = prop.Name,
+                        LocalizationKey = key,
+                        Title =
+                            prop.Configuration?.TryGetValue("Title", out var t) == true
+                                ? t.ToString()
+                                : null,
+                        Width =
+                            prop.Configuration?.TryGetValue("Width", out var w) == true
+                                ? w.ToString()
+                                : null,
+                        FormatString =
+                            prop.Configuration?.TryGetValue("FormatString", out var fs) == true
+                                ? fs.ToString()
+                                : null
+                    };
+                })
+        ];
+    }
+
+    public static RenderFragment ExtraPropertiesColumns<TItem>(
+        IReadOnlyList<ExtraPropertyColumnMeta> metas,
+        IStringLocalizerFactory stringLocalizerFactory
+    )
+        where TItem : class, IHasExtraProperties
+    {
+        return builder =>
+        {
+            foreach (var meta in metas)
+            {
+                builder.OpenComponent<RadzenDataGridColumn<TItem>>(0);
+
+                builder.AddAttribute(
+                    1,
+                    "Title",
+                    meta.Title
+                        ?? UiLocalizationHelper.GetDisplayName(
+                            meta.Name,
+                            meta.LocalizationKey,
+                            stringLocalizerFactory
+                        )
+                );
+                builder.AddAttribute(2, "Sortable", false);
+                builder.AddAttribute(3, "Filterable", false);
+
+                if (!string.IsNullOrEmpty(meta.Width))
+                {
+                    builder.AddAttribute(4, "Width", meta.Width);
+                }
+
+                if (!string.IsNullOrEmpty(meta.FormatString))
+                {
+                    builder.AddAttribute(5, "FormatString", meta.FormatString);
+                }
+
+                builder.AddAttribute(
+                    6,
+                    "Template",
+                    (RenderFragment<TItem>)(
+                        context =>
+                            tb =>
+                            {
+                                if (
+                                    context.ExtraProperties.TryGetValue(meta.Name, out var value)
+                                    && value != null
+                                )
+                                {
+                                    string text;
+
+                                    if (!string.IsNullOrEmpty(meta.FormatString))
+                                    {
+                                        try
+                                        {
+                                            text = string.Format(
+                                                CultureInfo.CurrentUICulture,
+                                                meta.FormatString,
+                                                value
+                                            );
+                                        }
+                                        catch
+                                        {
+                                            text = value.ToString()!;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        text = value.ToString()!;
+                                    }
+
+                                    tb.AddContent(0, text);
+                                }
+                                else
+                                {
+                                    tb.AddContent(0, string.Empty);
+                                }
+                            }
+                    )
+                );
+
+                builder.CloseComponent();
+            }
+        };
+    }
+}

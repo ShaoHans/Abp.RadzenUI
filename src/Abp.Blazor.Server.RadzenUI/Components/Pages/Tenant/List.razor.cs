@@ -1,3 +1,4 @@
+using Abp.RadzenUI.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Radzen;
 using Volo.Abp.ObjectExtending;
@@ -10,6 +11,7 @@ public partial class List
 {
     protected bool HasManageFeaturesPermission;
     protected string ManageFeaturesPolicyName;
+    private IReadOnlyList<ExtraPropertyColumnMeta> _extraColumns = default!;
 
     public List()
     {
@@ -21,6 +23,11 @@ public partial class List
         DeletePolicyName = TenantManagementPermissions.Tenants.Delete;
 
         ManageFeaturesPolicyName = TenantManagementPermissions.Tenants.ManageFeatures;
+    }
+
+    protected override void OnInitialized()
+    {
+        _extraColumns = RadzenColumnHelper.GetExtraPropertyMetas<TenantDto>();
     }
 
     protected override Task<TenantUpdateDto> SetEditDialogModelAsync(TenantDto dto)
@@ -45,7 +52,7 @@ public partial class List
         {
             Draggable = true,
             Width = $"{width}px",
-            Height = $"{heigth}px",
+            //Height = $"{heigth}px",
         };
     }
 }

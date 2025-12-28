@@ -1,3 +1,4 @@
+using Abp.RadzenUI.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Radzen;
 using Volo.Abp.Identity;
@@ -10,6 +11,7 @@ public partial class List
 {
     protected bool HasManagePermissionsPermission { get; set; }
     protected string ManagePermissionsPolicyName;
+    private IReadOnlyList<ExtraPropertyColumnMeta> _extraColumns = default!;
 
     public List()
     {
@@ -20,6 +22,11 @@ public partial class List
         UpdatePolicyName = IdentityPermissions.Users.Update;
         DeletePolicyName = IdentityPermissions.Users.Delete;
         ManagePermissionsPolicyName = IdentityPermissions.Users.ManagePermissions;
+    }
+
+    protected override void OnInitialized()
+    {
+        _extraColumns = RadzenColumnHelper.GetExtraPropertyMetas<IdentityUserDto>();
     }
 
     protected override async Task SetPermissionsAsync()
@@ -67,7 +74,7 @@ public partial class List
         {
             Draggable = true,
             Width = "600px",
-            Height = "740px",
+            //Height = "740px",
         };
     }
 
@@ -84,7 +91,6 @@ public partial class List
             {
                 Draggable = true,
                 Width = "800px",
-                Height = "700px",
             }
         );
     }

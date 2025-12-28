@@ -1,5 +1,6 @@
 ﻿@page "/tenantManagement/tenants"
 @using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.ObjectExtending
 @using Volo.Abp.TenantManagement
 @attribute [Authorize(TenantManagementPermissions.Tenants.Default)]
 @inherits AbpCrudPageBase<ITenantAppService, TenantDto, Guid, GetTenantsInput, TenantCreateDto, TenantUpdateDto>
@@ -27,17 +28,18 @@
     <Columns>
         <RadzenDataGridColumn Property="@nameof(TenantDto.Id)" Title="ID" Width="80px" Visible="false" />
         <RadzenDataGridColumn Property="@nameof(TenantDto.Name)" Title="@L["DisplayName:TenantName"]" />
+        @(RadzenColumnHelper.ExtraPropertiesColumns<TenantDto>(_extraColumns, StringLocalizerFactory))
         <RadzenDataGridColumn Title="@L["Actions"]" Width="160px" Filterable="false" Sortable="false">
             <Template>
                 @if (HasUpdatePermission)
                 {
-                    <RadzenButton Icon="edit" title="@L["Edit"]" ButtonStyle="ButtonStyle.Success"
-                                  Click="@(async () => await OpenEditDialogAsync<Edit>(@L["Edit"], context, ()=>{return SetDialogOptions(300);}))" />
+                    <RadzenButton Icon="edit" title="@L["Edit"]" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small"
+                                  Click="@(async () => await OpenEditDialogAsync<Edit>(@L["Edit"], context, ()=>{return SetDialogOptions();}))" />
                 }
 
                 @if (HasDeletePermission)
                 {
-                    <RadzenButton Icon="delete" title="@L["Delete"]" ButtonStyle="ButtonStyle.Danger"
+                    <RadzenButton Icon="delete" title="@L["Delete"]" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small"
                                   Click=@(async () => await OpenDeleteConfirmDialogAsync(context.Id, L["Delete"], L["TenantDeletionConfirmationMessage",context.Name])) />
                 }
             </Template>
