@@ -6,57 +6,57 @@
 @inherits AbpRadzenUIComponentBase
 @inject IStringLocalizer<IdentityResource> IL
 
-<RadzenTemplateForm TItem="SendTestEmailVM" Data=@SendTestEmailInput Submit="SendTestEmailAsync">
-    <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
-        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-            <RadzenColumn Size="12" SizeMD="5" class="rz-text-align-start rz-text-align-md-end">
-                <RequiredMark />
-                <RadzenLabel Text="@L["SenderEmailAddress"]" Component="@nameof(SendTestEmailVM.SenderEmailAddress)" />
-            </RadzenColumn>
-            <RadzenColumn Size="12" SizeMD="7">
-                <RadzenTextBox Name="@nameof(SendTestEmailVM.SenderEmailAddress)" @bind-Value="@SendTestEmailInput.SenderEmailAddress" Style="display: block; width: 100%;" />
-                <RadzenRequiredValidator Component="@nameof(SendTestEmailVM.SenderEmailAddress)" Text="@L.Required("SenderEmailAddress")" Style="position: absolute" />
-                <RadzenEmailValidator Component="@nameof(SendTestEmailVM.SenderEmailAddress)" Text="@IL["Volo.Abp.Identity:InvalidEmail",SendTestEmailInput.SenderEmailAddress]" Style="position: absolute" />
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-            <RadzenColumn Size="12" SizeMD="5" class="rz-text-align-start rz-text-align-md-end">
-                <RequiredMark />
-                <RadzenLabel Text="@L["TargetEmailAddress"]" Component="@nameof(SendTestEmailVM.TargetEmailAddress)" />
-            </RadzenColumn>
-            <RadzenColumn Size="12" SizeMD="7">
-                <RadzenTextBox Name="@nameof(SendTestEmailVM.TargetEmailAddress)" @bind-Value="@SendTestEmailInput.TargetEmailAddress" Style="display: block; width: 100%;" />
-                <RadzenRequiredValidator Component="@nameof(SendTestEmailVM.TargetEmailAddress)" Text="@L.Required("TargetEmailAddress")" Style="position: absolute" />
-                <RadzenEmailValidator Component="@nameof(SendTestEmailVM.SenderEmailAddress)" Text="@IL["Volo.Abp.Identity:InvalidEmail",SendTestEmailInput.TargetEmailAddress]" Style="position: absolute" />
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-            <RadzenColumn Size="12" SizeMD="5" class="rz-text-align-start rz-text-align-md-end">
-                <RequiredMark />
-                <RadzenLabel Text="@L["Subject"]" Component="@nameof(SendTestEmailVM.Subject)" />
-            </RadzenColumn>
-            <RadzenColumn Size="12" SizeMD="7">
-                <RadzenTextBox Name="@nameof(SendTestEmailVM.Subject)" @bind-Value="@SendTestEmailInput.Subject" Style="display: block; width: 100%;" />
-                <RadzenRequiredValidator Component="@nameof(SendTestEmailVM.Subject)" Text="@L.Required("Subject")" Style="position: absolute" />
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-            <RadzenColumn Size="12" SizeMD="5" class="rz-text-align-start rz-text-align-md-end">
-                <RequiredMark />
-                <RadzenLabel Text="@L["Body"]" Component="@nameof(SendTestEmailVM.Body)" />
-            </RadzenColumn>
-            <RadzenColumn Size="12" SizeMD="7">
-                <RadzenTextBox Name="@nameof(SendTestEmailVM.Body)" @bind-Value="@SendTestEmailInput.Body" Style="display: block; width: 100%;" />
-                <RadzenRequiredValidator Component="@nameof(SendTestEmailVM.Body)" Text="@L.Required("Body")" Style="position: absolute" />
-            </RadzenColumn>
-        </RadzenRow>
-    </RadzenStack>
-    <div class="dialog-footer">
-        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Right">
-            <RadzenButton Icon="cancel" Click="()=>{DialogService.Close();}" Text="@L["Cancel"]" ButtonStyle="ButtonStyle.Light" />
-            <RadzenButton ButtonType="ButtonType.Submit" Icon="send" Text="@L["Send"]"></RadzenButton>
+<RadzenTemplateForm TItem="SendTestEmailVM" Data=@SendTestEmailInput Submit="SendTestEmailAsync" Style="max-height:calc(100vh - 200px); display: flex;flex-direction:column">
+    <div style="flex: 1; overflow: auto">
+        <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="5" class="rz-text-align-start rz-text-align-md-end">
+                    <RequiredMark />
+                    <RadzenLabel Text="@L["SenderEmailAddress"]" Component="@nameof(SendTestEmailVM.SenderEmailAddress)" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="7">
+                    <RadzenTextBox Name="@nameof(SendTestEmailVM.SenderEmailAddress)" @bind-Value="@SendTestEmailInput.SenderEmailAddress" Style="display: block; width: 100%;" />
+                    <RadzenRequiredValidator Component="@nameof(SendTestEmailVM.SenderEmailAddress)" Text="@L.Required("SenderEmailAddress")" Style="position: absolute" />
+                    <RadzenEmailValidator Component="@nameof(SendTestEmailVM.SenderEmailAddress)" Text="@IL["Volo.Abp.Identity:InvalidEmail", SendTestEmailInput.SenderEmailAddress]" Style="position: absolute" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="5" class="rz-text-align-start rz-text-align-md-end">
+                    <RequiredMark />
+                    <RadzenLabel Text="@L["TargetEmailAddress"]" Component="@nameof(SendTestEmailVM.TargetEmailAddress)" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="7">
+                    <RadzenTextBox Name="@nameof(SendTestEmailVM.TargetEmailAddress)" @bind-Value="@SendTestEmailInput.TargetEmailAddress" Style="display: block; width: 100%;" />
+                    <RadzenRequiredValidator Component="@nameof(SendTestEmailVM.TargetEmailAddress)" Text="@L.Required("TargetEmailAddress")" Style="position: absolute" />
+                    <RadzenEmailValidator Component="@nameof(SendTestEmailVM.SenderEmailAddress)" Text="@IL["Volo.Abp.Identity:InvalidEmail", SendTestEmailInput.TargetEmailAddress]" Style="position: absolute" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="5" class="rz-text-align-start rz-text-align-md-end">
+                    <RequiredMark />
+                    <RadzenLabel Text="@L["Subject"]" Component="@nameof(SendTestEmailVM.Subject)" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="7">
+                    <RadzenTextBox Name="@nameof(SendTestEmailVM.Subject)" @bind-Value="@SendTestEmailInput.Subject" Style="display: block; width: 100%;" />
+                    <RadzenRequiredValidator Component="@nameof(SendTestEmailVM.Subject)" Text="@L.Required("Subject")" Style="position: absolute" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="5" class="rz-text-align-start rz-text-align-md-end">
+                    <RequiredMark />
+                    <RadzenLabel Text="@L["Body"]" Component="@nameof(SendTestEmailVM.Body)" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="7">
+                    <RadzenTextBox Name="@nameof(SendTestEmailVM.Body)" @bind-Value="@SendTestEmailInput.Body" Style="display: block; width: 100%;" />
+                    <RadzenRequiredValidator Component="@nameof(SendTestEmailVM.Body)" Text="@L.Required("Body")" Style="position: absolute" />
+                </RadzenColumn>
+            </RadzenRow>
         </RadzenStack>
     </div>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Right">
+        <RadzenButton Icon="cancel" Click="() => { DialogService.Close(); }" Text="@L["Cancel"]" ButtonStyle="ButtonStyle.Light" />
+        <RadzenButton ButtonType="ButtonType.Submit" Icon="send" Text="@L["Send"]"></RadzenButton>
+    </RadzenStack>
 </RadzenTemplateForm>
 
 @code {
@@ -79,14 +79,14 @@
     protected override void OnInitialized()
     {
         SendTestEmailInput = new SendTestEmailVM
-            {
-                SenderEmailAddress = DefaultFromAddress,
-                TargetEmailAddress = CurrentUser.Email ?? string.Empty,
-                Subject = L["TestEmailSubject", new Random().Next(1000, 9999)],
-                Body = L["TestEmailBody"]
-            };
+        {
+            SenderEmailAddress = DefaultFromAddress,
+            TargetEmailAddress = CurrentUser.Email ?? string.Empty,
+            Subject = L["TestEmailSubject", new Random().Next(1000, 9999)],
+            Body = L["TestEmailBody"]
+        };
         base.OnInitialized();
-    } 
+    }
 
     protected virtual async Task SendTestEmailAsync()
     {
