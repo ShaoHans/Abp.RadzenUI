@@ -1,10 +1,10 @@
-﻿@using Microsoft.Extensions.Localization
+﻿@using Abp.RadzenUI.UIPlaceHolders
+@using Microsoft.Extensions.Localization
 @using Microsoft.Extensions.Options
 @using Volo.Abp.Account.Localization
 @using Volo.Abp.AspNetCore.Components
 @inherits AbpRadzenUIComponentBase
 @inject IStringLocalizer<AbpRadzenUIResource> TL
-@inject IOptions<AbpRadzenUIOptions> Options
 
 <RadzenHeader>
     <ChildContent>
@@ -12,12 +12,12 @@
             <RadzenColumn Size="5">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
                     <RadzenSidebarToggle Click="@MenuToggle" />
-                    <span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">@Options.Value.TitleBar.Title</span>
+                    <span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">@_titleBar.Title</span>
                 </RadzenStack>
             </RadzenColumn>
             <RadzenColumn Size="7">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
-                    @if (Options.Value.TitleBar.ShowGithubLink)
+                    @if (_titleBar.ShowGithubLink)
                     {
                         <div class="rz-display-none rz-display-sm-inline-flex align-items-center">
                             <RadzenLink Path="https://github.com/ShaoHans/Abp-RadzenUI" Text="GitHub" title="Star Abp-RadzenUI on GitHub" class="rz-text-nowrap rz-mx-2 rz-mx-lg-4" target="_blank" />
@@ -25,7 +25,7 @@
                     }
                     <RadzenAppearanceToggle class="rz-mx-2" />
                     <RadzenSidebarToggle Icon="settings" Click="@ThemeToggle" class="rz-m-0" />
-                    @if (Options.Value.TitleBar.ShowLanguageMenu)
+                    @if (_titleBar.ShowLanguageMenu)
                     {
                         <LanguageSwitch />
                     }
@@ -61,14 +61,18 @@
 </RadzenHeader>
 
 @code {
-    [Parameter]
-    public EventCallback<EventArgs> MenuToggle { get; set; }
-
-    [Parameter]
-    public EventCallback<EventArgs> ThemeToggle { get; set; }
+    [Parameter] public EventCallback<EventArgs> MenuToggle { get; set; }
+    [Parameter] public EventCallback<EventArgs> ThemeToggle { get; set; }
+    [Inject] IUIPlaceHolderResolver UIPlaceHolderResolver { get; set; } = default!;
+    TitleBarSettings _titleBar = new();
 
     public Header()
     {
         LocalizationResource = typeof(AccountResource);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _titleBar = await UIPlaceHolderResolver.GetTitleBarSettingsAsync();
     }
 }
