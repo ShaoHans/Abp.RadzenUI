@@ -1,5 +1,8 @@
+using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Utils;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
 using Radzen;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.Localization;
@@ -9,6 +12,8 @@ namespace Abp.RadzenUI.Components.Pages.User;
 
 public partial class List
 {
+    [Inject]
+    public IStringLocalizer<AbpRadzenUIResource> IL { get; set; } = default!;
     protected bool HasManagePermissionsPermission { get; set; }
     protected string ManagePermissionsPolicyName;
     private IReadOnlyList<ExtraPropertyColumnMeta> _extraColumns = default!;
@@ -87,11 +92,7 @@ public partial class List
                 { "ProviderName", "U" },
                 { "ProviderKey", user.Id.ToString() },
             },
-            options: new DialogOptions()
-            {
-                Draggable = true,
-                Width = "800px",
-            }
+            options: new DialogOptions() { Draggable = true, Width = "800px", }
         );
     }
 }
