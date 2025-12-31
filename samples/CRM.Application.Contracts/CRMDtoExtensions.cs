@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using CRM.MultiTenancy;
 using Volo.Abp.Identity;
 using Volo.Abp.ObjectExtending;
 using Volo.Abp.TenantManagement;
@@ -47,7 +48,7 @@ public static class CRMDtoExtensions
             //);
 
             ObjectExtensionManager.Instance.AddOrUpdateProperty<TenantCreateDto, string>(
-                "TenantDisplayName",
+                MultiTenancyConsts.TenantDisplayNameField,
                 propertyInfo =>
                 {
                     propertyInfo.Attributes.Add(new DataTypeAttribute(DataType.Text));
@@ -56,7 +57,7 @@ public static class CRMDtoExtensions
             );
 
             ObjectExtensionManager.Instance.AddOrUpdateProperty<TenantUpdateDto, string>(
-                "TenantDisplayName",
+                MultiTenancyConsts.TenantDisplayNameField,
                 propertyInfo =>
                 {
                     propertyInfo.Attributes.Add(new DataTypeAttribute(DataType.Text));
@@ -65,11 +66,14 @@ public static class CRMDtoExtensions
             );
 
             ObjectExtensionManager.Instance.AddOrUpdateProperty<TenantDto, string>(
-                "TenantDisplayName",
+                MultiTenancyConsts.TenantDisplayNameField,
                 propertyInfo =>
                 {
                     propertyInfo.Configuration.Add("Width", "200px");
-                    propertyInfo.Configuration.Add("LocalizationKey", "DisplayName:TenantDisplayName");
+                    propertyInfo.Configuration.Add(
+                        "LocalizationKey",
+                        "DisplayName:TenantDisplayName"
+                    );
                     //propertyInfo.Configuration.Add("Title", "DisplayName");
                     propertyInfo.Configuration.Add("FormatString", "");
                     propertyInfo.CheckPairDefinitionOnMapping = false;
