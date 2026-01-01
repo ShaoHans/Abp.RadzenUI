@@ -135,7 +135,9 @@ public class OrganizationUnitAppService : ApplicationService, IOrganizationUnitA
 
     public virtual async Task<ListResultDto<OrganizationUnitDto>> GetAllAsync()
     {
-        var organizationUnits = await OrganizationUnitRepository.GetListAsync(false);
+        var organizationUnits = (await OrganizationUnitRepository.GetListAsync(false))
+            .OrderBy(x => x.CreationTime)
+            .ToList();
 
         return new ListResultDto<OrganizationUnitDto>(
             ObjectMapper.Map<List<OrganizationUnit>, List<OrganizationUnitDto>>(organizationUnits)

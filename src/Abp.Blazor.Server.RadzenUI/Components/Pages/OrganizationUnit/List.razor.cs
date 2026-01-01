@@ -79,7 +79,18 @@ public partial class List
         switch (action)
         {
             case OuTreeItemAction.Edit:
-                //await OpenEditDialogAsync<Edit>(@L["Edit"], context))
+                var ou = GetSelectedOu()!;
+                await OpenEditDialogAsync<Edit>(
+                    @L["Ou:EditOu.Title", ou.DisplayName],
+                    new OrganizationUnitDto
+                    {
+                        Code = ou.Code,
+                        DisplayName = ou.DisplayName,
+                        Id = ou.Id,
+                        ParentId = ou.ParentId
+                    },
+                    callback: LoadOuAsync
+                );
                 break;
             case OuTreeItemAction.AddSubOu:
                 await OpenCreateDialogAsync<Create>(L["Ou:NewOu.Title"], callback: LoadOuAsync);
