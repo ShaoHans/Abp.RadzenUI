@@ -22,6 +22,12 @@
     "Ou:NewOu.Title": "新组织机构",
     "Ou:EditRootOu": "编辑",
     "Ou:EditOu.Title": "编辑 - {0}",
-    "DisplayName:Ou.DisplayName": "显示名称"
+    "DisplayName:Ou.DisplayName": "显示名称",
+    "Ou:Members": "成员",
+    "Ou:Member.Tooltip": "选择一个组织机构来查看成员",
+    "Ou:Member.Add": "添加成员",
+    "Ou:Roles": "角色",
+    "Ou:Role.Tooltip": "选择一个组织机构来查看角色",
+    "Ou:Role.Add": "添加角色"
   }
 }
