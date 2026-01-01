@@ -2,7 +2,7 @@ using Volo.Abp.Application.Dtos;
 
 namespace Abp.RadzenUI.Application.Contracts.Organizations;
 
-public class OrganizationUnitDto : ExtensibleAuditedEntityDto<Guid>
+public class OrganizationUnitDto : ExtensibleFullAuditedEntityDto<Guid>
 {
     public Guid? ParentId { get; set; }
 

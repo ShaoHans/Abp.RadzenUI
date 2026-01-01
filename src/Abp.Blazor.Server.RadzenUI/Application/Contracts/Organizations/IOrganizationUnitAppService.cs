@@ -13,7 +13,7 @@ public interface IOrganizationUnitAppService
         OrganizationUnitUpdateDto
     >
 {
-    Task<ListResultDto<OrganizationUnitDto>> GetAllListAsync();
+    Task<ListResultDto<OrganizationUnitDto>> GetAllAsync();
 
     Task<OrganizationUnitDto> GetLastChildOrNullAsync(Guid? parentId);
 

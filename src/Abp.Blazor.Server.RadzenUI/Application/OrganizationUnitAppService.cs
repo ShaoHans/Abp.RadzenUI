@@ -29,7 +29,6 @@ public class OrganizationUnitAppService : ApplicationService, IOrganizationUnitA
         OrganizationUnitManager = organizationUnitManager;
         OrganizationUnitRepository = organizationUnitRepository;
         LocalizationResource = typeof(AbpRadzenUIResource);
-        ObjectMapperContext = typeof(AbpRadzenUIModule);
     }
 
     public virtual async Task<OrganizationUnitDto> CreateAsync(OrganizationUnitCreateDto input)
@@ -137,7 +136,7 @@ public class OrganizationUnitAppService : ApplicationService, IOrganizationUnitA
         );
     }
 
-    public virtual async Task<ListResultDto<OrganizationUnitDto>> GetAllListAsync()
+    public virtual async Task<ListResultDto<OrganizationUnitDto>> GetAllAsync()
     {
         var organizationUnits = await OrganizationUnitRepository.GetListAsync(false);
 
