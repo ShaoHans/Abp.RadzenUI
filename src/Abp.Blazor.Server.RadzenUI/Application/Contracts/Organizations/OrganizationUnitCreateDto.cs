@@ -9,7 +9,7 @@ public class OrganizationUnitCreateDto : ExtensibleObject
 {
     [Required]
     [DynamicStringLength(typeof(OrganizationUnitConsts), nameof(OrganizationUnitConsts.MaxDisplayNameLength))]
-    public required string DisplayName { get; set; }
+    public string DisplayName { get; set; } = default!;
 
     public Guid? ParentId { get; set; }
 }

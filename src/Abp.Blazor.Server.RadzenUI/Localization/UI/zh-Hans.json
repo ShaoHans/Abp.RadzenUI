@@ -14,6 +14,11 @@
     "Permission:SettingManagement_Account": "账户认证方式",
     "Menu:AccountSetting": "账户认证方式",
     "User:FullNameFormat": "{1}{0}",
-    "Display:User.FullName": "姓名"
+    "Display:User.FullName": "姓名",
+
+    "Ou:Tree": "组织机构树",
+    "Ou:NewRootOu": "添加根机构",
+    "Ou:NewOu.Title": "新组织机构",
+    "DisplayName:Ou.DisplayName": "显示名称"
   }
 }

@@ -1,11 +1,13 @@
 ﻿@page "/organization-units"
-@inherits AbpRadzenUIComponentBase
+@using Abp.RadzenUI.Application.Contracts.Organizations
+@inherits AbpCrudPageBase<IOrganizationUnitAppService, OrganizationUnitDto, Guid, OrganizationUnitGetListInput, OrganizationUnitCreateDto, OrganizationUnitUpdateDto>
 
 <RadzenCardGroup Responsive="true">
     <RadzenCard Variant="Variant.Filled" Style="margin-right:10px;">
         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
-            <RadzenText Text="组织机构树" TextAlign="TextAlign.Start" />
-            <RadzenButton Text="添加根机构" Icon="add"  />
+            <RadzenText Text="@L["Ou:Tree"]" TextAlign="TextAlign.Start" />
+            <RadzenButton Text="@L["Ou:NewRootOu"]" Icon="add"
+                          Click="@(async () => await OpenCreateDialogAsync<Create>(L["Ou:NewOu.Title"]))" />
         </RadzenStack>
         @* <RadzenTree Data=@employees Style="height: 300px" ItemRender="ItemRender">
             <RadzenTreeLevel TextProperty="LastName" ChildrenProperty="Employees1"
@@ -15,6 +17,6 @@
     </RadzenCard>
 
     <RadzenCard Variant="Variant.Filled">
-        
+
     </RadzenCard>
 </RadzenCardGroup>
