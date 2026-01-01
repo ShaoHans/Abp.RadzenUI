@@ -1,6 +1,7 @@
 using Abp.RadzenUI.Application.Contracts.Organizations;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Models;
+using Radzen.Blazor;
 using Volo.Abp.ObjectExtending;
 
 namespace Abp.RadzenUI.Components.Pages.OrganizationUnit;
@@ -12,28 +13,39 @@ public partial class List
         LocalizationResource = typeof(AbpRadzenUIResource);
     }
 
-    private IReadOnlyList<OrganizationUnitDto> _ous = [];
-
     private List<OrganizationUnitTreeItemVm> _ouTree = [];
+    private object? _selectedOu;
 
     protected override async Task OnInitializedAsync()
     {
-        _ous = (await AppService.GetAllAsync()).Items ?? [];
-        BuildOuTree();
+        await LoadOuAsync();
+    }
+
+    private async Task LoadOuAsync()
+    {
+        var ous = (await AppService.GetAllAsync()).Items ?? [];
+        BuildOuTree(ous);
+    }
+
+    protected override Task<OrganizationUnitCreateDto> SetCreateDialogModelAsync()
+    {
+        var createDto = new OrganizationUnitCreateDto { ParentId = GetSelectedOu()?.Id, };
+        return Task.FromResult(createDto);
     }
 
     protected override Task<OrganizationUnitUpdateDto> SetEditDialogModelAsync(
         OrganizationUnitDto dto
     )
     {
-        var updateDto = new OrganizationUnitUpdateDto { DisplayName = dto.DisplayName, };
+        var updateDto = new OrganizationUnitUpdateDto { DisplayName = dto.DisplayName };
         dto.MapExtraPropertiesTo(updateDto);
         return Task.FromResult(updateDto);
     }
 
-    private void BuildOuTree()
+    private void BuildOuTree(IReadOnlyList<OrganizationUnitDto> ous)
     {
-        var ouDict = _ous.ToDictionary(
+        _ouTree = [];
+        var ouDict = ous.ToDictionary(
             ou => ou.Id,
             ou => new OrganizationUnitTreeItemVm
             {
@@ -55,4 +67,40 @@ public partial class List
             }
         }
     }
+
+    private async Task TreeItemOnClick(RadzenSplitButtonItem item, string buttonName)
+    {
+        if (item == null)
+        {
+            return;
+        }
+
+        var action = Enum.Parse<OuTreeItemAction>(item.Value!.ToString()!);
+        switch (action)
+        {
+            case OuTreeItemAction.Edit:
+                //await OpenEditDialogAsync<Edit>(@L["Edit"], context))
+                break;
+            case OuTreeItemAction.AddSubOu:
+                await OpenCreateDialogAsync<Create>(L["Ou:NewOu.Title"], callback: LoadOuAsync);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private OrganizationUnitTreeItemVm? GetSelectedOu()
+    {
+        if (_selectedOu == null)
+        {
+            return null;
+        }
+        return (OrganizationUnitTreeItemVm)_selectedOu;
+    }
+}
+
+public enum OuTreeItemAction
+{
+    Edit,
+    AddSubOu
 }

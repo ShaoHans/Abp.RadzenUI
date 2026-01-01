@@ -18,7 +18,10 @@
 
     "Ou:Tree": "组织机构树",
     "Ou:NewRootOu": "添加根机构",
+    "Ou:NewSubOu": "添加子机构",
     "Ou:NewOu.Title": "新组织机构",
+    "Ou:EditRootOu": "编辑",
+    "Ou:EditOu.Title": "编辑 - {0}",
     "DisplayName:Ou.DisplayName": "显示名称"
   }
 }

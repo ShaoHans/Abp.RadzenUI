@@ -226,7 +226,8 @@ public abstract class AbpCrudPageBase<
     protected virtual async Task OpenCreateDialogAsync<TDialog>(
         string title,
         Func<DialogOptions>? func = null,
-        Dictionary<string, object>? parameters = null
+        Dictionary<string, object>? parameters = null,
+        Func<Task>? callback = null
     )
         where TDialog : ComponentBase
     {
@@ -244,17 +245,19 @@ public abstract class AbpCrudPageBase<
             parameters: parameters,
             options: func is not null
                 ? func()
-                : new DialogOptions()
-                {
-                    Draggable = true,
-                    Width = "600px",
-                    //Height = "450px",
-                }
+                : new DialogOptions() { Draggable = true, Width = "600px" }
         );
 
         if (result == true)
         {
-            await _grid.Reload();
+            if (_grid != null)
+            {
+                await _grid.Reload();
+            }
+            if (callback != null)
+            {
+                await callback();
+            }
         }
     }
 
@@ -286,7 +289,8 @@ public abstract class AbpCrudPageBase<
         string title,
         TGetListOutputDto dto,
         Func<DialogOptions>? func = null,
-        Dictionary<string, object>? parameters = null
+        Dictionary<string, object>? parameters = null,
+        Func<Task>? callback = null
     )
         where TDialog : ComponentBase
     {
@@ -305,17 +309,19 @@ public abstract class AbpCrudPageBase<
             parameters: parameters,
             options: func is not null
                 ? func()
-                : new DialogOptions()
-                {
-                    Draggable = true,
-                    Width = "600px",
-                    //Height = "450px",
-                }
+                : new DialogOptions() { Draggable = true, Width = "600px" }
         );
 
         if (result == true)
         {
-            await _grid.Reload();
+            if (_grid != null)
+            {
+                await _grid.Reload();
+            }
+            if (callback != null)
+            {
+                await callback();
+            }
         }
     }
 

@@ -7,13 +7,29 @@
         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
             <RadzenText Text="@L["Ou:Tree"]" TextAlign="TextAlign.Start" />
             <RadzenButton Text="@L["Ou:NewRootOu"]" Icon="add"
-                          Click="@(async () => await OpenCreateDialogAsync<Create>(L["Ou:NewOu.Title"]))" />
+                          Click="@(async () => await OpenCreateDialogAsync<Create>(L["Ou:NewOu.Title"], callback:LoadOuAsync))" />
         </RadzenStack>
-        @* <RadzenTree Data=@employees Style="height: 300px" ItemRender="ItemRender">
-            <RadzenTreeLevel TextProperty="LastName" ChildrenProperty="Employees1"
-                             Expanded=@(i => true)
-                             HasChildren=@(i => ((Employee)i).Employees1?.Any() == true) />
-        </RadzenTree> *@
+        
+        <RadzenTree Style="width: 100%; height: 100%"
+                    Data=@_ouTree @bind-Value="@_selectedOu">
+            <RadzenTreeLevel TextProperty="@nameof(OrganizationUnitTreeItemVm.DisplayName)"
+                             ChildrenProperty="@nameof(OrganizationUnitTreeItemVm.Children)"
+                             Expanded="(i=>true)"
+                             HasChildren="(i=>((OrganizationUnitTreeItemVm)i).Children.Count>0)">
+                <Template>
+                    @{
+                        var treeItem = (OrganizationUnitTreeItemVm)context.Value;
+                        <RadzenSplitButton Text="@treeItem.DisplayName" Variant="Variant.Text" Icon="lan"
+                                           Click=@(args => TreeItemOnClick(args, "SplitButton with icon"))>
+                            <ChildContent>
+                                <RadzenSplitButtonItem Text="@L["Ou:EditRootOu"]" Icon="edit" Value="@OuTreeItemAction.Edit.ToString()" />
+                                <RadzenSplitButtonItem Text="@L["Ou:NewSubOu"]" Icon="add" Value="@OuTreeItemAction.AddSubOu.ToString()" />
+                            </ChildContent>
+                        </RadzenSplitButton>
+                    }
+                </Template>
+            </RadzenTreeLevel>
+        </RadzenTree>
     </RadzenCard>
 
     <RadzenCard Variant="Variant.Filled">

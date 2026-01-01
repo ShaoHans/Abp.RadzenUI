@@ -38,10 +38,7 @@ public class OrganizationUnitAppService : ApplicationService, IOrganizationUnitA
             input.DisplayName,
             input.ParentId,
             CurrentTenant.Id
-        )
-        {
-            CreationTime = Clock.Now,
-        };
+        );
         input.MapExtraPropertiesTo(organizationUnit);
 
         await OrganizationUnitManager.CreateAsync(organizationUnit);
