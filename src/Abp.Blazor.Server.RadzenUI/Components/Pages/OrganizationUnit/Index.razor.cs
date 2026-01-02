@@ -6,9 +6,9 @@ using Volo.Abp.ObjectExtending;
 
 namespace Abp.RadzenUI.Components.Pages.OrganizationUnit;
 
-public partial class List
+public partial class Index
 {
-    public List()
+    public Index()
     {
         LocalizationResource = typeof(AbpRadzenUIResource);
     }
@@ -80,7 +80,7 @@ public partial class List
         {
             case OuTreeItemAction.Edit:
                 var ou = GetSelectedOu()!;
-                await OpenEditDialogAsync<Edit>(
+                await OpenEditDialogAsync<EditOu>(
                     @L["Ou:EditOu.Title", ou.DisplayName],
                     new OrganizationUnitDto
                     {
@@ -93,7 +93,7 @@ public partial class List
                 );
                 break;
             case OuTreeItemAction.AddSubOu:
-                await OpenCreateDialogAsync<Create>(L["Ou:NewOu.Title"], callback: LoadOuAsync);
+                await OpenCreateDialogAsync<CreateOu>(L["Ou:NewOu.Title"], callback: LoadOuAsync);
                 break;
             default:
                 break;
