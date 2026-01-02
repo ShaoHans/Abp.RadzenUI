@@ -20,7 +20,7 @@ public partial class SelectMember
     protected IOrganizationUnitAppService AppService { get; set; } = default!;
 
     [Inject]
-    public IAbpEnumLocalizer AbpEnumLocalizer { get; set; } = default!;
+    protected DialogService DialogService { get; set; } = default!;
 
     [Inject]
     public IStringLocalizer<AbpRadzenUIResource> IL { get; set; } = default!;
@@ -46,7 +46,6 @@ public partial class SelectMember
             return null;
         }
     }
-
 
     protected OrganizationUnitGetUnaddedUserListInput GetListInput = new();
     protected OrganizationUnitAddUserDto NewEntity;
@@ -91,5 +90,28 @@ public partial class SelectMember
         }
 
         return Task.CompletedTask;
+    }
+
+    private async Task SaveAsync()
+    {
+        try
+        {
+            if (_selectedUsers.Count == 0)
+            {
+                DialogService.Close(false);
+                return;
+            }
+
+            await AppService.AddUsersAsync(
+                OuId,
+                new OrganizationUnitAddUserDto { UserIds = [.. _selectedUsers.Select(u => u.Id)] }
+            );
+            await Notify.Success(L["SavedSuccessfully"]);
+            DialogService.Close(true);
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(ex);
+        }
     }
 }

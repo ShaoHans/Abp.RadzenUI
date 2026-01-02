@@ -130,11 +130,16 @@ public partial class OuMembers
     {
         var parameters = new Dictionary<string, object> { { "OuId", SelectedOu!.Id } };
 
-        await DialogService.OpenAsync<SelectMember>(
+        var result = await DialogService.OpenAsync<SelectMember>(
             title: IL["Ou:Member.Select", SelectedOu.DisplayName],
             parameters: parameters,
             options: new DialogOptions() { Draggable = true, Width = "700px" }
         );
+
+        if (result == true)
+        {
+            await _grid.Reload();
+        }
     }
 
     //protected virtual Task<TCreateInput> SetCreateDialogModelAsync()
@@ -161,29 +166,32 @@ public partial class OuMembers
     //    }
     //}
 
-    //protected virtual async Task OpenDeleteConfirmDialogAsync(
-    //    Guid id,
-    //    string title = "Confirm",
-    //    string confirm = "Confirm?"
-    //)
-    //{
-    //    var result = await DialogService.Confirm(
-    //        message: confirm,
-    //        title: title,
-    //        options: new ConfirmOptions()
-    //        {
-    //            OkButtonText = UL["Yes"],
-    //            CancelButtonText = UL["Cancel"],
-    //        }
-    //    );
+    private async Task OpenDeleteConfirmDialogAsync(Guid userId, string userName)
+    {
+        var result = await DialogService.Confirm(
+            message: IL["Ou:Member.Delete", SelectedOu!.DisplayName, userName],
+            title: "Confirm",
+            options: new ConfirmOptions()
+            {
+                OkButtonText = IL["Yes"],
+                CancelButtonText = IL["Cancel"],
+            }
+        );
 
-    //    if (result == true)
-    //    {
-    //        await AppService.DeleteAsync(id);
-    //        await _grid.Reload();
-    //        await Notify.Success(UL["DeletedSuccessfully"]);
-    //    }
-    //}
+        if (result == true)
+        {
+            try
+            {
+                await AppService.DeleteUserAsync(SelectedOu!.Id, userId);
+                await _grid.Reload();
+                await Notify.Success(IL["DeletedSuccessfully"]);
+            }
+            catch (Exception ex)
+            {
+                await HandleErrorAsync(ex);
+            }
+        }
+    }
 
     //protected virtual TCreateInput MapToCreateInput(TCreateViewModel createViewModel)
     //{

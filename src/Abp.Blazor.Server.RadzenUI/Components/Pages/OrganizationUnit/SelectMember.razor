@@ -50,7 +50,7 @@
         </RadzenStack>
     </div>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Right">
-        <RadzenButton Icon="cancel" Text="@L["Cancel"]" ButtonStyle="ButtonStyle.Light" />
-        <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="@L["Save"]"></RadzenButton>
+        <RadzenButton Icon="cancel" Text="@L["Cancel"]" ButtonStyle="ButtonStyle.Light" Click="@(() => DialogService.Close(false))" />
+        <RadzenButton Icon="save" Text="@L["Save"]" ButtonType="ButtonType.Submit" Click="@SaveAsync" />
     </RadzenStack>
 </RadzenStack>
