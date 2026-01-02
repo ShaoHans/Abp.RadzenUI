@@ -14,6 +14,31 @@
     "Permission:SettingManagement_Account": "Account authentication method",
     "Menu:AccountSetting": "Account auth method",
     "User:FullNameFormat": "{0} {1}",
-    "Display:User.FullName": "FullName"
+    "Display:User.FullName": "FullName",
+
+    "OrganizationUnits": "Organization units",
+    "Ou:Tree": "Organization tree",
+    "Ou:NewRootOu": "Add root unit",
+    "Ou:NewSubOu": "Add sub-unit",
+    "Ou:NewOu.Title": "New organization unit",
+    "Ou:EditOu": "Edit",
+    "Ou:EditOu.Title": "Edit - {0}",
+    "Ou:DeleteOu": "Delete",
+    "Ou:DeleteOu.ConfirmMessage": "Are you sure you want to delete the organization unit {0} ?",
+    "DisplayName:Ou.DisplayName": "Display name",
+    "Ou:Members": "Members",
+    "Ou:Member.Tooltip": "Select an organization unit to see members",
+    "Ou:Member.Add": "Add member",
+    "Ou:Member.Select": "Select members - {0}",
+    "Ou:Member.Delete": "Are you sure to you want to remove the user {1} from organization unit {0}?",
+    "Ou:Roles": "Roles",
+    "Ou:Role.Tooltip": "Select an organization unit to see roles",
+    "Ou:Role.Add": "Add role",
+    "Ou:Role.Select": "Select roles - {0}",
+    "Ou:Role.Delete": "Are you sure to you want to remove the role {1} from organization unit {0}?",
+    "Permission:Ou.Default": "Organization unit management",
+    "Permission:Ou.ManageTree": "Managing organization tree",
+    "Permission:Ou.ManageUsers": "Managing users",
+    "Permission:Ou.ManageRoles": "Managing roles"
   }
 }
