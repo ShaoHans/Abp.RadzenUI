@@ -14,7 +14,7 @@
     "Permission:SettingManagement_Account": "Account authentication method",
     "Menu:AccountSetting": "Account auth method",
     "User:FullNameFormat": "{0} {1}",
-    "Display:User.FullName": "FullName",
+    "Display:User.FullName": "Full Name",
 
     "OrganizationUnits": "Organization units",
     "Ou:Tree": "Organization tree",
