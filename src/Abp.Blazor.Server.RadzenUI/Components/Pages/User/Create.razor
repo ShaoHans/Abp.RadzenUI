@@ -17,7 +17,7 @@
         <RadzenTabs>
             <Tabs>
                 <RadzenTabsItem Text="@IL["DisplayName:UserInfo"]">
-                    <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
+                    <RadzenStack Gap="2rem">
                         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                             <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
                                 <RequiredMark />
@@ -86,15 +86,6 @@
                 @if (HasManagePermissionsPermission)
                 {
                     <RadzenTabsItem Text="@L["Roles"]">
-                        @* <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                                <RadzenLabel Text="@L["Roles"]" Component="RoleNames" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenDropDown TValue="IEnumerable<string>" Data=@roleNames Name="RoleNames" ValueChanged="RolesChange"
-                                                Multiple=true AllowClear=true Placeholder="assign roles" Chips=true Style="width: 100%;" />
-                            </RadzenColumn>
-                        </RadzenRow> *@
                         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                             <RadzenColumn Size="12" SizeMD="12">
                                 <RadzenCheckBoxList TValue="string" Change=@RolesChange Orientation="Orientation.Vertical">

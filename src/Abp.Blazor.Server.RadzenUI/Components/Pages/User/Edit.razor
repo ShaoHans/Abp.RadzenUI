@@ -1,4 +1,5 @@
-﻿@using Abp.RadzenUI.Components.ObjectExtending
+﻿@using Abp.RadzenUI.Application.Contracts.Organizations
+@using Abp.RadzenUI.Components.ObjectExtending
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.Extensions.Localization
 @using Volo.Abp.AspNetCore.Components
@@ -14,7 +15,7 @@
         <RadzenTabs>
             <Tabs>
                 <RadzenTabsItem Text="@IL["DisplayName:UserInfo"]">
-                    <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
+                    <RadzenStack Gap="2rem">
                         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                             <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
                                 <RequiredMark />
@@ -74,22 +75,15 @@
                 @if (HasManagePermissionsPermission)
                 {
                     <RadzenTabsItem Text="@L["Roles"]">
-                        @* <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                                <RadzenLabel Text="@L["Roles"]" Component="RoleNames" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenDropDown TValue="IEnumerable<string>" Value="@DialogFromOption.Model.RoleNames" Data=@roleNames Name="RoleNames" ValueChanged="RolesChange"
-                                                Multiple=true AllowClear=true Placeholder="assign roles" Chips=true Style="width: 100%;" />
-                            </RadzenColumn>
-                        </RadzenRow> *@
                         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                             <RadzenColumn Size="12" SizeMD="12">
                                 <RadzenCheckBoxList Value="@DialogFromOption.Model.RoleNames" TValue="string" Change=@RolesChange Orientation="Orientation.Vertical">
                                     <Items>
-                                        @foreach (var role in roleNames)
+                                        @foreach (var role in allRoles)
                                         {
-                                            <RadzenCheckBoxListItem Text="@role" Value="@role" />
+                                            <RadzenCheckBoxListItem Text="@(role.Disabled ? $"{role.Name}(OU)" : role.Name)"
+                                                                    Value="@role.Name"
+                                                                    Disabled="@role.Disabled" />
                                         }
                                     </Items>
                                 </RadzenCheckBoxList>
@@ -109,9 +103,13 @@
 
 @code {
     [Parameter] public DialogFromOption<IdentityUserUpdateDto> DialogFromOption { get; set; } = default!;
+    [Parameter] public Guid UserId { get; set; }
     [Inject] public IStringLocalizer<AbpRadzenUIResource> IL { get; set; } = default!;
+    [Inject] public IOrganizationUnitAppService OuAppService { get; set; } = default!;
     protected bool HasManagePermissionsPermission { get; set; }
     IList<string> roleNames = [];
+    IReadOnlyList<string> roleNamesInOu = [];
+    IReadOnlyList<RoleItem> allRoles = [];
 
     public Edit()
     {
@@ -130,10 +128,22 @@
             .Items?.Select(r => r.Name).ToArray()
             ?? [];
 
+        roleNamesInOu = (await OuAppService.GetRoleNamesAsync(UserId)).Items ?? [];
+
+        allRoles =
+            roleNames
+            .Union(roleNamesInOu)              
+            .Select(role => new RoleItem(
+                role,
+                roleNamesInOu.Contains(role)))  
+            .OrderBy(r => r.Name)               
+            .ToList();
     }
 
     void RolesChange(IEnumerable<string> values)
     {
         DialogFromOption.Model.RoleNames = values is null ? [] : values.ToArray();
     }
+
+    record RoleItem(string Name, bool Disabled);
 }
