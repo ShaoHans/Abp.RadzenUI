@@ -36,18 +36,7 @@
         <RadzenTabs>
             <Tabs>
                 <RadzenTabsItem Text="@L["Ou:Members"]">
-                    @if (_selectedOu == null)
-                    {
-                        <RadzenText Text="@L["Ou:Member.Tooltip"]" TextAlign="TextAlign.Start" />
-                    }
-                    else
-                    {
-                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
-                            <RadzenText Text="@GetSelectedOu()!.DisplayName" TextAlign="TextAlign.Start" />
-                            <RadzenButton Text="@L["Ou:Member.Add"]" Icon="add"
-                                           />
-                        </RadzenStack>
-                    }
+                    <OuMembers SelectedOu="@GetSelectedOu()" />
                 </RadzenTabsItem>
                 <RadzenTabsItem Text="@L["Ou:Roles"]">
                     @if (_selectedOu == null)

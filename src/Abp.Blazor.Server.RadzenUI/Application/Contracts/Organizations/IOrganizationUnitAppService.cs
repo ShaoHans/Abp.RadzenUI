@@ -44,7 +44,7 @@ public interface IOrganizationUnitAppService
         OrganizationUnitGetUnaddedUserListInput input
     );
 
-    Task<PagedResultDto<IdentityUserDto>> GetUsersAsync(Guid id, GetIdentityUsersInput input);
+    Task<PagedResultDto<IdentityUserDto>> GetMembersAsync(Guid id, GetIdentityUsersInput input);
 
     Task AddUsersAsync(Guid id, OrganizationUnitAddUserDto input);
 

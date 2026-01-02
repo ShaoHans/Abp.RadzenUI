@@ -244,7 +244,7 @@ public class OrganizationUnitAppService : ApplicationService, IOrganizationUnitA
         );
     }
 
-    public virtual async Task<PagedResultDto<IdentityUserDto>> GetUsersAsync(
+    public virtual async Task<PagedResultDto<IdentityUserDto>> GetMembersAsync(
         Guid id,
         GetIdentityUsersInput input
     )
