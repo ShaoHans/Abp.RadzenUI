@@ -9,7 +9,6 @@ using Radzen.Blazor;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.Localization;
-using Volo.Abp.Localization;
 
 namespace Abp.RadzenUI.Components.Pages.OrganizationUnit;
 
@@ -23,9 +22,6 @@ public partial class OuMembers
 
     [Inject]
     protected IOrganizationUnitAppService AppService { get; set; } = default!;
-
-    [Inject]
-    public IAbpEnumLocalizer AbpEnumLocalizer { get; set; } = default!;
 
     [Inject]
     public IStringLocalizer<AbpRadzenUIResource> IL { get; set; } = default!;
@@ -142,30 +138,6 @@ public partial class OuMembers
         }
     }
 
-    //protected virtual Task<TCreateInput> SetCreateDialogModelAsync()
-    //{
-    //    return Task.FromResult(new TCreateInput());
-    //}
-
-    //protected virtual void CloseDialog()
-    //{
-    //    DialogService.Close(false);
-    //}
-
-    //protected virtual async Task CreateEntityAsync(TCreateInput model)
-    //{
-    //    try
-    //    {
-    //        await AppService.AddUsersAsync(SelectedOu.Id, model);
-    //        await Notify.Success(UL["SavedSuccessfully"]);
-    //        DialogService.Close(true);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        await HandleErrorAsync(ex);
-    //    }
-    //}
-
     private async Task OpenDeleteConfirmDialogAsync(Guid userId, string userName)
     {
         var result = await DialogService.Confirm(
@@ -191,57 +163,5 @@ public partial class OuMembers
                 await HandleErrorAsync(ex);
             }
         }
-    }
-
-    //protected virtual TCreateInput MapToCreateInput(TCreateViewModel createViewModel)
-    //{
-    //    if (typeof(TCreateInput) == typeof(TCreateViewModel))
-    //    {
-    //        return createViewModel.As<TCreateInput>();
-    //    }
-
-    //    return ObjectMapper.Map<TCreateViewModel, TCreateInput>(createViewModel);
-    //}
-
-    //protected virtual TUpdateInput MapToUpdateInput(TUpdateViewModel updateViewModel)
-    //{
-    //    if (typeof(TUpdateInput) == typeof(TUpdateViewModel))
-    //    {
-    //        return updateViewModel.As<TUpdateInput>();
-    //    }
-
-    //    return ObjectMapper.Map<TUpdateViewModel, TUpdateInput>(updateViewModel);
-    //}
-
-    //protected virtual async Task CheckCreatePolicyAsync()
-    //{
-    //    await CheckPolicyAsync(CreatePolicyName);
-    //}
-
-    //protected virtual async Task CheckUpdatePolicyAsync()
-    //{
-    //    await CheckPolicyAsync(UpdatePolicyName);
-    //}
-
-    //protected virtual async Task CheckDeletePolicyAsync()
-    //{
-    //    await CheckPolicyAsync(DeletePolicyName);
-    //}
-
-    /// <summary>
-    /// Calls IAuthorizationService.CheckAsync for the given <paramref name="policyName"/>.
-    /// Throws <see cref="AbpAuthorizationException"/> if given policy was not granted for the current user.
-    ///
-    /// Does nothing if <paramref name="policyName"/> is null or empty.
-    /// </summary>
-    /// <param name="policyName">A policy name to check</param>
-    protected virtual async Task CheckPolicyAsync(string? policyName)
-    {
-        if (string.IsNullOrEmpty(policyName))
-        {
-            return;
-        }
-
-        await AuthorizationService.CheckAsync(policyName);
     }
 }
