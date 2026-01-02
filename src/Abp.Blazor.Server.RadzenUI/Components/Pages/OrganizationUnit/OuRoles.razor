@@ -1,0 +1,34 @@
+﻿@using Abp.RadzenUI.Application.Contracts.Organizations
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.Identity
+@using Volo.Abp.Users
+@inherits AbpRadzenUIComponentBase
+
+@if (SelectedOu == null)
+{
+    <RadzenText Text="@IL["Ou:Role.Tooltip"]" TextAlign="TextAlign.Start" />
+}
+else
+{
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
+        <RadzenText Text="@SelectedOu.DisplayName" TextAlign="TextAlign.Start" />
+        <RadzenButton Text="@IL["Ou:Role.Add"]" Icon="add" Click="@OpenSeleteRoleDialogAsync" />
+    </RadzenStack>
+
+    <RadzenStack Gap="1rem" Style="margin-top:5px;">
+        <RadzenDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true" Density="Density.Default"
+                        PagerHorizontalAlign="HorizontalAlign.Center"
+                        PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
+                        Count="@_totalCount" IsLoading="@_isLoading">
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(IdentityRoleDto.Name)" Title="@L["DisplayName:RoleName"]" Width="100px" />
+                <RadzenDataGridColumn Title="@L["Actions"]" Width="60px" Frozen="true" Filterable="false" Sortable="false">
+                    <Template>
+                        <RadzenButton Icon="delete" title="@L["Delete"]" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small"
+                                      Click=@(async () => await OpenDeleteConfirmDialogAsync(context.Id, context.Name)) />
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenStack>
+}

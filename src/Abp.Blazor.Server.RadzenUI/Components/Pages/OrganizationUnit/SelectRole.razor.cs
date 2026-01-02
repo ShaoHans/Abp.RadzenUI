@@ -7,10 +7,11 @@ using Radzen.Blazor;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.Localization;
+using Volo.Abp.Localization;
 
 namespace Abp.RadzenUI.Components.Pages.OrganizationUnit;
 
-public partial class SelectMember
+public partial class SelectRole
 {
     [Parameter]
     public Guid OuId { get; set; }
@@ -24,32 +25,34 @@ public partial class SelectMember
     [Inject]
     public IStringLocalizer<AbpRadzenUIResource> IL { get; set; } = default!;
 
-    protected RadzenDataGrid<IdentityUserDto> _grid = default!;
-    protected IReadOnlyList<IdentityUserDto> _entities = [];
+    protected RadzenDataGrid<IdentityRoleDto> _grid = default!;
+    protected IReadOnlyList<IdentityRoleDto> _entities = [];
     protected int _totalCount;
     protected readonly IEnumerable<int> _pageSizeOptions = [10, 20, 30];
     protected readonly bool _showPagerSummary = true;
     protected bool _isLoading = true;
     protected int _defaultPageSize = 10;
-    private IList<IdentityUserDto> _selectedUsers = [];
+    private IList<IdentityRoleDto> _selectedRoles = [];
     private bool? SelectAllValue
     {
         get
         {
-            if (_selectedUsers == null || !_selectedUsers.Any())
+            if (_selectedRoles == null || !_selectedRoles.Any())
                 return false;
 
-            if (_entities.All(u => _selectedUsers.Contains(u)))
+            if (_entities.All(u => _selectedRoles.Contains(u)))
                 return true;
 
             return null;
         }
     }
 
-    protected OrganizationUnitGetUnaddedUserListInput GetListInput = new();
+    protected OrganizationUnitGetUnaddedRoleListInput GetListInput = new();
+    protected OrganizationUnitAddUserDto NewEntity;
 
-    public SelectMember()
+    public SelectRole()
     {
+        NewEntity = new OrganizationUnitAddUserDto();
         LocalizationResource = typeof(IdentityResource);
     }
 
@@ -62,7 +65,7 @@ public partial class SelectMember
     {
         _isLoading = true;
         await UpdateGetListInputAsync(args);
-        var result = await AppService.GetUnaddedUsersAsync(OuId, GetListInput);
+        var result = await AppService.GetUnaddedRolesAsync(OuId, GetListInput);
         _entities = result.Items;
         _totalCount = (int)result.TotalCount;
         _isLoading = false;
@@ -93,15 +96,15 @@ public partial class SelectMember
     {
         try
         {
-            if (_selectedUsers.Count == 0)
+            if (_selectedRoles.Count == 0)
             {
                 DialogService.Close(false);
                 return;
             }
 
-            await AppService.AddUsersAsync(
+            await AppService.AddRolesAsync(
                 OuId,
-                new OrganizationUnitAddUserDto { UserIds = [.. _selectedUsers.Select(u => u.Id)] }
+                new OrganizationUnitAddRoleDto { RoleIds = [.. _selectedRoles.Select(u => u.Id)] }
             );
             await Notify.Success(L["SavedSuccessfully"]);
             DialogService.Close(true);

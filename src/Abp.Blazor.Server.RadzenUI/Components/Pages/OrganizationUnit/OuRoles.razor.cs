@@ -12,7 +12,7 @@ using Volo.Abp.Identity.Localization;
 
 namespace Abp.RadzenUI.Components.Pages.OrganizationUnit;
 
-public partial class OuMembers
+public partial class OuRoles
 {
     [Parameter]
     public OrganizationUnitTreeItemVm? SelectedOu { get; set; }
@@ -26,15 +26,15 @@ public partial class OuMembers
     [Inject]
     public IStringLocalizer<AbpRadzenUIResource> IL { get; set; } = default!;
 
-    protected RadzenDataGrid<IdentityUserDto> _grid = default!;
-    protected IReadOnlyList<IdentityUserDto> _entities = [];
+    protected RadzenDataGrid<IdentityRoleDto> _grid = default!;
+    protected IReadOnlyList<IdentityRoleDto> _entities = [];
     protected int _totalCount;
     protected readonly IEnumerable<int> _pageSizeOptions = [10, 20, 30];
     protected readonly bool _showPagerSummary = true;
     protected bool _isLoading = true;
     protected int _defaultPageSize = 10;
 
-    protected GetIdentityUsersInput GetListInput = new();
+    protected PagedAndSortedResultRequestDto GetListInput = new();
 
     protected string? CreatePolicyName { get; set; }
     protected string? UpdatePolicyName { get; set; }
@@ -44,7 +44,7 @@ public partial class OuMembers
     public bool HasUpdatePermission { get; set; }
     public bool HasDeletePermission { get; set; }
 
-    public OuMembers()
+    public OuRoles()
     {
         LocalizationResource = typeof(IdentityResource);
     }
@@ -65,7 +65,7 @@ public partial class OuMembers
     {
         _isLoading = true;
         await UpdateGetListInputAsync(args);
-        var result = await AppService.GetMembersAsync(SelectedOu!.Id, GetListInput);
+        var result = await AppService.GetRolesAsync(SelectedOu!.Id, GetListInput);
         _entities = result.Items;
         _totalCount = (int)result.TotalCount;
         _isLoading = false;
@@ -120,14 +120,14 @@ public partial class OuMembers
         }
     }
 
-    private async Task OpenSeleteMemberDialogAsync()
+    private async Task OpenSeleteRoleDialogAsync()
     {
         var parameters = new Dictionary<string, object> { { "OuId", SelectedOu!.Id } };
 
-        var result = await DialogService.OpenAsync<SelectMember>(
-            title: IL["Ou:Member.Select", SelectedOu.DisplayName],
+        var result = await DialogService.OpenAsync<SelectRole>(
+            title: IL["Ou:Role.Select", SelectedOu.DisplayName],
             parameters: parameters,
-            options: new DialogOptions() { Draggable = true, Width = "700px" }
+            options: new DialogOptions() { Draggable = true, Width = "500px" }
         );
 
         if (result == true)
@@ -136,10 +136,10 @@ public partial class OuMembers
         }
     }
 
-    private async Task OpenDeleteConfirmDialogAsync(Guid userId, string userName)
+    private async Task OpenDeleteConfirmDialogAsync(Guid roleId, string userName)
     {
         var result = await DialogService.Confirm(
-            message: IL["Ou:Member.Delete", SelectedOu!.DisplayName, userName],
+            message: IL["Ou:Role.Delete", SelectedOu!.DisplayName, userName],
             title: IL["Delete"],
             options: new ConfirmOptions()
             {
@@ -152,7 +152,7 @@ public partial class OuMembers
         {
             try
             {
-                await AppService.DeleteUserAsync(SelectedOu!.Id, userId);
+                await AppService.DeleteRoleAsync(SelectedOu!.Id, roleId);
                 await _grid.Reload();
                 await Notify.Success(IL["DeletedSuccessfully"]);
             }
