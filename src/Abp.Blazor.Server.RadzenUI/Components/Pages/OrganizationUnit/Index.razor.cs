@@ -1,6 +1,8 @@
 using Abp.RadzenUI.Application.Contracts.Organizations;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Models;
+using Abp.RadzenUI.Permissions;
+using Microsoft.AspNetCore.Authorization;
 using Radzen;
 using Radzen.Blazor;
 using Volo.Abp.ObjectExtending;
@@ -9,17 +11,44 @@ namespace Abp.RadzenUI.Components.Pages.OrganizationUnit;
 
 public partial class Index
 {
+    private List<OrganizationUnitTreeItemVm> _ouTree = [];
+    private object? _selectedOu;
+    public bool HasManageTreePermission { get; set; }
+    public bool HasManageUsersPermission { get; set; }
+    public bool HasManageRolesPermission { get; set; }
+
     public Index()
     {
         LocalizationResource = typeof(AbpRadzenUIResource);
     }
 
-    private List<OrganizationUnitTreeItemVm> _ouTree = [];
-    private object? _selectedOu;
-
     protected override async Task OnInitializedAsync()
     {
+        await TrySetPermissionsAsync();
         await LoadOuAsync();
+    }
+
+    private async Task TrySetPermissionsAsync()
+    {
+        if (IsDisposed)
+        {
+            return;
+        }
+
+        await SetPermissionsAsync();
+    }
+
+    protected override async Task SetPermissionsAsync()
+    {
+        HasManageTreePermission = await AuthorizationService.IsGrantedAsync(
+            IdentityManagementExtensionPermissions.OrganizationUnits.ManageTree
+        );
+        HasManageUsersPermission = await AuthorizationService.IsGrantedAsync(
+            IdentityManagementExtensionPermissions.OrganizationUnits.ManageUsers
+        );
+        HasManageRolesPermission = await AuthorizationService.IsGrantedAsync(
+            IdentityManagementExtensionPermissions.OrganizationUnits.ManageRoles
+        );
     }
 
     private async Task LoadOuAsync()

@@ -16,6 +16,7 @@
     "User:FullNameFormat": "{1}{0}",
     "Display:User.FullName": "姓名",
 
+    "OrganizationUnits": "组织机构",
     "Ou:Tree": "组织机构树",
     "Ou:NewRootOu": "添加根机构",
     "Ou:NewSubOu": "添加子机构",
@@ -34,6 +35,10 @@
     "Ou:Role.Tooltip": "选择一个组织机构来查看角色",
     "Ou:Role.Add": "添加角色",
     "Ou:Role.Select": "选择角色 - {0}",
-    "Ou:Role.Delete": "您确定要从组织机构 {0} 中删除角色 {1} ？"
+    "Ou:Role.Delete": "您确定要从组织机构 {0} 中删除角色 {1} ？",
+    "Permission:Ou.Default": "组织机构管理",
+    "Permission:Ou.ManageTree": "管理组织机构树",
+    "Permission:Ou.ManageUsers": "管理用户",
+    "Permission:Ou.ManageRoles": "管理角色"
   }
 }
