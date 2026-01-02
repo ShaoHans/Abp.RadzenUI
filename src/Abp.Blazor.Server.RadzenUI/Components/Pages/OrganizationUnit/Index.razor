@@ -22,8 +22,9 @@
                         <RadzenSplitButton Text="@treeItem.DisplayName" Variant="Variant.Text" Icon="lan"
                                            Click=@(args => TreeItemOnClick(args, "SplitButton with icon"))>
                             <ChildContent>
-                                <RadzenSplitButtonItem Text="@L["Ou:EditRootOu"]" Icon="edit" Value="@OuTreeItemAction.Edit.ToString()" />
+                                <RadzenSplitButtonItem Text="@L["Ou:EditOu"]" Icon="edit" Value="@OuTreeItemAction.Edit.ToString()" />
                                 <RadzenSplitButtonItem Text="@L["Ou:NewSubOu"]" Icon="add" Value="@OuTreeItemAction.AddSubOu.ToString()" />
+                                <RadzenSplitButtonItem Text="@L["Ou:DeleteOu"]" Icon="add" Value="@OuTreeItemAction.Delete.ToString()" />
                             </ChildContent>
                         </RadzenSplitButton>
                     }

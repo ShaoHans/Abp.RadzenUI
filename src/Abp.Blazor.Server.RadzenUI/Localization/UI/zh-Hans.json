@@ -20,8 +20,10 @@
     "Ou:NewRootOu": "添加根机构",
     "Ou:NewSubOu": "添加子机构",
     "Ou:NewOu.Title": "新组织机构",
-    "Ou:EditRootOu": "编辑",
+    "Ou:EditOu": "编辑",
     "Ou:EditOu.Title": "编辑 - {0}",
+    "Ou:DeleteOu": "删除",
+    "Ou:DeleteOu.ConfirmMessage": "您确定要删除组织机构 {0} 吗？",
     "DisplayName:Ou.DisplayName": "显示名称",
     "Ou:Members": "成员",
     "Ou:Member.Tooltip": "选择一个组织机构来查看成员",
@@ -31,6 +33,7 @@
     "Ou:Roles": "角色",
     "Ou:Role.Tooltip": "选择一个组织机构来查看角色",
     "Ou:Role.Add": "添加角色",
-    "Ou:Role.Select": "选择角色 - {0}"
+    "Ou:Role.Select": "选择角色 - {0}",
+    "Ou:Role.Delete": "您确定要从组织机构 {0} 中删除角色 {1} ？"
   }
 }

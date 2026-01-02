@@ -344,7 +344,8 @@ public abstract class AbpCrudPageBase<
     protected virtual async Task OpenDeleteConfirmDialogAsync(
         TKey id,
         string title = "Confirm",
-        string confirm = "Confirm?"
+        string confirm = "Confirm?",
+        Func<Task>? callback = null
     )
     {
         var result = await DialogService.Confirm(
@@ -359,9 +360,23 @@ public abstract class AbpCrudPageBase<
 
         if (result == true)
         {
-            await AppService.DeleteAsync(id);
-            await _grid.Reload();
-            await Notify.Success(UL["DeletedSuccessfully"]);
+            try
+            {
+                await AppService.DeleteAsync(id);
+                if (_grid != null)
+                {
+                    await _grid.Reload();
+                }
+                if (callback != null)
+                {
+                    await callback();
+                }
+                await Notify.Success(UL["DeletedSuccessfully"]);
+            }
+            catch (Exception ex)
+            {
+                await HandleErrorAsync(ex);
+            }
         }
     }
 

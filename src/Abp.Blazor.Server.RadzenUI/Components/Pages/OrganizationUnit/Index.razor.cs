@@ -1,6 +1,7 @@
 using Abp.RadzenUI.Application.Contracts.Organizations;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Models;
+using Radzen;
 using Radzen.Blazor;
 using Volo.Abp.ObjectExtending;
 
@@ -95,6 +96,18 @@ public partial class Index
             case OuTreeItemAction.AddSubOu:
                 await OpenCreateDialogAsync<CreateOu>(L["Ou:NewOu.Title"], callback: LoadOuAsync);
                 break;
+            case OuTreeItemAction.Delete:
+                var selectedOu = GetSelectedOu()!;
+                await OpenDeleteConfirmDialogAsync(
+                    selectedOu.Id,
+                    confirm: L["Ou:DeleteOu.ConfirmMessage", selectedOu.DisplayName],
+                    callback: async () =>
+                    {
+                        _selectedOu = null;
+                        await LoadOuAsync();
+                    }
+                );
+                break;
             default:
                 break;
         }
@@ -113,5 +126,6 @@ public partial class Index
 public enum OuTreeItemAction
 {
     Edit,
-    AddSubOu
+    AddSubOu,
+    Delete
 }
