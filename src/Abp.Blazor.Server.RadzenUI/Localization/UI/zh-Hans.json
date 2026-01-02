@@ -26,8 +26,10 @@
     "Ou:Members": "成员",
     "Ou:Member.Tooltip": "选择一个组织机构来查看成员",
     "Ou:Member.Add": "添加成员",
+    "Ou:Member.Select": "选择成员 - {0}",
     "Ou:Roles": "角色",
     "Ou:Role.Tooltip": "选择一个组织机构来查看角色",
-    "Ou:Role.Add": "添加角色"
+    "Ou:Role.Add": "添加角色",
+    "Ou:Role.Select": "选择角色 - {0}"
   }
 }

@@ -12,7 +12,7 @@ else
 {
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
         <RadzenText Text="@SelectedOu.DisplayName" TextAlign="TextAlign.Start" />
-        <RadzenButton Text="@IL["Ou:Member.Add"]" Icon="add" />
+        <RadzenButton Text="@IL["Ou:Member.Add"]" Icon="add" Click="@OpenSeleteMemberDialogAsync" />
     </RadzenStack>
 
     <RadzenStack Gap="1rem" Style="margin-top:5px;">

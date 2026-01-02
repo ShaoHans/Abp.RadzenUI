@@ -55,10 +55,7 @@ public partial class OuMembers
         LocalizationResource = typeof(IdentityResource);
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        
-    }
+    protected override async Task OnInitializedAsync() { }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -129,43 +126,16 @@ public partial class OuMembers
         }
     }
 
-    //protected virtual async Task OpenCreateDialogAsync<TDialog>(
-    //    string title,
-    //    Func<DialogOptions>? func = null,
-    //    Dictionary<string, object>? parameters = null,
-    //    Func<Task>? callback = null
-    //)
-    //    where TDialog : ComponentBase
-    //{
-    //    parameters ??= [];
-    //    var dialogFromOption = new DialogFromOption<OrganizationUnitAddUserDto>
-    //    {
-    //        OnSubmit = CreateEntityAsync,
-    //        OnCancel = CloseDialog,
-    //        Model = await SetCreateDialogModelAsync(),
-    //    };
-    //    parameters.Add("DialogFromOption", dialogFromOption);
+    private async Task OpenSeleteMemberDialogAsync()
+    {
+        var parameters = new Dictionary<string, object> { { "OuId", SelectedOu!.Id } };
 
-    //    bool? result = await DialogService.OpenAsync<TDialog>(
-    //        title: title,
-    //        parameters: parameters,
-    //        options: func is not null
-    //            ? func()
-    //            : new DialogOptions() { Draggable = true, Width = "600px" }
-    //    );
-
-    //    if (result == true)
-    //    {
-    //        if (_grid != null)
-    //        {
-    //            await _grid.Reload();
-    //        }
-    //        if (callback != null)
-    //        {
-    //            await callback();
-    //        }
-    //    }
-    //}
+        await DialogService.OpenAsync<SelectMember>(
+            title: IL["Ou:Member.Select", SelectedOu.DisplayName],
+            parameters: parameters,
+            options: new DialogOptions() { Draggable = true, Width = "700px" }
+        );
+    }
 
     //protected virtual Task<TCreateInput> SetCreateDialogModelAsync()
     //{
