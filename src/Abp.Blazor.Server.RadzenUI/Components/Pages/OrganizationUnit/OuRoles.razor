@@ -21,7 +21,13 @@ else
                         PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
                         Count="@_totalCount" IsLoading="@_isLoading">
             <Columns>
-                <RadzenDataGridColumn Property="@nameof(IdentityRoleDto.Name)" Title="@L["DisplayName:RoleName"]" Width="100px" />
+                <RadzenDataGridColumn Title="@L["DisplayName:RoleName"]" Property="@nameof(IdentityRoleDto.Name)">
+                    <Template>
+                        <RadzenLabel Text="@context.Name" />
+                        <RadzenBadge Text="@L["DisplayName:IsDefault"]" Visible="context.IsDefault" BadgeStyle="BadgeStyle.Success" />
+                        <RadzenBadge Text="@L["DisplayName:IsPublic"]" Visible="context.IsPublic" BadgeStyle="BadgeStyle.Info" />
+                    </Template>
+                </RadzenDataGridColumn>
                 <RadzenDataGridColumn Title="@L["Actions"]" Width="60px" Frozen="true" Filterable="false" Sortable="false">
                     <Template>
                         <RadzenButton Icon="delete" title="@L["Delete"]" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small"

@@ -127,7 +127,7 @@ public partial class OuRoles
         var result = await DialogService.OpenAsync<SelectRole>(
             title: IL["Ou:Role.Select", SelectedOu.DisplayName],
             parameters: parameters,
-            options: new DialogOptions() { Draggable = true, Width = "500px" }
+            options: new DialogOptions() { Draggable = true, Width = "800px" }
         );
 
         if (result == true)

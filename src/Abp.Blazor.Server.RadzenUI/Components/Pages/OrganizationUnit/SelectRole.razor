@@ -8,7 +8,7 @@
              style="max-height:calc(100vh - 200px); display: flex;flex-direction:column">
     <div style="flex: 1; overflow: auto">
         <RadzenStack Gap="1rem">
-            <RadzenDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true" Density="Density.Compact"
+            <RadzenDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true"
                             PagerHorizontalAlign="HorizontalAlign.Center"
                             PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
                             Count="@_totalCount" IsLoading="@_isLoading" 
@@ -25,7 +25,13 @@
                                             TValue="bool"  />
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Property="@nameof(IdentityRoleDto.Name)" Title="@L["DisplayName:RoleName"]" Width="100px" />
+                    <RadzenDataGridColumn Title="@L["DisplayName:RoleName"]" Property="@nameof(IdentityRoleDto.Name)">
+                        <Template>
+                            <RadzenLabel Text="@context.Name" />
+                            <RadzenBadge Text="@L["DisplayName:IsDefault"]" Visible="context.IsDefault" BadgeStyle="BadgeStyle.Success" />
+                            <RadzenBadge Text="@L["DisplayName:IsPublic"]" Visible="context.IsPublic" BadgeStyle="BadgeStyle.Info" />
+                        </Template>
+                    </RadzenDataGridColumn>
                 </Columns>
             </RadzenDataGrid>
         </RadzenStack>

@@ -127,7 +127,7 @@ public partial class OuMembers
         var result = await DialogService.OpenAsync<SelectMember>(
             title: IL["Ou:Member.Select", SelectedOu.DisplayName],
             parameters: parameters,
-            options: new DialogOptions() { Draggable = true, Width = "700px" }
+            options: new DialogOptions() { Draggable = true, Width = "800px" }
         );
 
         if (result == true)
