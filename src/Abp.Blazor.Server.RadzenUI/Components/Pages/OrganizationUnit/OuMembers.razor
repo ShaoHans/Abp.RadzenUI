@@ -1,0 +1,53 @@
+﻿@using Abp.RadzenUI.Application.Contracts.Organizations
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.Identity
+@using Volo.Abp.Users
+@inherits AbpRadzenUIComponentBase
+
+@if (SelectedOu == null)
+{
+    <RadzenText Text="@IL["Ou:Member.Tooltip"]" TextAlign="TextAlign.Start" />
+}
+else
+{
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
+        <RadzenText Text="@SelectedOu.DisplayName" TextAlign="TextAlign.Start" />
+        <RadzenButton Text="@IL["Ou:Member.Add"]" Icon="add" Click="@OpenSeleteMemberDialogAsync" />
+    </RadzenStack>
+
+    <RadzenStack Gap="1rem" Style="margin-top:5px;">
+        <RadzenDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true" Density="Density.Default"
+                        PagerHorizontalAlign="HorizontalAlign.Center"
+                        PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
+                        Count="@_totalCount" IsLoading="@_isLoading">
+            <HeaderTemplate>
+                <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.End" Gap="4px">
+                    <SearchTextBox PlaceHoder="@($"{L["DisplayName:UserName"]}/{L["DisplayName:Email"]}")"
+                                   @bind-Keyword="@GetListInput.Filter" SearchAsync="@_grid.Reload" Style="width:50%" />
+                </RadzenStack>
+            </HeaderTemplate>
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(IdentityUserDto.UserName)" Title="@L["DisplayName:UserName"]" Width="100px" />
+                <RadzenDataGridColumn Property="@nameof(IdentityUserDto.UserName)" Title="@IL["Display:User.FullName"]" Width="100px">
+                    <Template>
+                        @{
+                            var fullName = string.Format(
+                            IL["User:FullNameFormat"],
+                            context.Name,
+                            context.Surname
+                            );
+                            <RadzenLabel Text="@fullName" />
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(IdentityUserDto.Email)" Title="@L["DisplayName:Email"]" Width="180px" />
+                <RadzenDataGridColumn Title="@L["Actions"]" Width="60px" Frozen="true" Filterable="false" Sortable="false">
+                    <Template>
+                        <RadzenButton Icon="delete" title="@L["Delete"]" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small"
+                                      Click=@(async () => await OpenDeleteConfirmDialogAsync(context.Id, context.UserName)) />
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenStack>
+}

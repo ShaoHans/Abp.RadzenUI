@@ -1,4 +1,5 @@
-﻿using Volo.Abp.Authorization.Permissions;
+﻿using Abp.RadzenUI.Localization;
+using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.Localization;
 using Volo.Abp.UI.Navigation;
@@ -39,6 +40,18 @@ public class AbpIdentityMenuContributor : IMenuContributor
                 l["Users"],
                 url: "/identity/users"
             ).RequirePermissions(IdentityPermissions.Users.Default)
+        );
+
+        var rl = context.GetLocalizer<AbpRadzenUIResource>();
+
+        identityMenuItem.AddItem(
+            new ApplicationMenuItem(
+                RadzenUI.IdentityMenuNames.OrganizationUnits,
+                rl["OrganizationUnits"],
+                url: "/identity/organization-units"
+            ).RequirePermissions(
+                Permissions.IdentityManagementExtensionPermissions.OrganizationUnits.Default
+            )
         );
 
         return Task.CompletedTask;

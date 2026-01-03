@@ -1,0 +1,36 @@
+﻿@using Abp.RadzenUI.Application.Contracts.Organizations
+@using Volo.Abp.AspNetCore.Components
+@using Volo.Abp.Identity
+@inherits AbpRadzenUIComponentBase
+
+<RadzenTemplateForm TItem="OrganizationUnitCreateDto" Data=@DialogFromOption.Model Submit=@DialogFromOption.OnSubmit Style="max-height:calc(100vh - 200px); display: flex;flex-direction:column">
+    <div style="flex: 1; overflow: auto">
+        <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                    <RequiredMark />
+                    <RadzenLabel Text="@L["DisplayName:Ou.DisplayName"]" Component="@nameof(DialogFromOption.Model.DisplayName)" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8">
+                    <RadzenTextBox Name="@nameof(DialogFromOption.Model.DisplayName)" @bind-Value=@DialogFromOption.Model.DisplayName Style="display: block; width: 100%;" MaxLength="OrganizationUnitConsts.MaxDisplayNameLength" />
+                    <RadzenRequiredValidator Component="@nameof(DialogFromOption.Model.DisplayName)" Text="@L.Required("DisplayName:Ou.DisplayName")" />
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenStack>
+    </div>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Right">
+        <RadzenButton Icon="cancel" Click="DialogFromOption.OnCancel" Text="@L["Cancel"]" ButtonStyle="ButtonStyle.Light" />
+        <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="@L["Save"]"></RadzenButton>
+    </RadzenStack>
+</RadzenTemplateForm>
+
+
+@code {
+    [Parameter]
+    public DialogFromOption<OrganizationUnitCreateDto> DialogFromOption { get; set; } = default!;
+
+    public CreateOu()
+    {
+        LocalizationResource = typeof(AbpRadzenUIResource);
+    }
+}

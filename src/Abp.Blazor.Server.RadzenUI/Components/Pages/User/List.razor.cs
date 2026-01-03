@@ -65,6 +65,8 @@ public partial class List
             PhoneNumber = dto.PhoneNumber,
             IsActive = dto.IsActive,
             LockoutEnabled = dto.LockoutEnabled,
+            Surname = dto.Surname,
+            Name = dto.Name,            
             RoleNames = userRoles,
         };
 
@@ -79,7 +81,6 @@ public partial class List
         {
             Draggable = true,
             Width = "600px",
-            //Height = "740px",
         };
     }
 

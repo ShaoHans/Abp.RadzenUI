@@ -1,0 +1,56 @@
+﻿@using Abp.RadzenUI.Application.Contracts.Organizations
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.Identity
+@using Volo.Abp.Users
+@inherits AbpRadzenUIComponentBase
+
+<RadzenStack JustifyContent="JustifyContent.SpaceBetween"
+             style="max-height:calc(100vh - 200px); display: flex;flex-direction:column">
+    <div style="flex: 1; overflow: auto">
+        <RadzenStack Gap="1rem">
+            <RadzenDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true" Density="Density.Compact"
+                            PagerHorizontalAlign="HorizontalAlign.Center"
+                            PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
+                            Count="@_totalCount" IsLoading="@_isLoading" 
+                            SelectionMode="DataGridSelectionMode.Multiple" @bind-Value="@_selectedUsers">
+                <HeaderTemplate>
+                    <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.End" Gap="4px">
+                        <SearchTextBox PlaceHoder="@($"{L["DisplayName:UserName"]}/{L["DisplayName:Email"]}")"
+                                       @bind-Keyword="@GetListInput.Filter" SearchAsync="@_grid.Reload" Style="width:50%" />
+                    </RadzenStack>
+                </HeaderTemplate>
+                <Columns>
+                    <RadzenDataGridColumn Width="60px" Sortable="false" Filterable="false">
+                        <HeaderTemplate>
+                            <RadzenCheckBox TabIndex="-1" TriState="false" TValue="bool?" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "Select all items" } })"
+                                            Value="@SelectAllValue"
+                                            Change="@(args => _selectedUsers = args == true ? _entities.ToList() : [])" />
+                        </HeaderTemplate>
+                        <Template Context="data">
+                            <RadzenCheckBox TabIndex="-1" TriState="false" Value="@(_selectedUsers != null && _selectedUsers.Contains(data))" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select item" }})"
+                                            TValue="bool"  />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Property="@nameof(IdentityUserDto.UserName)" Title="@L["DisplayName:UserName"]" Width="100px" />
+                    <RadzenDataGridColumn Property="@nameof(IdentityUserDto.UserName)" Title="@IL["Display:User.FullName"]" Width="100px">
+                        <Template>
+                            @{
+                                var fullName = string.Format(
+                                IL["User:FullNameFormat"],
+                                context.Name,
+                                context.Surname
+                                );
+                                <RadzenLabel Text="@fullName" />
+                            }
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Property="@nameof(IdentityUserDto.Email)" Title="@L["DisplayName:Email"]" Width="180px" />
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenStack>
+    </div>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Right">
+        <RadzenButton Icon="cancel" Text="@L["Cancel"]" ButtonStyle="ButtonStyle.Light" Click="@(() => DialogService.Close(false))" />
+        <RadzenButton Icon="save" Text="@L["Save"]" ButtonType="ButtonType.Submit" Click="@SaveAsync" />
+    </RadzenStack>
+</RadzenStack>
