@@ -55,6 +55,22 @@
                         </RadzenRow>
                         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                             <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                                <RadzenLabel Text="@L["DisplayName:Name"]" Component="Name" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="8">
+                                <RadzenTextBox Name="Name" @bind-Value=@DialogFromOption.Model.Name Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxNameLength" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                                <RadzenLabel Text="@L["DisplayName:Surname"]" Component="Surname" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="8">
+                                <RadzenTextBox Name="Surname" @bind-Value=@DialogFromOption.Model.Surname Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxSurnameLength" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
                                 <RadzenLabel Text="@L["DisplayName:IsActive"]" Component="IsActive" />
                             </RadzenColumn>
                             <RadzenColumn Size="12" SizeMD="8">

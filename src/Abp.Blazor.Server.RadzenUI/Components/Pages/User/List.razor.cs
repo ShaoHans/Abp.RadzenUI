@@ -65,6 +65,8 @@ public partial class List
             PhoneNumber = dto.PhoneNumber,
             IsActive = dto.IsActive,
             LockoutEnabled = dto.LockoutEnabled,
+            Surname = dto.Surname,
+            Name = dto.Name,            
             RoleNames = userRoles,
         };
 
