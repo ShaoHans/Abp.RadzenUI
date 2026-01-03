@@ -34,6 +34,9 @@ Password:  **1q2w#E***
 ### 4.Theme switch
 ![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/switch-theme.png)
 
+### 5.Organization units
+![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/ou.png)
+
 ## 🌱How to use
 
 ### 1. Create new solution by abp cli
