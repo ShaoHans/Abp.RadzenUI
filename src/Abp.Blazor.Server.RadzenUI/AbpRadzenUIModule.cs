@@ -4,6 +4,9 @@ using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Menus;
 using Abp.RadzenUI.Services;
 using Localization.Resources.AbpUi;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Radzen;
@@ -65,6 +68,28 @@ public class AbpRadzenUIModule : AbpModule
                 )
                 .AddVirtualJson("/Localization/UI");
         });
+
+        Configure<CookieAuthenticationOptions>(
+            IdentityConstants.ApplicationScheme,
+            options =>
+            {
+                options.Events ??= new CookieAuthenticationEvents();
+
+                options.Events.OnRedirectToAccessDenied = ctx =>
+                {
+                    //ctx.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    ctx.Response.Redirect("/forbidden");
+                    return Task.CompletedTask;
+                };
+
+                options.Events.OnRedirectToLogin = ctx =>
+                {
+                    //ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    ctx.Response.Redirect("/account/login");
+                    return Task.CompletedTask;
+                };
+            }
+        );
 
         context.Services.AddMapperlyObjectMapper();
 
