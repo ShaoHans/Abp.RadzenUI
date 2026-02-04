@@ -5,13 +5,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Volo.Abp;
 using Volo.Abp.Account;
 using Volo.Abp.Auditing;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.AspNetCore;
 using Volo.Abp.Security.Claims;
-using static Volo.Abp.Identity.Settings.IdentitySettingNames;
 
 namespace Abp.RadzenUI.Controllers;
 
@@ -51,7 +49,12 @@ public class AccountController(
                 return Redirect("~/");
             }
 
-            return RedirectWithError("~/account/login", result.GetResultAsString());
+            return RedirectWithError(
+                "~/account/login",
+                result == Microsoft.AspNetCore.Identity.SignInResult.Failed
+                    ? "username or password error"
+                    : result.GetResultAsString()
+            );
         }
         catch (Exception ex)
         {
@@ -251,7 +254,10 @@ public class AccountController(
                 if (externalLoginInfo == null)
                 {
                     Logger.LogWarning("External login info is not available");
-                    return RedirectWithError("~/account/login", "External login info is not available");
+                    return RedirectWithError(
+                        "~/account/login",
+                        "External login info is not available"
+                    );
                 }
                 if (userName.IsNullOrWhiteSpace())
                 {
