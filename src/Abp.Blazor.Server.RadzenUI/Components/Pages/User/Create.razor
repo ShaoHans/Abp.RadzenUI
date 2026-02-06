@@ -13,7 +13,7 @@
 @inherits AbpRadzenUIComponentBase
 
 <RadzenTemplateForm TItem="IdentityUserCreateDto" Data=@DialogFromOption.Model Submit=@DialogFromOption.OnSubmit Style="max-height:calc(100vh - 200px); display: flex;flex-direction:column">
-    <DialogFormLayout CancelText="@L["Cancel"]" CancelClick="DialogFromOption.OnCancel" SaveText="@L["Save"]">
+    <DialogFormLayout CancelClick="DialogFromOption.OnCancel">
         <RadzenTabs>
             <Tabs>
                 <RadzenTabsItem Text="@IL["DisplayName:UserInfo"]">

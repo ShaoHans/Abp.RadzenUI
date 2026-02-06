@@ -9,7 +9,7 @@
 
 <RadzenStack JustifyContent="JustifyContent.SpaceBetween"
              Style="max-height:calc(100vh - 200px)">
-    <DialogFormLayout SaveClick="SaveAsync" CancelText="@L["Cancel"]" CancelClick="() => DialogService.Close(false)" SaveText="@L["Save"]" SaveButtonType="ButtonType.Button" SaveButtonStyle="ButtonStyle.Primary">
+    <DialogFormLayout SaveClick="SaveAsync" CancelClick="() => DialogService.Close(false)">
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start">
             <RadzenCheckBox TValue="bool" Name="GrantAll" Disabled="_selectAllDisabled" Value="@(_groups.All(x => x.GrantAll))" ValueChanged="GrantAll" />
             <RadzenLabel Text="@L["SelectAllInAllTabs"]" Component="GrantAll" />

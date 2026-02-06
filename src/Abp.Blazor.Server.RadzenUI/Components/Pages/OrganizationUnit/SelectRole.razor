@@ -6,7 +6,7 @@
 
 <RadzenStack JustifyContent="JustifyContent.SpaceBetween"
              style="max-height:calc(100vh - 200px); display: flex;flex-direction:column">
-    <DialogFormLayout CancelText="@L["Cancel"]" CancelClick="@(() => DialogService.Close(false))" SaveClick="@SaveAsync" SaveText="@L["Save"]">
+    <DialogFormLayout CancelClick="@(() => DialogService.Close(false))" SaveClick="@SaveAsync">
         <RadzenStack Gap="1rem">
             <RadzenDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true"
                             PagerHorizontalAlign="HorizontalAlign.Center"
