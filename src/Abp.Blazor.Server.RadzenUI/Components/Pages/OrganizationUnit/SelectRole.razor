@@ -6,7 +6,7 @@
 
 <RadzenStack JustifyContent="JustifyContent.SpaceBetween"
              style="max-height:calc(100vh - 200px); display: flex;flex-direction:column">
-    <div style="flex: 1; overflow: auto">
+    <DialogFormLayout CancelText="@L["Cancel"]" CancelClick="@(() => DialogService.Close(false))" SaveClick="@SaveAsync" SaveText="@L["Save"]">
         <RadzenStack Gap="1rem">
             <RadzenDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true"
                             PagerHorizontalAlign="HorizontalAlign.Center"
@@ -35,9 +35,5 @@
                 </Columns>
             </RadzenDataGrid>
         </RadzenStack>
-    </div>
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Right">
-        <RadzenButton Icon="cancel" Text="@L["Cancel"]" ButtonStyle="ButtonStyle.Light" Click="@(() => DialogService.Close(false))" />
-        <RadzenButton Icon="save" Text="@L["Save"]" ButtonType="ButtonType.Submit" Click="@SaveAsync" />
-    </RadzenStack>
+    </DialogFormLayout>
 </RadzenStack>

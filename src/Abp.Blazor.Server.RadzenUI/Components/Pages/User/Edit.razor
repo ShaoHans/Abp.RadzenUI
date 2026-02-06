@@ -11,7 +11,7 @@
 @inherits AbpRadzenUIComponentBase
 
 <RadzenTemplateForm TItem="IdentityUserUpdateDto" Data=@DialogFromOption.Model Submit=@DialogFromOption.OnSubmit Style="max-height:calc(100vh - 200px); display: flex;flex-direction:column">
-    <div style="flex: 1; overflow: auto">
+    <DialogFormLayout CancelText="@L["Cancel"]" CancelClick="@DialogFromOption.OnCancel" SaveText="@L["Save"]">
         <RadzenTabs>
             <Tabs>
                 <RadzenTabsItem Text="@IL["DisplayName:UserInfo"]">
@@ -109,12 +109,7 @@
                 }
             </Tabs>
         </RadzenTabs>
-
-    </div>
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Right">
-        <RadzenButton Icon="cancel" Click="@DialogFromOption.OnCancel" Text="@L["Cancel"]" ButtonStyle="ButtonStyle.Light" />
-        <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="@L["Save"]"></RadzenButton>
-    </RadzenStack>
+    </DialogFormLayout>
 </RadzenTemplateForm>
 
 @code {

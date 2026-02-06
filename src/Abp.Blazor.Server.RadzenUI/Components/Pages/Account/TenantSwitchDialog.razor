@@ -9,7 +9,7 @@
 @inject DialogService DialogService
 
 <RadzenTemplateForm TItem="TenantInfoModel" Data="@Model" Submit="@OnSubmit" Style="max-height:calc(100vh - 200px); display: flex;flex-direction:column">
-    <div style="flex: 1; overflow: auto">
+    <DialogFormLayout CancelText="@L["Cancel"]" CancelClick="@(() => DialogService.Close(false))" SaveText="@L["Save"]">
         <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
@@ -25,11 +25,7 @@
                 </RadzenAlert>
             </RadzenRow>
         </RadzenStack>
-    </div>
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Right">
-        <RadzenButton Icon="cancel" Click="() => { DialogService.Close(false); }" Text="@L["Cancel"]" ButtonStyle="ButtonStyle.Light" />
-        <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="@L["Save"]"></RadzenButton>
-    </RadzenStack>
+    </DialogFormLayout>
 </RadzenTemplateForm>
 
 @code {
