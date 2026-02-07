@@ -9,13 +9,12 @@
 
 <RadzenStack JustifyContent="JustifyContent.SpaceBetween"
              Style="max-height:calc(100vh - 200px)">
-    <div style="flex: 1; overflow: auto">
+    <DialogFormLayout SaveClick="SaveAsync" CancelClick="() => DialogService.Close(false)">
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start">
             <RadzenCheckBox TValue="bool" Name="GrantAll" Disabled="_selectAllDisabled" Value="@(_groups.All(x => x.GrantAll))" ValueChanged="GrantAll" />
             <RadzenLabel Text="@L["SelectAllInAllTabs"]" Component="GrantAll" />
         </RadzenStack>
         <Devider />
-
         <RadzenTabs TabPosition="TabPosition.Left" RenderMode="TabRenderMode.Client">
             <Tabs>
                 @foreach (var item in _groups)
@@ -27,7 +26,6 @@
                         </RadzenStack>
                         <RadzenStack Orientation="Orientation.Vertical" Gap="0" class="rz-pt-1"
                                      Style="border-top: var(--rz-grid-cell-border); min-height: 2rem; max-height: 12rem; overflow: auto;" />
-
                         <RadzenTree Style="width: 100%; height: 100%"
                                     Data=@item.TreeItems>
                             <RadzenTreeLevel Text="(i => GetPermissionShownName(((PermissionTreeItemVm)i).Permission))"
@@ -51,11 +49,7 @@
                 }
             </Tabs>
         </RadzenTabs>
-    </div>
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Right">
-        <RadzenButton Icon="cancel" Click="() => DialogService.Close(false)" Text="@L["Cancel"]" ButtonStyle="ButtonStyle.Light" />
-        <RadzenButton Icon="save" Click="SaveAsync" Text="@L["Save"]" ButtonStyle="ButtonStyle.Primary" />
-    </RadzenStack>
+    </DialogFormLayout>
 </RadzenStack>
 
 

@@ -13,7 +13,7 @@
 @inherits AbpRadzenUIComponentBase
 
 <RadzenTemplateForm TItem="IdentityUserCreateDto" Data=@DialogFromOption.Model Submit=@DialogFromOption.OnSubmit Style="max-height:calc(100vh - 200px); display: flex;flex-direction:column">
-    <div style="flex: 1; overflow: auto">
+    <DialogFormLayout CancelClick="DialogFromOption.OnCancel">
         <RadzenTabs>
             <Tabs>
                 <RadzenTabsItem Text="@IL["DisplayName:UserInfo"]">
@@ -93,10 +93,7 @@
                                 <RadzenCheckBox TValue="bool" @bind-Value=@DialogFromOption.Model.LockoutEnabled Name="LockoutEnabled" />
                             </RadzenColumn>
                         </RadzenRow>
-
                         <ExtensionProperties TEntityType="IdentityUserCreateDto" TResourceType="IdentityResource" Entity="@DialogFromOption.Model" LH="@LH" />
-
-
                     </RadzenStack>
                 </RadzenTabsItem>
                 @if (HasManagePermissionsPermission)
@@ -118,11 +115,7 @@
                 }
             </Tabs>
         </RadzenTabs>
-    </div>
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Right">
-        <RadzenButton Icon="cancel" Click="DialogFromOption.OnCancel" Text="@L["Cancel"]" ButtonStyle="ButtonStyle.Light" />
-        <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="@L["Save"]"></RadzenButton>
-    </RadzenStack>
+    </DialogFormLayout>
 </RadzenTemplateForm>
 
 @code {

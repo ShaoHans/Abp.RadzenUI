@@ -4,7 +4,7 @@
 @inherits AbpRadzenUIComponentBase
 
 <RadzenTemplateForm TItem="UpdateProductDto" Data=@DialogFromOption.Model Submit=@DialogFromOption.OnSubmit Style="max-height:calc(100vh - 200px); display: flex;flex-direction:column">
-    <div style="flex: 1; overflow: auto">
+    <DialogFormLayout CancelClick="@DialogFromOption.OnCancel">
         <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
@@ -14,7 +14,6 @@
                     <RadzenTextBox Name="Code" Value="@Code" Style="display: block; width: 100%;" ReadOnly="true" />
                 </RadzenColumn>
             </RadzenRow>
-
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
                     <RequiredMark />
@@ -25,7 +24,6 @@
                     <RadzenRequiredValidator Component="Name" Text="@L.Required("DisplayName:Name")" />
                 </RadzenColumn>
             </RadzenRow>
-
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
                     <RequiredMark />
@@ -36,7 +34,6 @@
                     <RadzenRequiredValidator Component="Price" Text="@L.Required("DisplayName:Price")" />
                 </RadzenColumn>
             </RadzenRow>
-
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
                     <RadzenLabel Text="@L["DisplayName:StockCount"]" Component="StockCount" />
@@ -45,7 +42,6 @@
                     <RadzenNumeric TValue="int" Name="StockCount" @bind-Value=@DialogFromOption.Model.StockCount Style="display: block; width: 100%;" />
                 </RadzenColumn>
             </RadzenRow>
-
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
                     <RadzenLabel Text="@L["DisplayName:Status"]" Component="Status" />
@@ -56,7 +52,6 @@
                                     Style="width: 100%; max-width: 400px;" Name="Status" />
                 </RadzenColumn>
             </RadzenRow>
-
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
                     <RadzenLabel Text="@L["DisplayName:Description"]" Component="Description" />
@@ -65,13 +60,8 @@
                     <RadzenTextArea Name="Description" @bind-Value=@DialogFromOption.Model.Description Style="display: block; width: 100%;" />
                 </RadzenColumn>
             </RadzenRow>
-
         </RadzenStack>
-    </div>
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Right">
-        <RadzenButton Icon="cancel" Click="@DialogFromOption.OnCancel" Text="@L["Cancel"]" ButtonStyle="ButtonStyle.Light" />
-        <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="@L["Save"]"></RadzenButton>
-    </RadzenStack>
+    </DialogFormLayout>
 </RadzenTemplateForm>
 
 @code {
