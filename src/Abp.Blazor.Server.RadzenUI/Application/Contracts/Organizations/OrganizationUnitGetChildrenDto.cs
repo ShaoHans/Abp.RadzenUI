@@ -3,11 +3,8 @@ using Volo.Abp.Application.Dtos;
 
 namespace Abp.RadzenUI.Application.Contracts.Organizations;
 
-public class OrganizationUnitGetChildrenDto : IEntityDto<Guid>
+public class OrganizationUnitGetChildrenDto : EntityDto<Guid>
 {
-    [Required]
-    public Guid Id { get; set; }
-
     public bool Recursive { get; set; }
 }
 
