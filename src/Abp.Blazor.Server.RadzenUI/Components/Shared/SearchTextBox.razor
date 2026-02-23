@@ -1,4 +1,4 @@
-﻿<RadzenFormField Style="width:100%" Text="@PlaceHoder" Variant="Variant.Outlined">
+﻿<RadzenFormField Style="@Style" Text="@PlaceHoder" Variant="Variant.Outlined">
     <ChildContent>
         <RadzenTextBox @bind-Value="@Keyword" @oninput="HandleInput" @onkeydown="HandleKeyDown" />
     </ChildContent>
@@ -8,6 +8,9 @@
 </RadzenFormField>
 
 @code {
+    [Parameter]
+    public string Style { get; set; } = "width:100%";
+
     [Parameter]
     public string PlaceHoder { get; set; } = string.Empty;
 

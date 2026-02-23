@@ -1,4 +1,8 @@
+using Abp.RadzenUI.Localization;
+using Abp.RadzenUI.Utils;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
 using Radzen;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.Localization;
@@ -8,8 +12,11 @@ namespace Abp.RadzenUI.Components.Pages.User;
 
 public partial class List
 {
+    [Inject]
+    public IStringLocalizer<AbpRadzenUIResource> IL { get; set; } = default!;
     protected bool HasManagePermissionsPermission { get; set; }
     protected string ManagePermissionsPolicyName;
+    private IReadOnlyList<ExtraPropertyColumnMeta> _extraColumns = default!;
 
     public List()
     {
@@ -20,6 +27,11 @@ public partial class List
         UpdatePolicyName = IdentityPermissions.Users.Update;
         DeletePolicyName = IdentityPermissions.Users.Delete;
         ManagePermissionsPolicyName = IdentityPermissions.Users.ManagePermissions;
+    }
+
+    protected override void OnInitialized()
+    {
+        _extraColumns = RadzenColumnHelper.GetExtraPropertyMetas<IdentityUserDto>();
     }
 
     protected override async Task SetPermissionsAsync()
@@ -53,6 +65,8 @@ public partial class List
             PhoneNumber = dto.PhoneNumber,
             IsActive = dto.IsActive,
             LockoutEnabled = dto.LockoutEnabled,
+            Surname = dto.Surname,
+            Name = dto.Name,            
             RoleNames = userRoles,
         };
 
@@ -67,7 +81,6 @@ public partial class List
         {
             Draggable = true,
             Width = "600px",
-            Height = "740px",
         };
     }
 
@@ -80,12 +93,7 @@ public partial class List
                 { "ProviderName", "U" },
                 { "ProviderKey", user.Id.ToString() },
             },
-            options: new DialogOptions()
-            {
-                Draggable = true,
-                Width = "800px",
-                Height = "700px",
-            }
+            options: new DialogOptions() { Draggable = true, Width = "800px", }
         );
     }
 }

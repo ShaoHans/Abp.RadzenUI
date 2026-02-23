@@ -19,7 +19,7 @@ namespace CRM.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("_Abp_DatabaseProvider", EfCoreDatabaseProvider.PostgreSql)
-                .HasAnnotation("ProductVersion", "9.0.8")
+                .HasAnnotation("ProductVersion", "10.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -260,6 +260,34 @@ namespace CRM.Migrations
                     b.HasIndex("TenantId", "ServiceName", "MethodName", "ExecutionTime");
 
                     b.ToTable("AbpAuditLogActions", (string)null);
+                });
+
+            modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLogExcelFile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<string>("FileName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("FileName");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("TenantId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AbpAuditLogExcelFiles", (string)null);
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.EntityChange", b =>
@@ -868,8 +896,8 @@ namespace CRM.Migrations
                         .HasColumnType("character varying(64)");
 
                     b.Property<string>("DeviceInfo")
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("ExtraProperties")
                         .HasColumnType("text")
@@ -1395,6 +1423,9 @@ namespace CRM.Migrations
                         .HasColumnType("text")
                         .HasColumnName("ExtraProperties");
 
+                    b.Property<string>("FrontChannelLogoutUri")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -1618,8 +1649,8 @@ namespace CRM.Migrations
                         .HasColumnType("character varying(400)");
 
                     b.Property<string>("Type")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
 
                     b.HasKey("Id");
 

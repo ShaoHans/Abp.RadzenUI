@@ -17,6 +17,8 @@ public class AbpRadzenUIOptions
 
 public class LoginPageSettings
 {
+    public string Title { get; set; } = "Abp RadzenUI";
+
     public string LogoPath { get; set; } = "_content/AbpRadzen.Blazor.Server.UI/images/radzen.webp";
 }
 

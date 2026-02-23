@@ -1,0 +1,89 @@
+@using Volo.Abp.AspNetCore.Components
+@using Abp.RadzenUI.Localization
+@inherits AbpRadzenUIComponentBase
+
+<div style="@BodyStyle">
+    @ChildContent
+</div>
+@if (FooterContent is not null)
+{
+    @FooterContent
+}
+else
+{
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="@FooterJustifyContent">
+        @if (ShowCancel)
+        {
+            <RadzenButton Icon="@CancelIcon" Click="@CancelClick" Text="@CancelText" ButtonStyle="@CancelButtonStyle" />
+        }
+        @if (ShowSave)
+        {
+            <RadzenButton ButtonType="@SaveButtonType" Icon="@SaveIcon" Text="@SaveText" ButtonStyle="@SaveButtonStyle" Click="@SaveClick" />
+        }
+    </RadzenStack>
+}
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = default!;
+
+    [Parameter]
+    public RenderFragment? FooterContent { get; set; }
+
+    [Parameter]
+    public EventCallback CancelClick { get; set; }
+
+    [Parameter]
+    public EventCallback SaveClick { get; set; }
+
+    [Parameter]
+    public string BodyStyle { get; set; } = "flex: 1; overflow: auto";
+
+    [Parameter]
+    public JustifyContent FooterJustifyContent { get; set; } = JustifyContent.Right;
+
+    [Parameter]
+    public bool ShowCancel { get; set; } = true;
+
+    [Parameter]
+    public bool ShowSave { get; set; } = true;
+
+    [Parameter]
+    public ButtonType SaveButtonType { get; set; } = ButtonType.Submit;
+
+    [Parameter]
+    public ButtonStyle SaveButtonStyle { get; set; } = ButtonStyle.Primary;
+
+    [Parameter]
+    public ButtonStyle CancelButtonStyle { get; set; } = ButtonStyle.Light;
+
+    [Parameter]
+    public string? SaveText { get; set; }
+
+    [Parameter]
+    public string? CancelText { get; set; }
+
+    [Parameter]
+    public string SaveIcon { get; set; } = "save";
+
+    [Parameter]
+    public string CancelIcon { get; set; } = "cancel";
+
+    protected override void OnInitialized()
+    {
+        LocalizationResource = typeof(AbpRadzenUIResource);
+
+        if (string.IsNullOrWhiteSpace(SaveText))
+        {
+            SaveText = L["Save"];
+        }
+
+        if (string.IsNullOrWhiteSpace(CancelText))
+        {
+            CancelText = L["Cancel"];
+        }
+
+        base.OnInitialized();
+    }
+}
+

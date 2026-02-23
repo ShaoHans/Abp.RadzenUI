@@ -1,0 +1,17 @@
+﻿@page "/forbidden"
+@using Volo.Abp.ExceptionHandling.Localization
+@inherits AbpRadzenUIComponentBase
+
+<RadzenText TextStyle="TextStyle.H3" class="rz-my-12">
+    @L["403Message"]
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-my-12">
+    @L["DefaultErrorMessage403Detail"]
+</RadzenText>
+
+@code {
+    public _403()
+    {
+        LocalizationResource = typeof(AbpExceptionHandlingResource);
+    }
+}

@@ -101,7 +101,7 @@ public abstract class AbpCrudPageBase<
     TListViewModel,
     TCreateViewModel,
     TUpdateViewModel
-> : AbpComponentBase
+> : AbpRadzenUIComponentBase
     where TAppService : ICrudAppService<
             TGetOutputDto,
             TGetListOutputDto,
@@ -226,7 +226,8 @@ public abstract class AbpCrudPageBase<
     protected virtual async Task OpenCreateDialogAsync<TDialog>(
         string title,
         Func<DialogOptions>? func = null,
-        Dictionary<string, object>? parameters = null
+        Dictionary<string, object>? parameters = null,
+        Func<Task>? callback = null
     )
         where TDialog : ComponentBase
     {
@@ -244,17 +245,19 @@ public abstract class AbpCrudPageBase<
             parameters: parameters,
             options: func is not null
                 ? func()
-                : new DialogOptions()
-                {
-                    Draggable = true,
-                    Width = "600px",
-                    Height = "450px",
-                }
+                : new DialogOptions() { Draggable = true, Width = "600px" }
         );
 
         if (result == true)
         {
-            await _grid.Reload();
+            if (_grid != null)
+            {
+                await _grid.Reload();
+            }
+            if (callback != null)
+            {
+                await callback();
+            }
         }
     }
 
@@ -286,7 +289,8 @@ public abstract class AbpCrudPageBase<
         string title,
         TGetListOutputDto dto,
         Func<DialogOptions>? func = null,
-        Dictionary<string, object>? parameters = null
+        Dictionary<string, object>? parameters = null,
+        Func<Task>? callback = null
     )
         where TDialog : ComponentBase
     {
@@ -305,17 +309,19 @@ public abstract class AbpCrudPageBase<
             parameters: parameters,
             options: func is not null
                 ? func()
-                : new DialogOptions()
-                {
-                    Draggable = true,
-                    Width = "600px",
-                    Height = "450px",
-                }
+                : new DialogOptions() { Draggable = true, Width = "600px" }
         );
 
         if (result == true)
         {
-            await _grid.Reload();
+            if (_grid != null)
+            {
+                await _grid.Reload();
+            }
+            if (callback != null)
+            {
+                await callback();
+            }
         }
     }
 
@@ -338,7 +344,8 @@ public abstract class AbpCrudPageBase<
     protected virtual async Task OpenDeleteConfirmDialogAsync(
         TKey id,
         string title = "Confirm",
-        string confirm = "Confirm?"
+        string confirm = "Confirm?",
+        Func<Task>? callback = null
     )
     {
         var result = await DialogService.Confirm(
@@ -353,9 +360,23 @@ public abstract class AbpCrudPageBase<
 
         if (result == true)
         {
-            await AppService.DeleteAsync(id);
-            await _grid.Reload();
-            await Notify.Success(UL["DeletedSuccessfully"]);
+            try
+            {
+                await AppService.DeleteAsync(id);
+                if (_grid != null)
+                {
+                    await _grid.Reload();
+                }
+                if (callback != null)
+                {
+                    await callback();
+                }
+                await Notify.Success(UL["DeletedSuccessfully"]);
+            }
+            catch (Exception ex)
+            {
+                await HandleErrorAsync(ex);
+            }
         }
     }
 
@@ -424,19 +445,5 @@ public abstract class AbpCrudPageBase<
         }
 
         await AuthorizationService.CheckAsync(policyName);
-    }
-
-    protected override async Task HandleErrorAsync(Exception exception)
-    {
-        if (!base.IsDisposed)
-        {
-            await InvokeAsync(async () =>
-            {
-                await UserExceptionInformer.InformAsync(new UserExceptionInformerContext(exception));
-            });
-
-            // Call StateHasChanged separately within the InvokeAsync context
-            await InvokeAsync(StateHasChanged);
-        }
     }
 }

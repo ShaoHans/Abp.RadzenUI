@@ -27,9 +27,21 @@
         </RadzenStack>
     </HeaderTemplate>
     <Columns>
-        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.UserName)" Frozen="true" Title="@L["DisplayName:UserName"]" Width="160px" />
-        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.Email)" Title="@L["DisplayName:Email"]" Width="160px" />
-        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.PhoneNumber)" Title="@L["DisplayName:PhoneNumber"]" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.UserName)" Frozen="true" Title="@L["DisplayName:UserName"]" Width="100px" />
+        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.UserName)" Title="@IL["Display:User.FullName"]" Width="100px">
+            <Template>
+                @{
+                    var fullName = string.Format(
+                    IL["User:FullNameFormat"],
+                    context.Name,
+                    context.Surname
+                    );
+                    <RadzenLabel Text="@fullName" />
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.Email)" Title="@L["DisplayName:Email"]" Width="180px" />
+        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.PhoneNumber)" Title="@L["DisplayName:PhoneNumber"]" Width="140px" />
         <RadzenDataGridColumn Title="@L["DisplayName:IsActive"]" Width="60px" Filterable="false" Sortable="false">
             <Template>
                 <BooleanIcon Value="@context.IsActive" />
@@ -40,22 +52,27 @@
                 <BooleanIcon Value="@context.LockoutEnabled" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.CreationTime)" Filterable="false" Title="@L["CreationTime"]" Width="160px" />
+        @(RadzenColumnHelper.ExtraPropertiesColumns<IdentityUserDto>(_extraColumns, StringLocalizerFactory))
+        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.CreationTime)" Filterable="false" Title="@L["CreationTime"]" Width="130px">
+            <Template>
+                @context.CreationTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")
+            </Template>
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn Title="@L["Actions"]" Width="120px" Frozen="true" Filterable="false" Sortable="false">
             <Template>
                 @if ((context.UserName != "admin" || CurrentUser.UserName == "admin") && HasUpdatePermission)
                 {
-                    <RadzenButton Icon="edit" title="@L["Edit"]" ButtonStyle="ButtonStyle.Success"
-                                  Click="@(async () => await OpenEditDialogAsync<Edit>(@L["Edit"], context, SetDialogOptions))" />
+                    <RadzenButton Icon="edit" title="@L["Edit"]" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small"
+                                  Click="@(async () => await OpenEditDialogAsync<Edit>(@L["Edit"], context, SetDialogOptions, new Dictionary<string, object>{{"UserId",context.Id}}))" />
                 }
                 @if ((context.UserName != "admin" || CurrentUser.UserName == "admin") && HasManagePermissionsPermission)
                 {
-                    <RadzenButton Icon="productivity" title="@L["Permissions"]" ButtonStyle="ButtonStyle.Warning"
+                    <RadzenButton Icon="productivity" title="@L["Permissions"]" ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small"
                                   Click="@(async () => await OpenAssignPermissionDialog(context))" />
                 }
                 @if (context.UserName != "admin" && HasDeletePermission)
                 {
-                    <RadzenButton Icon="delete" title="@L["Delete"]" ButtonStyle="ButtonStyle.Danger"
+                    <RadzenButton Icon="delete" title="@L["Delete"]" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small"
                                   Click=@(async () => await OpenDeleteConfirmDialogAsync(context.Id, L["Delete"], L["UserDeletionConfirmationMessage",context.UserName])) />
                 }
             </Template>

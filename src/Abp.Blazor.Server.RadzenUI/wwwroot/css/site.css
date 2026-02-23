@@ -642,3 +642,19 @@ svg.illustration {
 .rz-data-grid .rz-group-header {
     display: block;
 }
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* 整体页面不滚动 */
+}
+
+.rz-layout {
+    height: 100vh; /* 占满全屏 */
+}
+
+.rz-body {
+    overflow: auto; /* 只在内容超出时滚动 */
+}
+

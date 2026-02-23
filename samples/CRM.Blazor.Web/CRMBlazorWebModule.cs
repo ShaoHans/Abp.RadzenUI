@@ -1,5 +1,6 @@
 ﻿using Abp.RadzenUI;
 using Abp.RadzenUI.Localization;
+using Abp.RadzenUI.UIPlaceHolders;
 using CRM.Blazor.Web.Components.Pages;
 using CRM.Blazor.Web.Menus;
 using CRM.EntityFrameworkCore;
@@ -7,6 +8,7 @@ using CRM.Localization;
 using CRM.MultiTenancy;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.OpenApi.Models;
 using OpenIddict.Server.AspNetCore;
@@ -114,7 +116,7 @@ public class CRMBlazorWebModule : AbpModule
             options.AutoValidate = false;
         });
 
-        ConfigureAbpRadzenUI();
+        ConfigureAbpRadzenUI(context);
         ConfigureAuthentication(context);
 
         // configure external login
@@ -232,7 +234,7 @@ public class CRMBlazorWebModule : AbpModule
         });
     }
 
-    private void ConfigureAbpRadzenUI()
+    private void ConfigureAbpRadzenUI(ServiceConfigurationContext context)
     {
         // Configure AbpRadzenUI
         Configure<AbpRadzenUIOptions>(options =>
@@ -283,6 +285,10 @@ public class CRMBlazorWebModule : AbpModule
         {
             options.MenuContributors.Add(new CRMMenuContributor());
         });
+
+        context.Services.Replace(
+            ServiceDescriptor.Transient<IUIPlaceHolderResolver, CRMUIPlaceHolderResolver>()
+        );
     }
 
     public override void OnApplicationInitialization(ApplicationInitializationContext context)

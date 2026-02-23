@@ -1,7 +1,7 @@
 ﻿@using Volo.Abp.AspNetCore.Components
 @using Volo.Abp.Identity.Localization
 @using Microsoft.Extensions.Localization
-@inherits AbpComponentBase
+@inherits AbpRadzenUIComponentBase
 @inject IStringLocalizer<IdentityResource> IL
 
 <RadzenTemplateForm TItem="UpdateEmailSettingsVm" Data=@EmailSettings Submit="UpdateSettingsAsync">

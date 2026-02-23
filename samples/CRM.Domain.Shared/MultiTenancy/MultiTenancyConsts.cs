@@ -7,4 +7,6 @@ public static class MultiTenancyConsts
      * related modules and code parts, including this file.
      */
     public const bool IsEnabled = true;
+
+    public const string TenantDisplayNameField = "TenantDisplayName";
 }

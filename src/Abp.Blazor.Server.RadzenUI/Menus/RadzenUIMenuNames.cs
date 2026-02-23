@@ -8,6 +8,7 @@ public class RadzenUI
 
         public const string Roles = GroupName + ".Roles";
         public const string Users = GroupName + ".Users";
+        public const string OrganizationUnits = GroupName + ".OrganizationUnits";
     }
 
     public static class TenantManagementMenuNames

@@ -78,13 +78,12 @@ public partial class EmailSettingComponent
                 L["SendTestEmail"],
                 parameters: new Dictionary<string, object>
                 {
-                    { "DefaultFromAddress",EmailSettings.DefaultFromAddress}
+                    { "DefaultFromAddress", EmailSettings.DefaultFromAddress}
                 },
                 options: new DialogOptions
                 {
                     Draggable = true,
                     Width = "600px",
-                    Height = "550px"
                 }
             );
         }

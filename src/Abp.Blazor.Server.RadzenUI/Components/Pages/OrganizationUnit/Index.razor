@@ -1,0 +1,60 @@
+﻿@page "/identity/organization-units"
+@using Abp.RadzenUI.Application.Contracts.Organizations
+@inherits AbpCrudPageBase<IOrganizationUnitAppService, OrganizationUnitDto, Guid, OrganizationUnitGetListInput, OrganizationUnitCreateDto, OrganizationUnitUpdateDto>
+
+<PageTitle>@L["OrganizationUnits"]</PageTitle>
+
+<RadzenCardGroup Responsive="true">
+
+    @if (HasManageTreePermission)
+    {
+        <RadzenCard Variant="Variant.Filled" Style="margin-right:10px;">
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
+                <RadzenText Text="@L["Ou:Tree"]" TextAlign="TextAlign.Start" />
+                <RadzenButton Text="@L["Ou:NewRootOu"]" Icon="add"
+                              Click="@(async () => await OpenCreateDialogAsync<CreateOu>(L["Ou:NewOu.Title"], callback:LoadOuAsync))" />
+            </RadzenStack>
+
+            <RadzenTree Style="width: 100%; height: 100%"
+                        Data=@_ouTree @bind-Value="@_selectedOu">
+                <RadzenTreeLevel TextProperty="@nameof(OrganizationUnitTreeItemVm.DisplayName)"
+                                 ChildrenProperty="@nameof(OrganizationUnitTreeItemVm.Children)"
+                                 Expanded="(i=>true)"
+                                 HasChildren="(i=>((OrganizationUnitTreeItemVm)i).Children.Count>0)">
+                    <Template>
+                        @{
+                            var treeItem = (OrganizationUnitTreeItemVm)context.Value;
+                            <RadzenSplitButton Text="@treeItem.DisplayName" Variant="Variant.Text" Icon="lan"
+                                               Click=@(args => TreeItemOnClick(args, "SplitButton with icon"))>
+                                <ChildContent>
+                                    <RadzenSplitButtonItem Text="@L["Ou:EditOu"]" Icon="edit" Value="@OuTreeItemAction.Edit.ToString()" />
+                                    <RadzenSplitButtonItem Text="@L["Ou:NewSubOu"]" Icon="add" Value="@OuTreeItemAction.AddSubOu.ToString()" />
+                                    <RadzenSplitButtonItem Text="@L["Ou:DeleteOu"]" Icon="add" Value="@OuTreeItemAction.Delete.ToString()" />
+                                </ChildContent>
+                            </RadzenSplitButton>
+                        }
+                    </Template>
+                </RadzenTreeLevel>
+            </RadzenTree>
+        </RadzenCard>
+    }
+
+    <RadzenCard Variant="Variant.Filled">
+        <RadzenTabs>
+            <Tabs>
+                @if (HasManageUsersPermission)
+                {
+                    <RadzenTabsItem Text="@L["Ou:Members"]">
+                        <OuMembers SelectedOu="@GetSelectedOu()" />
+                    </RadzenTabsItem>
+                }
+                @if (HasManageRolesPermission)
+                {
+                    <RadzenTabsItem Text="@L["Ou:Roles"]">
+                        <OuRoles SelectedOu="@GetSelectedOu()" />
+                    </RadzenTabsItem>
+                }
+            </Tabs>
+        </RadzenTabs>
+    </RadzenCard>
+</RadzenCardGroup>

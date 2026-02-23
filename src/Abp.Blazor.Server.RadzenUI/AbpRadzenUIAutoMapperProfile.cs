@@ -1,8 +1,10 @@
 using Abp.RadzenUI.Application.Contracts.AuditLogs;
+using Abp.RadzenUI.Application.Contracts.Organizations;
 using Abp.RadzenUI.Models;
 using Riok.Mapperly.Abstractions;
 using Volo.Abp.Account;
 using Volo.Abp.AuditLogging;
+using Volo.Abp.Identity;
 using Volo.Abp.Mapperly;
 using Volo.Abp.SettingManagement;
 
@@ -67,4 +69,13 @@ public partial class SendTestEmailVMToSendTestEmailInputMapper
     public override partial SendTestEmailInput Map(SendTestEmailVM source);
 
     public override partial void Map(SendTestEmailVM source, SendTestEmailInput destination);
+}
+
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+public partial class OrganizationUnitToOrganizationUnitDtoMapper
+    : MapperBase<OrganizationUnit, OrganizationUnitDto>
+{
+    public override partial OrganizationUnitDto Map(OrganizationUnit source);
+
+    public override partial void Map(OrganizationUnit source, OrganizationUnitDto destination);
 }
