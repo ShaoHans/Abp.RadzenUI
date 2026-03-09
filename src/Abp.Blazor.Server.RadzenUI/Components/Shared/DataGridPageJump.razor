@@ -1,0 +1,108 @@
+@typeparam TItem where TItem : notnull
+@using Microsoft.AspNetCore.Components.Web
+
+<RadzenStack Orientation="Orientation.Horizontal"
+             AlignItems="AlignItems.Center"
+             JustifyContent="JustifyContent.End"
+             Gap="8px"
+             Wrap="FlexWrap.Wrap">
+    <RadzenLabel Text="@LabelText" />
+    <RadzenTextBox Value="@_targetPageText"
+                   Placeholder="@Placeholder"
+                   Change="OnTextChanged"
+                   @oninput="OnInput"
+                   @onkeydown="OnKeyDownAsync"
+                   style="width: 96px;" />
+    <RadzenButton Text="@ButtonText"
+                  Disabled="@(!CanJump)"
+                  Click="JumpToPageAsync" />
+    <RadzenText TextStyle="TextStyle.Body2">/ @TotalPages</RadzenText>
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public RadzenDataGrid<TItem>? Grid { get; set; }
+
+    [Parameter]
+    public int Count { get; set; }
+
+    [Parameter]
+    public int? PageSize { get; set; }
+
+    [Parameter]
+    public string LabelText { get; set; } = "Page";
+
+    [Parameter]
+    public string Placeholder { get; set; } = "Page";
+
+    [Parameter]
+    public string ButtonText { get; set; } = "Go";
+
+    private string _targetPageText = "1";
+    private int _lastSyncedPage = 1;
+
+    private int EffectivePageSize => PageSize ?? Grid?.PageSize ?? 10;
+
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(Count / (double)EffectivePageSize));
+
+    private int? TargetPage =>
+        int.TryParse(_targetPageText, out var page) ? page : null;
+
+    private bool CanJump => Grid is not null && TargetPage is >= 1 && TargetPage <= TotalPages;
+
+    protected override void OnParametersSet()
+    {
+        SyncCurrentPage();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        SyncCurrentPage();
+    }
+
+    private async Task JumpToPageAsync()
+    {
+        if (!CanJump || Grid is null || TargetPage is null)
+        {
+            return;
+        }
+
+        var targetPage = Math.Min(TargetPage.Value, TotalPages);
+        await Grid.GoToPage(targetPage - 1);
+        _lastSyncedPage = targetPage;
+        _targetPageText = targetPage.ToString();
+    }
+
+    private async Task OnKeyDownAsync(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+        {
+            await JumpToPageAsync();
+        }
+    }
+
+    private void OnInput(ChangeEventArgs args)
+    {
+        _targetPageText = args.Value?.ToString() ?? string.Empty;
+    }
+
+    private void OnTextChanged(string? value)
+    {
+        _targetPageText = value ?? string.Empty;
+    }
+
+    private void SyncCurrentPage()
+    {
+        if (Grid is null)
+        {
+            return;
+        }
+
+        var currentPage = Grid.CurrentPage + 1;
+        if (_lastSyncedPage != currentPage)
+        {
+            _lastSyncedPage = currentPage;
+            _targetPageText = currentPage.ToString();
+        }
+    }
+}

@@ -12,12 +12,17 @@
                 PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
                 Count="@_totalCount" IsLoading="@_isLoading">
     <HeaderTemplate>
-        @if (HasCreatePermission)
-        {
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap" Gap="8px">
+            @if (HasCreatePermission)
+            {
                 <RadzenButton Icon="add" Text="@L["NewProduct"]" Click="@(async()=>{await OpenCreateDialogAsync<Create>(L["NewProduct"], SetDialogOptions);})" />
+            }
+            <RadzenStack Orientation="Orientation.Vertical" style="margin-left: auto;">
+                <DataGridPageJump TItem="ProductDto"
+                                  Grid="_grid"
+                                  Count="_totalCount" />
             </RadzenStack>
-        }
+        </RadzenStack>
     </HeaderTemplate>
     <Columns>
         <RadzenDataGridColumn Property="@nameof(ProductDto.Code)" Title="@L["DisplayName:Code"]" Width="100px" />
