@@ -17,11 +17,11 @@
             {
                 <RadzenButton Icon="add" Text="@L["NewProduct"]" Click="@(async()=>{await OpenCreateDialogAsync<Create>(L["NewProduct"], SetDialogOptions);})" />
             }
-            <RadzenStack Orientation="Orientation.Vertical" style="margin-left: auto;">
+            @* <RadzenStack Orientation="Orientation.Vertical" style="margin-left: auto;">
                 <DataGridPageJump TItem="ProductDto"
                                   Grid="_grid"
                                   Count="_totalCount" />
-            </RadzenStack>
+            </RadzenStack> *@
         </RadzenStack>
     </HeaderTemplate>
     <Columns>
