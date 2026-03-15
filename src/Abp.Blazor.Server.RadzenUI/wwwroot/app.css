@@ -49,3 +49,109 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+.avatar-preview-wrap {
+    width: 200px;
+    height: 200px;
+}
+
+.avatar-preview {
+    width: 100%;
+    height: 100%;
+    border-radius: 999px;
+    object-fit: cover;
+    border: var(--rz-border-normal);
+    background: var(--rz-base-200);
+}
+
+.avatar-preview--empty {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-crop-dialog {
+    padding: 0.5rem;
+}
+
+.avatar-crop-dialog__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-top: var(--rz-border-normal);
+}
+
+.avatar-editor__viewport {
+    position: relative;
+    width: 460px;
+    height: 460px;
+    max-width: 100%;
+    overflow: hidden;
+    border-radius: var(--rz-border-radius);
+    background: var(--rz-base-200);
+    border: var(--rz-border-normal);
+    touch-action: none;
+}
+
+.avatar-editor__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.avatar-editor__viewport.is-editable {
+    cursor: grab;
+}
+
+.avatar-editor__viewport.is-dragging {
+    cursor: grabbing;
+}
+
+.avatar-editor__placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: var(--rz-text-tertiary-color);
+    font-size: 0.875rem;
+    text-align: center;
+    padding: 1rem;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.avatar-editor__status {
+    min-height: 1.25rem;
+    margin-top: 0.5rem;
+    color: var(--rz-text-secondary-color);
+    font-size: 0.875rem;
+}
+
+.avatar-editor__status[data-state='error'] {
+    color: var(--rz-danger);
+}
+
+.avatar-header-image {
+    width: 24px;
+    height: 24px;
+    border-radius: 9999px;
+    object-fit: cover;
+    display: block;
+    flex-shrink: 0;
+}
+
+@media (max-width: 767px) {
+    .avatar-preview-wrap {
+        width: 160px;
+        height: 160px;
+    }
+}

@@ -1,5 +1,6 @@
 ﻿using Abp.RadzenUI.Blazor.SettingManagement;
 using Abp.RadzenUI.Bundling;
+using Abp.RadzenUI.Avatar;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Menus;
 using Abp.RadzenUI.Services;
@@ -48,6 +49,8 @@ public class AbpRadzenUIModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
+        AvatarModuleExtensionConfigurator.Configure();
+
         var configuration = context.Services.GetConfiguration();
 
         Configure<AbpVirtualFileSystemOptions>(options =>
@@ -153,5 +156,6 @@ public class AbpRadzenUIModule : AbpModule
         });
 
         context.Services.AddSingleton(typeof(AbpBlazorMessageLocalizerHelper<>));
+        context.Services.AddTransient<IUploadService, DefaultUploadService>();
     }
 }
