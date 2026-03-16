@@ -1,10 +1,14 @@
-﻿@using Abp.RadzenUI.UIPlaceHolders
+﻿@using Abp.RadzenUI.Avatar
+@using Abp.RadzenUI.UIPlaceHolders
 @using Microsoft.Extensions.Localization
 @using Microsoft.Extensions.Options
 @using Volo.Abp.Account.Localization
 @using Volo.Abp.AspNetCore.Components
+@using Volo.Abp.Data
+@using Volo.Abp.Identity
 @inherits AbpRadzenUIComponentBase
 @inject IStringLocalizer<AbpRadzenUIResource> TL
+@inject IIdentityUserRepository IdentityUserRepository
 
 <RadzenHeader>
     <ChildContent>
@@ -35,7 +39,14 @@
                             <RadzenProfileMenu class="rz-mx-2">
                                 <Template>
                                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-me-2">
-                                        <RadzenGravatar Email="@CurrentUser.Email" Style="width:24px;height:24px;"></RadzenGravatar>
+                                        @if (_avatarUrl.IsNullOrWhiteSpace())
+                                        {
+                                            <RadzenGravatar Email="@CurrentUser.Email" Style="width:24px;height:24px;"></RadzenGravatar>
+                                        }
+                                        else
+                                        {
+                                            <img src="@_avatarUrl" alt="@CurrentUser.UserName" class="avatar-header-image" />
+                                        }
                                         <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0 rz-display-none rz-display-md-block" Style="line-height: 1; color: inherit;">@CurrentUser.UserName</RadzenText>
                                     </RadzenStack>
                                 </Template>
@@ -65,6 +76,7 @@
     [Parameter] public EventCallback<EventArgs> ThemeToggle { get; set; }
     [Inject] IUIPlaceHolderResolver UIPlaceHolderResolver { get; set; } = default!;
     TitleBarSettings _titleBar = new();
+    string? _avatarUrl;
 
     public Header()
     {
@@ -74,5 +86,11 @@
     protected override async Task OnInitializedAsync()
     {
         _titleBar = await UIPlaceHolderResolver.GetTitleBarSettingsAsync();
+
+        if (CurrentUser.IsAuthenticated && CurrentUser.Id.HasValue)
+        {
+            var user = await IdentityUserRepository.GetAsync(CurrentUser.Id.Value);
+            _avatarUrl = user.GetProperty<string>(AvatarConsts.ExtraPropertyName);
+        }
     }
 }

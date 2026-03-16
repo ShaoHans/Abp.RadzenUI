@@ -1,0 +1,141 @@
+@using Abp.RadzenUI.Avatar
+@using Abp.RadzenUI.Localization
+@using Microsoft.Extensions.Localization
+@inject IJSRuntime JSRuntime
+@inject DialogService DialogService
+@inject IStringLocalizer<AbpRadzenUIResource> TL
+
+<div class="avatar-crop-dialog">
+    <div id="@_editorId">
+        <input id="@_inputId" type="file" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none;" />
+        <div class="avatar-editor__viewport">
+            <img id="@_imageId" src="" data-initial-src="" alt="@TL["AvatarPreviewAlt"]"
+                 class="avatar-editor__image" draggable="false" />
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none"
+                 style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2;">
+                <defs>
+                    <mask id="crop-mask-@_editorId">
+                        <rect width="100" height="100" fill="white" />
+                        <circle class="avatar-editor__mask-circle" cx="50" cy="50" r="40" fill="black" />
+                    </mask>
+                </defs>
+                <rect width="100" height="100" fill="rgba(0,0,0,0.5)" mask="url(#crop-mask-@_editorId)" />
+                <circle class="avatar-editor__stroke-circle" cx="50" cy="50" r="40"
+                        fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="0.4" />
+                <circle class="avatar-editor__resize-handle" cx="50" cy="90" r="3"
+                        fill="white" stroke="rgba(0,0,0,0.25)" stroke-width="0.5"
+                        style="filter:drop-shadow(0 1px 3px rgba(0,0,0,0.45));" />
+            </svg>
+            <div class="avatar-editor__placeholder">
+                <RadzenIcon Icon="add_photo_alternate" Style="font-size: 48px;" />
+                <span>@TL["AvatarNoImage"]</span>
+            </div>
+        </div>
+        <div id="@_statusId" class="avatar-editor__status"></div>
+    </div>
+
+    <RadzenText TextStyle="TextStyle.Caption" class="rz-mt-2 rz-mb-0"
+                Style="color: var(--rz-text-tertiary-color);">
+        @TL["AvatarModalHint"]
+    </RadzenText>
+
+    @if (!string.IsNullOrEmpty(_errorMessage))
+    {
+        <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Size="AlertSize.Small"
+                     ShowIcon="true" AllowClose="false" class="rz-mt-2">
+            @_errorMessage
+        </RadzenAlert>
+    }
+</div>
+
+<div class="avatar-crop-dialog__footer">
+    <RadzenButton Text="@TL["AvatarChooseImage"]" ButtonStyle="ButtonStyle.Light" Icon="image"
+                  Click="@PickFileAsync" Disabled="@_busy" />
+    <RadzenButton Text="@TL["AvatarSave"]" ButtonStyle="ButtonStyle.Primary" Icon="check"
+                  IsBusy="@_busy" Click="@UploadAsync" />
+</div>
+
+@code {
+    [Parameter] public string? AvatarUrl { get; set; }
+
+    bool _busy;
+    string? _errorMessage;
+    readonly string _editorId = $"avatar-editor-{Guid.NewGuid():N}";
+    readonly string _inputId = $"avatar-input-{Guid.NewGuid():N}";
+    readonly string _imageId = $"avatar-preview-{Guid.NewGuid():N}";
+    readonly string _statusId = $"avatar-status-{Guid.NewGuid():N}";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync(
+                "abpRadzenAvatar.initialize",
+                _editorId,
+                new
+                {
+                    inputId = _inputId,
+                    imageId = _imageId,
+                    statusId = _statusId,
+                    viewportSize = 460,
+                    outputSize = AvatarConsts.OutputSize,
+                    maxFileSize = AvatarConsts.MaxFileSize,
+                    allowedContentTypes = AvatarConsts.AllowedContentTypes,
+                    messages = new
+                    {
+                        noFileSelected = TL["AvatarNoFileSelected"].Value,
+                        invalidFileType = TL["AvatarInvalidFileType"].Value,
+                        fileTooLarge = TL["AvatarFileTooLarge"].Value,
+                        uploadFailed = TL["AvatarUploadFailed"].Value,
+                        deleteFailed = TL["AvatarDeleteFailed"].Value,
+                        previewFailed = TL["AvatarPreviewFailed"].Value,
+                        currentAvatarLoaded = TL["AvatarCurrentLoaded"].Value
+                    }
+                }
+            );
+        }
+    }
+
+    async Task PickFileAsync()
+    {
+        _errorMessage = null;
+        await JSRuntime.InvokeVoidAsync("abpRadzenAvatar.pickFile", _editorId);
+    }
+
+    async Task UploadAsync()
+    {
+        try
+        {
+            _errorMessage = null;
+            _busy = true;
+            var result = await JSRuntime.InvokeAsync<AvatarJsResult>(
+                "abpRadzenAvatar.upload",
+                _editorId,
+                "/api/account/avatar"
+            );
+
+            if (!result.Success)
+            {
+                _errorMessage = result.Error ?? TL["AvatarUploadFailed"];
+                return;
+            }
+
+            DialogService.Close(result.AvatarUrl);
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    class AvatarJsResult
+    {
+        public bool Success { get; set; }
+        public string? Error { get; set; }
+        public string? AvatarUrl { get; set; }
+    }
+}

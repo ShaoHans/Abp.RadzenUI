@@ -1,10 +1,16 @@
 ﻿@page "/account/manage"
+@using Abp.RadzenUI.Avatar
+@using Microsoft.Extensions.Localization
 @using Volo.Abp.Account
 @using Volo.Abp.Account.Localization
 @using Volo.Abp.AspNetCore.Components
+@using Volo.Abp.Data
 @using Volo.Abp.Identity
 @inject IProfileAppService ProfileAppService
 @inject NavigationManager NavigationManager
+@inject IStringLocalizer<AbpRadzenUIResource> TL
+@inject DialogService DialogService
+@inject IJSRuntime JSRuntime
 @inherits AbpRadzenUIComponentBase
 
 <RadzenTabs @bind-SelectedIndex=@_selectedIndex Change="TabChange" TabPosition="TabPosition.Left" RenderMode="TabRenderMode.Client">
@@ -107,6 +113,40 @@
                 </RadzenStack>
             </RadzenTemplateForm>
         </RadzenTabsItem>
+
+        <RadzenTabsItem Text="@TL["ProfileTab:Avatar"]">
+            <RadzenStack Gap="1rem" Style="max-width: 420px;">
+                <div class="avatar-preview-wrap">
+                    @if (!string.IsNullOrWhiteSpace(_avatarUrl))
+                    {
+                        <img src="@_avatarUrl" alt="@TL["AvatarPreviewAlt"]" class="avatar-preview" />
+                    }
+                    else
+                    {
+                        <div class="avatar-preview avatar-preview--empty">
+                            <RadzenIcon Icon="person" Style="font-size: 64px; color: var(--rz-text-disabled-color);" />
+                        </div>
+                    }
+                </div>
+
+                <RadzenText TextStyle="TextStyle.Caption" class="rz-mb-0"
+                            Style="color: var(--rz-text-tertiary-color);">
+                    @TL["AvatarFileRule"]
+                </RadzenText>
+
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                    <RadzenButton Text="@TL["AvatarUploadPhoto"]" Icon="upload"
+                                  ButtonStyle="ButtonStyle.Primary" Click="@OpenCropDialogAsync"
+                                  Disabled="@_avatarBusy" />
+                    @if (!string.IsNullOrWhiteSpace(_avatarUrl))
+                    {
+                        <RadzenButton Text="@TL["AvatarRemove"]" Icon="delete"
+                                      ButtonStyle="ButtonStyle.Danger" Variant="Variant.Outlined"
+                                      IsBusy="@_avatarBusy" Click="@DeleteAvatarAsync" />
+                    }
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenTabsItem>
     </Tabs>
 </RadzenTabs>
 
@@ -116,10 +156,13 @@
     {
         { 0,"ChangePassword"},
         { 1,"PersonalInfo"},
+        { 2,"Avatar"},
     };
 
     ChangePasswordModel ChangePasswordModel = new();
     PersonalInfoModel PersonalInfoModel = new();
+    string? _avatarUrl;
+    bool _avatarBusy;
 
     public Manage()
     {
@@ -156,12 +199,90 @@
             };
 
         PersonalInfoModel = ObjectMapper.Map<ProfileDto, PersonalInfoModel>(user);
+        _avatarUrl = user.GetProperty<string>(AvatarConsts.ExtraPropertyName);
     }
 
     void TabChange(int index)
     {
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         NavigationManager.NavigateTo($"{uri.AbsolutePath}#{_tabs[index]}");
+    }
+
+    async Task OpenCropDialogAsync()
+    {
+        var result = await DialogService.OpenAsync<AvatarCropDialog>(
+            TL["AvatarDialogTitle"],
+            new Dictionary<string, object?>
+            {
+                { nameof(AvatarCropDialog.AvatarUrl), _avatarUrl ?? "" }
+            },
+            new DialogOptions
+            {
+                Width = "500px",
+                Height = "700px",
+                Draggable = true,
+                CloseDialogOnOverlayClick = true
+            }
+        );
+
+        if (result is string newAvatarUrl)
+        {
+            _avatarUrl = newAvatarUrl;
+            await Notify.Success(TL["AvatarUploadSuccess"]);
+            RefreshWithAvatarTab();
+        }
+    }
+
+    async Task DeleteAvatarAsync()
+    {
+        var confirmed = await DialogService.Confirm(
+            TL["AvatarDeleteConfirmMessage"],
+            TL["AvatarRemove"],
+            new ConfirmOptions()
+            {
+                OkButtonText = L["Yes"],
+                CancelButtonText = L["Cancel"]
+            }
+        );
+
+        if (confirmed != true)
+        {
+            return;
+        }
+
+        try
+        {
+            _avatarBusy = true;
+            var result = await JSRuntime.InvokeAsync<AvatarJsResult>(
+                "abpRadzenAvatar.deleteAvatarApi",
+                "/api/account/avatar",
+                TL["AvatarDeleteFailed"].Value
+            );
+
+            if (!result.Success)
+            {
+                await Notify.Error(result.Error ?? TL["AvatarDeleteFailed"]);
+                return;
+            }
+
+            _avatarUrl = null;
+            await Notify.Success(TL["AvatarDeleteSuccess"]);
+            RefreshWithAvatarTab();
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(ex);
+        }
+        finally
+        {
+            _avatarBusy = false;
+        }
+    }
+
+    void RefreshWithAvatarTab()
+    {
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        NavigationManager.NavigateTo($"{uri.AbsolutePath}#Avatar", forceLoad: true);
     }
 
     async Task ChangePasswordAsync()
@@ -216,5 +337,14 @@
         {
             await HandleErrorAsync(ex);
         }
+    }
+
+    class AvatarJsResult
+    {
+        public bool Success { get; set; }
+
+        public string? Error { get; set; }
+
+        public string? AvatarUrl { get; set; }
     }
 }
