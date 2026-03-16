@@ -116,12 +116,6 @@
 
         <RadzenTabsItem Text="@TL["ProfileTab:Avatar"]">
             <RadzenStack Gap="1rem" Style="max-width: 420px;">
-                <RadzenText TextStyle="TextStyle.H6" class="rz-mb-0">@TL["AvatarTitle"]</RadzenText>
-                <RadzenText TextStyle="TextStyle.Body2" class="rz-mb-0"
-                            Style="color: var(--rz-text-secondary-color);">
-                    @TL["AvatarHint"]
-                </RadzenText>
-
                 <div class="avatar-preview-wrap">
                     @if (!string.IsNullOrWhiteSpace(_avatarUrl))
                     {
@@ -218,7 +212,7 @@
     {
         var result = await DialogService.OpenAsync<AvatarCropDialog>(
             TL["AvatarDialogTitle"],
-            new Dictionary<string, object>
+            new Dictionary<string, object?>
             {
                 { nameof(AvatarCropDialog.AvatarUrl), _avatarUrl ?? "" }
             },
