@@ -264,3 +264,4 @@ tempkey.rsa
 tempkey.jwk
 /samples/CRM.Blazor.Web/Logs
 /samples/CRM.Blazor/Logs
+samples/CRM.Blazor.Web/wwwroot/avatars/*
