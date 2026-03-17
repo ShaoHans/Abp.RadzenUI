@@ -9,7 +9,7 @@
     "SwitchTenantHint": "Оставьте поле Имя пустым, чтобы переключиться на хост.",
     "SwitchTenant": "Сменить арендатора",
     "NotSelected": "Не выбрано",
-    "Permission:GroupName": "RadzenUI",
+    "Permission:SystemGroupName": "System Management",
     "Permission:AuditLogs": "Журналы аудита",
     "Permission:SettingManagement_Account": "Метод аутентификации аккаунта",
     "Menu:AccountSetting": "Метод аутентификации аккаунта",
@@ -42,3 +42,4 @@
     "Permission:Ou.ManageRoles": "Управление ролями"
   }
 }
+

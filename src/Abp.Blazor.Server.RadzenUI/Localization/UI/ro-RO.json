@@ -9,7 +9,7 @@
     "SwitchTenantHint": "Lăsați câmpul de nume gol pentru a comuta la host.",
     "SwitchTenant": "Schimbă tenant",
     "NotSelected": "Neselectat",
-    "Permission:GroupName": "RadzenUI",
+    "Permission:SystemGroupName": "System Management",
     "Permission:AuditLogs": "Jurnale de audit",
     "Permission:SettingManagement_Account": "Metodă de autentificare a contului",
     "Menu:AccountSetting": "Metodă de autentificare a contului",
@@ -42,3 +42,4 @@
     "Permission:Ou.ManageRoles": "Gestionarea rolurilor"
   }
 }
+

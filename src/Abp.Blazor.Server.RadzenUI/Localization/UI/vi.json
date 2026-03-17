@@ -9,7 +9,7 @@
     "SwitchTenantHint": "Để trống trường tên để chuyển sang phía máy chủ.",
     "SwitchTenant": "Chuyển đổi người thuê",
     "NotSelected": "Chưa chọn",
-    "Permission:GroupName": "RadzenUI",
+    "Permission:SystemGroupName": "System Management",
     "Permission:AuditLogs": "Nhật ký kiểm toán",
     "Permission:SettingManagement_Account": "Phương thức xác thực tài khoản",
     "Menu:AccountSetting": "Phương thức xác thực tài khoản",
@@ -42,3 +42,4 @@
     "Permission:Ou.ManageRoles": "Quản lý vai trò"
   }
 }
+

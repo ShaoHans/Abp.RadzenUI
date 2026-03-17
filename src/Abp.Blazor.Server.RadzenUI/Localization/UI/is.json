@@ -9,7 +9,7 @@
     "SwitchTenantHint": "Láttu nafnið vera tómt til að skipta yfir á hlið gestgjafans.",
     "SwitchTenant": "Skipta um leigjanda",
     "NotSelected": "Ekki valið",
-    "Permission:GroupName": "RadzenUI",
+    "Permission:SystemGroupName": "System Management",
     "Permission:AuditLogs": "Endurskoðunarferlar",
     "Permission:SettingManagement_Account": "Auðkenningaraðferð reiknings",
     "Menu:AccountSetting": "Auðkenningaraðferð reiknings",
@@ -42,3 +42,4 @@
     "Permission:Ou.ManageRoles": "Stjórnun hlutverka"
   }
 }
+

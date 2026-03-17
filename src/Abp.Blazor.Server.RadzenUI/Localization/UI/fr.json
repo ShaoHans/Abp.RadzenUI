@@ -9,7 +9,7 @@
     "SwitchTenantHint": "Laissez le champ Nom vide pour passer à l'hôte.",
     "SwitchTenant": "Changer de locataire",
     "NotSelected": "Non sélectionné",
-    "Permission:GroupName": "RadzenUI",
+    "Permission:SystemGroupName": "System Management",
     "Permission:AuditLogs": "Journaux d'audit",
     "Permission:SettingManagement_Account": "Méthode d'authentification du compte",
     "Menu:AccountSetting": "Méthode d'authentification du compte",
@@ -42,3 +42,4 @@
     "Permission:Ou.ManageRoles": "Gestion des rôles"
   }
 }
+

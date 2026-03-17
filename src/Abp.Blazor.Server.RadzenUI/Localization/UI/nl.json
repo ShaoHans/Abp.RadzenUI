@@ -9,7 +9,7 @@
     "SwitchTenantHint": "Laat het naamveld leeg om naar de host te schakelen.",
     "SwitchTenant": "Huurder wisselen",
     "NotSelected": "Niet geselecteerd",
-    "Permission:GroupName": "RadzenUI",
+    "Permission:SystemGroupName": "System Management",
     "Permission:AuditLogs": "Auditlogs",
     "Permission:SettingManagement_Account": "Account authenticatiemethode",
     "Menu:AccountSetting": "Account authenticatiemethode",
@@ -42,3 +42,4 @@
     "Permission:Ou.ManageRoles": "Rollen beheren"
   }
 }
+

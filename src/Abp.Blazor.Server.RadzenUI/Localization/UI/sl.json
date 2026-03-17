@@ -9,7 +9,7 @@
     "SwitchTenantHint": "Pustite polje z imenom prazno, da preklopite na stran gostitelja.",
     "SwitchTenant": "Zamenjaj najemnika",
     "NotSelected": "Ni izbran",
-    "Permission:GroupName": "RadzenUI",
+    "Permission:SystemGroupName": "System Management",
     "Permission:AuditLogs": "Revizijski zapisi",
     "Permission:SettingManagement_Account": "Metoda overjanja računa",
     "Menu:AccountSetting": "Metoda overjanja računa",
@@ -42,3 +42,4 @@
     "Permission:Ou.ManageRoles": "Upravljanje vlog"
   }
 }
+

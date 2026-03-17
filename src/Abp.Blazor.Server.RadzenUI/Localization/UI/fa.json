@@ -1,4 +1,4 @@
-﻿{
+{
   "culture": "fa",
   "texts": {
     "GivenTenantIsNotExist": "مستأجر واردشده یافت نشد: {0}",
@@ -9,7 +9,7 @@
     "SwitchTenantHint": "برای رفتن به میزبان، فیلد نام را خالی بگذارید.",
     "SwitchTenant": "تعویض مستأجر",
     "NotSelected": "انتخاب نشده",
-    "Permission:GroupName": "RadzenUI",
+    "Permission:SystemGroupName": "System Management",
     "Permission:AuditLogs": "گزارش‌های ممیزی",
     "Permission:SettingManagement_Account": "روش احراز هویت حساب",
     "Menu:AccountSetting": "روش احراز هویت حساب",
@@ -42,3 +42,4 @@
     "Permission:Ou.ManageRoles": "مدیریت نقش‌ها"
   }
 }
+

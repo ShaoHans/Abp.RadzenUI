@@ -9,7 +9,7 @@
     "SwitchTenantHint": "Αφήστε το πεδίο ονόματος κενό για εναλλαγή στον κεντρικό υπολογιστή.",
     "SwitchTenant": "Αλλαγή μισθωτή",
     "NotSelected": "Μη επιλεγμένο",
-    "Permission:GroupName": "RadzenUI",
+    "Permission:SystemGroupName": "System Management",
     "Permission:AuditLogs": "Αρχεία ελέγχου",
     "Permission:SettingManagement_Account": "Μέθοδος ελέγχου ταυτότητας λογαριασμού",
     "Menu:AccountSetting": "Μέθοδος ελέγχου ταυτότητας λογαριασμού",
@@ -42,3 +42,4 @@
     "Permission:Ou.ManageRoles": "Διαχείριση ρόλων"
   }
 }
+

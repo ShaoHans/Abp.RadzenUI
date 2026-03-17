@@ -9,7 +9,7 @@
     "SwitchTenantHint": "Hagyja üresen a nevet, hogy a host oldalra váltson.",
     "SwitchTenant": "Előfizető váltás",
     "NotSelected": "Nincs kiválasztva",
-    "Permission:GroupName": "RadzenUI",
+    "Permission:SystemGroupName": "System Management",
     "Permission:AuditLogs": "Auditnaplók",
     "Permission:SettingManagement_Account": "Fiók hitelesítési módja",
     "Menu:AccountSetting": "Fiók hitelesítési módja",
@@ -42,3 +42,4 @@
     "Permission:Ou.ManageRoles": "Szerepek kezelése"
   }
 }
+

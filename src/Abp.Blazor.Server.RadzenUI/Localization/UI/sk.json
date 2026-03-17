@@ -9,7 +9,7 @@
     "SwitchTenantHint": "Ak sa chcete prihlásiť ako používateľ hostiteľa, nechajte pole s menom prázdne.",
     "SwitchTenant": "Prepnúť tenanta",
     "NotSelected": "Nie je vybraný",
-    "Permission:GroupName": "RadzenUI",
+    "Permission:SystemGroupName": "System Management",
     "Permission:AuditLogs": "Auditové záznamy",
     "Permission:SettingManagement_Account": "Spôsob autentifikácie účtu",
     "Menu:AccountSetting": "Spôsob autentifikácie účtu",
@@ -42,3 +42,4 @@
     "Permission:Ou.ManageRoles": "Správa rolí"
   }
 }
+

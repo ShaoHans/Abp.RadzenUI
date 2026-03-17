@@ -9,7 +9,7 @@
     "SwitchTenantHint": "Lascia vuoto il campo nome per passare all'host.",
     "SwitchTenant": "Cambia tenant",
     "NotSelected": "Non selezionato",
-    "Permission:GroupName": "RadzenUI",
+    "Permission:SystemGroupName": "System Management",
     "Permission:AuditLogs": "Registri di controllo",
     "Permission:SettingManagement_Account": "Metodo di autenticazione account",
     "Menu:AccountSetting": "Metodo di autenticazione account",
@@ -42,3 +42,4 @@
     "Permission:Ou.ManageRoles": "Gestione ruoli"
   }
 }
+

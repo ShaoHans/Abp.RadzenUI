@@ -9,7 +9,7 @@
     "SwitchTenantHint": "اترك حقل الاسم فارغًا للتبديل إلى المضيف.",
     "SwitchTenant": "تغيير الجهة",
     "NotSelected": "غير محدد",
-    "Permission:GroupName": "RadzenUI",
+    "Permission:SystemGroupName": "System Management",
     "Permission:AuditLogs": "سجلات التدقيق",
     "Permission:SettingManagement_Account": "طريقة مصادقة الحساب",
     "Menu:AccountSetting": "طريقة مصادقة الحساب",
@@ -42,3 +42,4 @@
     "Permission:Ou.ManageRoles": "إدارة الأدوار"
   }
 }
+

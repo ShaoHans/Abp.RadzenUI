@@ -9,7 +9,7 @@
     "SwitchTenantHint": "Jätä nimikenttä tyhjäksi vaihtaaksesi isäntäpuolelle.",
     "SwitchTenant": "Vaihda vuokralainen",
     "NotSelected": "Ei valittu",
-    "Permission:GroupName": "RadzenUI",
+    "Permission:SystemGroupName": "System Management",
     "Permission:AuditLogs": "Tarkastuslokit",
     "Permission:SettingManagement_Account": "Tilin todennusmenetelmä",
     "Menu:AccountSetting": "Tilin todennusmenetelmä",
@@ -42,3 +42,4 @@
     "Permission:Ou.ManageRoles": "Roolien hallinta"
   }
 }
+

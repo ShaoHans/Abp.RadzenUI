@@ -9,7 +9,7 @@
     "SwitchTenantHint": "将名称字段留空以切换到主机端。",
     "SwitchTenant": "切换租户",
     "NotSelected": "未选择",
-    "Permission:GroupName": "RadzenUI",
+    "Permission:SystemGroupName": "系统管理",
     "Permission:AuditLogs": "审计日志",
     "Permission:SecurityLogs": "登录日志",
     "Menu:SecurityLogs": "登录日志",
@@ -76,3 +76,4 @@
     "Permission:Ou.ManageRoles": "管理角色"
   }
 }
+

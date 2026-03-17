@@ -9,7 +9,7 @@
     "SwitchTenantHint": "Ostavite polje Naziv prazno da biste prešli na host stranu.",
     "SwitchTenant": "Promijeni najmoprimca",
     "NotSelected": "Nije odabrano",
-    "Permission:GroupName": "RadzenUI",
+    "Permission:SystemGroupName": "System Management",
     "Permission:AuditLogs": "Dnevnici revizije",
     "Permission:SettingManagement_Account": "Metoda autentifikacije računa",
     "Menu:AccountSetting": "Metoda autentifikacije računa",
@@ -42,3 +42,4 @@
     "Permission:Ou.ManageRoles": "Upravljanje ulogama"
   }
 }
+

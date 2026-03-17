@@ -9,7 +9,7 @@
     "SwitchTenantHint": "將名稱欄位留空以切換到主控端。",
     "SwitchTenant": "切換租戶",
     "NotSelected": "尚未選定",
-    "Permission:GroupName": "RadzenUI",
+    "Permission:SystemGroupName": "系統管理",
     "Permission:AuditLogs": "審計日誌",
     "Permission:SecurityLogs": "登入日誌",
     "Menu:SecurityLogs": "登入日誌",
@@ -55,3 +55,4 @@
     "Permission:Ou.ManageRoles": "管理角色"
   }
 }
+

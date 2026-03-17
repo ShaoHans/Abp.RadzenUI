@@ -9,7 +9,7 @@
     "SwitchTenantHint": "Ponechte pole názvu prázdné pro přepnutí na hostitele.",
     "SwitchTenant": "Změnit tenant",
     "NotSelected": "Nevybráno",
-    "Permission:GroupName": "RadzenUI",
+    "Permission:SystemGroupName": "System Management",
     "Permission:AuditLogs": "Auditní záznamy",
     "Permission:SettingManagement_Account": "Metoda ověřování účtu",
     "Menu:AccountSetting": "Metoda ověřování účtu",
@@ -42,3 +42,4 @@
     "Permission:Ou.ManageRoles": "Správa rolí"
   }
 }
+

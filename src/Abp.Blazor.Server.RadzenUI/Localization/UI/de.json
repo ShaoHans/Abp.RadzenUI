@@ -9,7 +9,7 @@
     "SwitchTenantHint": "Lassen Sie das Namensfeld leer, um zum Host zu wechseln.",
     "SwitchTenant": "Mandant wechseln",
     "NotSelected": "Nicht ausgewählt",
-    "Permission:GroupName": "RadzenUI",
+    "Permission:SystemGroupName": "System Management",
     "Permission:AuditLogs": "Auditprotokolle",
     "Permission:SettingManagement_Account": "Authentifizierungsmethode des Kontos",
     "Menu:AccountSetting": "Authentifizierungsmethode des Kontos",
@@ -42,3 +42,4 @@
     "Permission:Ou.ManageRoles": "Verwaltung der Rollen"
   }
 }
+

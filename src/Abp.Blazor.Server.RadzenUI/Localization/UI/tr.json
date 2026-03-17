@@ -9,7 +9,7 @@
     "SwitchTenantHint": "Host tarafına geçmek için isim alanını boş bırakın.",
     "SwitchTenant": "Müşteri değiştir",
     "NotSelected": "Seçili değil",
-    "Permission:GroupName": "RadzenUI",
+    "Permission:SystemGroupName": "System Management",
     "Permission:AuditLogs": "Denetim Kayıtları",
     "Permission:SettingManagement_Account": "Hesap doğrulama yöntemi",
     "Menu:AccountSetting": "Hesap doğrulama yöntemi",
@@ -42,3 +42,4 @@
     "Permission:Ou.ManageRoles": "Rolleri yönetme"
   }
 }
+

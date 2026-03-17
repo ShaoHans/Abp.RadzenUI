@@ -2,9 +2,13 @@
 @using Volo.Abp.AspNetCore.Components.Web.Configuration
 @using Volo.Abp.PermissionManagement
 @using Volo.Abp.PermissionManagement.Localization
+@using Microsoft.Extensions.Localization
+@using Abp.RadzenUI.Localization
+@using Abp.RadzenUI.Permissions
 @inject IPermissionAppService PermissionAppService
 @inject ICurrentApplicationConfigurationCacheResetService CacheResetService
 @inject DialogService DialogService
+@inject IStringLocalizer<AbpRadzenUIResource> UI
 @inherits AbpRadzenUIComponentBase
 
 <RadzenStack JustifyContent="JustifyContent.SpaceBetween"
@@ -59,6 +63,16 @@
     [Parameter]
     public string ProviderKey { get; set; } = default!;
 
+    // Permission groups merged into the single "System Management" tab
+    private static readonly HashSet<string> _systemMgmtGroupNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "AbpIdentity",
+        "AbpTenantManagement",
+        "SettingManagement",
+        "FeatureManagement",
+        RadzenUIPermissions.GroupName
+    };
+
     List<PermissionGroupVm> _groups = [];
     List<PermissionGrantInfoDto> _disabledPermissions = [];
 
@@ -75,14 +89,39 @@
 
         var result = await PermissionAppService.GetAsync(ProviderName, ProviderKey);
 
-        foreach (var group in result.Groups)
+        var sysMgmtApiGroups = result.Groups
+            .Where(g => _systemMgmtGroupNames.Contains(g.Name))
+            .ToList();
+        var otherApiGroups = result.Groups
+            .Where(g => !_systemMgmtGroupNames.Contains(g.Name))
+            .ToList();
+
+        if (sysMgmtApiGroups.Count > 0)
+        {
+            var mergedTreeItems = new List<PermissionTreeItemVm>();
+            foreach (var g in sysMgmtApiGroups)
+            {
+                mergedTreeItems.AddRange(GenerateTree(g.Permissions, null, 0, null));
+            }
+
+            var displayName = UI["Permission:SystemGroupName"].Value;
+
+            _groups.Add(new PermissionGroupVm
+            {
+                Name = "SystemManagement",
+                DisplayName = displayName,
+                TreeItems = mergedTreeItems
+            });
+        }
+
+        foreach (var group in otherApiGroups)
         {
             _groups.Add(new PermissionGroupVm
-                {
-                    Name = group.Name,
-                    DisplayName = group.DisplayName,
-                    TreeItems = GenerateTree(group.Permissions, null, 0, null)
-                });
+            {
+                Name = group.Name,
+                DisplayName = group.DisplayName,
+                TreeItems = GenerateTree(group.Permissions, null, 0, null)
+            });
         }
 
         _selectAllDisabled = _groups.All(IsPermissionGroupDisabled);
