@@ -10,6 +10,12 @@ public static class RadzenUIPermissions
     {
         public const string Default = GroupName + ".AuditLogs";
     }
+
+    public static class SecurityLogs
+    {
+        public const string Default = GroupName + ".SecurityLogs";
+    }
+
     public static string[] GetAll()
     {
         return ReflectionHelper.GetPublicConstantsRecursively(typeof(RadzenUIPermissions));

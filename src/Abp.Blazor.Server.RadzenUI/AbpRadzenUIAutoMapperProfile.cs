@@ -1,4 +1,5 @@
 using Abp.RadzenUI.Application.Contracts.AuditLogs;
+using Abp.RadzenUI.Application.Contracts.IdentitySecurityLogs;
 using Abp.RadzenUI.Application.Contracts.Organizations;
 using Abp.RadzenUI.Models;
 using Riok.Mapperly.Abstractions;
@@ -39,6 +40,18 @@ public partial class AuditLogToAuditLogDtoMapper : MapperBase<AuditLog, AuditLog
     public override partial AuditLogDto Map(AuditLog source);
 
     public override partial void Map(AuditLog source, AuditLogDto destination);
+}
+
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+public partial class IdentitySecurityLogToIdentitySecurityLogDtoMapper
+    : MapperBase<IdentitySecurityLog, IdentitySecurityLogDto>
+{
+    public override partial IdentitySecurityLogDto Map(IdentitySecurityLog source);
+
+    public override partial void Map(
+        IdentitySecurityLog source,
+        IdentitySecurityLogDto destination
+    );
 }
 
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]

@@ -145,6 +145,7 @@ public class AbpRadzenUIModule : AbpModule
             options.MenuContributors.Add(new AbpIdentityMenuContributor());
             options.MenuContributors.Add(new AbpTenantMenuContributor());
             options.MenuContributors.Add(new AuditLoggingMenuContributor());
+            options.MenuContributors.Add(new IdentitySecurityLogMenuContributor());
             options.MenuContributors.Add(new SettingManagementMenuContributor());
         });
 

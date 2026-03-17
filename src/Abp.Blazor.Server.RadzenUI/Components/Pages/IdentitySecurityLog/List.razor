@@ -1,0 +1,43 @@
+@page "/identity/security-logs"
+@using Abp.RadzenUI.Application.Contracts.IdentitySecurityLogs
+@using Abp.RadzenUI.Application.Contracts.CommonDtos
+@using Abp.RadzenUI.Permissions
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(RadzenUIPermissions.SecurityLogs.Default)]
+@inherits AbpCrudPageBase<IIdentitySecurityLogAppService, IdentitySecurityLogDto, Guid, GetIdentitySecurityLogsInput, EmptyCreateDto, EmptyUpdateDto>
+
+<PageTitle>@L["PageTitle:SecurityLogs"]</PageTitle>
+
+<RadzenDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true"
+                PagerHorizontalAlign="HorizontalAlign.Center"
+                Style="height:calc(100vh - 150px)" PageSize="@_defaultPageSize"
+                PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
+                Count="@_totalCount" IsLoading="@_isLoading">
+    <HeaderTemplate>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap" Gap="8px">
+            <RadzenDatePicker TValue="DateTime?" @bind-Value="_loginTimeStart" ShowTime="true" DateFormat="yyyy-MM-dd HH:mm:ss"
+                              Placeholder="@L["DisplayName:SecurityLog.LoginTimeStart"]" Style="width:220px" />
+            <RadzenDatePicker TValue="DateTime?" @bind-Value="_loginTimeEnd" ShowTime="true" DateFormat="yyyy-MM-dd HH:mm:ss"
+                              Placeholder="@L["DisplayName:SecurityLog.LoginTimeEnd"]" Style="width:220px" />
+            <RadzenTextBox @bind-Value="_userName" Placeholder="@L["DisplayName:SecurityLog.UserName"]" Style="width:220px;" />
+            <RadzenButton Icon="search" Text="@L["Btn:Search"]" Click="@(async () => await SearchAsync())" />
+            <RadzenButton Icon="refresh" Text="@L["Btn:Reset"]" ButtonStyle="ButtonStyle.Secondary" Click="@(async () => await ResetAsync())" />
+        </RadzenStack>
+    </HeaderTemplate>
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(IdentitySecurityLogDto.ApplicationName)" Title="@L["DisplayName:SecurityLog.ApplicationName"]" Sortable="false" />
+        <RadzenDataGridColumn Property="@nameof(IdentitySecurityLogDto.UserName)" Title="@L["DisplayName:SecurityLog.UserName"]" />
+        <RadzenDataGridColumn Property="@nameof(IdentitySecurityLogDto.TenantName)" Title="@L["DisplayName:SecurityLog.TenantName"]" Sortable="false" />
+        <RadzenDataGridColumn Property="@nameof(IdentitySecurityLogDto.Action)" Title="@L["DisplayName:SecurityLog.LoginStatus"]" Sortable="false" />
+        <RadzenDataGridColumn Property="@nameof(IdentitySecurityLogDto.ClientIpAddress)" Title="@L["DisplayName:SecurityLog.ClientIpAddress"]" Sortable="false">
+            <Template>
+                <RadzenLabel>@context.ClientIpAddress?.Replace("::ffff:", "")</RadzenLabel>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(IdentitySecurityLogDto.CreationTime)" Title="@L["DisplayName:SecurityLog.LoginTime"]" Width="200px">
+            <Template>
+                <RadzenLabel>@context.CreationTime.ToLocalTime()</RadzenLabel>
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
