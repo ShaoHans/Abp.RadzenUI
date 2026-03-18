@@ -4,7 +4,7 @@ using Volo.Abp.MultiTenancy;
 
 namespace Abp.RadzenUI.DataDictionaries;
 
-public class DataDictionaryItem : AuditedAggregateRoot<Guid>, IMultiTenant
+public class DataDictionaryItem : FullAuditedAggregateRoot<Guid>, IMultiTenant
 {
     public Guid? TenantId { get; set; }
 
