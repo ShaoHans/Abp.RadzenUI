@@ -73,7 +73,33 @@
     "Permission:Ou.Default": "组织机构管理",
     "Permission:Ou.ManageTree": "管理组织机构树",
     "Permission:Ou.ManageUsers": "管理用户",
-    "Permission:Ou.ManageRoles": "管理角色"
+    "Permission:Ou.ManageRoles": "管理角色",
+
+    "Permission:DataDictionary": "数据字典管理",
+    "Permission:DataDictionary.Create": "创建",
+    "Permission:DataDictionary.Update": "更新",
+    "Permission:DataDictionary.Delete": "删除",
+    "Menu:DataDictionary": "数据字典",
+    "DataDictionary:TypeCodeExist": "字典类型编码 '{code}' 已存在。",
+    "DataDictionary:ItemCodeExist": "字典项编码 '{code}' 已存在。",
+    "DataDictionary:TypeHasItems": "无法删除该字典类型，因为它关联了字典项。",
+    "DisplayName:DataDictionaryType.Code": "编码",
+    "DisplayName:DataDictionaryType.Name": "名称",
+    "DisplayName:DataDictionaryType.Description": "描述",
+    "DisplayName:DataDictionaryItem.Code": "编码",
+    "DisplayName:DataDictionaryItem.Name": "名称",
+    "DisplayName:DataDictionaryItem.Sort": "排序",
+    "DisplayName:DataDictionaryItem.IsActive": "是否启用",
+    "DisplayName:DataDictionaryItem.Description": "描述",
+    "DataDictionary:Types": "字典类型",
+    "DataDictionary:Items": "字典项",
+    "DataDictionary:CreateType": "新增字典类型",
+    "DataDictionary:EditType": "编辑字典类型",
+    "DataDictionary:CreateItem": "新增字典项",
+    "DataDictionary:EditItem": "编辑字典项",
+    "DataDictionary:DeleteType.Confirm": "您确定要删除字典类型 '{0}' 吗？",
+    "DataDictionary:DeleteItem.Confirm": "您确定要删除字典项 '{0}' 吗？",
+    "DataDictionary:SelectType": "请在左侧选择一个字典类型。"
   }
 }
 

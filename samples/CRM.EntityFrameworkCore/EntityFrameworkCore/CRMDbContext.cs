@@ -1,4 +1,5 @@
 using CRM.Products;
+using Abp.RadzenUI.DataDictionaries;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -20,11 +21,13 @@ namespace CRM.EntityFrameworkCore;
 
 [ReplaceDbContext(typeof(IIdentityDbContext))]
 [ReplaceDbContext(typeof(ITenantManagementDbContext))]
+[ReplaceDbContext(typeof(IDataDictionaryDbContext))]
 [ConnectionStringName("Default")]
 public class CRMDbContext(DbContextOptions<CRMDbContext> options)
     : AbpDbContext<CRMDbContext>(options),
         ITenantManagementDbContext,
-        IIdentityDbContext
+        IIdentityDbContext,
+        IDataDictionaryDbContext
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
 
@@ -59,6 +62,10 @@ public class CRMDbContext(DbContextOptions<CRMDbContext> options)
     // Business Modules
     public DbSet<Product> Products { get; set; }
 
+    // Data Dictionary
+    public DbSet<DataDictionaryType> DataDictionaryTypes { get; set; }
+    public DbSet<DataDictionaryItem> DataDictionaryItems { get; set; }
+
     #endregion
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -76,6 +83,7 @@ public class CRMDbContext(DbContextOptions<CRMDbContext> options)
         builder.ConfigureOpenIddict();
         builder.ConfigureTenantManagement();
         builder.ConfigureBlobStoring();
+        builder.ConfigureDataDictionary();
 
         /* Configure your own tables/entities inside here */
 

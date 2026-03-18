@@ -32,4 +32,9 @@ public class RadzenUI
     {
         public const string GroupName = "SettingManagement";
     }
+
+    public static class DataDictionaryMenuNames
+    {
+        public const string Default = "DataDictionary";
+    }
 }

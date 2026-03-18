@@ -1,6 +1,7 @@
 ﻿using Abp.RadzenUI.Blazor.SettingManagement;
 using Abp.RadzenUI.Bundling;
 using Abp.RadzenUI.Avatar;
+using Abp.RadzenUI.DataDictionaries;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Menus;
 using Abp.RadzenUI.Services;
@@ -32,6 +33,7 @@ using Volo.Abp.TenantManagement.EntityFrameworkCore;
 using Volo.Abp.UI.Navigation;
 using Volo.Abp.Validation.Localization;
 using Volo.Abp.VirtualFileSystem;
+using Volo.Abp.EntityFrameworkCore;
 
 namespace Abp.RadzenUI;
 
@@ -146,6 +148,7 @@ public class AbpRadzenUIModule : AbpModule
             options.MenuContributors.Add(new AbpTenantMenuContributor());
             options.MenuContributors.Add(new AuditLoggingMenuContributor());
             options.MenuContributors.Add(new IdentitySecurityLogMenuContributor());
+            options.MenuContributors.Add(new DataDictionaryMenuContributor());
             options.MenuContributors.Add(new SettingManagementMenuContributor());
         });
 
@@ -158,5 +161,10 @@ public class AbpRadzenUIModule : AbpModule
 
         context.Services.AddSingleton(typeof(AbpBlazorMessageLocalizerHelper<>));
         context.Services.AddTransient<IUploadService, DefaultUploadService>();
+
+        context.Services.AddAbpDbContext<DataDictionaryDbContext>(options =>
+        {
+            options.AddDefaultRepositories();
+        });
     }
 }

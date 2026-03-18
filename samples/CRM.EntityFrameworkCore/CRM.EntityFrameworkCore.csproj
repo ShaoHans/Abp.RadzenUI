@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CRM.Domain\CRM.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Abp.Blazor.Server.RadzenUI\Abp.Blazor.Server.RadzenUI.csproj" />
   </ItemGroup>
 
   <ItemGroup>

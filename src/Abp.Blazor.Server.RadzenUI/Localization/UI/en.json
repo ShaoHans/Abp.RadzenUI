@@ -72,7 +72,33 @@
     "Permission:Ou.Default": "Organization unit management",
     "Permission:Ou.ManageTree": "Managing organization tree",
     "Permission:Ou.ManageUsers": "Managing users",
-    "Permission:Ou.ManageRoles": "Managing roles"
+    "Permission:Ou.ManageRoles": "Managing roles",
+
+    "Permission:DataDictionary": "Data dictionary management",
+    "Permission:DataDictionary.Create": "Create",
+    "Permission:DataDictionary.Update": "Update",
+    "Permission:DataDictionary.Delete": "Delete",
+    "Menu:DataDictionary": "Data Dictionary",
+    "DataDictionary:TypeCodeExist": "Dictionary type code '{code}' already exists.",
+    "DataDictionary:ItemCodeExist": "Dictionary item code '{code}' already exists.",
+    "DataDictionary:TypeHasItems": "Cannot delete this dictionary type because it has associated items.",
+    "DisplayName:DataDictionaryType.Code": "Code",
+    "DisplayName:DataDictionaryType.Name": "Name",
+    "DisplayName:DataDictionaryType.Description": "Description",
+    "DisplayName:DataDictionaryItem.Code": "Code",
+    "DisplayName:DataDictionaryItem.Name": "Name",
+    "DisplayName:DataDictionaryItem.Sort": "Sort",
+    "DisplayName:DataDictionaryItem.IsActive": "Is Active",
+    "DisplayName:DataDictionaryItem.Description": "Description",
+    "DataDictionary:Types": "Dictionary Types",
+    "DataDictionary:Items": "Dictionary Items",
+    "DataDictionary:CreateType": "New Dictionary Type",
+    "DataDictionary:EditType": "Edit Dictionary Type",
+    "DataDictionary:CreateItem": "New Dictionary Item",
+    "DataDictionary:EditItem": "Edit Dictionary Item",
+    "DataDictionary:DeleteType.Confirm": "Are you sure you want to delete the dictionary type '{0}'?",
+    "DataDictionary:DeleteItem.Confirm": "Are you sure you want to delete the dictionary item '{0}'?",
+    "DataDictionary:SelectType": "Please select a dictionary type on the left."
   }
 }
 

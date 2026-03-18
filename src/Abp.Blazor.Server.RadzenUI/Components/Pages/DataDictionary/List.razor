@@ -1,0 +1,147 @@
+@page "/data-dictionary"
+@using Abp.RadzenUI.Application.Contracts.DataDictionaries
+@using Abp.RadzenUI.DataDictionaries
+@using Abp.RadzenUI.Permissions
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(RadzenUIPermissions.DataDictionary.Default)]
+@inherits AbpRadzenUIComponentBase
+
+<PageTitle>@L["Menu:DataDictionary"]</PageTitle>
+
+<RadzenRow Gap="1rem" Style="height:calc(100vh - 150px)">
+    @* Left panel - Dictionary Types *@
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard Variant="Variant.Filled" Style="height:100%; display:flex; flex-direction:column">
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween"
+                         AlignItems="AlignItems.Center" class="rz-mb-2">
+                <RadzenText Text="@L["DataDictionary:Types"]" TextStyle="TextStyle.H6" Style="margin:0" />
+                @if (HasCreatePermission)
+                {
+                    <RadzenButton Icon="add" Text="@UL["NewBtn"]" Size="ButtonSize.Small"
+                                  Click="OpenCreateTypeDialogAsync" />
+                }
+            </RadzenStack>
+            <RadzenTextBox @bind-Value="_typeFilter" Placeholder="@L["Btn:Search"]"
+                           Style="width:100%; margin-bottom:8px;"
+                           Change="@(async (_) => await LoadTypesAsync())" />
+            <div style="flex:1; overflow:auto">
+                <RadzenDataList Data="@_types" TItem="DataDictionaryTypeDto" Style="width:100%">
+                    <Template Context="type">
+                        <RadzenCard @onclick="() => SelectType(type)"
+                                    Variant="Variant.Outlined"
+                                    Style="@GetTypeCardStyle(type)"
+                                    class="rz-mb-1 rz-cursor-pointer">
+                            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween"
+                                         AlignItems="AlignItems.Center">
+                                <RadzenStack Gap="0">
+                                    <RadzenText TextStyle="TextStyle.Subtitle1" Style="margin:0">
+                                        <strong>@type.Name</strong>
+                                    </RadzenText>
+                                    <RadzenText TextStyle="TextStyle.Caption" Style="margin:0; color:var(--rz-text-secondary-color)">
+                                        @type.Code
+                                    </RadzenText>
+                                </RadzenStack>
+                                <RadzenStack Orientation="Orientation.Horizontal" Gap="4px">
+                                    @if (HasUpdatePermission)
+                                    {
+                                        <RadzenButton Icon="edit" Size="ButtonSize.ExtraSmall"
+                                                      ButtonStyle="ButtonStyle.Light"
+                                                      Click="@(async () => await OpenEditTypeDialogAsync(type))"
+                                                      Click:stopPropagation="true" />
+                                    }
+                                    @if (HasDeletePermission)
+                                    {
+                                        <RadzenButton Icon="delete" Size="ButtonSize.ExtraSmall"
+                                                      ButtonStyle="ButtonStyle.Danger"
+                                                      Click="@(async () => await DeleteTypeAsync(type))"
+                                                      Click:stopPropagation="true" />
+                                    }
+                                </RadzenStack>
+                            </RadzenStack>
+                            @if (!string.IsNullOrEmpty(type.Description))
+                            {
+                                <RadzenText TextStyle="TextStyle.Body2" Style="margin-top:4px; color:var(--rz-text-secondary-color)">
+                                    @type.Description
+                                </RadzenText>
+                            }
+                        </RadzenCard>
+                    </Template>
+                </RadzenDataList>
+            </div>
+        </RadzenCard>
+    </RadzenColumn>
+
+    @* Right panel - Dictionary Items *@
+    <RadzenColumn Size="12" SizeMD="8">
+        <RadzenCard Variant="Variant.Filled" Style="height:100%; display:flex; flex-direction:column">
+            @if (_selectedType == null)
+            {
+                <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="flex:1">
+                    <RadzenIcon Icon="list_alt" Style="font-size:48px; color:var(--rz-text-secondary-color)" />
+                    <RadzenText TextStyle="TextStyle.H6" Style="color:var(--rz-text-secondary-color)">
+                        @L["DataDictionary:SelectType"]
+                    </RadzenText>
+                </RadzenStack>
+            }
+            else
+            {
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween"
+                             AlignItems="AlignItems.Center" class="rz-mb-2">
+                    <RadzenText TextStyle="TextStyle.H6" Style="margin:0">
+                        @L["DataDictionary:Items"] - @_selectedType.Name
+                    </RadzenText>
+                    @if (HasCreatePermission)
+                    {
+                        <RadzenButton Icon="add" Text="@UL["NewBtn"]" Size="ButtonSize.Small"
+                                      Click="OpenCreateItemDialogAsync" />
+                    }
+                </RadzenStack>
+                <RadzenDataGrid @ref="_itemGrid" Data="@_items" AllowPaging="true" AllowSorting="true"
+                                PagerHorizontalAlign="HorizontalAlign.Center"
+                                Style="flex:1" PageSize="@_defaultPageSize"
+                                PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="true"
+                                LoadData="LoadItemsAsync" Count="@_itemTotalCount" IsLoading="@_isItemLoading">
+                    <HeaderTemplate>
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap" Gap="8px">
+                            <RadzenTextBox @bind-Value="_itemFilter" Placeholder="@L["Btn:Search"]" Style="width:220px" />
+                            <RadzenButton Icon="search" Text="@L["Btn:Search"]" Click="@(async () => await SearchItemsAsync())" />
+                            <RadzenButton Icon="refresh" Text="@L["Btn:Reset"]" ButtonStyle="ButtonStyle.Secondary"
+                                          Click="@(async () => await ResetItemsAsync())" />
+                        </RadzenStack>
+                    </HeaderTemplate>
+                    <Columns>
+                        <RadzenDataGridColumn Property="@nameof(DataDictionaryItemDto.Code)"
+                                              Title="@L["DisplayName:DataDictionaryItem.Code"]" Width="120px" />
+                        <RadzenDataGridColumn Property="@nameof(DataDictionaryItemDto.Name)"
+                                              Title="@L["DisplayName:DataDictionaryItem.Name"]" Width="150px" />
+                        <RadzenDataGridColumn Property="@nameof(DataDictionaryItemDto.Sort)"
+                                              Title="@L["DisplayName:DataDictionaryItem.Sort"]" Width="80px" />
+                        <RadzenDataGridColumn Property="@nameof(DataDictionaryItemDto.IsActive)"
+                                              Title="@L["DisplayName:DataDictionaryItem.IsActive"]" Width="100px">
+                            <Template Context="item">
+                                <RadzenSwitch Value="@item.IsActive" Disabled="@(!HasUpdatePermission)"
+                                              Change="@(async (bool _) => await ToggleItemActiveAsync(item))" />
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Property="@nameof(DataDictionaryItemDto.Description)"
+                                              Title="@L["DisplayName:DataDictionaryItem.Description"]" />
+                        <RadzenDataGridColumn Title="@UL["Actions"]" Width="120px" Sortable="false" TextAlign="TextAlign.Center">
+                            <Template Context="item">
+                                @if (HasUpdatePermission)
+                                {
+                                    <RadzenButton Icon="edit" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Light"
+                                                  Click="@(async () => await OpenEditItemDialogAsync(item))" />
+                                }
+                                @if (HasDeletePermission)
+                                {
+                                    <RadzenButton Icon="delete" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Danger"
+                                                  Click="@(async () => await DeleteItemAsync(item))" class="rz-ml-1" />
+                                }
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            }
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>

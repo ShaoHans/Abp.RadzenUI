@@ -1,0 +1,56 @@
+@using Abp.RadzenUI.Application.Contracts.DataDictionaries
+@using Abp.RadzenUI.DataDictionaries
+@using Volo.Abp.AspNetCore.Components
+@inherits AbpRadzenUIComponentBase
+
+<RadzenTemplateForm TItem="CreateDataDictionaryTypeDto" Data=@DialogFromOption.Model Submit=@DialogFromOption.OnSubmit
+                    Style="max-height:calc(100vh - 200px); display: flex; flex-direction:column">
+    <DialogFormLayout CancelClick="DialogFromOption.OnCancel">
+        <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                    <RequiredMark />
+                    <RadzenLabel Text="@L["DisplayName:DataDictionaryType.Code"]" Component="Code" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8">
+                    <RadzenTextBox Name="Code" @bind-Value=@DialogFromOption.Model.Code
+                                   Style="display: block; width: 100%;"
+                                   MaxLength="DataDictionaryTypeConsts.MaxCodeLength" />
+                    <RadzenRequiredValidator Component="Code" Text="@L.Required("DisplayName:DataDictionaryType.Code")" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                    <RequiredMark />
+                    <RadzenLabel Text="@L["DisplayName:DataDictionaryType.Name"]" Component="Name" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8">
+                    <RadzenTextBox Name="Name" @bind-Value=@DialogFromOption.Model.Name
+                                   Style="display: block; width: 100%;"
+                                   MaxLength="DataDictionaryTypeConsts.MaxNameLength" />
+                    <RadzenRequiredValidator Component="Name" Text="@L.Required("DisplayName:DataDictionaryType.Name")" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                    <RadzenLabel Text="@L["DisplayName:DataDictionaryType.Description"]" Component="Description" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8">
+                    <RadzenTextArea Name="Description" @bind-Value=@DialogFromOption.Model.Description
+                                    Style="display: block; width: 100%;" Rows="3"
+                                    MaxLength="DataDictionaryTypeConsts.MaxDescriptionLength" />
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenStack>
+    </DialogFormLayout>
+</RadzenTemplateForm>
+
+@code {
+    [Parameter]
+    public DialogFromOption<CreateDataDictionaryTypeDto> DialogFromOption { get; set; } = default!;
+
+    public CreateType()
+    {
+        LocalizationResource = typeof(AbpRadzenUIResource);
+    }
+}
