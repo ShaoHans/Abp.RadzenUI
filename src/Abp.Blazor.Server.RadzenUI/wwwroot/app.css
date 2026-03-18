@@ -141,8 +141,8 @@ h1:focus {
 }
 
 .avatar-header-image {
-    width: 36px;
-    height: 36px;
+    width: 30px;
+    height: 30px;
     border-radius: 9999px;
     object-fit: cover;
     display: block;

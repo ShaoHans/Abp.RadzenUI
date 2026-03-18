@@ -27,7 +27,20 @@
         </RadzenStack>
     </HeaderTemplate>
     <Columns>
-        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.UserName)" Frozen="true" Title="@L["DisplayName:UserName"]" Width="100px" />
+        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.UserName)" Frozen="true" Title="@L["DisplayName:UserName"]" Width="140px">
+            <Template>
+                @{
+                    var avatarUrl = GetAvatarUrl(context);
+                }
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="8px" Wrap="FlexWrap.NoWrap">
+                    @if (!string.IsNullOrWhiteSpace(avatarUrl))
+                    {
+                        <img src="@avatarUrl" alt="@context.UserName" class="avatar-header-image" />
+                    }
+                    <RadzenLabel Text="@context.UserName" />
+                </RadzenStack>
+            </Template>
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(IdentityUserDto.UserName)" Title="@IL["Display:User.FullName"]" Width="100px">
             <Template>
                 @{

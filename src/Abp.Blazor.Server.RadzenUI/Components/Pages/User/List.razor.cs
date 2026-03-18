@@ -1,9 +1,11 @@
+using Abp.RadzenUI.Avatar;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 using Radzen;
+using Volo.Abp.Data;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.Localization;
 using Volo.Abp.ObjectExtending;
@@ -31,7 +33,16 @@ public partial class List
 
     protected override void OnInitialized()
     {
-        _extraColumns = RadzenColumnHelper.GetExtraPropertyMetas<IdentityUserDto>();
+        _extraColumns = RadzenColumnHelper
+            .GetExtraPropertyMetas<IdentityUserDto>()
+            .Where(x => !x.Name.Equals(AvatarConsts.ExtraPropertyName, StringComparison.Ordinal))
+            .ToList();
+    }
+
+    protected static string? GetAvatarUrl(IdentityUserDto user)
+    {
+        var avatarUrl = user.GetProperty<string>(AvatarConsts.ExtraPropertyName);
+        return string.IsNullOrWhiteSpace(avatarUrl) ? null : avatarUrl;
     }
 
     protected override async Task SetPermissionsAsync()
