@@ -44,6 +44,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Abp.RadzenUI.DataDictionary.EntityFrameworkCore\Abp.RadzenUI.DataDictionary.EntityFrameworkCore.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<EmbeddedResource Include="Localization\UI\*.json" />
 		<Content Remove="Localization\UI\*.json" />
 	</ItemGroup>

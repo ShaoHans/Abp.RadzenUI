@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CRM.Domain\CRM.Domain.csproj" />
-    <ProjectReference Include="..\..\src\Abp.Blazor.Server.RadzenUI\Abp.Blazor.Server.RadzenUI.csproj" />
+    <ProjectReference Include="..\..\src\Abp.RadzenUI.DataDictionary.EntityFrameworkCore\Abp.RadzenUI.DataDictionary.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>
