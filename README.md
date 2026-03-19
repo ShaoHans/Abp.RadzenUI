@@ -2,7 +2,7 @@
 
 <div align="center">
 
-Abp RadzenUI is a UI theme built on the [Abp](https://github.com/abpframework/abp) framework and developed using the [Radzen Blazor](https://github.com/radzenhq/radzen-blazor) component.
+Abp RadzenUI is a Blazor Server UI theme built on top of the [ABP](https://github.com/abpframework/abp) framework and crafted with the [Radzen Blazor](https://github.com/radzenhq/radzen-blazor) component library.
 
 ![build](https://github.com/ShaoHans/Abp.RadzenUI/actions/workflows/publish-nuget.yml/badge.svg)
 [![AbpRadzen.Blazor.Server.UI](https://img.shields.io/nuget/v/AbpRadzen.Blazor.Server.UI.svg?color=red)](https://www.nuget.org/packages/AbpRadzen.Blazor.Server.UI/)
@@ -13,57 +13,50 @@ Abp RadzenUI is a UI theme built on the [Abp](https://github.com/abpframework/ab
 
 English | [简体中文](README_zh-CN.md)
 
-## ❤️Demo Site
+## Contents
+
+- [Try the Demo](#-try-the-demo)
+- [Get Started](#-get-started)
+- [Use the Data Dictionary Module](#-use-the-data-dictionary-module)
+- [Preview the Interface](#-preview-the-interface)
+
+## ❤️ Try the Demo
 [http://111.230.87.81:20103/](http://111.230.87.81:20103/)
 
 UserName:  **test**
 
 Password:  **1q2w#E***
 
-## 🎨Page display
+## 🌱 Get Started
 
-### 1.The login page
-![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/login.png)
+### Integration Steps
 
-### 2.The list page
-![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/list.png)
-
-### 3.The other list page with datagrid filter
-![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/list-with-filter.png)
-
-### 4.Theme switch
-![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/switch-theme.png)
-
-### 5.Organization units
-![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/ou.png)
-
-## 🌱How to use
-
-### 1. Create new solution by abp cli
+#### 1. Create a new solution with the ABP CLI
 ```shell
 abp new CRM -u blazor-server -dbms PostgreSQL -m none --theme leptonx-lite -csf
 ```
 
-### 2. Install `AbpRadzen.Blazor.Server.UI` on your `CRM.Blazor` project
+#### 2. Install `AbpRadzen.Blazor.Server.UI` in your `CRM.Blazor` project
 ```shell
 dotnet add package AbpRadzen.Blazor.Server.UI
 ```
 
-### 3. Remove the nuget packages and code associated with the leptonx-lite theme
-This is mainly the code in the `CRMBlazorModule` class and delete files in the Pages directory
+#### 3. Remove the NuGet packages and code related to the `leptonx-lite` theme
+In practice, this mainly means cleaning up the code in `CRMBlazorModule` and removing the default Razor pages under the `Pages` directory.
 
-### 4. Config Abp RadzenUI
-Add the `ConfigureAbpRadzenUI` method on your `ConfigService` method
+#### 4. Configure Abp RadzenUI
+Add a `ConfigureAbpRadzenUI` method inside your `ConfigService` method:
 ```csharp
 private void ConfigureAbpRadzenUI()
 {
     // Configure AbpRadzenUI
     Configure<AbpRadzenUIOptions>(options =>
     {
-        // this is very imporant to set current web application's pages to the AbpRadzenUI module
+        // This is important. It registers the Razor pages from your current web application
+        // so that they can be discovered by the router inside the AbpRadzenUI module.
         options.RouterAdditionalAssemblies = [typeof(Home).Assembly];
 
-        // other settings
+        // Other optional settings
         //options.TitleBar = new TitleBarSettings
         //{
         //    ShowLanguageMenu = false,
@@ -79,11 +72,12 @@ private void ConfigureAbpRadzenUI()
         //    EnablePremiumTheme = true,
         //};
 
-        // configure external login provider icon
+        // Configure the icon for external login providers
         options.ExternalLogin.Providers.Add(new ExternalLoginProvider("AzureOpenId", "images/microsoft-logo.svg"));
     });
 
-    // Configure AbpMultiTenancyOptions, this will affect login page that whether need to switch tenants
+    // Configure AbpMultiTenancyOptions. This controls whether tenant switching
+    // is shown on the login page.
     Configure<AbpMultiTenancyOptions>(options =>
     {
         options.IsEnabled = MultiTenancyConsts.IsEnabled;
@@ -92,18 +86,19 @@ private void ConfigureAbpRadzenUI()
     // Configure AbpLocalizationOptions
     Configure<AbpLocalizationOptions>(options =>
     {
-        // set AbpRadzenUIResource as BaseTypes for your application's localization resources
+        // Inherit from AbpRadzenUIResource so your application can reuse
+        // the built-in localization texts provided by this UI package.
         var crmResource = options.Resources.Get<CRMResource>();
         crmResource.AddBaseTypes(typeof(AbpRadzenUIResource));
 
-        // if you don't want to use the default language list, you can clear it and add your own languages
+        // If you prefer a custom language list, clear the default set and add your own.
         options.Languages.Clear();
         options.Languages.Add(new LanguageInfo("en", "en", "English"));
         options.Languages.Add(new LanguageInfo("fr", "fr", "Français"));
         options.Languages.Add(new LanguageInfo("zh-Hans", "zh-Hans", "简体中文"));
     });
 
-    // Configure your web application's navigation menu
+    // Configure your application's navigation menu
     Configure<AbpNavigationOptions>(options =>
     {
         options.MenuContributors.Add(new CRMMenuContributor());
@@ -111,18 +106,18 @@ private void ConfigureAbpRadzenUI()
 }
 ```
 
-then add the following code on your `OnApplicationInitialization` method
+Then add the following line at the end of your `OnApplicationInitialization` method:
 ```csharp
 app.UseRadzenUI();
 ```
 
-yuo can refer to the sample code [CRMBlazorWebModule](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/CRMBlazorWebModule.cs)
+For a complete example, refer to [CRMBlazorWebModule](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/CRMBlazorWebModule.cs).
 
-### 5. Config Menu
-When you add razor page and need config menu , you should edit the [CRMMenuContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/Menus/CRMMenuContributor.cs) class 
+#### 5. Configure the menu
+Whenever you add a new Razor page and want it to appear in the sidebar, update the [CRMMenuContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/Menus/CRMMenuContributor.cs) class accordingly.
 
-### 6. Config External Login
-If you want to integrate third-party authentication such as Azure AD, it's quite straightforward. Simply update your configuration file as shown below, and add the necessary setup in your web project’s module. Once completed, third-party login functionality will be enabled and ready to use.You can refer to the sample project to see how it is implemented in practice.
+#### 6. Configure external login
+If you want to integrate a third-party identity provider such as Azure AD, the setup is straightforward. Add the following configuration to your settings file, then register the authentication handler in your web module. You can also refer to the sample project for a working implementation.
 ```json
 "AzureAd": {
   "Instance": "https://login.microsoftonline.com/",
@@ -165,36 +160,48 @@ private void ConfigureOidcAuthentication(
     }
 }
 ```
-### 7. Configuration Settings Page
-In the process of system development, we often need to configure certain system or business parameters, such as email service providers, SMS service providers, etc. Usually, corresponding pages are developed to configure these parameters. The Abp framework provides [Settings](https://abp.io/docs/latest/framework/infrastructure/settings?_redirected=B8ABF606AA1BDF5C629883DF1061649A), which makes it convenient to save and manage such settings. Based on this, this UI component allows you to easily create configuration pages for unified management. By following the steps below, your custom configuration component will be automatically added as a tab item on the settings page:
+#### 7. Configure the settings page
+In real-world projects, it is common to manage system-level or business-level settings such as email providers, SMS providers, and similar options. ABP provides a convenient [Settings](https://abp.io/docs/latest/framework/infrastructure/settings?_redirected=B8ABF606AA1BDF5C629883DF1061649A) infrastructure for persisting and retrieving these values. Based on that mechanism, this UI package makes it easy to surface configuration components as tabs on a unified settings page.
 
-#### (1) Create your parameter configuration service, for example: [AccountSettingsAppService](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Application/AccountSettingsAppService.cs)
+Follow the steps below to add your own settings component:
 
-#### (2) Create your parameter configuration Blazor component, for example: [AccountSettingComponent](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Components/Pages/Setting/AccountSettingComponent.razor)
+##### (1) Create an application service for your settings, for example: [AccountSettingsAppService](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Application/AccountSettingsAppService.cs)
 
-#### (3) Define your parameter configuration Contributor by implementing the interface `ISettingComponentContributor`. This contributor is mainly used to add your parameter configuration Blazor component, for example: [AccountPageContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Blazor/SettingManagement/AccountPageContributor.cs)
+##### (2) Create a Blazor component for the settings UI, for example: [AccountSettingComponent](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Components/Pages/Setting/AccountSettingComponent.razor)
 
-#### (4) Finally, add your Contributor to the Module configuration
+##### (3) Create a contributor by implementing `ISettingComponentContributor`. The contributor is responsible for registering your settings component, for example: [AccountPageContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Blazor/SettingManagement/AccountPageContributor.cs)
 
+##### (4) Finally, register the contributor in your module configuration
 
-### 8. Don't forget migrate your database when you first run the app
+```csharp
+Configure<SettingManagementComponentOptions>(options =>
+{
+    options.Contributors.Add(new EmailingPageContributor());
+    options.Contributors.Add(new TimeZonePageContributor());
+    options.Contributors.Add(new AccountPageContributor());
+});
+```
 
-## 📚Data Dictionary Module
+#### 8. Apply database migrations before the first run
 
-The data dictionary module is included in the UI package and provides a built-in page for maintaining dictionary types and dictionary items.
+## 📚 Use the Data Dictionary Module
 
-### 1. Install the package
+The data dictionary module is included in the UI package and provides an out-of-the-box page for managing dictionary types and dictionary items.
+
+### Module Guide
+
+#### 1. Install the package
 ```shell
 dotnet add package AbpRadzen.Blazor.Server.UI
 ```
 
-If you only need the entity model and EF Core mapping, you can install the standalone package below:
+If you only need the entity definitions and EF Core mappings, you can install the standalone package below:
 ```shell
 dotnet add package AbpRadzen.DataDictionary.EntityFrameworkCore
 ```
 
-### 2. Register the DbContext
-The UI module already registers `DataDictionaryDbContext` in `AbpRadzenUIModule`. If you are integrating only the EF Core package into your own project, add the DbSets and call `ConfigureDataDictionary()` in your application's DbContext.
+#### 2. Register the DbContext
+The full UI module already registers `DataDictionaryDbContext` inside `AbpRadzenUIModule`. If you integrate only the EF Core package into your own solution, add the DbSets and call `ConfigureDataDictionary()` inside your application's DbContext.
 
 ```csharp
 public class MyProjectDbContext : AbpDbContext<MyProjectDbContext>
@@ -212,19 +219,36 @@ public class MyProjectDbContext : AbpDbContext<MyProjectDbContext>
 }
 ```
 
-### 3. Add localization and menu support
-The dictionary page route is `/data-dictionary`. When you use the full UI package, the menu contributor and localization resources are already wired in. If you are composing your own application module, make sure your localization resource inherits from `AbpRadzenUIResource`.
+#### 3. Add localization and menu support
+The built-in page route is `/data-dictionary`. When you use the full UI package, menu contributions and localization resources are already wired up. If you are composing your own application module, make sure your localization resource inherits from `AbpRadzenUIResource`.
 
-### 4. Apply database changes
-The data dictionary module creates two tables:
+#### 4. Apply database changes
+The data dictionary module creates the following two tables:
 
 - `DataDictionaryTypes`
 - `DataDictionaryItems`
 
-After adding the module, create and apply your EF Core migration as usual.
+After integrating the module, create and apply your EF Core migrations in the usual way.
 
-### 5. Usage notes
+#### 5. Usage notes
 
-- Dictionary items are associated with types through `DataDictionaryTypeId`, but the EF Core mapping does not create a database foreign key.
-- Deleting a dictionary type will also remove its dictionary items in application logic.
-- The built-in page uses a master-detail DataGrid layout: selecting a dictionary type refreshes the item grid automatically.
+- Dictionary items are associated with dictionary types through `DataDictionaryTypeId`, but the EF Core mapping does not create a database-level foreign key.
+- Deleting a dictionary type will also remove its child dictionary items at the application-service level.
+- The built-in page uses a master-detail DataGrid layout. Selecting a dictionary type automatically refreshes the item grid on the right.
+
+## 🎨 Preview the Interface
+
+### 1. Login page
+![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/login.png)
+
+### 2. List page
+![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/list.png)
+
+### 3. List page with DataGrid filters
+![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/list-with-filter.png)
+
+### 4. Theme switching
+![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/switch-theme.png)
+
+### 5. Organization units
+![image](https://raw.githubusercontent.com/ShaoHans/Abp.RadzenUI/refs/heads/main/samples/CRM.Blazor.Web/wwwroot/images/ou.png)
