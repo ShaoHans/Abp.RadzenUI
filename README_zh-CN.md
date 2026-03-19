@@ -183,3 +183,53 @@ Configure<SettingManagementComponentOptions>(options =>
 
 ### 8. 第一次运行示例程序的时候不要忘了执行迁移代码
 
+## 📚数据字典模块
+
+数据字典模块已经集成在 UI 包中，提供了开箱即用的字典类型和字典项维护页面。
+
+### 1. 安装包
+```shell
+dotnet add package AbpRadzen.Blazor.Server.UI
+```
+
+如果你只需要数据字典实体和 EF Core 映射，也可以单独安装下面这个包：
+```shell
+dotnet add package AbpRadzen.DataDictionary.EntityFrameworkCore
+```
+
+### 2. 注册 DbContext
+完整 UI 包已经在 `AbpRadzenUIModule` 中注册了 `DataDictionaryDbContext`。如果你只集成 EF Core 包到自己的项目中，需要在业务 DbContext 中添加 `DbSet` 并调用 `ConfigureDataDictionary()`。
+
+```csharp
+public class MyProjectDbContext : AbpDbContext<MyProjectDbContext>
+{
+    public DbSet<DataDictionaryType> DataDictionaryTypes { get; set; }
+
+    public DbSet<DataDictionaryItem> DataDictionaryItems { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+
+        builder.ConfigureDataDictionary();
+    }
+}
+```
+
+### 3. 菜单和多语言
+数据字典页面路由为 `/data-dictionary`。使用完整 UI 包时，菜单贡献者和多语言资源已经配置完成；如果你是在自己的应用模块中组合使用，请确保你的本地化资源继承了 `AbpRadzenUIResource`。
+
+### 4. 执行数据库变更
+数据字典模块会创建两张表：
+
+- `DataDictionaryTypes`
+- `DataDictionaryItems`
+
+接入模块后，按常规方式创建并执行 EF Core Migration 即可。
+
+### 5. 使用说明
+
+- 字典项通过 `DataDictionaryTypeId` 关联字典类型，但 EF Core 映射不会创建数据库外键。
+- 删除字典类型时，会在应用服务中同步删除其下的字典项。
+- 内置页面采用主从 DataGrid 布局，选中字典类型后会自动刷新右侧字典项列表。
+

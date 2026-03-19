@@ -8,7 +8,6 @@ using Abp.RadzenUI.Permissions;
 using Microsoft.AspNetCore.Authorization;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
-using Volo.Abp.Caching;
 using Volo.Abp.Domain.Repositories;
 
 namespace Abp.RadzenUI.Application.DataDictionaries;
@@ -25,16 +24,16 @@ public class DataDictionaryItemAppService
         IDataDictionaryItemAppService
 {
     private readonly IRepository<DataDictionaryType, Guid> _typeRepository;
-    private readonly IDistributedCache<List<DataDictionaryItemDto>> _cache;
+    private readonly IDataDictionaryItemsCache _itemsCache;
 
     public DataDictionaryItemAppService(
         IRepository<DataDictionaryItem, Guid> repository,
         IRepository<DataDictionaryType, Guid> typeRepository,
-        IDistributedCache<List<DataDictionaryItemDto>> cache)
+        IDataDictionaryItemsCache itemsCache)
         : base(repository)
     {
         _typeRepository = typeRepository;
-        _cache = cache;
+        _itemsCache = itemsCache;
 
         GetPolicyName = RadzenUIPermissions.DataDictionary.Default;
         GetListPolicyName = RadzenUIPermissions.DataDictionary.Default;
@@ -53,7 +52,7 @@ public class DataDictionaryItemAppService
         }
 
         var result = await base.CreateAsync(input);
-        await RemoveCacheAsync(input.DataDictionaryTypeId);
+        await _itemsCache.RemoveByTypeIdAsync(input.DataDictionaryTypeId);
         return result;
     }
 
@@ -61,7 +60,7 @@ public class DataDictionaryItemAppService
     {
         var entity = await Repository.GetAsync(id);
         var result = await base.UpdateAsync(id, input);
-        await RemoveCacheAsync(entity.DataDictionaryTypeId);
+        await _itemsCache.RemoveByTypeIdAsync(entity.DataDictionaryTypeId);
         return result;
     }
 
@@ -69,7 +68,7 @@ public class DataDictionaryItemAppService
     {
         var entity = await Repository.GetAsync(id);
         await base.DeleteAsync(id);
-        await RemoveCacheAsync(entity.DataDictionaryTypeId);
+        await _itemsCache.RemoveByTypeIdAsync(entity.DataDictionaryTypeId);
     }
 
     [Authorize(RadzenUIPermissions.DataDictionary.Update)]
@@ -78,14 +77,13 @@ public class DataDictionaryItemAppService
         var entity = await Repository.GetAsync(id);
         entity.IsActive = !entity.IsActive;
         await Repository.UpdateAsync(entity);
-        await RemoveCacheAsync(entity.DataDictionaryTypeId);
+        await _itemsCache.RemoveByTypeIdAsync(entity.DataDictionaryTypeId);
     }
 
     [AllowAnonymous]
     public async Task<List<DataDictionaryItemDto>> GetItemsByTypeCodeAsync(string typeCode)
     {
-        var cacheKey = $"DataDictionary:{typeCode}";
-        return await _cache.GetOrAddAsync(cacheKey, async () =>
+        return await _itemsCache.GetOrAddByTypeCodeAsync(typeCode, async () =>
         {
             var type = await _typeRepository.FindAsync(x => x.Code == typeCode);
             if (type == null)
@@ -98,7 +96,7 @@ public class DataDictionaryItemAppService
 
             return ObjectMapper.Map<List<DataDictionaryItem>, List<DataDictionaryItemDto>>(
                 items.OrderBy(x => x.Sort).ToList());
-        }) ?? [];
+        });
     }
 
     [AllowAnonymous]
@@ -123,14 +121,5 @@ public class DataDictionaryItemAppService
         }
 
         return query;
-    }
-
-    private async Task RemoveCacheAsync(Guid typeId)
-    {
-        var type = await _typeRepository.FindAsync(typeId);
-        if (type != null)
-        {
-            await _cache.RemoveAsync($"DataDictionary:{type.Code}");
-        }
     }
 }

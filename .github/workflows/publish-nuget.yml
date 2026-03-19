@@ -16,19 +16,23 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       name: Checkout code
+    - name: Set package version
+      run: echo "PACKAGE_VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 10.0.x
     - name: Restore dependencies
-      run: dotnet restore ./src/Abp.Blazor.Server.RadzenUI/Abp.Blazor.Server.RadzenUI.csproj
+      run: dotnet restore ./Abp.RadzenUI.sln
     - name: Build
-      run: dotnet build --no-restore -c Release ./src/Abp.Blazor.Server.RadzenUI/Abp.Blazor.Server.RadzenUI.csproj
-    - name: Create the package
-      run: dotnet pack -c Release ./src/Abp.Blazor.Server.RadzenUI/Abp.Blazor.Server.RadzenUI.csproj
+      run: dotnet build --no-restore -c Release ./Abp.RadzenUI.sln
+    - name: Create the UI package
+      run: dotnet pack --no-build -c Release ./src/Abp.Blazor.Server.RadzenUI/Abp.Blazor.Server.RadzenUI.csproj -p:Version=$PACKAGE_VERSION -o ./artifacts
+    - name: Create the data dictionary package
+      run: dotnet pack --no-build -c Release ./src/Abp.RadzenUI.DataDictionary.EntityFrameworkCore/Abp.RadzenUI.DataDictionary.EntityFrameworkCore.csproj -p:Version=$PACKAGE_VERSION -o ./artifacts
     - name: Add nuget source
       run: dotnet nuget add source --username ShaoHans --password ${{ secrets.NUGET_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/ShaoHans/index.json"
     - name: Publish the package to Github Packages
-      run: dotnet nuget push ./src/Abp.Blazor.Server.RadzenUI/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_TOKEN }} --source github --skip-duplicate
+      run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_TOKEN }} --source github --skip-duplicate
     - name: Publish the package to Nuget Gallery
-      run: dotnet nuget push ./src/Abp.Blazor.Server.RadzenUI/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_GALLERY_TOKEN }}  --source nuget.org --skip-duplicate
+      run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_GALLERY_TOKEN }}  --source nuget.org --skip-duplicate

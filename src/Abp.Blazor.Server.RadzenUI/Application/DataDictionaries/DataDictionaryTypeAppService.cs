@@ -1,9 +1,9 @@
 using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Abp.RadzenUI.Application.Contracts.DataDictionaries;
 using Abp.RadzenUI.DataDictionaries;
 using Abp.RadzenUI.Permissions;
+using System.Linq;
+using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
@@ -21,9 +21,18 @@ public class DataDictionaryTypeAppService
     >,
         IDataDictionaryTypeAppService
 {
-    public DataDictionaryTypeAppService(IRepository<DataDictionaryType, Guid> repository)
+    private readonly IRepository<DataDictionaryItem, Guid> _itemRepository;
+    private readonly IDataDictionaryItemsCache _itemsCache;
+
+    public DataDictionaryTypeAppService(
+        IRepository<DataDictionaryType, Guid> repository,
+        IRepository<DataDictionaryItem, Guid> itemRepository,
+        IDataDictionaryItemsCache itemsCache)
         : base(repository)
     {
+        _itemRepository = itemRepository;
+        _itemsCache = itemsCache;
+
         GetPolicyName = RadzenUIPermissions.DataDictionary.Default;
         GetListPolicyName = RadzenUIPermissions.DataDictionary.Default;
         CreatePolicyName = RadzenUIPermissions.DataDictionary.Create;
@@ -44,13 +53,16 @@ public class DataDictionaryTypeAppService
 
     public override async Task DeleteAsync(Guid id)
     {
-        var itemRepository = LazyServiceProvider.LazyGetRequiredService<IRepository<DataDictionaryItem, Guid>>();
-        if (await itemRepository.AnyAsync(x => x.DataDictionaryTypeId == id))
+        var entity = await Repository.GetAsync(id);
+        var items = await _itemRepository.GetListAsync(x => x.DataDictionaryTypeId == id);
+
+        if (items.Count != 0)
         {
-            throw new BusinessException(DataDictionaryErrorCodes.TypeHasItems);
+            await _itemRepository.DeleteManyAsync(items, autoSave: true);
         }
 
         await base.DeleteAsync(id);
+        await _itemsCache.RemoveByTypeCodeAsync(entity.Code);
     }
 
     protected override async Task<IQueryable<DataDictionaryType>> CreateFilteredQueryAsync(

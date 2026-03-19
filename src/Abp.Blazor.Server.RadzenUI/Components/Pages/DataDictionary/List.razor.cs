@@ -31,8 +31,10 @@ public partial class List
     [Microsoft.AspNetCore.Components.Inject]
     public IStringLocalizer<AbpRadzenUIResource> UL { get; set; } = default!;
 
-    private List<DataDictionaryTypeDto> _types = [];
+    private RadzenDataGrid<DataDictionaryTypeDto> _typeGrid = default!;
+    private IReadOnlyList<DataDictionaryTypeDto> _types = [];
     private DataDictionaryTypeDto? _selectedType;
+    private bool _isTypeLoading;
     private string? _typeFilter;
 
     private RadzenDataGrid<DataDictionaryItemDto> _itemGrid = default!;
@@ -67,27 +69,95 @@ public partial class List
 
     private async Task LoadTypesAsync()
     {
-        var result = await TypeAppService.GetListAsync(new GetDataDictionaryTypesInput
+        _isTypeLoading = true;
+
+        try
         {
-            Filter = _typeFilter,
-            MaxResultCount = 1000,
-            SkipCount = 0
-        });
-        _types = result.Items.ToList();
+            var result = await TypeAppService.GetListAsync(new GetDataDictionaryTypesInput
+            {
+                Filter = _typeFilter,
+                MaxResultCount = 1000,
+                SkipCount = 0
+            });
+
+            _types = result.Items.ToList();
+            await SyncSelectedTypeAsync();
+        }
+        finally
+        {
+            _isTypeLoading = false;
+        }
     }
 
-    private void SelectType(DataDictionaryTypeDto type)
+    private async Task SearchTypesAsync()
     {
+        await LoadTypesAsync();
+    }
+
+    private async Task ResetTypesAsync()
+    {
+        _typeFilter = null;
+        await LoadTypesAsync();
+    }
+
+    private async Task SelectTypeAsync(DataDictionaryTypeDto type)
+    {
+        if (_selectedType?.Id == type.Id)
+        {
+            return;
+        }
+
         _selectedType = type;
         _itemFilter = null;
-        _itemGrid?.Reload();
+
+        if (_itemGrid is not null)
+        {
+            await _itemGrid.FirstPage(true);
+        }
     }
 
-    private string GetTypeCardStyle(DataDictionaryTypeDto type)
+    private void OnTypeRowRender(RowRenderEventArgs<DataDictionaryTypeDto> args)
     {
-        return _selectedType?.Id == type.Id
-            ? "cursor:pointer; border-left:3px solid var(--rz-primary)"
-            : "cursor:pointer";
+        if (args.Data != null && _selectedType?.Id == args.Data.Id)
+        {
+            args.Attributes["style"] = "background-color: var(--rz-base-200);";
+        }
+    }
+
+    private async Task SyncSelectedTypeAsync()
+    {
+        if (_types.Count == 0)
+        {
+            _selectedType = null;
+            ClearItems();
+            return;
+        }
+
+        var matchingType = _selectedType == null
+            ? _types.FirstOrDefault()
+            : _types.FirstOrDefault(x => x.Id == _selectedType.Id) ?? _types.FirstOrDefault();
+
+        if (matchingType == null)
+        {
+            _selectedType = null;
+            ClearItems();
+            return;
+        }
+
+        var typeChanged = _selectedType?.Id != matchingType.Id;
+        _selectedType = matchingType;
+
+        if (_itemGrid is not null && (typeChanged || _items.Count == 0))
+        {
+            await _itemGrid.FirstPage(true);
+        }
+    }
+
+    private void ClearItems()
+    {
+        _items = [];
+        _itemTotalCount = 0;
+        _isItemLoading = false;
     }
 
     #region Type CRUD
@@ -168,10 +238,6 @@ public partial class List
         if (result is true)
         {
             await LoadTypesAsync();
-            if (_selectedType?.Id == type.Id)
-            {
-                _selectedType = _types.Find(t => t.Id == type.Id);
-            }
         }
     }
 
@@ -188,10 +254,6 @@ public partial class List
             {
                 await TypeAppService.DeleteAsync(type.Id);
                 await Notify.Success(UL["DeletedSuccessfully"]);
-                if (_selectedType?.Id == type.Id)
-                {
-                    _selectedType = null;
-                }
                 await LoadTypesAsync();
             }
             catch (Exception ex)
@@ -207,23 +269,33 @@ public partial class List
 
     private async Task LoadItemsAsync(LoadDataArgs args)
     {
-        if (_selectedType == null) return;
+        if (_selectedType == null)
+        {
+            ClearItems();
+            return;
+        }
 
         _isItemLoading = true;
 
-        var input = new GetDataDictionaryItemsInput
+        try
         {
-            DataDictionaryTypeId = _selectedType.Id,
-            Filter = _itemFilter,
-            Sorting = args.OrderBy,
-            SkipCount = args.Skip ?? 0,
-            MaxResultCount = args.Top ?? _defaultPageSize
-        };
+            var input = new GetDataDictionaryItemsInput
+            {
+                DataDictionaryTypeId = _selectedType.Id,
+                Filter = _itemFilter,
+                Sorting = args.OrderBy,
+                SkipCount = args.Skip ?? 0,
+                MaxResultCount = args.Top ?? _defaultPageSize
+            };
 
-        var result = await ItemAppService.GetListAsync(input);
-        _items = result.Items;
-        _itemTotalCount = (int)result.TotalCount;
-        _isItemLoading = false;
+            var result = await ItemAppService.GetListAsync(input);
+            _items = result.Items;
+            _itemTotalCount = (int)result.TotalCount;
+        }
+        finally
+        {
+            _isItemLoading = false;
+        }
     }
 
     private async Task SearchItemsAsync()

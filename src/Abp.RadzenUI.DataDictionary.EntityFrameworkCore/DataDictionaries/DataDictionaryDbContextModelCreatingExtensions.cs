@@ -24,13 +24,13 @@ public static class DataDictionaryDbContextModelCreatingExtensions
         {
             b.ToTable(DataDictionaryDbProperties.DbTablePrefix + "DataDictionaryItems", DataDictionaryDbProperties.DbSchema);
             b.ConfigureByConvention();
+            b.Property(p => p.DataDictionaryTypeId).IsRequired();
             b.Property(p => p.Code).IsRequired().HasMaxLength(DataDictionaryItemConsts.MaxCodeLength);
             b.Property(p => p.Name).IsRequired().HasMaxLength(DataDictionaryItemConsts.MaxNameLength);
             b.Property(p => p.Description).HasMaxLength(DataDictionaryItemConsts.MaxDescriptionLength);
             b.Property(p => p.Sort).IsRequired();
             b.Property(p => p.IsActive).IsRequired().HasDefaultValue(true);
             b.HasIndex(p => new { p.TenantId, p.DataDictionaryTypeId, p.Code }).IsUnique();
-            b.HasOne<DataDictionaryType>().WithMany().HasForeignKey(p => p.DataDictionaryTypeId).OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

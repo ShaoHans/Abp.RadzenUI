@@ -178,3 +178,53 @@ In the process of system development, we often need to configure certain system 
 
 
 ### 8. Don't forget migrate your database when you first run the app
+
+## 📚Data Dictionary Module
+
+The data dictionary module is included in the UI package and provides a built-in page for maintaining dictionary types and dictionary items.
+
+### 1. Install the package
+```shell
+dotnet add package AbpRadzen.Blazor.Server.UI
+```
+
+If you only need the entity model and EF Core mapping, you can install the standalone package below:
+```shell
+dotnet add package AbpRadzen.DataDictionary.EntityFrameworkCore
+```
+
+### 2. Register the DbContext
+The UI module already registers `DataDictionaryDbContext` in `AbpRadzenUIModule`. If you are integrating only the EF Core package into your own project, add the DbSets and call `ConfigureDataDictionary()` in your application's DbContext.
+
+```csharp
+public class MyProjectDbContext : AbpDbContext<MyProjectDbContext>
+{
+    public DbSet<DataDictionaryType> DataDictionaryTypes { get; set; }
+
+    public DbSet<DataDictionaryItem> DataDictionaryItems { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+
+        builder.ConfigureDataDictionary();
+    }
+}
+```
+
+### 3. Add localization and menu support
+The dictionary page route is `/data-dictionary`. When you use the full UI package, the menu contributor and localization resources are already wired in. If you are composing your own application module, make sure your localization resource inherits from `AbpRadzenUIResource`.
+
+### 4. Apply database changes
+The data dictionary module creates two tables:
+
+- `DataDictionaryTypes`
+- `DataDictionaryItems`
+
+After adding the module, create and apply your EF Core migration as usual.
+
+### 5. Usage notes
+
+- Dictionary items are associated with types through `DataDictionaryTypeId`, but the EF Core mapping does not create a database foreign key.
+- Deleting a dictionary type will also remove its dictionary items in application logic.
+- The built-in page uses a master-detail DataGrid layout: selecting a dictionary type refreshes the item grid automatically.
