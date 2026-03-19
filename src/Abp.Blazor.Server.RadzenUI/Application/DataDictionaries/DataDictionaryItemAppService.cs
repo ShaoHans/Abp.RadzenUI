@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Abp.RadzenUI.Application.Contracts.DataDictionaries;
 using Abp.RadzenUI.DataDictionaries;
+using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Permissions;
 using Microsoft.AspNetCore.Authorization;
 using Volo.Abp;
@@ -34,6 +35,7 @@ public class DataDictionaryItemAppService
     {
         _typeRepository = typeRepository;
         _itemsCache = itemsCache;
+        LocalizationResource = typeof(AbpRadzenUIResource);
 
         GetPolicyName = RadzenUIPermissions.DataDictionary.Default;
         GetListPolicyName = RadzenUIPermissions.DataDictionary.Default;
@@ -47,11 +49,20 @@ public class DataDictionaryItemAppService
         if (await Repository.AnyAsync(x =>
             x.DataDictionaryTypeId == input.DataDictionaryTypeId && x.Code == input.Code))
         {
-            throw new BusinessException(DataDictionaryErrorCodes.ItemCodeExist)
-                .WithData("code", input.Code);
+            throw new UserFriendlyException(L["DataDictionary:ItemCodeExist", input.Code]);
         }
 
-        var result = await base.CreateAsync(input);
+        DataDictionaryItemDto result;
+
+        try
+        {
+            result = await base.CreateAsync(input);
+        }
+        catch (Exception ex) when (IsDuplicateCodeException(ex))
+        {
+            throw new UserFriendlyException(L["DataDictionary:ItemCodeExist", input.Code]);
+        }
+
         await _itemsCache.RemoveByTypeIdAsync(input.DataDictionaryTypeId);
         return result;
     }
@@ -59,6 +70,7 @@ public class DataDictionaryItemAppService
     public override async Task<DataDictionaryItemDto> UpdateAsync(Guid id, UpdateDataDictionaryItemDto input)
     {
         var entity = await Repository.GetAsync(id);
+
         var result = await base.UpdateAsync(id, input);
         await _itemsCache.RemoveByTypeIdAsync(entity.DataDictionaryTypeId);
         return result;
@@ -121,5 +133,30 @@ public class DataDictionaryItemAppService
         }
 
         return query;
+    }
+
+    protected override IQueryable<DataDictionaryItem> ApplyDefaultSorting(IQueryable<DataDictionaryItem> query)
+    {
+        return query.OrderBy(x => x.Sort);
+    }
+
+    private static bool IsDuplicateCodeException(Exception exception)
+    {
+        while (true)
+        {
+            if (exception.Message.Contains("IX_AbpDataDictionaryItems", StringComparison.OrdinalIgnoreCase) ||
+                exception.Message.Contains("duplicate", StringComparison.OrdinalIgnoreCase) ||
+                exception.Message.Contains("unique", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            if (exception.InnerException == null)
+            {
+                return false;
+            }
+
+            exception = exception.InnerException;
+        }
     }
 }

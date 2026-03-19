@@ -5,9 +5,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Localization;
 using Radzen;
 using Radzen.Blazor;
+using Volo.Abp;
 using Volo.Abp.Application.Dtos;
-using Volo.Abp.AspNetCore.Components.ExceptionHandling;
 using Volo.Abp.AspNetCore.Components.Notifications;
+using Volo.Abp.Validation;
 
 namespace Abp.RadzenUI.Components.Pages.DataDictionary;
 
@@ -23,24 +24,24 @@ public partial class List
     protected DialogService DialogService { get; set; } = default!;
 
     [Microsoft.AspNetCore.Components.Inject]
-    protected IUiNotificationService Notify { get; set; } = default!;
-
-    [Microsoft.AspNetCore.Components.Inject]
-    protected IUserExceptionInformer ExceptionInformer { get; set; } = default!;
+    protected new IUiNotificationService Notify { get; set; } = default!;
 
     [Microsoft.AspNetCore.Components.Inject]
     public IStringLocalizer<AbpRadzenUIResource> UL { get; set; } = default!;
 
     private RadzenDataGrid<DataDictionaryTypeDto> _typeGrid = default!;
     private IReadOnlyList<DataDictionaryTypeDto> _types = [];
+    private int _typeTotalCount;
     private DataDictionaryTypeDto? _selectedType;
     private bool _isTypeLoading;
+    private bool _hasTriggeredInitialTypeLoad;
     private string? _typeFilter;
 
     private RadzenDataGrid<DataDictionaryItemDto> _itemGrid = default!;
     private IReadOnlyList<DataDictionaryItemDto> _items = [];
     private int _itemTotalCount;
     private bool _isItemLoading;
+    private bool _shouldLoadSelectedTypeItems;
     private string? _itemFilter;
     private readonly int _defaultPageSize = 10;
     private readonly IEnumerable<int> _pageSizeOptions = [10, 20, 30];
@@ -57,7 +58,26 @@ public partial class List
     protected override async Task OnInitializedAsync()
     {
         await SetPermissionsAsync();
-        await LoadTypesAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender && !_hasTriggeredInitialTypeLoad && _typeGrid is not null)
+        {
+            _hasTriggeredInitialTypeLoad = true;
+            await _typeGrid.FirstPage(true);
+            return;
+        }
+
+        if (!_shouldLoadSelectedTypeItems || _selectedType == null || _itemGrid is null)
+        {
+            return;
+        }
+
+        _shouldLoadSelectedTypeItems = false;
+        await _itemGrid.FirstPage(true);
     }
 
     private async Task SetPermissionsAsync()
@@ -67,7 +87,7 @@ public partial class List
         HasDeletePermission = await AuthorizationService.IsGrantedAsync(RadzenUIPermissions.DataDictionary.Delete);
     }
 
-    private async Task LoadTypesAsync()
+    private async Task LoadTypesAsync(LoadDataArgs args)
     {
         _isTypeLoading = true;
 
@@ -76,11 +96,13 @@ public partial class List
             var result = await TypeAppService.GetListAsync(new GetDataDictionaryTypesInput
             {
                 Filter = _typeFilter,
-                MaxResultCount = 1000,
-                SkipCount = 0
+                Sorting = args.OrderBy,
+                SkipCount = args.Skip ?? 0,
+                MaxResultCount = args.Top ?? _defaultPageSize
             });
 
             _types = result.Items.ToList();
+            _typeTotalCount = (int)result.TotalCount;
             await SyncSelectedTypeAsync();
         }
         finally
@@ -91,13 +113,20 @@ public partial class List
 
     private async Task SearchTypesAsync()
     {
-        await LoadTypesAsync();
+        if (_typeGrid is not null)
+        {
+            await _typeGrid.FirstPage(true);
+        }
     }
 
     private async Task ResetTypesAsync()
     {
         _typeFilter = null;
-        await LoadTypesAsync();
+
+        if (_typeGrid is not null)
+        {
+            await _typeGrid.FirstPage(true);
+        }
     }
 
     private async Task SelectTypeAsync(DataDictionaryTypeDto type)
@@ -109,6 +138,7 @@ public partial class List
 
         _selectedType = type;
         _itemFilter = null;
+        _shouldLoadSelectedTypeItems = true;
 
         if (_itemGrid is not null)
         {
@@ -129,6 +159,7 @@ public partial class List
         if (_types.Count == 0)
         {
             _selectedType = null;
+            _typeTotalCount = 0;
             ClearItems();
             return;
         }
@@ -146,9 +177,11 @@ public partial class List
 
         var typeChanged = _selectedType?.Id != matchingType.Id;
         _selectedType = matchingType;
+        _shouldLoadSelectedTypeItems = typeChanged || _items.Count == 0;
 
-        if (_itemGrid is not null && (typeChanged || _items.Count == 0))
+        if (_itemGrid is not null && _shouldLoadSelectedTypeItems)
         {
+            _shouldLoadSelectedTypeItems = false;
             await _itemGrid.FirstPage(true);
         }
     }
@@ -158,6 +191,7 @@ public partial class List
         _items = [];
         _itemTotalCount = 0;
         _isItemLoading = false;
+        _shouldLoadSelectedTypeItems = false;
     }
 
     #region Type CRUD
@@ -177,13 +211,13 @@ public partial class List
                 }
                 catch (Exception ex)
                 {
-                    await ExceptionInformer.InformAsync(new UserExceptionInformerContext(ex));
+                    await ShowErrorAsync(ex);
                 }
             },
             OnCancel = () => DialogService.Close(false)
         };
 
-        var parameters = new Dictionary<string, object>
+        var parameters = new Dictionary<string, object?>
         {
             { "DialogFromOption", dialogFromOption }
         };
@@ -195,7 +229,7 @@ public partial class List
 
         if (result is true)
         {
-            await LoadTypesAsync();
+            await _typeGrid.Reload();
         }
     }
 
@@ -218,13 +252,13 @@ public partial class List
                 }
                 catch (Exception ex)
                 {
-                    await ExceptionInformer.InformAsync(new UserExceptionInformerContext(ex));
+                    await ShowErrorAsync(ex);
                 }
             },
             OnCancel = () => DialogService.Close(false)
         };
 
-        var parameters = new Dictionary<string, object>
+        var parameters = new Dictionary<string, object?>
         {
             { "DialogFromOption", dialogFromOption },
             { "Code", type.Code }
@@ -237,7 +271,7 @@ public partial class List
 
         if (result is true)
         {
-            await LoadTypesAsync();
+            await _typeGrid.Reload();
         }
     }
 
@@ -254,11 +288,11 @@ public partial class List
             {
                 await TypeAppService.DeleteAsync(type.Id);
                 await Notify.Success(UL["DeletedSuccessfully"]);
-                await LoadTypesAsync();
+                await _typeGrid.Reload();
             }
             catch (Exception ex)
             {
-                await ExceptionInformer.InformAsync(new UserExceptionInformerContext(ex));
+                await ShowErrorAsync(ex);
             }
         }
     }
@@ -316,6 +350,8 @@ public partial class List
     {
         if (_selectedType == null) return;
 
+        var typeDisplayText = $"{_selectedType.Code} - {_selectedType.Name}";
+
         var dialogFromOption = new Models.DialogFromOption<CreateDataDictionaryItemDto>
         {
             Model = new CreateDataDictionaryItemDto
@@ -333,15 +369,16 @@ public partial class List
                 }
                 catch (Exception ex)
                 {
-                    await ExceptionInformer.InformAsync(new UserExceptionInformerContext(ex));
+                    await ShowErrorAsync(ex);
                 }
             },
             OnCancel = () => DialogService.Close(false)
         };
 
-        var parameters = new Dictionary<string, object>
+        var parameters = new Dictionary<string, object?>
         {
-            { "DialogFromOption", dialogFromOption }
+            { "DialogFromOption", dialogFromOption },
+            { "TypeDisplayText", typeDisplayText }
         };
 
         var result = await DialogService.OpenAsync<CreateItem>(
@@ -357,6 +394,10 @@ public partial class List
 
     private async Task OpenEditItemDialogAsync(DataDictionaryItemDto item)
     {
+        var typeDisplayText = _selectedType == null
+            ? string.Empty
+            : $"{_selectedType.Code} - {_selectedType.Name}";
+
         var dialogFromOption = new Models.DialogFromOption<UpdateDataDictionaryItemDto>
         {
             Model = new UpdateDataDictionaryItemDto
@@ -376,15 +417,16 @@ public partial class List
                 }
                 catch (Exception ex)
                 {
-                    await ExceptionInformer.InformAsync(new UserExceptionInformerContext(ex));
+                    await ShowErrorAsync(ex);
                 }
             },
             OnCancel = () => DialogService.Close(false)
         };
 
-        var parameters = new Dictionary<string, object>
+        var parameters = new Dictionary<string, object?>
         {
             { "DialogFromOption", dialogFromOption },
+            { "TypeDisplayText", typeDisplayText },
             { "Code", item.Code }
         };
 
@@ -416,7 +458,7 @@ public partial class List
             }
             catch (Exception ex)
             {
-                await ExceptionInformer.InformAsync(new UserExceptionInformerContext(ex));
+                await ShowErrorAsync(ex);
             }
         }
     }
@@ -430,7 +472,38 @@ public partial class List
         }
         catch (Exception ex)
         {
-            await ExceptionInformer.InformAsync(new UserExceptionInformerContext(ex));
+            await ShowErrorAsync(ex);
+        }
+    }
+
+    private async Task ShowErrorAsync(Exception ex)
+    {
+        if (TryGetUserFriendlyMessage(ex, out var message))
+        {
+            await Notify.Error(message);
+            return;
+        }
+
+        await HandleErrorAsync(ex);
+    }
+
+    private static bool TryGetUserFriendlyMessage(Exception? exception, out string message)
+    {
+        switch (exception)
+        {
+            case null:
+                message = string.Empty;
+                return false;
+            case UserFriendlyException friendlyException when !string.IsNullOrWhiteSpace(friendlyException.Message):
+                message = friendlyException.Message;
+                return true;
+            case AbpValidationException validationException when validationException.ValidationErrors.Count != 0:
+                message = string.Join(" ", validationException.ValidationErrors
+                    .Select(x => x.ErrorMessage)
+                    .Where(x => !string.IsNullOrWhiteSpace(x)));
+                return !string.IsNullOrWhiteSpace(message);
+            default:
+                return TryGetUserFriendlyMessage(exception.InnerException, out message);
         }
     }
 

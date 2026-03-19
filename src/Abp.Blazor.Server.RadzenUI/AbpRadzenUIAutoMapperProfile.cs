@@ -130,8 +130,8 @@ public partial class CreateDataDictionaryTypeDtoToDataDictionaryTypeMapper
 public partial class UpdateDataDictionaryTypeDtoToDataDictionaryTypeMapper
     : MapperBase<UpdateDataDictionaryTypeDto, DataDictionaryType>
 {
-    [MapperIgnoreTarget(nameof(DataDictionaryType.TenantId))]
     [MapperIgnoreTarget(nameof(DataDictionaryType.Code))]
+    [MapperIgnoreTarget(nameof(DataDictionaryType.TenantId))]
     [MapperIgnoreTarget(nameof(DataDictionaryType.CreatorId))]
     [MapperIgnoreTarget(nameof(DataDictionaryType.CreationTime))]
     [MapperIgnoreTarget(nameof(DataDictionaryType.LastModifierId))]
@@ -139,8 +139,8 @@ public partial class UpdateDataDictionaryTypeDtoToDataDictionaryTypeMapper
     [MapperIgnoreTarget(nameof(DataDictionaryType.ConcurrencyStamp))]
     public override partial DataDictionaryType Map(UpdateDataDictionaryTypeDto source);
 
-    [MapperIgnoreTarget(nameof(DataDictionaryType.TenantId))]
     [MapperIgnoreTarget(nameof(DataDictionaryType.Code))]
+    [MapperIgnoreTarget(nameof(DataDictionaryType.TenantId))]
     [MapperIgnoreTarget(nameof(DataDictionaryType.CreatorId))]
     [MapperIgnoreTarget(nameof(DataDictionaryType.CreationTime))]
     [MapperIgnoreTarget(nameof(DataDictionaryType.LastModifierId))]
@@ -186,9 +186,9 @@ public partial class CreateDataDictionaryItemDtoToDataDictionaryItemMapper
 public partial class UpdateDataDictionaryItemDtoToDataDictionaryItemMapper
     : MapperBase<UpdateDataDictionaryItemDto, DataDictionaryItem>
 {
+    [MapperIgnoreTarget(nameof(DataDictionaryItem.Code))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.TenantId))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.DataDictionaryTypeId))]
-    [MapperIgnoreTarget(nameof(DataDictionaryItem.Code))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.CreatorId))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.CreationTime))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.LastModifierId))]
@@ -196,9 +196,9 @@ public partial class UpdateDataDictionaryItemDtoToDataDictionaryItemMapper
     [MapperIgnoreTarget(nameof(DataDictionaryItem.ConcurrencyStamp))]
     public override partial DataDictionaryItem Map(UpdateDataDictionaryItemDto source);
 
+    [MapperIgnoreTarget(nameof(DataDictionaryItem.Code))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.TenantId))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.DataDictionaryTypeId))]
-    [MapperIgnoreTarget(nameof(DataDictionaryItem.Code))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.CreatorId))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.CreationTime))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.LastModifierId))]

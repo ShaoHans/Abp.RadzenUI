@@ -9,6 +9,16 @@
         <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                    <RadzenLabel Text="@L["DataDictionary:Types"]" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8">
+                    <RadzenText TextStyle="TextStyle.Body1" Style="font-weight:700; display:block; width:100%; padding-top:0.5rem;">
+                        @TypeDisplayText
+                    </RadzenText>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
                     <RequiredMark />
                     <RadzenLabel Text="@L["DisplayName:DataDictionaryItem.Code"]" Component="Code" />
                 </RadzenColumn>
@@ -57,6 +67,9 @@
 @code {
     [Parameter]
     public DialogFromOption<CreateDataDictionaryItemDto> DialogFromOption { get; set; } = default!;
+
+    [Parameter]
+    public string TypeDisplayText { get; set; } = string.Empty;
 
     public CreateItem()
     {

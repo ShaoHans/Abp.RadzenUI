@@ -1,6 +1,7 @@
 using System;
 using Abp.RadzenUI.Application.Contracts.DataDictionaries;
 using Abp.RadzenUI.DataDictionaries;
+using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Permissions;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,6 +33,7 @@ public class DataDictionaryTypeAppService
     {
         _itemRepository = itemRepository;
         _itemsCache = itemsCache;
+        LocalizationResource = typeof(AbpRadzenUIResource);
 
         GetPolicyName = RadzenUIPermissions.DataDictionary.Default;
         GetListPolicyName = RadzenUIPermissions.DataDictionary.Default;
@@ -44,11 +46,22 @@ public class DataDictionaryTypeAppService
     {
         if (await Repository.AnyAsync(x => x.Code == input.Code))
         {
-            throw new BusinessException(DataDictionaryErrorCodes.TypeCodeExist)
-                .WithData("code", input.Code);
+            throw new UserFriendlyException(L["DataDictionary:TypeCodeExist", input.Code]);
         }
 
-        return await base.CreateAsync(input);
+        try
+        {
+            return await base.CreateAsync(input);
+        }
+        catch (Exception ex) when (IsDuplicateCodeException(ex))
+        {
+            throw new UserFriendlyException(L["DataDictionary:TypeCodeExist", input.Code]);
+        }
+    }
+
+    public override async Task<DataDictionaryTypeDto> UpdateAsync(Guid id, UpdateDataDictionaryTypeDto input)
+    {
+        return await base.UpdateAsync(id, input);
     }
 
     public override async Task DeleteAsync(Guid id)
@@ -78,5 +91,25 @@ public class DataDictionaryTypeAppService
         }
 
         return query;
+    }
+
+    private static bool IsDuplicateCodeException(Exception exception)
+    {
+        while (true)
+        {
+            if (exception.Message.Contains("IX_AbpDataDictionaryTypes", StringComparison.OrdinalIgnoreCase) ||
+                exception.Message.Contains("duplicate", StringComparison.OrdinalIgnoreCase) ||
+                exception.Message.Contains("unique", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            if (exception.InnerException == null)
+            {
+                return false;
+            }
+
+            exception = exception.InnerException;
+        }
     }
 }

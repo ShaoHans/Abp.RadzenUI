@@ -18,6 +18,7 @@
                             Style="flex:1" PageSize="@_defaultPageSize"
                             PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="true"
                             IsLoading="@_isTypeLoading"
+                            LoadData="LoadTypesAsync" Count="@_typeTotalCount"
                             RowSelect="SelectTypeAsync"
                             RowRender="OnTypeRowRender">
                 <HeaderTemplate>
@@ -27,12 +28,12 @@
                             <RadzenText Text="@L["DataDictionary:Types"]" TextStyle="TextStyle.H6" Style="margin:0" />
                             @if (HasCreatePermission)
                             {
-                                <RadzenButton Icon="add" Text="@UL["NewBtn"]" Size="ButtonSize.Small"
+                                <RadzenButton Icon="add" Text="@L["Btn:Add"]" Size="ButtonSize.Small"
                                               Click="OpenCreateTypeDialogAsync" />
                             }
                         </RadzenStack>
                         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap" Gap="8px">
-                            <RadzenTextBox @bind-Value="_typeFilter" Placeholder="@L["Btn:Search"]" Style="width:220px" />
+                            <RadzenTextBox @bind-Value="_typeFilter" Placeholder="@($"{L["DisplayName:DataDictionaryType.Code"]}/{L["DisplayName:DataDictionaryType.Name"]}")" Style="width:220px" />
                             <RadzenButton Icon="search" Text="@L["Btn:Search"]" Click="SearchTypesAsync" />
                             <RadzenButton Icon="refresh" Text="@L["Btn:Reset"]" ButtonStyle="ButtonStyle.Secondary"
                                           Click="ResetTypesAsync" />
@@ -88,7 +89,7 @@
                     </RadzenText>
                     @if (HasCreatePermission)
                     {
-                        <RadzenButton Icon="add" Text="@UL["NewBtn"]" Size="ButtonSize.Small"
+                        <RadzenButton Icon="add" Text="@L["Btn:Add"]" Size="ButtonSize.Small"
                                       Click="OpenCreateItemDialogAsync" />
                     }
                 </RadzenStack>
@@ -99,7 +100,7 @@
                                 LoadData="LoadItemsAsync" Count="@_itemTotalCount" IsLoading="@_isItemLoading">
                     <HeaderTemplate>
                         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap" Gap="8px">
-                            <RadzenTextBox @bind-Value="_itemFilter" Placeholder="@L["Btn:Search"]" Style="width:220px" />
+                            <RadzenTextBox @bind-Value="_itemFilter" Placeholder="@($"{L["DisplayName:DataDictionaryItem.Code"]}/{L["DisplayName:DataDictionaryItem.Name"]}")" Style="width:220px" />
                             <RadzenButton Icon="search" Text="@L["Btn:Search"]" Click="@(async () => await SearchItemsAsync())" />
                             <RadzenButton Icon="refresh" Text="@L["Btn:Reset"]" ButtonStyle="ButtonStyle.Secondary"
                                           Click="@(async () => await ResetItemsAsync())" />
@@ -113,14 +114,14 @@
                         <RadzenDataGridColumn Property="@nameof(DataDictionaryItemDto.Sort)"
                                               Title="@L["DisplayName:DataDictionaryItem.Sort"]" Width="80px" />
                         <RadzenDataGridColumn Property="@nameof(DataDictionaryItemDto.IsActive)"
-                                              Title="@L["DisplayName:DataDictionaryItem.IsActive"]" Width="100px">
+                                              Title="@L["DisplayName:DataDictionaryItem.IsActive"]" Width="100px" Sortable="false">
                             <Template Context="item">
                                 <RadzenSwitch Value="@item.IsActive" Disabled="@(!HasUpdatePermission)"
                                               Change="@(async (bool _) => await ToggleItemActiveAsync(item))" />
                             </Template>
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn Property="@nameof(DataDictionaryItemDto.Description)"
-                                              Title="@L["DisplayName:DataDictionaryItem.Description"]" />
+                                              Title="@L["DisplayName:DataDictionaryItem.Description"]" Sortable="false" />
                         <RadzenDataGridColumn Title="@UL["Actions"]" Width="120px" Sortable="false" TextAlign="TextAlign.Center">
                             <Template Context="item">
                                 @if (HasUpdatePermission)
