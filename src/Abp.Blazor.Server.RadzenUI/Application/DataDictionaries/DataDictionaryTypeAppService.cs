@@ -1,10 +1,7 @@
-using System;
 using Abp.RadzenUI.Application.Contracts.DataDictionaries;
 using Abp.RadzenUI.DataDictionaries;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Permissions;
-using System.Linq;
-using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
@@ -28,7 +25,8 @@ public class DataDictionaryTypeAppService
     public DataDictionaryTypeAppService(
         IRepository<DataDictionaryType, Guid> repository,
         IRepository<DataDictionaryItem, Guid> itemRepository,
-        IDataDictionaryItemsCache itemsCache)
+        IDataDictionaryItemsCache itemsCache
+    )
         : base(repository)
     {
         _itemRepository = itemRepository;
@@ -44,22 +42,23 @@ public class DataDictionaryTypeAppService
 
     public override async Task<DataDictionaryTypeDto> CreateAsync(CreateDataDictionaryTypeDto input)
     {
+        input.Code = input.Code.Trim();
+
         if (await Repository.AnyAsync(x => x.Code == input.Code))
         {
-            throw new UserFriendlyException(L["DataDictionary:TypeCodeExist", input.Code]);
+            throw new BusinessException(DataDictionaryErrorCodes.TypeCodeExist).WithData(
+                "code",
+                input.Code
+            );
         }
 
-        try
-        {
-            return await base.CreateAsync(input);
-        }
-        catch (Exception ex) when (IsDuplicateCodeException(ex))
-        {
-            throw new UserFriendlyException(L["DataDictionary:TypeCodeExist", input.Code]);
-        }
+        return await base.CreateAsync(input);
     }
 
-    public override async Task<DataDictionaryTypeDto> UpdateAsync(Guid id, UpdateDataDictionaryTypeDto input)
+    public override async Task<DataDictionaryTypeDto> UpdateAsync(
+        Guid id,
+        UpdateDataDictionaryTypeDto input
+    )
     {
         return await base.UpdateAsync(id, input);
     }
@@ -79,37 +78,18 @@ public class DataDictionaryTypeAppService
     }
 
     protected override async Task<IQueryable<DataDictionaryType>> CreateFilteredQueryAsync(
-        GetDataDictionaryTypesInput input)
+        GetDataDictionaryTypesInput input
+    )
     {
         var query = await base.CreateFilteredQueryAsync(input);
 
         if (!string.IsNullOrEmpty(input.Filter))
         {
             query = query.Where(x =>
-                x.Code.Contains(input.Filter) ||
-                x.Name.Contains(input.Filter));
+                x.Code.Contains(input.Filter) || x.Name.Contains(input.Filter)
+            );
         }
 
         return query;
-    }
-
-    private static bool IsDuplicateCodeException(Exception exception)
-    {
-        while (true)
-        {
-            if (exception.Message.Contains("IX_AbpDataDictionaryTypes", StringComparison.OrdinalIgnoreCase) ||
-                exception.Message.Contains("duplicate", StringComparison.OrdinalIgnoreCase) ||
-                exception.Message.Contains("unique", StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-
-            if (exception.InnerException == null)
-            {
-                return false;
-            }
-
-            exception = exception.InnerException;
-        }
     }
 }

@@ -25,6 +25,7 @@ using Volo.Abp.ExceptionHandling.Localization;
 using Volo.Abp.Identity.AspNetCore;
 using Volo.Abp.Identity.EntityFrameworkCore;
 using Volo.Abp.Localization;
+using Volo.Abp.Localization.ExceptionHandling;
 using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
@@ -72,6 +73,11 @@ public class AbpRadzenUIModule : AbpModule
                     typeof(AbpSettingManagementResource)
                 )
                 .AddVirtualJson("/Localization/UI");
+        });
+
+        Configure<AbpExceptionLocalizationOptions>(options =>
+        {
+            options.MapCodeNamespace("AbpRadzenUI", typeof(AbpRadzenUIResource));
         });
 
         Configure<CookieAuthenticationOptions>(

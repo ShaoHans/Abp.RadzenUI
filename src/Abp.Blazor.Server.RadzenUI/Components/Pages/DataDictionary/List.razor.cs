@@ -2,31 +2,29 @@ using Abp.RadzenUI.Application.Contracts.DataDictionaries;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Permissions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 using Radzen;
 using Radzen.Blazor;
-using Volo.Abp;
-using Volo.Abp.Application.Dtos;
 using Volo.Abp.AspNetCore.Components.Notifications;
-using Volo.Abp.Validation;
 
 namespace Abp.RadzenUI.Components.Pages.DataDictionary;
 
 public partial class List
 {
-    [Microsoft.AspNetCore.Components.Inject]
+    [Inject]
     protected IDataDictionaryTypeAppService TypeAppService { get; set; } = default!;
 
-    [Microsoft.AspNetCore.Components.Inject]
+    [Inject]
     protected IDataDictionaryItemAppService ItemAppService { get; set; } = default!;
 
-    [Microsoft.AspNetCore.Components.Inject]
+    [Inject]
     protected DialogService DialogService { get; set; } = default!;
 
-    [Microsoft.AspNetCore.Components.Inject]
+    [Inject]
     protected new IUiNotificationService Notify { get; set; } = default!;
 
-    [Microsoft.AspNetCore.Components.Inject]
+    [Inject]
     public IStringLocalizer<AbpRadzenUIResource> UL { get; set; } = default!;
 
     private RadzenDataGrid<DataDictionaryTypeDto> _typeGrid = default!;
@@ -82,9 +80,15 @@ public partial class List
 
     private async Task SetPermissionsAsync()
     {
-        HasCreatePermission = await AuthorizationService.IsGrantedAsync(RadzenUIPermissions.DataDictionary.Create);
-        HasUpdatePermission = await AuthorizationService.IsGrantedAsync(RadzenUIPermissions.DataDictionary.Update);
-        HasDeletePermission = await AuthorizationService.IsGrantedAsync(RadzenUIPermissions.DataDictionary.Delete);
+        HasCreatePermission = await AuthorizationService.IsGrantedAsync(
+            RadzenUIPermissions.DataDictionary.Create
+        );
+        HasUpdatePermission = await AuthorizationService.IsGrantedAsync(
+            RadzenUIPermissions.DataDictionary.Update
+        );
+        HasDeletePermission = await AuthorizationService.IsGrantedAsync(
+            RadzenUIPermissions.DataDictionary.Delete
+        );
     }
 
     private async Task LoadTypesAsync(LoadDataArgs args)
@@ -93,13 +97,15 @@ public partial class List
 
         try
         {
-            var result = await TypeAppService.GetListAsync(new GetDataDictionaryTypesInput
-            {
-                Filter = _typeFilter,
-                Sorting = args.OrderBy,
-                SkipCount = args.Skip ?? 0,
-                MaxResultCount = args.Top ?? _defaultPageSize
-            });
+            var result = await TypeAppService.GetListAsync(
+                new GetDataDictionaryTypesInput
+                {
+                    Filter = _typeFilter,
+                    Sorting = args.OrderBy,
+                    SkipCount = args.Skip ?? 0,
+                    MaxResultCount = args.Top ?? _defaultPageSize,
+                }
+            );
 
             _types = result.Items.ToList();
             _typeTotalCount = (int)result.TotalCount;
@@ -164,9 +170,10 @@ public partial class List
             return;
         }
 
-        var matchingType = _selectedType == null
-            ? _types.FirstOrDefault()
-            : _types.FirstOrDefault(x => x.Id == _selectedType.Id) ?? _types.FirstOrDefault();
+        var matchingType =
+            _selectedType == null
+                ? _types.FirstOrDefault()
+                : _types.FirstOrDefault(x => x.Id == _selectedType.Id) ?? _types.FirstOrDefault();
 
         if (matchingType == null)
         {
@@ -211,21 +218,22 @@ public partial class List
                 }
                 catch (Exception ex)
                 {
-                    await ShowErrorAsync(ex);
+                    await HandleErrorAsync(ex);
                 }
             },
-            OnCancel = () => DialogService.Close(false)
+            OnCancel = () => DialogService.Close(false),
         };
 
         var parameters = new Dictionary<string, object?>
         {
-            { "DialogFromOption", dialogFromOption }
+            { "DialogFromOption", dialogFromOption },
         };
 
         var result = await DialogService.OpenAsync<CreateType>(
             L["DataDictionary:CreateType"],
             parameters,
-            new DialogOptions { Draggable = true, Width = "600px" });
+            new DialogOptions { Draggable = true, Width = "600px" }
+        );
 
         if (result is true)
         {
@@ -240,7 +248,7 @@ public partial class List
             Model = new UpdateDataDictionaryTypeDto
             {
                 Name = type.Name,
-                Description = type.Description
+                Description = type.Description,
             },
             OnSubmit = async model =>
             {
@@ -252,22 +260,23 @@ public partial class List
                 }
                 catch (Exception ex)
                 {
-                    await ShowErrorAsync(ex);
+                    await HandleErrorAsync(ex);
                 }
             },
-            OnCancel = () => DialogService.Close(false)
+            OnCancel = () => DialogService.Close(false),
         };
 
         var parameters = new Dictionary<string, object?>
         {
             { "DialogFromOption", dialogFromOption },
-            { "Code", type.Code }
+            { "Code", type.Code },
         };
 
         var result = await DialogService.OpenAsync<EditType>(
             L["DataDictionary:EditType"],
             parameters,
-            new DialogOptions { Draggable = true, Width = "600px" });
+            new DialogOptions { Draggable = true, Width = "600px" }
+        );
 
         if (result is true)
         {
@@ -280,7 +289,8 @@ public partial class List
         var confirmed = await DialogService.Confirm(
             L["DataDictionary:DeleteType.Confirm", type.Name],
             UL["AreYouSure"],
-            new ConfirmOptions { OkButtonText = UL["Yes"], CancelButtonText = UL["Cancel"] });
+            new ConfirmOptions { OkButtonText = UL["Yes"], CancelButtonText = UL["Cancel"] }
+        );
 
         if (confirmed == true)
         {
@@ -292,7 +302,7 @@ public partial class List
             }
             catch (Exception ex)
             {
-                await ShowErrorAsync(ex);
+                await HandleErrorAsync(ex);
             }
         }
     }
@@ -319,7 +329,7 @@ public partial class List
                 Filter = _itemFilter,
                 Sorting = args.OrderBy,
                 SkipCount = args.Skip ?? 0,
-                MaxResultCount = args.Top ?? _defaultPageSize
+                MaxResultCount = args.Top ?? _defaultPageSize,
             };
 
             var result = await ItemAppService.GetListAsync(input);
@@ -348,7 +358,8 @@ public partial class List
 
     private async Task OpenCreateItemDialogAsync()
     {
-        if (_selectedType == null) return;
+        if (_selectedType == null)
+            return;
 
         var typeDisplayText = $"{_selectedType.Code} - {_selectedType.Name}";
 
@@ -357,7 +368,7 @@ public partial class List
             Model = new CreateDataDictionaryItemDto
             {
                 DataDictionaryTypeId = _selectedType.Id,
-                Sort = 0
+                Sort = 0,
             },
             OnSubmit = async model =>
             {
@@ -369,22 +380,23 @@ public partial class List
                 }
                 catch (Exception ex)
                 {
-                    await ShowErrorAsync(ex);
+                    await HandleErrorAsync(ex);
                 }
             },
-            OnCancel = () => DialogService.Close(false)
+            OnCancel = () => DialogService.Close(false),
         };
 
         var parameters = new Dictionary<string, object?>
         {
             { "DialogFromOption", dialogFromOption },
-            { "TypeDisplayText", typeDisplayText }
+            { "TypeDisplayText", typeDisplayText },
         };
 
         var result = await DialogService.OpenAsync<CreateItem>(
             L["DataDictionary:CreateItem"],
             parameters,
-            new DialogOptions { Draggable = true, Width = "600px" });
+            new DialogOptions { Draggable = true, Width = "600px" }
+        );
 
         if (result is true)
         {
@@ -394,9 +406,8 @@ public partial class List
 
     private async Task OpenEditItemDialogAsync(DataDictionaryItemDto item)
     {
-        var typeDisplayText = _selectedType == null
-            ? string.Empty
-            : $"{_selectedType.Code} - {_selectedType.Name}";
+        var typeDisplayText =
+            _selectedType == null ? string.Empty : $"{_selectedType.Code} - {_selectedType.Name}";
 
         var dialogFromOption = new Models.DialogFromOption<UpdateDataDictionaryItemDto>
         {
@@ -405,7 +416,7 @@ public partial class List
                 Name = item.Name,
                 Sort = item.Sort,
                 IsActive = item.IsActive,
-                Description = item.Description
+                Description = item.Description,
             },
             OnSubmit = async model =>
             {
@@ -417,23 +428,24 @@ public partial class List
                 }
                 catch (Exception ex)
                 {
-                    await ShowErrorAsync(ex);
+                    await HandleErrorAsync(ex);
                 }
             },
-            OnCancel = () => DialogService.Close(false)
+            OnCancel = () => DialogService.Close(false),
         };
 
         var parameters = new Dictionary<string, object?>
         {
             { "DialogFromOption", dialogFromOption },
             { "TypeDisplayText", typeDisplayText },
-            { "Code", item.Code }
+            { "Code", item.Code },
         };
 
         var result = await DialogService.OpenAsync<EditItem>(
             L["DataDictionary:EditItem"],
             parameters,
-            new DialogOptions { Draggable = true, Width = "600px" });
+            new DialogOptions { Draggable = true, Width = "600px" }
+        );
 
         if (result is true)
         {
@@ -446,7 +458,8 @@ public partial class List
         var confirmed = await DialogService.Confirm(
             L["DataDictionary:DeleteItem.Confirm", item.Name],
             UL["AreYouSure"],
-            new ConfirmOptions { OkButtonText = UL["Yes"], CancelButtonText = UL["Cancel"] });
+            new ConfirmOptions { OkButtonText = UL["Yes"], CancelButtonText = UL["Cancel"] }
+        );
 
         if (confirmed == true)
         {
@@ -458,7 +471,7 @@ public partial class List
             }
             catch (Exception ex)
             {
-                await ShowErrorAsync(ex);
+                await HandleErrorAsync(ex);
             }
         }
     }
@@ -472,38 +485,7 @@ public partial class List
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
-        }
-    }
-
-    private async Task ShowErrorAsync(Exception ex)
-    {
-        if (TryGetUserFriendlyMessage(ex, out var message))
-        {
-            await Notify.Error(message);
-            return;
-        }
-
-        await HandleErrorAsync(ex);
-    }
-
-    private static bool TryGetUserFriendlyMessage(Exception? exception, out string message)
-    {
-        switch (exception)
-        {
-            case null:
-                message = string.Empty;
-                return false;
-            case UserFriendlyException friendlyException when !string.IsNullOrWhiteSpace(friendlyException.Message):
-                message = friendlyException.Message;
-                return true;
-            case AbpValidationException validationException when validationException.ValidationErrors.Count != 0:
-                message = string.Join(" ", validationException.ValidationErrors
-                    .Select(x => x.ErrorMessage)
-                    .Where(x => !string.IsNullOrWhiteSpace(x)));
-                return !string.IsNullOrWhiteSpace(message);
-            default:
-                return TryGetUserFriendlyMessage(exception.InnerException, out message);
+            await HandleErrorAsync(ex);
         }
     }
 
