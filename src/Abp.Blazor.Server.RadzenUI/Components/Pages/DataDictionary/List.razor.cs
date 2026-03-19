@@ -125,16 +125,6 @@ public partial class List
         }
     }
 
-    private async Task ResetTypesAsync()
-    {
-        _typeFilter = null;
-
-        if (_typeGrid is not null)
-        {
-            await _typeGrid.FirstPage(true);
-        }
-    }
-
     private async Task SelectTypeAsync(DataDictionaryTypeDto type)
     {
         if (_selectedType?.Id == type.Id)
@@ -346,14 +336,8 @@ public partial class List
     {
         if (_itemGrid is not null)
         {
-            await _itemGrid.Reload();
+            await _itemGrid.FirstPage(true);
         }
-    }
-
-    private async Task ResetItemsAsync()
-    {
-        _itemFilter = null;
-        await SearchItemsAsync();
     }
 
     private async Task OpenCreateItemDialogAsync()
