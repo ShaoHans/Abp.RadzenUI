@@ -134,7 +134,7 @@ public abstract class AbpCrudPageBase<
     protected RadzenDataGrid<TListViewModel> _grid = default!;
     protected IReadOnlyList<TListViewModel> _entities = [];
     protected int _totalCount;
-    protected readonly IEnumerable<int> _pageSizeOptions = [10, 20, 30];
+    protected readonly IEnumerable<int> _pageSizeOptions = [10, 20, 30, 50, 100];
     protected readonly bool _showPagerSummary = true;
     protected bool _isLoading = true;
     protected int _defaultPageSize = 10;
