@@ -69,7 +69,7 @@
     {
         await DialogService.OpenAsync<Pages.Account.TenantSwitchDialog>(
             title: TL["SwitchTenant"],
-            parameters: new Dictionary<string, object>
+            parameters: new Dictionary<string, object?>
                     {
                         { "TenantName", CurrentTenant?.Name ?? string.Empty }
                     },

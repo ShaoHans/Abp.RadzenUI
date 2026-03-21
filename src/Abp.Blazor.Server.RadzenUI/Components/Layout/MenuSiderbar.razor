@@ -1,4 +1,5 @@
-﻿@using Volo.Abp.UI.Navigation
+﻿@using Abp.RadzenUI.UIPlaceHolders
+@using Volo.Abp.UI.Navigation
 @inject IMenuManager MenuManager
 
 <RadzenSidebar @bind-Expanded="@SidebarExpanded"
@@ -8,7 +9,7 @@
         <RadzenTextBox id="find" Placeholder="Find menu ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" class="rz-search-input" aria-label="find" />
     </div> *@
     <div style="flex: 1; overflow: auto">
-        <RadzenPanelMenu Match="NavLinkMatch.Prefix"
+        <RadzenPanelMenu Match="NavLinkMatch.Prefix" Multiple="@_titleBarSettings.AllowSideMenuMultipleExpand"
                          Style="--rz-panel-menu-icon-margin-inline: 0 0.75rem; --rz-panel-menu-item-padding: 0.75rem 0.875rem; --rz-panel-menu-item-2nd-level-padding: 0.625rem 0.875rem 0.625rem 2.5rem; --rz-panel-menu-item-3rd-level-padding: 0.5rem 0.875rem 0.5rem 3rem;">
             @foreach (var menu in _applicationMenu?.Items ?? [])
             {
@@ -19,17 +20,18 @@
 </RadzenSidebar>
 
 @code {
-    [Parameter]
-    public bool SidebarExpanded { get; set; }
+    [Parameter] public bool SidebarExpanded { get; set; }
+    [Parameter] public EventCallback<bool> SidebarExpandedChanged { get; set; }
+    [Inject] IUIPlaceHolderResolver UIPlaceHolderResolver { get; set; } = default!;
+    TitleBarSettings _titleBarSettings = new();
 
-    [Parameter]
-    public EventCallback<bool> SidebarExpandedChanged { get; set; }
 
     ApplicationMenu _applicationMenu = default!;
 
     protected override async Task OnInitializedAsync()
     {
         _applicationMenu = await MenuManager.GetMainMenuAsync();
+        _titleBarSettings = await UIPlaceHolderResolver.GetTitleBarSettingsAsync();
     }
 
     void FilterPanelMenu(ChangeEventArgs args)

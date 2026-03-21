@@ -38,6 +38,11 @@ public class TitleBarSettings
     /// Whether to display multilingual menus
     /// </summary>
     public bool ShowLanguageMenu = true;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether multiple side menu items can be expanded at the same time.
+    /// </summary>
+    public bool AllowSideMenuMultipleExpand { get; set; } = true;
 }
 
 public class ThemeSettings
