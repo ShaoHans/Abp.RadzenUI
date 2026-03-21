@@ -1,12 +1,15 @@
 ﻿@using Volo.Abp.UI.Navigation
 @inject IMenuManager MenuManager
 
-<RadzenSidebar @bind-Expanded="@SidebarExpanded" class="demos-sidebar" style="display: flex; flex-direction: column">
+<RadzenSidebar @bind-Expanded="@SidebarExpanded"
+               class="demos-sidebar"
+               style="display: flex; flex-direction: column; --rz-sidebar-width: clamp(14rem, 13.5rem + 0.6vw, 15rem);">
     @* <div style="padding: 1rem">
         <RadzenTextBox id="find" Placeholder="Find menu ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" class="rz-search-input" aria-label="find" />
     </div> *@
     <div style="flex: 1; overflow: auto">
-        <RadzenPanelMenu Match="NavLinkMatch.Prefix">
+        <RadzenPanelMenu Match="NavLinkMatch.Prefix"
+                         Style="--rz-panel-menu-icon-margin-inline: 0 0.75rem; --rz-panel-menu-item-padding: 0.75rem 0.875rem; --rz-panel-menu-item-2nd-level-padding: 0.625rem 0.875rem 0.625rem 2.5rem; --rz-panel-menu-item-3rd-level-padding: 0.5rem 0.875rem 0.5rem 3rem;">
             @foreach (var menu in _applicationMenu?.Items ?? [])
             {
                 @BuildMenuTree(menu);

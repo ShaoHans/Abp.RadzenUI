@@ -4,6 +4,32 @@
     flex-direction: column;
 }
 
+.app-layout-shell {
+    --app-layout-inline-space: clamp(0.75rem, 0.45rem + 0.9vw, 1.5rem);
+    --app-layout-block-space: clamp(0.75rem, 0.5rem + 0.6vw, 1.25rem);
+    --app-layout-body-margin: clamp(0.625rem, 0.35rem + 0.7vw, 0.875rem);
+    --app-layout-max-width: 1720px;
+    --app-sidebar-width: clamp(15.5rem, 15rem + 0.75vw, 16.75rem);
+}
+
+.app-layout-shell ::deep .rz-body {
+    margin: var(--app-layout-body-margin);
+}
+
+.app-layout-shell ::deep .app-layout-content {
+    padding: var(--app-layout-block-space) var(--app-layout-inline-space);
+    row-gap: var(--app-layout-block-space);
+}
+
+.app-layout-shell ::deep .app-layout-frame {
+    margin-inline: auto;
+    width: min(100%, var(--app-layout-max-width));
+}
+
+.app-layout-shell ::deep .demos-sidebar {
+    --rz-sidebar-width: var(--app-sidebar-width);
+}
+
 main {
     flex: 1;
 }
@@ -43,6 +69,17 @@ main {
 
     .top-row ::deep a, .top-row ::deep .btn-link {
         margin-left: 0;
+    }
+
+    .app-layout-shell {
+        --app-layout-inline-space: 0.75rem;
+        --app-layout-block-space: 0.75rem;
+        --app-layout-body-margin: 0;
+    }
+
+    .app-layout-shell ::deep .rz-body {
+        margin: 0;
+        border-radius: 0;
     }
 }
 

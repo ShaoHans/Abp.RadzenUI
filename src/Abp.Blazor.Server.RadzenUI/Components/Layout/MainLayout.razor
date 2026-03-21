@@ -6,15 +6,15 @@
 {
     <RadzenComponents />
 
-    <RadzenLayout Style="grid-template-columns: auto 1fr auto; grid-template-areas: 'rz-header rz-header rz-header' 'rz-sidebar rz-body rz-config-sidebar'">
+    <RadzenLayout class="app-layout-shell" Style="grid-template-columns: auto 1fr auto; grid-template-areas: 'rz-header rz-header rz-header' 'rz-sidebar rz-body rz-config-sidebar'">
         <Header MenuToggle="ToggleMenu"
                 ThemeToggle="ToggleTheme" />
         <RadzenBody>
             <ChildContent>
-                <RadzenContentContainer Name="main">
-                    <RadzenRow Gap="2rem" class="rz-pt-6 rz-px-4 rz-px-sm-8 rz-px-xl-12">
+                <RadzenContentContainer Name="main" class="app-layout-main">
+                    <RadzenRow Gap="1rem" class="app-layout-content">
                         <RadzenColumn Size="12">
-                            <RadzenRow class="rz-mx-auto" Style="max-width: 1600px;">
+                            <RadzenRow class="app-layout-frame">
                                 <RadzenColumn Size="12">
                                     <CustomErrorBoundary @ref="errorBoundary">
                                         @Body
