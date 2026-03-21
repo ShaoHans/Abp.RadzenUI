@@ -10,35 +10,41 @@
 @inject IStringLocalizer<AbpRadzenUIResource> TL
 @inject IIdentityUserRepository IdentityUserRepository
 
-<RadzenHeader>
+<RadzenHeader class="app-header">
     <ChildContent>
-        <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px">
+        <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px" class="app-header__row">
             <RadzenColumn Size="5">
-                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" class="app-header__title">
                     <RadzenSidebarToggle Click="@MenuToggle" />
-                    <span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">@_titleBar.Title</span>
+                    <span class="app-header__title-text" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">@_titleBar.Title</span>
                 </RadzenStack>
             </RadzenColumn>
             <RadzenColumn Size="7">
-                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" class="app-header__actions">
                     @if (_titleBar.ShowGithubLink)
                     {
-                        <div class="rz-display-none rz-display-sm-inline-flex align-items-center">
-                            <RadzenLink Path="https://github.com/ShaoHans/Abp-RadzenUI" Text="GitHub" title="Star Abp-RadzenUI on GitHub" class="rz-text-nowrap rz-mx-2 rz-mx-lg-4" target="_blank" />
+                        <div class="app-header__action app-header__action--github">
+                            <RadzenLink Path="https://github.com/ShaoHans/Abp-RadzenUI"
+                                        Text="GitHub"
+                                        title="Star Abp-RadzenUI on GitHub"
+                                        class="rz-text-nowrap app-header__link app-header__github-text"
+                                        target="_blank" />
                         </div>
                     }
-                    <RadzenAppearanceToggle class="rz-mx-2" />
-                    <RadzenSidebarToggle Icon="settings" Click="@ThemeToggle" class="rz-m-0" />
+                    <RadzenAppearanceToggle class="app-header__action app-header__icon-action" />
+                    <RadzenSidebarToggle Icon="settings" Click="@ThemeToggle" class="app-header__action app-header__icon-action" />
                     @if (_titleBar.ShowLanguageMenu)
                     {
-                        <LanguageSwitch />
+                        <div class="app-header__action">
+                            <LanguageSwitch />
+                        </div>
                     }
                     @if (CurrentUser != null && CurrentUser.IsAuthenticated)
                     {
-                        <div>
-                            <RadzenProfileMenu class="rz-mx-2">
+                        <div class="app-header__action">
+                            <RadzenProfileMenu class="app-header__profile">
                                 <Template>
-                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-me-2">
+                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" class="app-header__profile-trigger">
                                         @if (_avatarUrl.IsNullOrWhiteSpace())
                                         {
                                             <RadzenGravatar Email="@CurrentUser.Email" Style="width:24px;height:24px;"></RadzenGravatar>
@@ -61,8 +67,8 @@
                     }
                     else
                     {
-                        <div class="rz-display-none rz-display-sm-inline-flex align-items-center">
-                            <RadzenLink Path="/account/login" Text="@TL["Login"]" class="rz-text-nowrap rz-mx-2 rz-mx-lg-4" />
+                        <div class="rz-display-none rz-display-sm-inline-flex align-items-center app-header__action">
+                            <RadzenLink Path="/account/login" Text="@TL["Login"]" class="rz-text-nowrap app-header__link" />
                         </div>
                     }
                 </RadzenStack>
