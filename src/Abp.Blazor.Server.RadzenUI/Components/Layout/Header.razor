@@ -13,6 +13,70 @@
 @inject IIdentityUserRepository IdentityUserRepository
 @inject IJSRuntime JSRuntime
 
+<style>
+    /* Uniform header icon button sizing */
+    .app-header__actions .rz-sidebar-toggle.app-header__icon-action {
+        padding: 0 !important;
+        margin: 0 !important;
+        margin-inline-end: 0 !important;
+        border-inline-end: none !important;
+        width: 2.25rem !important;
+        height: 2.25rem !important;
+        border-radius: 50% !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    .app-header__actions .rz-button.app-header__icon-action {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 2.25rem !important;
+        height: 2.25rem !important;
+        min-width: unset !important;
+        min-height: unset !important;
+        border-radius: 50% !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    .app-header__actions .rz-button.app-header__icon-action .rz-button-icon-left {
+        margin: 0 !important;
+    }
+    /* Language menu: icon-only circle */
+    .app-header__actions .app-header__menu--language {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+    }
+    .app-header__actions .app-header__menu--language > li > .rz-navigation-item-wrapper > .rz-navigation-item-link {
+        padding: 0 !important;
+        width: 2.25rem !important;
+        height: 2.25rem !important;
+        min-height: unset !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: 50% !important;
+        gap: 0 !important;
+    }
+    .app-header__actions .app-header__menu--language .rz-navigation-item-icon-children {
+        display: none !important;
+    }
+    /* Profile menu: compact */
+    .app-header__actions .rz-profile-menu {
+        margin: 0 !important;
+        background: transparent !important;
+    }
+    .app-header__actions .rz-profile-menu > li > .rz-navigation-item-wrapper > .rz-navigation-item-link {
+        padding: 0 0.25rem !important;
+        min-height: 2.25rem !important;
+        gap: 0 !important;
+    }
+    .app-header__actions .rz-profile-menu > li > .rz-navigation-item-wrapper > .rz-navigation-item-link > .rz-navigation-item-icon-children {
+        display: none !important;
+    }
+</style>
+
 <RadzenHeader class="app-header">
     <ChildContent>
         <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px" class="app-header__row">
