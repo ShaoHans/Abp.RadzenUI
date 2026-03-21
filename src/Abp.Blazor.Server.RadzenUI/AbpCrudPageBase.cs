@@ -1,10 +1,16 @@
 ﻿using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Models;
+using Abp.RadzenUI.Services;
+using Abp.RadzenUI.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
+using Microsoft.JSInterop;
 using Radzen;
 using Radzen.Blazor;
+using System.Globalization;
+using System.Linq;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.AspNetCore.Components;
@@ -131,6 +137,15 @@ public abstract class AbpCrudPageBase<
     [Inject]
     public IStringLocalizer<AbpRadzenUIResource> UL { get; set; } = default!;
 
+    [Inject]
+    protected IHttpContextAccessor HttpContextAccessor { get; set; } = default!;
+
+    [Inject]
+    protected IJSRuntime JSRuntime { get; set; } = default!;
+
+    [Inject]
+    protected GridPageSizePreferenceService GridPageSizePreferenceService { get; set; } = default!;
+
     protected RadzenDataGrid<TListViewModel> _grid = default!;
     protected IReadOnlyList<TListViewModel> _entities = [];
     protected int _totalCount;
@@ -138,6 +153,8 @@ public abstract class AbpCrudPageBase<
     protected readonly bool _showPagerSummary = true;
     protected bool _isLoading = true;
     protected int _defaultPageSize = 10;
+    private bool _isInteractive;
+    private int? _lastPersistedPageSize;
 
     protected TGetListInput GetListInput = new();
     protected TCreateViewModel NewEntity;
@@ -161,12 +178,25 @@ public abstract class AbpCrudPageBase<
     protected override async Task OnInitializedAsync()
     {
         await TrySetPermissionsAsync();
-        await LoadDataAsync(new LoadDataArgs());
+        InitializePageSizePreference();
+        await LoadDataAsync(new LoadDataArgs { Top = _defaultPageSize });
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _isInteractive = true;
+        await PersistPageSizeCookieAsync(_defaultPageSize);
     }
 
     protected virtual async Task LoadDataAsync(LoadDataArgs args)
     {
         _isLoading = true;
+        await UpdatePageSizePreferenceAsync(args);
         await UpdateGetListInputAsync(args);
         var result = await AppService.GetListAsync(GetListInput);
         _entities = MapToListViewModel(result.Items);
@@ -193,6 +223,60 @@ public abstract class AbpCrudPageBase<
         }
 
         return Task.CompletedTask;
+    }
+
+    private void InitializePageSizePreference()
+    {
+        var pageSize =
+            GridPageSizePreferenceService.PageSize
+            ?? AbpRadzenUICookieHelper.GetPageSizeCookie(HttpContextAccessor.HttpContext);
+
+        if (!IsSupportedPageSize(pageSize))
+        {
+            return;
+        }
+
+        _defaultPageSize = pageSize!.Value;
+        GridPageSizePreferenceService.PageSize = _defaultPageSize;
+        _lastPersistedPageSize = _defaultPageSize;
+    }
+
+    private async Task UpdatePageSizePreferenceAsync(LoadDataArgs args)
+    {
+        if (!IsSupportedPageSize(args.Top))
+        {
+            return;
+        }
+
+        _defaultPageSize = args.Top!.Value;
+        GridPageSizePreferenceService.PageSize = _defaultPageSize;
+
+        if (_isInteractive)
+        {
+            await PersistPageSizeCookieAsync(_defaultPageSize);
+        }
+    }
+
+    private bool IsSupportedPageSize(int? pageSize)
+    {
+        return pageSize.HasValue && _pageSizeOptions.Contains(pageSize.Value);
+    }
+
+    private async Task PersistPageSizeCookieAsync(int pageSize)
+    {
+        if (_lastPersistedPageSize == pageSize)
+        {
+            return;
+        }
+
+        await JSRuntime.InvokeVoidAsync(
+            "abpRadzenCookie.set",
+            AbpRadzenUICookieHelper.PageSizeKey,
+            pageSize.ToString(CultureInfo.InvariantCulture),
+            3650
+        );
+
+        _lastPersistedPageSize = pageSize;
     }
 
     private async Task TrySetPermissionsAsync()
@@ -226,7 +310,7 @@ public abstract class AbpCrudPageBase<
     protected virtual async Task OpenCreateDialogAsync<TDialog>(
         string title,
         Func<DialogOptions>? func = null,
-        Dictionary<string, object>? parameters = null,
+        Dictionary<string, object?>? parameters = null,
         Func<Task>? callback = null
     )
         where TDialog : ComponentBase

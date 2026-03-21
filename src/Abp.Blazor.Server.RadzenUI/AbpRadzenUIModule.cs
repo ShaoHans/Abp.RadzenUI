@@ -166,6 +166,7 @@ public class AbpRadzenUIModule : AbpModule
         });
 
         context.Services.AddSingleton(typeof(AbpBlazorMessageLocalizerHelper<>));
+        context.Services.AddScoped<GridPageSizePreferenceService>();
         context.Services.AddTransient<IUploadService, DefaultUploadService>();
 
         context.Services.AddAbpDbContext<DataDictionaryDbContext>(options =>

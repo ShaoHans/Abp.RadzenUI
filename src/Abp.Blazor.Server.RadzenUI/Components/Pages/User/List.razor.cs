@@ -99,7 +99,7 @@ public partial class List
     {
         await DialogService.OpenAsync<Role.Permission>(
             $"{L["Permissions"]} - {user.UserName}",
-            parameters: new Dictionary<string, object>()
+            parameters: new Dictionary<string, object?>()
             {
                 { "ProviderName", "U" },
                 { "ProviderKey", user.Id.ToString() },

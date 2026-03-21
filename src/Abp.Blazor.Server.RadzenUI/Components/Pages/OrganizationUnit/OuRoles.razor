@@ -17,7 +17,7 @@ else
 
     <RadzenStack Gap="1rem" Style="margin-top:5px;">
         <RadzenDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true" Density="Density.Default"
-                        PagerHorizontalAlign="HorizontalAlign.Center"
+                        PagerHorizontalAlign="HorizontalAlign.Center" PageSize="@_defaultPageSize"
                         PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
                         Count="@_totalCount" IsLoading="@_isLoading">
             <Columns>
