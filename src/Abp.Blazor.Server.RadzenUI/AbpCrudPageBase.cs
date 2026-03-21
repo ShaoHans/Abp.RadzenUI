@@ -144,7 +144,8 @@ public abstract class AbpCrudPageBase<
     protected IJSRuntime JSRuntime { get; set; } = default!;
 
     [Inject]
-    protected GridPageSizePreferenceService GridPageSizePreferenceService { get; set; } = default!;
+    protected GridPageSizePreferenceService GridPageSizePreferenceService { get; set; } =
+        default!;
 
     protected RadzenDataGrid<TListViewModel> _grid = default!;
     protected IReadOnlyList<TListViewModel> _entities = [];
@@ -153,8 +154,8 @@ public abstract class AbpCrudPageBase<
     protected readonly bool _showPagerSummary = true;
     protected bool _isLoading = true;
     protected int _defaultPageSize = 10;
-    private bool _isInteractive;
-    private int? _lastPersistedPageSize;
+    bool _isInteractive;
+    int? _lastPersistedPageSize;
 
     protected TGetListInput GetListInput = new();
     protected TCreateViewModel NewEntity;
@@ -225,7 +226,7 @@ public abstract class AbpCrudPageBase<
         return Task.CompletedTask;
     }
 
-    private void InitializePageSizePreference()
+    void InitializePageSizePreference()
     {
         var pageSize =
             GridPageSizePreferenceService.PageSize
@@ -241,7 +242,7 @@ public abstract class AbpCrudPageBase<
         _lastPersistedPageSize = _defaultPageSize;
     }
 
-    private async Task UpdatePageSizePreferenceAsync(LoadDataArgs args)
+    async Task UpdatePageSizePreferenceAsync(LoadDataArgs args)
     {
         if (!IsSupportedPageSize(args.Top))
         {
@@ -257,12 +258,12 @@ public abstract class AbpCrudPageBase<
         }
     }
 
-    private bool IsSupportedPageSize(int? pageSize)
+    bool IsSupportedPageSize(int? pageSize)
     {
         return pageSize.HasValue && _pageSizeOptions.Contains(pageSize.Value);
     }
 
-    private async Task PersistPageSizeCookieAsync(int pageSize)
+    async Task PersistPageSizeCookieAsync(int pageSize)
     {
         if (_lastPersistedPageSize == pageSize)
         {
@@ -373,7 +374,7 @@ public abstract class AbpCrudPageBase<
         string title,
         TGetListOutputDto dto,
         Func<DialogOptions>? func = null,
-        Dictionary<string, object>? parameters = null,
+        Dictionary<string, object?>? parameters = null,
         Func<Task>? callback = null
     )
         where TDialog : ComponentBase
