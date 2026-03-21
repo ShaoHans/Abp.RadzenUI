@@ -2,13 +2,16 @@
 @using Abp.RadzenUI.UIPlaceHolders
 @using Microsoft.Extensions.Localization
 @using Microsoft.Extensions.Options
+@using Microsoft.JSInterop
 @using Volo.Abp.Account.Localization
 @using Volo.Abp.AspNetCore.Components
 @using Volo.Abp.Data
 @using Volo.Abp.Identity
+@implements IAsyncDisposable
 @inherits AbpRadzenUIComponentBase
 @inject IStringLocalizer<AbpRadzenUIResource> TL
 @inject IIdentityUserRepository IdentityUserRepository
+@inject IJSRuntime JSRuntime
 
 <RadzenHeader class="app-header">
     <ChildContent>
@@ -33,6 +36,12 @@
                     }
                     <RadzenAppearanceToggle class="app-header__action app-header__icon-action" />
                     <RadzenSidebarToggle Icon="settings" Click="@ThemeToggle" class="app-header__action app-header__icon-action" />
+                    <RadzenButton Icon="@(_isFullscreen ? "fullscreen_exit" : "fullscreen")"
+                                  title="@(_isFullscreen ? "Exit full screen" : "Full screen")"
+                                  Variant="Variant.Text"
+                                  ButtonStyle="ButtonStyle.Base"
+                                  class="@GetFullscreenButtonClass()"
+                                  Click="@ToggleFullscreenAsync" />
                     @if (_titleBar.ShowLanguageMenu)
                     {
                         <div class="app-header__action">
@@ -83,6 +92,8 @@
     [Inject] IUIPlaceHolderResolver UIPlaceHolderResolver { get; set; } = default!;
     TitleBarSettings _titleBar = new();
     string? _avatarUrl;
+    bool _isFullscreen;
+    DotNetObjectReference<Header>? _dotNetReference;
 
     public Header()
     {
@@ -98,5 +109,58 @@
             var user = await IdentityUserRepository.GetAsync(CurrentUser.Id.Value);
             _avatarUrl = user.GetProperty<string>(AvatarConsts.ExtraPropertyName);
         }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _dotNetReference = DotNetObjectReference.Create(this);
+        _isFullscreen = await JSRuntime.InvokeAsync<bool>(
+            "abpRadzenFullscreen.initialize",
+            _dotNetReference
+        );
+        await InvokeAsync(StateHasChanged);
+    }
+
+    async Task ToggleFullscreenAsync()
+    {
+        _isFullscreen = await JSRuntime.InvokeAsync<bool>("abpRadzenFullscreen.toggle");
+    }
+
+    string GetFullscreenButtonClass()
+    {
+        return _isFullscreen
+            ? "app-header__action app-header__icon-action app-header__icon-action--active"
+            : "app-header__action app-header__icon-action";
+    }
+
+    [JSInvokable]
+    public async Task HandleFullscreenChange(bool isFullscreen)
+    {
+        _isFullscreen = isFullscreen;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_dotNetReference is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("abpRadzenFullscreen.dispose");
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+
+        _dotNetReference.Dispose();
+        _dotNetReference = null;
     }
 }

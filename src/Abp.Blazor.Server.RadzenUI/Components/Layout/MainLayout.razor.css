@@ -99,6 +99,10 @@
     border-radius: 50%;
 }
 
+.app-layout-shell ::deep .app-header__icon-action--active {
+    color: var(--rz-primary);
+}
+
 .app-layout-shell ::deep .app-header__profile {
     margin: 0;
 }
