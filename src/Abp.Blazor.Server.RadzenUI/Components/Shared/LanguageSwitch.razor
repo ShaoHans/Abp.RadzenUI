@@ -9,7 +9,7 @@
 @if (_otherLanguages != null && _otherLanguages.Any())
 {
     <RadzenMenu class="app-header__menu app-header__menu--language">
-        <RadzenMenuItem Text="@_currentLanguage.DisplayName" Icon="language">
+        <RadzenMenuItem Icon="g_translate">
             @foreach (var language in _otherLanguages)
             {
                 <RadzenMenuItem Click="@((args)=>ChangeLanguage(language))" Text="@language.DisplayName" />
