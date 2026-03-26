@@ -8,7 +8,7 @@
 
 <PageTitle>@L["PageTitle:SecurityLogs"]</PageTitle>
 
-<RadzenDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true"
+<LocalizedDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true"
                 PagerHorizontalAlign="HorizontalAlign.Center"
                 Style="height:calc(100vh - 150px)" PageSize="@_defaultPageSize"
                 PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
@@ -40,4 +40,4 @@
             </Template>
         </RadzenDataGridColumn>
     </Columns>
-</RadzenDataGrid>
+</LocalizedDataGrid>
