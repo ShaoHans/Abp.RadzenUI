@@ -9,7 +9,7 @@
 
 <PageTitle>@L["AuditLogs"]</PageTitle>
 
-<RadzenDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true" AllowFiltering="true"
+<LocalizedDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true" AllowFiltering="true"
                 PagerHorizontalAlign="HorizontalAlign.Center" PageSize="@_defaultPageSize"
                 Style="height:calc(100vh - 160px)"
                 PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
@@ -55,7 +55,7 @@
             </Template>
         </RadzenDataGridColumn>
     </Columns>
-</RadzenDataGrid>
+</LocalizedDataGrid>
 
 @code {
     void ShowTooltip(ElementReference elementReference, string? text, TooltipOptions? options = null) => TooltipService.Open(elementReference, text ?? "Nothing", options);

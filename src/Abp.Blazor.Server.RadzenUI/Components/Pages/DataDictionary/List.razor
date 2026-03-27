@@ -12,7 +12,7 @@
     @* Left panel - Dictionary Types *@
     <RadzenColumn Size="12" SizeMD="4">
         <RadzenCard Variant="Variant.Filled" Style="height:100%; display:flex; flex-direction:column">
-            <RadzenDataGrid @ref="_typeGrid" Data="@_types" TItem="DataDictionaryTypeDto"
+            <LocalizedDataGrid @ref="_typeGrid" Data="@_types" TItem="DataDictionaryTypeDto"
                             AllowPaging="true" AllowSorting="true"
                             PagerHorizontalAlign="HorizontalAlign.Center"
                             Style="flex:1" PageSize="@_defaultPageSize"
@@ -64,7 +64,7 @@
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
-            </RadzenDataGrid>
+            </LocalizedDataGrid>
         </RadzenCard>
     </RadzenColumn>
 

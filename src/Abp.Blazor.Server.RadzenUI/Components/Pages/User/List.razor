@@ -8,7 +8,7 @@
 <PageTitle>@L["Users"]</PageTitle>
 
 @* Freeze Header： Style="height:calc(100vh - 160px)" *@
-<RadzenDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true"
+<LocalizedDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true"
                 PagerHorizontalAlign="HorizontalAlign.Center" PageSize="@_defaultPageSize" Style="height:calc(100vh - 150px)"
                 PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
                 Count="@_totalCount" IsLoading="@_isLoading">
@@ -91,4 +91,4 @@
             </Template>
         </RadzenDataGridColumn>
     </Columns>
-</RadzenDataGrid>
+</LocalizedDataGrid>

@@ -203,7 +203,7 @@ public class CRMDbMigrationService(
 
         return Directory
             .GetDirectories(srcDirectoryPath)
-            .FirstOrDefault(d => d.EndsWith(".EntityFrameworkCore"));
+            .FirstOrDefault(d =>d.StartsWith("CRM")&&d.EndsWith(".EntityFrameworkCore"));
     }
 
     private static string? GetSolutionDirectoryPath()
