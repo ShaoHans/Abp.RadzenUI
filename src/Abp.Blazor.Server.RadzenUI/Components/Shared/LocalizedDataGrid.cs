@@ -10,9 +10,12 @@ namespace Abp.RadzenUI.Components.Shared;
 /// </summary>
 /// <typeparam name="TItem">Data type of table records.</typeparam>
 [CascadingTypeParameter(nameof(TItem))]
-public class LocalizedDataGrid<TItem>(IStringLocalizer<AbpRadzenUIResource> L)
+public class LocalizedDataGrid<TItem>()
     : RadzenDataGrid<TItem> where TItem : notnull
 {
+    [Inject]
+    private IStringLocalizer<AbpRadzenUIResource> L { get; set; } = default!;
+
     protected override void OnInitialized()
     {
         base.OnInitialized();
