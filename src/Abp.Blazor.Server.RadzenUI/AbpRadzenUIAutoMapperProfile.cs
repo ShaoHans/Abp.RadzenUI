@@ -114,6 +114,9 @@ public partial class CreateDataDictionaryTypeDtoToDataDictionaryTypeMapper
     [MapperIgnoreTarget(nameof(DataDictionaryType.CreationTime))]
     [MapperIgnoreTarget(nameof(DataDictionaryType.LastModifierId))]
     [MapperIgnoreTarget(nameof(DataDictionaryType.LastModificationTime))]
+    [MapperIgnoreTarget(nameof(DataDictionaryType.IsDeleted))]
+    [MapperIgnoreTarget(nameof(DataDictionaryType.DeleterId))]
+    [MapperIgnoreTarget(nameof(DataDictionaryType.DeletionTime))]
     [MapperIgnoreTarget(nameof(DataDictionaryType.ConcurrencyStamp))]
     public override partial DataDictionaryType Map(CreateDataDictionaryTypeDto source);
 
@@ -122,6 +125,9 @@ public partial class CreateDataDictionaryTypeDtoToDataDictionaryTypeMapper
     [MapperIgnoreTarget(nameof(DataDictionaryType.CreationTime))]
     [MapperIgnoreTarget(nameof(DataDictionaryType.LastModifierId))]
     [MapperIgnoreTarget(nameof(DataDictionaryType.LastModificationTime))]
+    [MapperIgnoreTarget(nameof(DataDictionaryType.IsDeleted))]
+    [MapperIgnoreTarget(nameof(DataDictionaryType.DeleterId))]
+    [MapperIgnoreTarget(nameof(DataDictionaryType.DeletionTime))]
     [MapperIgnoreTarget(nameof(DataDictionaryType.ConcurrencyStamp))]
     public override partial void Map(CreateDataDictionaryTypeDto source, DataDictionaryType destination);
 }
@@ -136,6 +142,9 @@ public partial class UpdateDataDictionaryTypeDtoToDataDictionaryTypeMapper
     [MapperIgnoreTarget(nameof(DataDictionaryType.CreationTime))]
     [MapperIgnoreTarget(nameof(DataDictionaryType.LastModifierId))]
     [MapperIgnoreTarget(nameof(DataDictionaryType.LastModificationTime))]
+    [MapperIgnoreTarget(nameof(DataDictionaryType.IsDeleted))]
+    [MapperIgnoreTarget(nameof(DataDictionaryType.DeleterId))]
+    [MapperIgnoreTarget(nameof(DataDictionaryType.DeletionTime))]
     [MapperIgnoreTarget(nameof(DataDictionaryType.ConcurrencyStamp))]
     public override partial DataDictionaryType Map(UpdateDataDictionaryTypeDto source);
 
@@ -145,6 +154,9 @@ public partial class UpdateDataDictionaryTypeDtoToDataDictionaryTypeMapper
     [MapperIgnoreTarget(nameof(DataDictionaryType.CreationTime))]
     [MapperIgnoreTarget(nameof(DataDictionaryType.LastModifierId))]
     [MapperIgnoreTarget(nameof(DataDictionaryType.LastModificationTime))]
+    [MapperIgnoreTarget(nameof(DataDictionaryType.IsDeleted))]
+    [MapperIgnoreTarget(nameof(DataDictionaryType.DeleterId))]
+    [MapperIgnoreTarget(nameof(DataDictionaryType.DeletionTime))]
     [MapperIgnoreTarget(nameof(DataDictionaryType.ConcurrencyStamp))]
     public override partial void Map(UpdateDataDictionaryTypeDto source, DataDictionaryType destination);
 }
@@ -169,6 +181,9 @@ public partial class CreateDataDictionaryItemDtoToDataDictionaryItemMapper
     [MapperIgnoreTarget(nameof(DataDictionaryItem.CreationTime))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.LastModifierId))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.LastModificationTime))]
+    [MapperIgnoreTarget(nameof(DataDictionaryItem.IsDeleted))]
+    [MapperIgnoreTarget(nameof(DataDictionaryItem.DeleterId))]
+    [MapperIgnoreTarget(nameof(DataDictionaryItem.DeletionTime))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.ConcurrencyStamp))]
     public override partial DataDictionaryItem Map(CreateDataDictionaryItemDto source);
 
@@ -178,6 +193,9 @@ public partial class CreateDataDictionaryItemDtoToDataDictionaryItemMapper
     [MapperIgnoreTarget(nameof(DataDictionaryItem.CreationTime))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.LastModifierId))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.LastModificationTime))]
+    [MapperIgnoreTarget(nameof(DataDictionaryItem.IsDeleted))]
+    [MapperIgnoreTarget(nameof(DataDictionaryItem.DeleterId))]
+    [MapperIgnoreTarget(nameof(DataDictionaryItem.DeletionTime))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.ConcurrencyStamp))]
     public override partial void Map(CreateDataDictionaryItemDto source, DataDictionaryItem destination);
 }
@@ -193,6 +211,9 @@ public partial class UpdateDataDictionaryItemDtoToDataDictionaryItemMapper
     [MapperIgnoreTarget(nameof(DataDictionaryItem.CreationTime))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.LastModifierId))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.LastModificationTime))]
+    [MapperIgnoreTarget(nameof(DataDictionaryItem.IsDeleted))]
+    [MapperIgnoreTarget(nameof(DataDictionaryItem.DeleterId))]
+    [MapperIgnoreTarget(nameof(DataDictionaryItem.DeletionTime))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.ConcurrencyStamp))]
     public override partial DataDictionaryItem Map(UpdateDataDictionaryItemDto source);
 
@@ -203,6 +224,9 @@ public partial class UpdateDataDictionaryItemDtoToDataDictionaryItemMapper
     [MapperIgnoreTarget(nameof(DataDictionaryItem.CreationTime))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.LastModifierId))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.LastModificationTime))]
+    [MapperIgnoreTarget(nameof(DataDictionaryItem.IsDeleted))]
+    [MapperIgnoreTarget(nameof(DataDictionaryItem.DeleterId))]
+    [MapperIgnoreTarget(nameof(DataDictionaryItem.DeletionTime))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.ConcurrencyStamp))]
     public override partial void Map(UpdateDataDictionaryItemDto source, DataDictionaryItem destination);
 }
