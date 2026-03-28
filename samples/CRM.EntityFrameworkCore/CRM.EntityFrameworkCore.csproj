@@ -1,10 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\common.props" />
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <RootNamespace>CRM</RootNamespace>
   </PropertyGroup>
 
@@ -14,24 +12,24 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="10.7.1" />
-    <PackageReference Include="Volo.Abp.EntityFrameworkCore.PostgreSql" Version="10.1.0" />
-    <PackageReference Include="Volo.Abp.PermissionManagement.EntityFrameworkCore" Version="10.1.0" />
-    <PackageReference Include="Volo.Abp.SettingManagement.EntityFrameworkCore" Version="10.1.0" />
-    <PackageReference Include="Volo.Abp.BackgroundJobs.EntityFrameworkCore" Version="10.1.0" />
-    <PackageReference Include="Volo.Abp.AuditLogging.EntityFrameworkCore" Version="10.1.0" />
-    <PackageReference Include="Volo.Abp.FeatureManagement.EntityFrameworkCore" Version="10.1.0" />
-    <PackageReference Include="Volo.Abp.BlobStoring.Database.EntityFrameworkCore" Version="10.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.DynamicLinq" />
+    <PackageReference Include="Volo.Abp.EntityFrameworkCore.PostgreSql" />
+    <PackageReference Include="Volo.Abp.PermissionManagement.EntityFrameworkCore" />
+    <PackageReference Include="Volo.Abp.SettingManagement.EntityFrameworkCore" />
+    <PackageReference Include="Volo.Abp.BackgroundJobs.EntityFrameworkCore" />
+    <PackageReference Include="Volo.Abp.AuditLogging.EntityFrameworkCore" />
+    <PackageReference Include="Volo.Abp.FeatureManagement.EntityFrameworkCore" />
+    <PackageReference Include="Volo.Abp.BlobStoring.Database.EntityFrameworkCore" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.OpenIddict.EntityFrameworkCore" Version="10.1.0" />
-    <PackageReference Include="Volo.Abp.Identity.EntityFrameworkCore" Version="10.1.0" />
-    <PackageReference Include="Volo.Abp.TenantManagement.EntityFrameworkCore" Version="10.1.0" />
+    <PackageReference Include="Volo.Abp.OpenIddict.EntityFrameworkCore" />
+    <PackageReference Include="Volo.Abp.Identity.EntityFrameworkCore" />
+    <PackageReference Include="Volo.Abp.TenantManagement.EntityFrameworkCore" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.3">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>compile; build; native; contentfiles; analyzers; buildtransitive</PrivateAssets>
     </PackageReference>

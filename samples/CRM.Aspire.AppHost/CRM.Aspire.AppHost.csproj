@@ -4,15 +4,14 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
     <IsAspireHost>true</IsAspireHost>
     <UserSecretsId>343c3ecd-582a-4d00-96b8-7838f0b658da</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.1.1" />
-		<PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.1.1" />
-		<PackageReference Include="Aspire.Hosting.Redis" Version="13.1.1" />
+    <PackageReference Include="Aspire.Hosting.AppHost" />
+		<PackageReference Include="Aspire.Hosting.PostgreSQL" />
+		<PackageReference Include="Aspire.Hosting.Redis" />
   </ItemGroup>
 
   <ItemGroup>

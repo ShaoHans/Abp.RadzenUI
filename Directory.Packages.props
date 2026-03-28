@@ -1,0 +1,105 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <AbpVersion>10.1.0</AbpVersion>
+    <Net10PackageVersion>10.0.3</Net10PackageVersion>
+    <ContainersToolsVersion>1.23.0</ContainersToolsVersion>
+    <AspireHostingVersion>13.1.1</AspireHostingVersion>
+    <OpenTelemetryVersion>1.15.0</OpenTelemetryVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="Aspire.Hosting.AppHost" Version="$(AspireHostingVersion)" />
+    <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="$(AspireHostingVersion)" />
+    <PackageVersion Include="Aspire.Hosting.Redis" Version="$(AspireHostingVersion)" />
+    <PackageVersion Include="Bogus" Version="35.6.5" />
+    <PackageVersion Include="IdentityModel" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="$(Net10PackageVersion)" />
+    <PackageVersion Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="$(Net10PackageVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="10.7.1" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="$(Net10PackageVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.FileProviders.Embedded" Version="$(Net10PackageVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(Net10PackageVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="$(Net10PackageVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.3.0" />
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.3.0" />
+    <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="$(ContainersToolsVersion)" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="Radzen.Blazor" Version="10.0.6" />
+    <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageVersion Include="Serilog.Extensions.Logging" Version="10.0.0" />
+    <PackageVersion Include="Serilog.Sinks.Async" Version="2.1.0" />
+    <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageVersion Include="Volo.Abp.Account.Web.OpenIddict" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.Account.Application" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.Account.Application.Contracts" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.Account.HttpApi" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.Account.HttpApi.Client" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.AspNetCore.Authentication.JwtBearer" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.AspNetCore.Authentication.OpenIdConnect" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.AspNetCore.Components.Server" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.AspNetCore.Serilog" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.AuditLogging.Domain" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.AuditLogging.Domain.Shared" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.AuditLogging.EntityFrameworkCore" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.Autofac" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.BackgroundJobs.Domain" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.BackgroundJobs.Domain.Shared" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.BackgroundJobs.EntityFrameworkCore" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.BlobStoring.Database.Domain" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.BlobStoring.Database.Domain.Shared" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.BlobStoring.Database.EntityFrameworkCore" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.Caching" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.Caching.StackExchangeRedis" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.Emailing" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.EntityFrameworkCore" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.EntityFrameworkCore.PostgreSql" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.FeatureManagement.Application" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.FeatureManagement.Application.Contracts" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.FeatureManagement.Domain" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.FeatureManagement.Domain.Shared" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.FeatureManagement.EntityFrameworkCore" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.FeatureManagement.HttpApi" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.FeatureManagement.HttpApi.Client" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.GlobalFeatures" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.Identity.Application" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.Identity.Application.Contracts" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.Identity.Domain" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.Identity.Domain.Shared" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.Identity.EntityFrameworkCore" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.Identity.HttpApi" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.Identity.HttpApi.Client" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.OpenIddict.Domain" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.OpenIddict.Domain.Shared" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.OpenIddict.EntityFrameworkCore" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.PermissionManagement.Application" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.PermissionManagement.Application.Contracts" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.PermissionManagement.Domain.Identity" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.PermissionManagement.Domain.OpenIddict" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.PermissionManagement.Domain.Shared" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.PermissionManagement.EntityFrameworkCore" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.PermissionManagement.HttpApi" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.PermissionManagement.HttpApi.Client" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.SettingManagement.Application" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.SettingManagement.Application.Contracts" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.SettingManagement.Domain" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.SettingManagement.Domain.Shared" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.SettingManagement.EntityFrameworkCore" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.SettingManagement.HttpApi" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.SettingManagement.HttpApi.Client" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.Swashbuckle" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.TenantManagement.Application" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.TenantManagement.Application.Contracts" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.TenantManagement.Domain" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.TenantManagement.Domain.Shared" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.TenantManagement.EntityFrameworkCore" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.TenantManagement.HttpApi" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.TenantManagement.HttpApi.Client" Version="$(AbpVersion)" />
+  </ItemGroup>
+
+</Project>

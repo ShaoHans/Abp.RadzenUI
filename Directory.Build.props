@@ -1,10 +1,11 @@
 <Project>
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
     <AbpRadzenUIPackageVersion>0.9.6</AbpRadzenUIPackageVersion>
     <Version Condition="'$(Version)' == ''">$(AbpRadzenUIPackageVersion)</Version>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
-	<AbpProjectType>app</AbpProjectType>
+    <AbpProjectType>app</AbpProjectType>
   </PropertyGroup>
 
   <Target Name="NoWarnOnRazorViewImportedTypeConflicts" BeforeTargets="RazorCoreCompile">
@@ -16,5 +17,4 @@
   <ItemGroup>
     <Content Remove="$(UserProfile)\.nuget\packages\*\*\contentFiles\any\*\*.abppkg*" />
   </ItemGroup>
-
 </Project>

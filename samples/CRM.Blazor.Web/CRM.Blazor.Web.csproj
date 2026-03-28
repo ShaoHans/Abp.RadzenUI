@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>CRM.Blazor.Web</RootNamespace>
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
@@ -24,24 +23,24 @@
 		<ProjectReference Include="..\CRM.Aspire.ServiceDefaults\CRM.Aspire.ServiceDefaults.csproj" />
 		<ProjectReference Include="..\CRM.HttpApi\CRM.HttpApi.csproj" />
 		<ProjectReference Include="..\CRM.EntityFrameworkCore\CRM.EntityFrameworkCore.csproj" />
-		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
 		<!--<PackageReference Include="AbpRadzen.Blazor.Server.UI" Version="0.1.1" />-->
-		<PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
-		<PackageReference Include="Serilog.Sinks.Async" Version="2.1.0" />
-		<PackageReference Include="IdentityModel" Version="7.0.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3" />
-		<PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="10.0.3" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.3">
+		<PackageReference Include="Serilog.AspNetCore" />
+		<PackageReference Include="Serilog.Sinks.Async" />
+		<PackageReference Include="IdentityModel" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+		<PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Volo.Abp.AspNetCore.Authentication.JwtBearer" Version="10.1.0" />
-		<PackageReference Include="Volo.Abp.AspNetCore.Authentication.OpenIdConnect" Version="10.1.0" />
-		<PackageReference Include="Volo.Abp.AspNetCore.Components.Server" Version="10.1.0" />
-		<PackageReference Include="Volo.Abp.Autofac" Version="10.1.0" />
-		<PackageReference Include="Volo.Abp.Caching.StackExchangeRedis" Version="10.1.0" />
-		<PackageReference Include="Volo.Abp.AspNetCore.Serilog" Version="10.1.0" />
-		<PackageReference Include="Volo.Abp.Swashbuckle" Version="10.1.0" />
+		<PackageReference Include="Volo.Abp.AspNetCore.Authentication.JwtBearer" />
+		<PackageReference Include="Volo.Abp.AspNetCore.Authentication.OpenIdConnect" />
+		<PackageReference Include="Volo.Abp.AspNetCore.Components.Server" />
+		<PackageReference Include="Volo.Abp.Autofac" />
+		<PackageReference Include="Volo.Abp.Caching.StackExchangeRedis" />
+		<PackageReference Include="Volo.Abp.AspNetCore.Serilog" />
+		<PackageReference Include="Volo.Abp.Swashbuckle" />
 	</ItemGroup>
 
 	<ItemGroup>

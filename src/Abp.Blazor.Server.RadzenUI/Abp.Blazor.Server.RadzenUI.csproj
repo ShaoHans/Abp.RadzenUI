@@ -1,9 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
-	<Import Project="..\..\common.props" />
 
 	<PropertyGroup>
 		<TargetFrameworks>net10.0</TargetFrameworks>
-		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>Abp.RadzenUI</RootNamespace>
 		<PackageId>AbpRadzen.Blazor.Server.UI</PackageId>
@@ -26,21 +24,21 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Radzen.Blazor" Version="10.0.6" />
-		<PackageReference Include="Volo.Abp.AspNetCore.Components.Server" Version="10.1.0" />
-		<PackageReference Include="Volo.Abp.Autofac" Version="10.1.0" />
-		<PackageReference Include="Volo.Abp.PermissionManagement.EntityFrameworkCore" Version="10.1.0" />
-		<PackageReference Include="Volo.Abp.SettingManagement.EntityFrameworkCore" Version="10.1.0" />
-		<PackageReference Include="Volo.Abp.SettingManagement.Application" Version="10.1.0" />
-		<PackageReference Include="Volo.Abp.AuditLogging.EntityFrameworkCore" Version="10.1.0" />
-		<PackageReference Include="Volo.Abp.TenantManagement.EntityFrameworkCore" Version="10.1.0" />
-		<PackageReference Include="Volo.Abp.TenantManagement.Application" Version="10.1.0" />
-		<PackageReference Include="Volo.Abp.Identity.EntityFrameworkCore" Version="10.1.0" />
-		<PackageReference Include="Volo.Abp.Account.Web.OpenIddict" Version="10.1.0" />
+		<PackageReference Include="Radzen.Blazor" />
+		<PackageReference Include="Volo.Abp.AspNetCore.Components.Server" />
+		<PackageReference Include="Volo.Abp.Autofac" />
+		<PackageReference Include="Volo.Abp.PermissionManagement.EntityFrameworkCore" />
+		<PackageReference Include="Volo.Abp.SettingManagement.EntityFrameworkCore" />
+		<PackageReference Include="Volo.Abp.SettingManagement.Application" />
+		<PackageReference Include="Volo.Abp.AuditLogging.EntityFrameworkCore" />
+		<PackageReference Include="Volo.Abp.TenantManagement.EntityFrameworkCore" />
+		<PackageReference Include="Volo.Abp.TenantManagement.Application" />
+		<PackageReference Include="Volo.Abp.Identity.EntityFrameworkCore" />
+		<PackageReference Include="Volo.Abp.Account.Web.OpenIddict" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.3" />
+		<PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" />
 	</ItemGroup>
 
 	<ItemGroup>

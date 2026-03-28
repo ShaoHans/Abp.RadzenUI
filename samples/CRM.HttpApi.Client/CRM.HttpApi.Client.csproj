@@ -1,10 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\common.props" />
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <RootNamespace>CRM</RootNamespace>
   </PropertyGroup>
 
@@ -13,15 +11,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.PermissionManagement.HttpApi.Client" Version="10.1.0" />
-    <PackageReference Include="Volo.Abp.FeatureManagement.HttpApi.Client" Version="10.1.0" />
-    <PackageReference Include="Volo.Abp.SettingManagement.HttpApi.Client" Version="10.1.0" />
+    <PackageReference Include="Volo.Abp.PermissionManagement.HttpApi.Client" />
+    <PackageReference Include="Volo.Abp.FeatureManagement.HttpApi.Client" />
+    <PackageReference Include="Volo.Abp.SettingManagement.HttpApi.Client" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.Identity.HttpApi.Client" Version="10.1.0" />
-    <PackageReference Include="Volo.Abp.Account.HttpApi.Client" Version="10.1.0" />
-    <PackageReference Include="Volo.Abp.TenantManagement.HttpApi.Client" Version="10.1.0" />
+    <PackageReference Include="Volo.Abp.Identity.HttpApi.Client" />
+    <PackageReference Include="Volo.Abp.Account.HttpApi.Client" />
+    <PackageReference Include="Volo.Abp.TenantManagement.HttpApi.Client" />
   </ItemGroup>
 
   <ItemGroup>

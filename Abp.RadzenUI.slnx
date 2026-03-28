@@ -1,0 +1,27 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/samples/">
+    <Project Path="samples/CRM.Application.Contracts/CRM.Application.Contracts.csproj" />
+    <Project Path="samples/CRM.Application/CRM.Application.csproj" />
+    <Project Path="samples/CRM.Aspire.AppHost/CRM.Aspire.AppHost.csproj" />
+    <Project Path="samples/CRM.Aspire.ServiceDefaults/CRM.Aspire.ServiceDefaults.csproj" />
+    <Project Path="samples/CRM.Blazor.Web/CRM.Blazor.Web.csproj" />
+    <Project Path="samples/CRM.DbMigrator/CRM.DbMigrator.csproj" />
+    <Project Path="samples/CRM.Domain.Shared/CRM.Domain.Shared.csproj" />
+    <Project Path="samples/CRM.Domain/CRM.Domain.csproj" />
+    <Project Path="samples/CRM.EntityFrameworkCore/CRM.EntityFrameworkCore.csproj" />
+    <Project Path="samples/CRM.HttpApi.Client/CRM.HttpApi.Client.csproj" />
+    <Project Path="samples/CRM.HttpApi/CRM.HttpApi.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="docker-compose.yml" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Abp.Blazor.Server.RadzenUI/Abp.Blazor.Server.RadzenUI.csproj" />
+    <Project Path="src/Abp.RadzenUI.DataDictionary.EntityFrameworkCore/Abp.RadzenUI.DataDictionary.EntityFrameworkCore.csproj" />
+  </Folder>
+</Solution>
