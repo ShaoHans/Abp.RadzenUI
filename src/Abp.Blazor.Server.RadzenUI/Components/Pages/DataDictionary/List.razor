@@ -16,7 +16,7 @@
                             AllowPaging="true" AllowSorting="true"
                             PagerHorizontalAlign="HorizontalAlign.Center"
                             Style="flex:1" PageSize="@_defaultPageSize"
-                            PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="true"
+                            PageSizeOptions="@_pageSizeOptions" 
                             IsLoading="@_isTypeLoading"
                             LoadData="LoadTypesAsync" Count="@_typeTotalCount"
                             RowSelect="SelectTypeAsync"
@@ -93,7 +93,7 @@
                                       Click="OpenCreateItemDialogAsync" />
                     }
                 </RadzenStack>
-                <RadzenDataGrid @ref="_itemGrid" Data="@_items" AllowPaging="true" AllowSorting="true"
+                <LocalizedDataGrid @ref="_itemGrid" Data="@_items" AllowPaging="true" AllowSorting="true"
                                 PagerHorizontalAlign="HorizontalAlign.Center"
                                 Style="flex:1" PageSize="@_defaultPageSize"
                                 PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="true"
@@ -137,7 +137,7 @@
                             </Template>
                         </RadzenDataGridColumn>
                     </Columns>
-                </RadzenDataGrid>
+                </LocalizedDataGrid>
             }
         </RadzenCard>
     </RadzenColumn>
