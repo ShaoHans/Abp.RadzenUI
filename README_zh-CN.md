@@ -60,7 +60,8 @@ private void ConfigureAbpRadzenUI()
         //options.TitleBar = new TitleBarSettings
         //{
         //    ShowLanguageMenu = false, // 是否显示多语言菜单
-        //    Title = "CRM" // 标题栏名称，通常为系统名称
+        //    Title = "CRM", // 标题栏名称，通常为系统名称
+        //    ShowBreadcrumb = true, // 是否在标题栏显示面包屑导航（默认值：true）
         //};
         //options.LoginPage = new LoginPageSettings
         //{

@@ -60,7 +60,8 @@ private void ConfigureAbpRadzenUI()
         //options.TitleBar = new TitleBarSettings
         //{
         //    ShowLanguageMenu = false,
-        //    Title = "CRM"
+        //    Title = "CRM",
+        //    ShowBreadcrumb = true, // Show breadcrumb navigation in the title bar (default: true)
         //};
         //options.LoginPage = new LoginPageSettings
         //{
