@@ -76,9 +76,9 @@ public partial class EmailSettingComponent
         {
             await DialogService.OpenAsync<SendTestEmail>(
                 L["SendTestEmail"],
-                parameters: new Dictionary<string, object>
+                parameters: new Dictionary<string, object?>
                 {
-                    { "DefaultFromAddress", EmailSettings.DefaultFromAddress}
+                    { "DefaultFromAddress", EmailSettings.DefaultFromAddress ?? string.Empty }
                 },
                 options: new DialogOptions
                 {

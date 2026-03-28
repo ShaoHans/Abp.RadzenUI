@@ -15,7 +15,7 @@ public interface IOrganizationUnitAppService
 {
     Task<ListResultDto<OrganizationUnitDto>> GetAllAsync();
 
-    Task<OrganizationUnitDto> GetLastChildOrNullAsync(Guid? parentId);
+    Task<OrganizationUnitDto?> GetLastChildOrNullAsync(Guid? parentId);
 
     Task MoveAsync(Guid id, OrganizationUnitMoveDto input);
 

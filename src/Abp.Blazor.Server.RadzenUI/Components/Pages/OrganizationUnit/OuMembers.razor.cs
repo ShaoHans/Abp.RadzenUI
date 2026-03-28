@@ -122,7 +122,7 @@ public partial class OuMembers
 
     private async Task OpenSeleteMemberDialogAsync()
     {
-        var parameters = new Dictionary<string, object> { { "OuId", SelectedOu!.Id } };
+        var parameters = new Dictionary<string, object?> { { "OuId", SelectedOu!.Id } };
 
         var result = await DialogService.OpenAsync<SelectMember>(
             title: IL["Ou:Member.Select", SelectedOu.DisplayName],

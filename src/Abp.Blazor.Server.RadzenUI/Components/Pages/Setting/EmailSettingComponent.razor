@@ -24,7 +24,7 @@
             <RadzenColumn Size="12" SizeMD="8">
                 <RadzenTextBox Name="@nameof(UpdateEmailSettingsVm.DefaultFromAddress)" @bind-Value="@EmailSettings.DefaultFromAddress" Style="display:block;width:30%" />
                 <RadzenRequiredValidator Component="@nameof(UpdateEmailSettingsVm.DefaultFromAddress)" Text="@L.Required("DefaultFromAddress")" Style="position: absolute" />
-                <RadzenEmailValidator Component="@nameof(UpdateEmailSettingsVm.DefaultFromAddress)" Text="@IL["Volo.Abp.Identity:InvalidEmail",EmailSettings.DefaultFromAddress]" Style="position: absolute" />
+                <RadzenEmailValidator Component="@nameof(UpdateEmailSettingsVm.DefaultFromAddress)" Text="@IL["Volo.Abp.Identity:InvalidEmail", EmailSettings.DefaultFromAddress ?? string.Empty]" Style="position: absolute" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">

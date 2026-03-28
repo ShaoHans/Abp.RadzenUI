@@ -21,7 +21,7 @@
             {
                 <RadzenRequiredValidator Component="@PropertyInfo.Name" Text="@L.Required(PropertyInfo.GetLocalizedDisplayName(StringLocalizerFactory))" />
             }
-            <RadzenEmailValidator Component="Email" Text="@L["Volo.Abp.Identity:InvalidEmail", Value]" />
+            <RadzenEmailValidator Component="Email" Text="@L["Volo.Abp.Identity:InvalidEmail", Value ?? string.Empty]" />
         </RadzenColumn>
     </RadzenRow>
 }

@@ -46,7 +46,7 @@ public partial class List
     {
         await DialogService.OpenAsync<Permission>(
             $"{L["Permissions"]} - {role.Name}",
-            parameters: new Dictionary<string, object>()
+            parameters: new Dictionary<string, object?>()
             {
                 { "ProviderName", "R" },
                 { "ProviderKey", role.Name },

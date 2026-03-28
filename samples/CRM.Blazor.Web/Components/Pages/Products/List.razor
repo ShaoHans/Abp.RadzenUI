@@ -36,7 +36,7 @@
                 @if (HasUpdatePermission)
                 {
                     <RadzenButton Icon="edit" title="@L["Edit"]" ButtonStyle="ButtonStyle.Success"
-                                  Click="@(async () => await OpenEditDialogAsync<Edit>(@L["Edit"], context, SetDialogOptions,new Dictionary<string, object>{{"Code",context.Code}}))" />
+                                  Click="@(async () => await OpenEditDialogAsync<Edit>(@L["Edit"], context, SetDialogOptions,new Dictionary<string, object?>{{"Code",context.Code}}))" />
                 }
                 @if (HasDeletePermission)
                 {

@@ -117,16 +117,21 @@ public class OrganizationUnitAppService : ApplicationService, IOrganizationUnitA
 
     public virtual async Task<OrganizationUnitDto> GetAsync(Guid id)
     {
-        var organizationUnit = await OrganizationUnitRepository.FindAsync(id);
+        var organizationUnit = await OrganizationUnitRepository.GetAsync(id);
 
         return ObjectMapper.Map<OrganizationUnit, OrganizationUnitDto>(organizationUnit);
     }
 
-    public virtual async Task<OrganizationUnitDto> GetLastChildOrNullAsync(Guid? parentId)
+    public virtual async Task<OrganizationUnitDto?> GetLastChildOrNullAsync(Guid? parentId)
     {
         var organizationUnitLastChildren = await OrganizationUnitManager.GetLastChildOrNullAsync(
             parentId
         );
+
+        if (organizationUnitLastChildren == null)
+        {
+            return null;
+        }
 
         return ObjectMapper.Map<OrganizationUnit, OrganizationUnitDto>(
             organizationUnitLastChildren

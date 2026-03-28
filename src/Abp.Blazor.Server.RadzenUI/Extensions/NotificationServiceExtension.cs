@@ -15,7 +15,7 @@ public static class NotificationServiceExtension
     {
         service.Notify(
             NotificationSeverity.Info,
-            summary,
+            summary ?? string.Empty,
             detail,
             duration,
             click,
@@ -39,7 +39,7 @@ public static class NotificationServiceExtension
     {
         service.Notify(
             NotificationSeverity.Success,
-            summary,
+            summary ?? string.Empty,
             detail,
             duration,
             click,
@@ -63,7 +63,7 @@ public static class NotificationServiceExtension
     {
         service.Notify(
             NotificationSeverity.Warning,
-            summary,
+            summary ?? string.Empty,
             detail,
             duration,
             click,
@@ -87,7 +87,7 @@ public static class NotificationServiceExtension
     {
         service.Notify(
             NotificationSeverity.Error,
-            summary,
+            summary ?? string.Empty,
             detail,
             duration,
             click,

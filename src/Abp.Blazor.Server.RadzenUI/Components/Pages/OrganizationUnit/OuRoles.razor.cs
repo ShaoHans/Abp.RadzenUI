@@ -122,7 +122,7 @@ public partial class OuRoles
 
     private async Task OpenSeleteRoleDialogAsync()
     {
-        var parameters = new Dictionary<string, object> { { "OuId", SelectedOu!.Id } };
+        var parameters = new Dictionary<string, object?> { { "OuId", SelectedOu!.Id } };
 
         var result = await DialogService.OpenAsync<SelectRole>(
             title: IL["Ou:Role.Select", SelectedOu.DisplayName],

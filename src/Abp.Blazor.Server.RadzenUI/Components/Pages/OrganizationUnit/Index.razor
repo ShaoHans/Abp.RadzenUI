@@ -23,15 +23,17 @@
                                  HasChildren="(i=>((OrganizationUnitTreeItemVm)i).Children.Count>0)">
                     <Template>
                         @{
-                            var treeItem = (OrganizationUnitTreeItemVm)context.Value;
-                            <RadzenSplitButton Text="@treeItem.DisplayName" Variant="Variant.Text" Icon="lan"
-                                               Click=@(args => TreeItemOnClick(args, "SplitButton with icon"))>
-                                <ChildContent>
-                                    <RadzenSplitButtonItem Text="@L["Ou:EditOu"]" Icon="edit" Value="@OuTreeItemAction.Edit.ToString()" />
-                                    <RadzenSplitButtonItem Text="@L["Ou:NewSubOu"]" Icon="add" Value="@OuTreeItemAction.AddSubOu.ToString()" />
-                                    <RadzenSplitButtonItem Text="@L["Ou:DeleteOu"]" Icon="add" Value="@OuTreeItemAction.Delete.ToString()" />
-                                </ChildContent>
-                            </RadzenSplitButton>
+                            if (context.Value is OrganizationUnitTreeItemVm treeItem)
+                            {
+                                <RadzenSplitButton Text="@treeItem.DisplayName" Variant="Variant.Text" Icon="lan"
+                                                   Click=@(args => TreeItemOnClick(args, "SplitButton with icon"))>
+                                    <ChildContent>
+                                        <RadzenSplitButtonItem Text="@L["Ou:EditOu"]" Icon="edit" Value="@OuTreeItemAction.Edit.ToString()" />
+                                        <RadzenSplitButtonItem Text="@L["Ou:NewSubOu"]" Icon="add" Value="@OuTreeItemAction.AddSubOu.ToString()" />
+                                        <RadzenSplitButtonItem Text="@L["Ou:DeleteOu"]" Icon="add" Value="@OuTreeItemAction.Delete.ToString()" />
+                                    </ChildContent>
+                                </RadzenSplitButton>
+                            }
                         }
                     </Template>
                 </RadzenTreeLevel>

@@ -38,13 +38,15 @@
                                              HasChildren="(i=>((PermissionTreeItemVm)i).Children.Count>0)">
                                 <Template>
                                     @{
-                                        var treeItem = (PermissionTreeItemVm)context.Value;
-                                        <RadzenCheckBox TValue="bool"
-                                                        Name="@treeItem.Permission.Name"
-                                                        Disabled="@_disabledPermissions.Exists(x=>x.Name==treeItem.Permission.Name)"
-                                                        onclick="@(() => PermissionCheckChanged(context.Value))"
-                                                        @bind-Value="treeItem.Permission.IsGranted" />
-                                        <RadzenLabel Text="@context.Text" Component="@treeItem.Permission.Name" />
+                                        if (context.Value is PermissionTreeItemVm treeItem)
+                                        {
+                                            <RadzenCheckBox TValue="bool"
+                                                            Name="@treeItem.Permission.Name"
+                                                            Disabled="@_disabledPermissions.Exists(x=>x.Name==treeItem.Permission.Name)"
+                                                            onclick="@(() => PermissionCheckChanged(treeItem))"
+                                                            @bind-Value="treeItem.Permission.IsGranted" />
+                                            <RadzenLabel Text="@context.Text" Component="@treeItem.Permission.Name" />
+                                        }
                                     }
                                 </Template>
                             </RadzenTreeLevel>
@@ -186,10 +188,8 @@
         );
     }
 
-    void PermissionCheckChanged(object obj)
+    void PermissionCheckChanged(PermissionTreeItemVm treeItem)
     {
-        var treeItem = (PermissionTreeItemVm)obj;
-
         if (treeItem.Permission.IsGranted)
         {
             GrantAllDirectParents(treeItem);
