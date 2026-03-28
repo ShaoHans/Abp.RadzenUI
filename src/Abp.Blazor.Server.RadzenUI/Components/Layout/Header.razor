@@ -7,11 +7,14 @@
 @using Volo.Abp.AspNetCore.Components
 @using Volo.Abp.Data
 @using Volo.Abp.Identity
+@using Volo.Abp.UI.Navigation
 @implements IAsyncDisposable
 @inherits AbpRadzenUIComponentBase
 @inject IStringLocalizer<AbpRadzenUIResource> TL
 @inject IIdentityUserRepository IdentityUserRepository
 @inject IJSRuntime JSRuntime
+@inject IMenuManager MenuManager
+@inject NavigationManager NavigationManager
 
 <style>
     /* GitHub-style icon buttons with rounded border box */
@@ -99,18 +102,71 @@
     .app-header__actions .rz-profile-menu > li > .rz-navigation-item-wrapper > .rz-navigation-item-link > .rz-navigation-item-icon-children {
         display: none !important;
     }
+    /* Sidebar-width toggle area */
+    .app-header__sidebar-area {
+        min-width: clamp(14rem, 13.5rem + 0.6vw, 15rem);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+    }
+    /* Breadcrumb in header */
+    .app-header__breadcrumb {
+        display: inline-flex;
+        align-items: center;
+        overflow: hidden;
+    }
+    .app-header__breadcrumb .rz-breadcrumb {
+        flex-wrap: nowrap;
+        padding: 0;
+        gap: 0;
+    }
+    .app-header__breadcrumb .rz-breadcrumb-item {
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.125rem;
+    }
+    .app-header__breadcrumb .rz-breadcrumb-item + .rz-breadcrumb-item::before {
+        content: ">" !important;
+        margin: 0 0.375rem;
+        opacity: 0.6;
+    }
+    .app-header__breadcrumb .rz-breadcrumb-item .rzi {
+        font-size: 1.125rem !important;
+    }
+    .app-header__breadcrumb .rz-breadcrumb-item .rz-label {
+        font-size: 0.875rem;
+    }
 </style>
 
 <RadzenHeader class="app-header">
     <ChildContent>
         <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px" class="app-header__row">
-            <RadzenColumn Size="5">
+            <RadzenColumn Size="8">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" class="app-header__title">
-                    <RadzenSidebarToggle Click="@MenuToggle" />
-                    <span class="app-header__title-text" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">@_titleBar.Title</span>
+                    <div class="app-header__sidebar-area">
+                        <RadzenSidebarToggle Click="@MenuToggle" />
+                        <span class="app-header__title-text" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">@_titleBar.Title</span>
+                    </div>
+                    @if (_titleBar.ShowBreadcrumb && _breadcrumbItems.Count > 0)
+                    {
+                        <RadzenButton Icon="refresh" title="Refresh" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base"
+                                      class="app-header__icon-action" Click="@RefreshPage" Style="margin-inline-end: 0.25rem;" />
+                        <div class="app-header__breadcrumb">
+                            <RadzenBreadCrumb>
+                                @for (var i = 0; i < _breadcrumbItems.Count; i++)
+                                {
+                                    var item = _breadcrumbItems[i];
+                                    var isLast = i == _breadcrumbItems.Count - 1;
+                                    <RadzenBreadCrumbItem Text="@item.DisplayName" Icon="@item.Icon"
+                                                          Path="@(isLast ? null : item.Url)" />
+                                }
+                            </RadzenBreadCrumb>
+                        </div>
+                    }
                 </RadzenStack>
             </RadzenColumn>
-            <RadzenColumn Size="7">
+            <RadzenColumn Size="4">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" JustifyContent="JustifyContent.End" class="app-header__actions">
                     @if (_titleBar.ShowGithubLink)
                     {
@@ -184,6 +240,8 @@
     string? _avatarUrl;
     bool _isFullscreen;
     DotNetObjectReference<Header>? _dotNetReference;
+    List<ApplicationMenuItem> _breadcrumbItems = new();
+    ApplicationMenu? _applicationMenu;
 
     public Header()
     {
@@ -193,6 +251,9 @@
     protected override async Task OnInitializedAsync()
     {
         _titleBar = await UIPlaceHolderResolver.GetTitleBarSettingsAsync();
+        _applicationMenu = await MenuManager.GetMainMenuAsync();
+        UpdateBreadcrumb();
+        NavigationManager.LocationChanged += OnLocationChanged;
 
         if (CurrentUser.IsAuthenticated && CurrentUser.Id.HasValue)
         {
@@ -235,8 +296,61 @@
         await InvokeAsync(StateHasChanged);
     }
 
+    void RefreshPage()
+    {
+        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+    }
+
+    void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        UpdateBreadcrumb();
+        InvokeAsync(StateHasChanged);
+    }
+
+    void UpdateBreadcrumb()
+    {
+        _breadcrumbItems.Clear();
+        if (_applicationMenu == null) return;
+
+        var currentPath = "/" + NavigationManager.ToBaseRelativePath(NavigationManager.Uri).TrimStart('/');
+
+        foreach (var menuItem in _applicationMenu.Items)
+        {
+            var trail = new List<ApplicationMenuItem>();
+            if (FindMenuPath(menuItem, currentPath, trail))
+            {
+                _breadcrumbItems = trail;
+                return;
+            }
+        }
+    }
+
+    bool FindMenuPath(ApplicationMenuItem item, string currentPath, List<ApplicationMenuItem> trail)
+    {
+        trail.Add(item);
+
+        var itemUrl = item.Url?.TrimEnd('/') ?? "";
+        if (!string.IsNullOrEmpty(itemUrl) && string.Equals(itemUrl, currentPath.TrimEnd('/'), StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        foreach (var child in item.Items)
+        {
+            if (FindMenuPath(child, currentPath, trail))
+            {
+                return true;
+            }
+        }
+
+        trail.RemoveAt(trail.Count - 1);
+        return false;
+    }
+
     public async ValueTask DisposeAsync()
     {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+
         if (_dotNetReference is null)
         {
             return;

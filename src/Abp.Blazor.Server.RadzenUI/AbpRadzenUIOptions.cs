@@ -43,6 +43,11 @@ public class TitleBarSettings
     /// Gets or sets a value indicating whether multiple side menu items can be expanded at the same time.
     /// </summary>
     public bool AllowSideMenuMultipleExpand { get; set; } = true;
+
+    /// <summary>
+    /// Whether to display the breadcrumb navigation in the title bar
+    /// </summary>
+    public bool ShowBreadcrumb { get; set; } = true;
 }
 
 public class ThemeSettings
