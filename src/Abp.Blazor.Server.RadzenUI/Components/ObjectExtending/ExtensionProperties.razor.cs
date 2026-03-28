@@ -19,6 +19,9 @@ public partial class ExtensionProperties<TEntityType, TResourceType> : Component
     [Parameter]
     public TEntityType Entity { get; set; } = default!;
 
+    [Parameter]
+    public IReadOnlyCollection<string> ExcludedPropertyNames { get; set; } = Array.Empty<string>();
+
     [Inject]
     public IServiceProvider ServiceProvider { get; set; } = default!;
 

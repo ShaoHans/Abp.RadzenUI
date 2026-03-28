@@ -1,4 +1,5 @@
 ﻿@using Abp.RadzenUI.Components.ObjectExtending
+@using Abp.RadzenUI.Avatar
 @using Microsoft.AspNetCore.Authorization
 @using System.Collections.Immutable
 @using Microsoft.Extensions.Localization
@@ -93,7 +94,11 @@
                                 <RadzenCheckBox TValue="bool" @bind-Value=@DialogFromOption.Model.LockoutEnabled Name="LockoutEnabled" />
                             </RadzenColumn>
                         </RadzenRow>
-                        <ExtensionProperties TEntityType="IdentityUserCreateDto" TResourceType="IdentityResource" Entity="@DialogFromOption.Model" LH="@LH" />
+                        <ExtensionProperties TEntityType="IdentityUserCreateDto"
+                                             TResourceType="IdentityResource"
+                                             Entity="@DialogFromOption.Model"
+                                             LH="@LH"
+                                             ExcludedPropertyNames="@(new[] { AvatarConsts.ExtraPropertyName })" />
                     </RadzenStack>
                 </RadzenTabsItem>
                 @if (HasManagePermissionsPermission)
