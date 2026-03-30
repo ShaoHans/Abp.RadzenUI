@@ -53,7 +53,7 @@
     "AvatarDeleteSuccess": "头像已删除。",
     "AvatarDeleteConfirmMessage": "确定要删除当前头像吗？",
 
-    "DataGrid.EmptyText": "无可显示记录。",
+    "DataGrid.EmptyText": "未查询到记录。",
     "DataGrid:Filter.Apply": "应用",
     "DataGrid:Filter.Clear": "清除",
     "DataGrid:Filter.Filter": "筛选器",

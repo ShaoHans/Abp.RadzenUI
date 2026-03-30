@@ -41,7 +41,7 @@ else
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn Property="@nameof(IdentityUserDto.Email)" Title="@L["DisplayName:Email"]" Width="180px" />
-                <RadzenDataGridColumn Title="@L["Actions"]" Width="60px" Frozen="true" Filterable="false" Sortable="false">
+                <RadzenDataGridColumn Title="@L["Actions"]" Width="40px" Frozen="true" Filterable="false" Sortable="false">
                     <Template>
                         <RadzenButton Icon="delete" title="@L["Delete"]" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small"
                                       Click=@(async () => await OpenDeleteConfirmDialogAsync(context.Id, context.UserName)) />
