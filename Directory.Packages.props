@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <AbpVersion>10.1.0</AbpVersion>
+    <AbpVersion>10.2.0</AbpVersion>
     <Net10PackageVersion>10.0.3</Net10PackageVersion>
     <ContainersToolsVersion>1.23.0</ContainersToolsVersion>
     <AspireHostingVersion>13.1.1</AspireHostingVersion>
@@ -29,7 +29,7 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="$(OpenTelemetryVersion)" />
-    <PackageVersion Include="Radzen.Blazor" Version="10.0.6" />
+    <PackageVersion Include="Radzen.Blazor" Version="10.1.0" />
     <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageVersion Include="Serilog.Extensions.Logging" Version="10.0.0" />
     <PackageVersion Include="Serilog.Sinks.Async" Version="2.1.0" />
