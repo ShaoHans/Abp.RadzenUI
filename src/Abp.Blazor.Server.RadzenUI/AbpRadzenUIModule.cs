@@ -55,10 +55,10 @@ public class AbpRadzenUIModule : AbpModule
     {
         AvatarModuleExtensionConfigurator.Configure();
 
-        Configure<AbpAspNetCoreAuditingOptions>(options =>
-        {
-            options.IgnoredUrls.AddIfNotContains("/_blazor");
-        });
+        //Configure<AbpAspNetCoreAuditingOptions>(options =>
+        //{
+        //    options.IgnoredUrls.AddIfNotContains("/_blazor");
+        //});
 
         var configuration = context.Services.GetConfiguration();
 
