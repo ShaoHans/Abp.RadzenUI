@@ -1,0 +1,186 @@
+@using Abp.RadzenUI.Application.Contracts.AuditLogs
+@using Volo.Abp.Auditing
+@inject IAuditLogAppService AuditLogAppService
+@inject DialogService DialogService
+@inherits AbpRadzenUIComponentBase
+
+<RadzenStack Style="max-height:calc(100vh - 200px); min-height: 400px;">
+    <DialogFormLayout ShowSave="false" CancelText="@L["Close"]" CancelIcon="close"
+                      CancelClick="() => DialogService.Close(false)">
+        @if (_detail is not null)
+        {
+            <RadzenTabs RenderMode="TabRenderMode.Client">
+                <Tabs>
+                    <RadzenTabsItem Text="@L["AuditLog:Overview"]">
+                        <RadzenStack Gap="1rem" class="rz-p-4">
+                            <RadzenRow>
+                                <RadzenColumn Size="3"><RadzenText TextStyle="TextStyle.Subtitle2">@L["Url"]</RadzenText></RadzenColumn>
+                                <RadzenColumn Size="9"><RadzenText>@_detail.Url</RadzenText></RadzenColumn>
+                            </RadzenRow>
+                            <RadzenRow>
+                                <RadzenColumn Size="3"><RadzenText TextStyle="TextStyle.Subtitle2">@L["HttpMethod"]</RadzenText></RadzenColumn>
+                                <RadzenColumn Size="9"><RadzenText>@_detail.HttpMethod</RadzenText></RadzenColumn>
+                            </RadzenRow>
+                            <RadzenRow>
+                                <RadzenColumn Size="3"><RadzenText TextStyle="TextStyle.Subtitle2">@L["HttpStatusCode"]</RadzenText></RadzenColumn>
+                                <RadzenColumn Size="9">
+                                    @{
+                                        var color = "rz-color-info";
+                                        if (_detail.HttpStatusCode >= 200 && _detail.HttpStatusCode < 400) { color = "rz-color-success"; }
+                                        else if (_detail.HttpStatusCode >= 400) { color = "rz-color-danger"; }
+                                    }
+                                    <RadzenText class="@color">@_detail.HttpStatusCode</RadzenText>
+                                </RadzenColumn>
+                            </RadzenRow>
+                            <RadzenRow>
+                                <RadzenColumn Size="3"><RadzenText TextStyle="TextStyle.Subtitle2">@L["UserName"]</RadzenText></RadzenColumn>
+                                <RadzenColumn Size="9"><RadzenText>@_detail.UserName</RadzenText></RadzenColumn>
+                            </RadzenRow>
+                            <RadzenRow>
+                                <RadzenColumn Size="3"><RadzenText TextStyle="TextStyle.Subtitle2">@L["ClientIpAddress"]</RadzenText></RadzenColumn>
+                                <RadzenColumn Size="9"><RadzenText>@_detail.ClientIpAddress?.Replace("::ffff:", "")</RadzenText></RadzenColumn>
+                            </RadzenRow>
+                            <RadzenRow>
+                                <RadzenColumn Size="3"><RadzenText TextStyle="TextStyle.Subtitle2">@L["ExecutionTime"]</RadzenText></RadzenColumn>
+                                <RadzenColumn Size="9"><RadzenText>@_detail.ExecutionTime.ToLocalTime()</RadzenText></RadzenColumn>
+                            </RadzenRow>
+                            <RadzenRow>
+                                <RadzenColumn Size="3"><RadzenText TextStyle="TextStyle.Subtitle2">@L["ExecutionDuration"]</RadzenText></RadzenColumn>
+                                <RadzenColumn Size="9"><RadzenText>@(_detail.ExecutionDuration) ms</RadzenText></RadzenColumn>
+                            </RadzenRow>
+                            <RadzenRow>
+                                <RadzenColumn Size="3"><RadzenText TextStyle="TextStyle.Subtitle2">@L["BrowserInfo"]</RadzenText></RadzenColumn>
+                                <RadzenColumn Size="9"><RadzenText>@_detail.BrowserInfo</RadzenText></RadzenColumn>
+                            </RadzenRow>
+                            @if (!string.IsNullOrEmpty(_detail.Exceptions))
+                            {
+                                <RadzenRow>
+                                    <RadzenColumn Size="3"><RadzenText TextStyle="TextStyle.Subtitle2" class="rz-color-danger">@L["AuditLog:Exceptions"]</RadzenText></RadzenColumn>
+                                    <RadzenColumn Size="9">
+                                        <pre style="white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow: auto; font-size: 0.85rem;">@_detail.Exceptions</pre>
+                                    </RadzenColumn>
+                                </RadzenRow>
+                            }
+                        </RadzenStack>
+                    </RadzenTabsItem>
+
+                    <RadzenTabsItem Text="@($"{L["AuditLog:Actions"]} ({_detail.Actions.Count})")"> 
+                        <RadzenDataGrid Data="@_detail.Actions" AllowSorting="true" Style="height: 350px;">
+                            <Columns>
+                                <RadzenDataGridColumn Property="@nameof(AuditLogActionDto.ServiceName)" Title="@L["AuditLog:ServiceName"]" Width="280px" />
+                                <RadzenDataGridColumn Property="@nameof(AuditLogActionDto.MethodName)" Title="@L["AuditLog:MethodName"]" Width="200px" />
+                                <RadzenDataGridColumn Property="@nameof(AuditLogActionDto.ExecutionDuration)" Title="@L["ExecutionDuration"]" Width="100px">
+                                    <Template>
+                                        @(context.ExecutionDuration) ms
+                                    </Template>
+                                </RadzenDataGridColumn>
+                                <RadzenDataGridColumn Property="@nameof(AuditLogActionDto.Parameters)" Title="@L["AuditLog:Parameters"]" Sortable="false">
+                                    <Template>
+                                        @if (!string.IsNullOrEmpty(context.Parameters))
+                                        {
+                                            <pre style="white-space: pre-wrap; word-break: break-all; max-height: 100px; overflow: auto; font-size: 0.8rem; margin:0;">@context.Parameters</pre>
+                                        }
+                                    </Template>
+                                </RadzenDataGridColumn>
+                            </Columns>
+                        </RadzenDataGrid>
+                    </RadzenTabsItem>
+
+                    <RadzenTabsItem Text="@($"{L["AuditLog:EntityChanges"]} ({_detail.EntityChanges.Count})")"> 
+                        <RadzenDataGrid Data="@_detail.EntityChanges" AllowSorting="true" Style="height: 350px;"
+                                        TItem="EntityChangeDto" RowRender="@OnEntityChangeRowRender"
+                                        ExpandMode="DataGridExpandMode.Single">
+                            <Template Context="ec">
+                                <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-2">@L["AuditLog:PropertyChanges"]</RadzenText>
+                                <RadzenDataGrid Data="@ec.PropertyChanges" AllowSorting="false">
+                                    <Columns>
+                                        <RadzenDataGridColumn Property="@nameof(EntityPropertyChangeDto.PropertyName)" Title="@L["AuditLog:PropertyName"]" Width="200px" />
+                                        <RadzenDataGridColumn Property="@nameof(EntityPropertyChangeDto.OriginalValue)" Title="@L["AuditLog:OriginalValue"]">
+                                            <Template>
+                                                <pre style="white-space: pre-wrap; word-break: break-all; max-height: 80px; overflow:auto; font-size: 0.8rem; margin:0;">@context.OriginalValue</pre>
+                                            </Template>
+                                        </RadzenDataGridColumn>
+                                        <RadzenDataGridColumn Property="@nameof(EntityPropertyChangeDto.NewValue)" Title="@L["AuditLog:NewValue"]">
+                                            <Template>
+                                                <pre style="white-space: pre-wrap; word-break: break-all; max-height: 80px; overflow:auto; font-size: 0.8rem; margin:0;">@context.NewValue</pre>
+                                            </Template>
+                                        </RadzenDataGridColumn>
+                                    </Columns>
+                                </RadzenDataGrid>
+                            </Template>
+                            <Columns>
+                                <RadzenDataGridColumn Property="@nameof(EntityChangeDto.EntityTypeFullName)" Title="@L["AuditLog:EntityType"]" Width="300px">
+                                    <Template>
+                                        @GetShortTypeName(context.EntityTypeFullName)
+                                    </Template>
+                                </RadzenDataGridColumn>
+                                <RadzenDataGridColumn Property="@nameof(EntityChangeDto.EntityId)" Title="@L["AuditLog:EntityId"]" Width="160px" />
+                                <RadzenDataGridColumn Property="@nameof(EntityChangeDto.ChangeType)" Title="@L["AuditLog:ChangeType"]" Width="120px">
+                                    <Template>
+                                        @{
+                                            var (badge, text) = context.ChangeType switch
+                                            {
+                                                EntityChangeType.Created => (BadgeStyle.Success, L["AuditLog:ChangeType.Created"]),
+                                                EntityChangeType.Updated => (BadgeStyle.Info, L["AuditLog:ChangeType.Updated"]),
+                                                EntityChangeType.Deleted => (BadgeStyle.Danger, L["AuditLog:ChangeType.Deleted"]),
+                                                _ => (BadgeStyle.Light, context.ChangeType.ToString())
+                                            };
+                                        }
+                                        <RadzenBadge BadgeStyle="@badge" Text="@text" />
+                                    </Template>
+                                </RadzenDataGridColumn>
+                                <RadzenDataGridColumn Property="@nameof(EntityChangeDto.ChangeTime)" Title="@L["AuditLog:ChangeTime"]" Width="180px">
+                                    <Template>
+                                        @context.ChangeTime.ToLocalTime()
+                                    </Template>
+                                </RadzenDataGridColumn>
+                            </Columns>
+                        </RadzenDataGrid>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        }
+        else
+        {
+            <RadzenProgressBarCircular ShowValue="true" Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Medium" />
+        }
+    </DialogFormLayout>
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public Guid AuditLogId { get; set; }
+
+    AuditLogDetailDto? _detail;
+
+    public Detail()
+    {
+        LocalizationResource = typeof(AbpRadzenUIResource);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _detail = await AuditLogAppService.GetDetailAsync(AuditLogId);
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(ex);
+        }
+    }
+
+    void OnEntityChangeRowRender(RowRenderEventArgs<EntityChangeDto> args)
+    {
+        args.Expandable = args.Data?.PropertyChanges.Count > 0;
+    }
+
+    static string GetShortTypeName(string? fullTypeName)
+    {
+        if (string.IsNullOrEmpty(fullTypeName))
+            return string.Empty;
+
+        var lastDot = fullTypeName.LastIndexOf('.');
+        return lastDot >= 0 ? fullTypeName[(lastDot + 1)..] : fullTypeName;
+    }
+}

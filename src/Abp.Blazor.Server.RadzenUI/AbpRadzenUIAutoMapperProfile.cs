@@ -45,6 +45,15 @@ public partial class AuditLogToAuditLogDtoMapper : MapperBase<AuditLog, AuditLog
 }
 
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+public partial class AuditLogToAuditLogDetailDtoMapper
+    : MapperBase<AuditLog, AuditLogDetailDto>
+{
+    public override partial AuditLogDetailDto Map(AuditLog source);
+
+    public override partial void Map(AuditLog source, AuditLogDetailDto destination);
+}
+
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
 public partial class IdentitySecurityLogToIdentitySecurityLogDtoMapper
     : MapperBase<IdentitySecurityLog, IdentitySecurityLogDto>
 {

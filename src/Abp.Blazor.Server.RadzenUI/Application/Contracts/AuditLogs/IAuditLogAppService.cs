@@ -5,4 +5,6 @@ namespace Abp.RadzenUI.Application.Contracts.AuditLogs;
 
 public interface IAuditLogAppService
     : ICrudAppService<AuditLogDto, Guid, GetAuditLogsInput, EmptyCreateDto, EmptyUpdateDto>
-{ }
+{
+    Task<AuditLogDetailDto> GetDetailAsync(Guid id);
+}

@@ -136,7 +136,40 @@
     "DataDictionary:EditItem": "编辑字典项",
     "DataDictionary:DeleteType.Confirm": "您确定要删除字典类型 '{0}' 吗？",
     "DataDictionary:DeleteItem.Confirm": "您确定要删除字典项 '{0}' 吗？",
-    "DataDictionary:SelectType": "请在左侧选择一个字典类型。"
+    "DataDictionary:SelectType": "请在左侧选择一个字典类型。",
+
+    "AuditLog:ViewDetail": "查看详情",
+    "AuditLog:Overview": "概览",
+    "AuditLog:Actions": "操作记录",
+    "AuditLog:EntityChanges": "实体变更",
+    "AuditLog:Exceptions": "异常信息",
+    "AuditLog:ServiceName": "服务",
+    "AuditLog:MethodName": "方法",
+    "AuditLog:Parameters": "参数",
+    "AuditLog:PropertyChanges": "属性变更",
+    "AuditLog:EntityType": "实体类型",
+    "AuditLog:EntityId": "实体ID",
+    "AuditLog:ChangeType": "变更类型",
+    "AuditLog:ChangeTime": "变更时间",
+    "AuditLog:PropertyName": "属性",
+    "AuditLog:OriginalValue": "原始值",
+    "AuditLog:NewValue": "新值",
+    "AuditLog:ChangeType.Created": "新增",
+    "AuditLog:ChangeType.Updated": "修改",
+    "AuditLog:ChangeType.Deleted": "删除",
+    "Close": "关闭",
+
+    "Feature:ManageFeatures": "管理功能",
+    "Feature:NoFeatures": "未定义任何功能。",
+    "Permission:ManageFeatures": "功能",
+
+    "ConnectionString:Manage": "连接字符串",
+    "ConnectionString:Add": "添加连接字符串",
+    "ConnectionString:Edit": "编辑连接字符串",
+    "ConnectionString:Name": "名称",
+    "ConnectionString:Value": "值",
+    "ConnectionString:NameAndValueRequired": "名称和值为必填项。",
+    "ConnectionString:DeleteConfirm": "确定要删除连接字符串 '{0}' 吗？"
   }
 }
 

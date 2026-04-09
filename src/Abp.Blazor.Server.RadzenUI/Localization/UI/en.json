@@ -137,7 +137,40 @@
     "DataDictionary:EditItem": "Edit Dictionary Item",
     "DataDictionary:DeleteType.Confirm": "Are you sure you want to delete the dictionary type '{0}'?",
     "DataDictionary:DeleteItem.Confirm": "Are you sure you want to delete the dictionary item '{0}'?",
-    "DataDictionary:SelectType": "Please select a dictionary type on the left."
+    "DataDictionary:SelectType": "Please select a dictionary type on the left.",
+
+    "AuditLog:ViewDetail": "View Detail",
+    "AuditLog:Overview": "Overview",
+    "AuditLog:Actions": "Actions",
+    "AuditLog:EntityChanges": "Entity Changes",
+    "AuditLog:Exceptions": "Exceptions",
+    "AuditLog:ServiceName": "Service",
+    "AuditLog:MethodName": "Method",
+    "AuditLog:Parameters": "Parameters",
+    "AuditLog:PropertyChanges": "Property Changes",
+    "AuditLog:EntityType": "Entity Type",
+    "AuditLog:EntityId": "Entity ID",
+    "AuditLog:ChangeType": "Change Type",
+    "AuditLog:ChangeTime": "Change Time",
+    "AuditLog:PropertyName": "Property",
+    "AuditLog:OriginalValue": "Original Value",
+    "AuditLog:NewValue": "New Value",
+    "AuditLog:ChangeType.Created": "Created",
+    "AuditLog:ChangeType.Updated": "Updated",
+    "AuditLog:ChangeType.Deleted": "Deleted",
+    "Close": "Close",
+
+    "Feature:ManageFeatures": "Manage Features",
+    "Feature:NoFeatures": "No features defined.",
+    "Permission:ManageFeatures": "Features",
+
+    "ConnectionString:Manage": "Connection Strings",
+    "ConnectionString:Add": "Add Connection String",
+    "ConnectionString:Edit": "Edit Connection String",
+    "ConnectionString:Name": "Name",
+    "ConnectionString:Value": "Value",
+    "ConnectionString:NameAndValueRequired": "Name and value are required.",
+    "ConnectionString:DeleteConfirm": "Are you sure you want to delete the connection string '{0}'?"
   }
 }
 

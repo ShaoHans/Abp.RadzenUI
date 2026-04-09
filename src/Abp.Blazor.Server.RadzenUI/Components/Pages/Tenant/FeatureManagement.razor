@@ -1,0 +1,152 @@
+@using Volo.Abp.FeatureManagement
+@using Volo.Abp.Validation.StringValues
+@inject IFeatureAppService FeatureAppService
+@inject DialogService DialogService
+@inherits AbpRadzenUIComponentBase
+
+<RadzenStack JustifyContent="JustifyContent.SpaceBetween"
+             Style="max-height:calc(100vh - 200px)">
+    <DialogFormLayout SaveClick="SaveAsync" CancelClick="() => DialogService.Close(false)">
+        @if (_groups is not null && _groups.Count > 0)
+        {
+            <RadzenTabs TabPosition="TabPosition.Left" RenderMode="TabRenderMode.Client">
+                <Tabs>
+                    @foreach (var group in _groups)
+                    {
+                        <RadzenTabsItem Text="@group.DisplayName">
+                            <RadzenStack Gap="1rem" class="rz-p-4" Style="max-height: 16rem; overflow: auto;">
+                                @foreach (var feature in group.Features)
+                                {
+                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+                                                 Style="@($"padding-left: {feature.Depth * 24}px")">
+                                        @if (IsToggle(feature))
+                                        {
+                                            <RadzenCheckBox TValue="bool" Name="@feature.Name"
+                                                            Value="@IsFeatureEnabled(feature)"
+                                                            ValueChanged="@(v => SetFeatureValue(feature, v ? "true" : "false"))" />
+                                            <RadzenLabel Text="@feature.DisplayName" Component="@feature.Name" />
+                                        }
+                                        else if (IsSelection(feature))
+                                        {
+                                            <RadzenLabel Text="@feature.DisplayName" Style="min-width: 150px;" />
+                                            <RadzenDropDown TValue="string" Data="@GetSelectionItems(feature)"
+                                                            TextProperty="Key" ValueProperty="Value"
+                                                            Value="@feature.Value"
+                                                            ValueChanged="@(v => SetFeatureValue(feature, v))"
+                                                            Style="width: 200px;" />
+                                        }
+                                        else
+                                        {
+                                            <RadzenLabel Text="@feature.DisplayName" Style="min-width: 150px;" />
+                                            <RadzenTextBox Value="@feature.Value"
+                                                           ValueChanged="@(v => SetFeatureValue(feature, v))"
+                                                           Style="width: 200px;" />
+                                        }
+                                        @if (!string.IsNullOrEmpty(feature.Description))
+                                        {
+                                            <RadzenIcon Icon="info" title="@feature.Description"
+                                                        Style="color:var(--rz-text-disabled-color); cursor:help; font-size: 1rem;" />
+                                        }
+                                    </RadzenStack>
+                                }
+                            </RadzenStack>
+                        </RadzenTabsItem>
+                    }
+                </Tabs>
+            </RadzenTabs>
+        }
+        else if (_groups is not null && _groups.Count == 0)
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter">
+                @L["Feature:NoFeatures"]
+            </RadzenAlert>
+        }
+        else
+        {
+            <RadzenProgressBarCircular ShowValue="true" Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Medium" />
+        }
+    </DialogFormLayout>
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public string ProviderName { get; set; } = default!;
+
+    [Parameter]
+    public string ProviderKey { get; set; } = default!;
+
+    List<FeatureGroupDto>? _groups;
+
+    public FeatureManagement()
+    {
+        LocalizationResource = typeof(AbpRadzenUIResource);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var result = await FeatureAppService.GetAsync(ProviderName, ProviderKey);
+            _groups = result.Groups;
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(ex);
+        }
+    }
+
+    static bool IsToggle(FeatureDto feature)
+    {
+        return feature.ValueType is ToggleStringValueType;
+    }
+
+    static bool IsSelection(FeatureDto feature)
+    {
+        return feature.ValueType is SelectionStringValueType;
+    }
+
+    static bool IsFeatureEnabled(FeatureDto feature)
+    {
+        return string.Equals(feature.Value, "true", StringComparison.OrdinalIgnoreCase);
+    }
+
+    static List<KeyValuePair<string, string>> GetSelectionItems(FeatureDto feature)
+    {
+        if (feature.ValueType is SelectionStringValueType selectionType)
+        {
+            return selectionType.ItemSource.Items
+                .Select(i => new KeyValuePair<string, string>(
+                    i.DisplayText?.Name ?? i.Value,
+                    i.Value))
+                .ToList();
+        }
+        return [];
+    }
+
+    void SetFeatureValue(FeatureDto feature, string value)
+    {
+        feature.Value = value;
+    }
+
+    async Task SaveAsync()
+    {
+        try
+        {
+            var updateDto = new UpdateFeaturesDto
+            {
+                Features = _groups!
+                    .SelectMany(g => g.Features)
+                    .Select(f => new UpdateFeatureDto { Name = f.Name, Value = f.Value })
+                    .ToList()
+            };
+
+            await FeatureAppService.UpdateAsync(ProviderName, ProviderKey, updateDto);
+            await Notify.Success(L["SavedSuccessfully"]);
+            DialogService.Close(true);
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(ex);
+        }
+    }
+}

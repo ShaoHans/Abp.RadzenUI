@@ -29,12 +29,24 @@
         <RadzenDataGridColumn Property="@nameof(TenantDto.Id)" Title="ID" Width="80px" Visible="false" />
         <RadzenDataGridColumn Property="@nameof(TenantDto.Name)" Title="@L["DisplayName:TenantName"]" />
         @(RadzenColumnHelper.ExtraPropertiesColumns<TenantDto>(_extraColumns, StringLocalizerFactory))
-        <RadzenDataGridColumn Title="@L["Actions"]" Width="160px" Filterable="false" Sortable="false">
+        <RadzenDataGridColumn Title="@L["Actions"]" Width="260px" Filterable="false" Sortable="false">
             <Template>
                 @if (HasUpdatePermission)
                 {
                     <RadzenButton Icon="edit" title="@L["Edit"]" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small"
                                   Click="@(async () => await OpenEditDialogAsync<Edit>(@L["Edit"], context, ()=>{return SetDialogOptions();}))" />
+                }
+
+                @if (HasManageFeaturesPermission)
+                {
+                    <RadzenButton Icon="toggle_on" title="@UL["Permission:ManageFeatures"]" ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small"
+                                  Click="@(async () => await OpenFeaturesDialogAsync(context))" />
+                }
+
+                @if (HasManageConnectionStringsPermission)
+                {
+                    <RadzenButton Icon="link" title="@UL["ConnectionString:Manage"]" ButtonStyle="ButtonStyle.Info" Size="ButtonSize.Small"
+                                  Click="@(async () => await OpenConnectionStringsDialogAsync(context))" />
                 }
 
                 @if (HasDeletePermission)

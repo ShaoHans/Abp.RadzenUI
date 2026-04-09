@@ -1,5 +1,6 @@
 using Abp.RadzenUI.Utils;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
 using Radzen;
 using Volo.Abp.ObjectExtending;
 using Volo.Abp.TenantManagement;
@@ -9,8 +10,13 @@ namespace Abp.RadzenUI.Components.Pages.Tenant;
 
 public partial class List
 {
+    [Inject]
+    protected DialogService TenantDialogService { get; set; } = default!;
+
     protected bool HasManageFeaturesPermission;
     protected string ManageFeaturesPolicyName;
+    protected bool HasManageConnectionStringsPermission;
+    protected string ManageConnectionStringsPolicyName;
     private IReadOnlyList<ExtraPropertyColumnMeta> _extraColumns = default!;
 
     public List()
@@ -23,6 +29,8 @@ public partial class List
         DeletePolicyName = TenantManagementPermissions.Tenants.Delete;
 
         ManageFeaturesPolicyName = TenantManagementPermissions.Tenants.ManageFeatures;
+        ManageConnectionStringsPolicyName =
+            TenantManagementPermissions.Tenants.ManageConnectionStrings;
     }
 
     protected override void OnInitialized()
@@ -43,6 +51,31 @@ public partial class List
 
         HasManageFeaturesPermission = await AuthorizationService.IsGrantedAsync(
             ManageFeaturesPolicyName
+        );
+        HasManageConnectionStringsPermission = await AuthorizationService.IsGrantedAsync(
+            ManageConnectionStringsPolicyName
+        );
+    }
+
+    private async Task OpenFeaturesDialogAsync(TenantDto tenant)
+    {
+        await TenantDialogService.OpenAsync<FeatureManagement>(
+            UL["Feature:ManageFeatures"],
+            new Dictionary<string, object?>
+            {
+                { "ProviderName", "T" },
+                { "ProviderKey", tenant.Id.ToString() },
+            },
+            new DialogOptions { Draggable = true, Width = "800px" }
+        );
+    }
+
+    private async Task OpenConnectionStringsDialogAsync(TenantDto tenant)
+    {
+        await TenantDialogService.OpenAsync<ConnectionStrings>(
+            UL["ConnectionString:Manage"],
+            new Dictionary<string, object?> { { "TenantId", tenant.Id } },
+            new DialogOptions { Draggable = true, Width = "750px" }
         );
     }
 
