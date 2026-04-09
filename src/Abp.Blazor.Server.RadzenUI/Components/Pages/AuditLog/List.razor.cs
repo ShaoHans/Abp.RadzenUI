@@ -28,7 +28,7 @@ public partial class List
     private async Task OpenDetailDialogAsync(AuditLogDto dto)
     {
         await DialogService.OpenAsync<Detail>(
-            L["AuditLog:ViewDetail"],
+            UL["AuditLog:ViewDetail"],
             new Dictionary<string, object?> { { "AuditLogId", dto.Id } },
             new DialogOptions { Draggable = true, Width = "900px" }
         );

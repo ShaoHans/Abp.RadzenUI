@@ -18,6 +18,7 @@ using Volo.Abp.AspNetCore.Components.Server.Configuration;
 using Volo.Abp.AspNetCore.Components.Web;
 using Volo.Abp.AspNetCore.Components.Web.Configuration;
 using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
+using Volo.Abp.AspNetCore.Auditing;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.Localization;
 using Volo.Abp.Autofac;
@@ -53,6 +54,11 @@ public class AbpRadzenUIModule : AbpModule
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         AvatarModuleExtensionConfigurator.Configure();
+
+        Configure<AbpAspNetCoreAuditingOptions>(options =>
+        {
+            options.IgnoredUrls.AddIfNotContains("/_blazor");
+        });
 
         var configuration = context.Services.GetConfiguration();
 
