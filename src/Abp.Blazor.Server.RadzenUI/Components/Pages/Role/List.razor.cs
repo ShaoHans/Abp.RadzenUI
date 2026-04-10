@@ -1,3 +1,4 @@
+using Abp.RadzenUI.Localization;
 using Microsoft.AspNetCore.Authorization;
 using Radzen;
 using Volo.Abp.Identity;
@@ -55,6 +56,22 @@ public partial class List
             {
                 Draggable = true,
                 Width = "800px",
+            }
+        );
+    }
+
+    private async Task OpenClaimsDialog(IdentityRoleDto role)
+    {
+        await DialogService.OpenAsync<Claims>(
+            $"{UL["RoleClaim:Claims"]} - {role.Name}",
+            parameters: new Dictionary<string, object?>()
+            {
+                { "RoleId", role.Id },
+            },
+            options: new DialogOptions()
+            {
+                Draggable = true,
+                Width = "700px",
             }
         );
     }

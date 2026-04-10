@@ -169,7 +169,26 @@
     "ConnectionString:Name": "名称",
     "ConnectionString:Value": "值",
     "ConnectionString:NameAndValueRequired": "名称和值为必填项。",
-    "ConnectionString:DeleteConfirm": "确定要删除连接字符串 '{0}' 吗？"
+    "ConnectionString:DeleteConfirm": "确定要删除连接字符串 '{0}' 吗？",
+
+    "RoleClaim:Claims": "声明管理",
+    "RoleClaim:AddNew": "添加新声明",
+    "RoleClaim:ClaimType": "声明类型",
+    "RoleClaim:ClaimValue": "声明值",
+    "RoleClaim:NoClaims": "该角色未分配任何声明。",
+    "RoleClaim:DeleteConfirm": "确定要删除声明 '{0}' 吗？",
+
+    "Menu:Dashboard": "仪表盘",
+    "Dashboard:TotalUsers": "用户总数",
+    "Dashboard:TotalRoles": "角色总数",
+    "Dashboard:TodayRequests": "今日请求",
+    "Dashboard:TodayErrors": "今日错误",
+    "Dashboard:RequestTrend": "请求趋势（近7天）",
+    "Dashboard:Requests": "请求数",
+    "Dashboard:Errors": "错误数",
+    "Dashboard:StatusCodeDist": "HTTP 状态码分布",
+    "Dashboard:StatusCode": "状态码",
+    "Dashboard:NoData": "暂无数据。"
   }
 }
 

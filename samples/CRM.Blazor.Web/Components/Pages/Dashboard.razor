@@ -1,0 +1,145 @@
+@page "/dashboard"
+@using Abp.RadzenUI
+@using Abp.RadzenUI.Application.Contracts.Dashboard
+@using Abp.RadzenUI.Localization
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Extensions.Localization
+@attribute [Authorize]
+@inject IDashboardAppService DashboardAppService
+@inject IStringLocalizer<AbpRadzenUIResource> UL
+@inherits AbpRadzenUIComponentBase
+
+<PageTitle>@UL["Menu:Dashboard"]</PageTitle>
+
+@if (_data is null)
+{
+    <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="height:50vh;">
+        <RadzenProgressBarCircular ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+    </RadzenStack>
+}
+else
+{
+    <RadzenStack Gap="1.5rem" class="rz-p-4">
+        @* Summary Cards *@
+        <RadzenRow Gap="1rem">
+            <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
+                <RadzenCard class="rz-shadow-3" Style="height:100%;">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                        <RadzenIcon Icon="people" Style="font-size:2.5rem; color:var(--rz-primary);" />
+                        <RadzenStack Gap="0.25rem">
+                            <RadzenText TextStyle="TextStyle.Caption" class="rz-color-on-surface-variant">@UL["Dashboard:TotalUsers"]</RadzenText>
+                            <RadzenText TextStyle="TextStyle.H4">@_data.TotalUsers</RadzenText>
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
+                <RadzenCard class="rz-shadow-3" Style="height:100%;">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                        <RadzenIcon Icon="shield" Style="font-size:2.5rem; color:var(--rz-success);" />
+                        <RadzenStack Gap="0.25rem">
+                            <RadzenText TextStyle="TextStyle.Caption" class="rz-color-on-surface-variant">@UL["Dashboard:TotalRoles"]</RadzenText>
+                            <RadzenText TextStyle="TextStyle.H4">@_data.TotalRoles</RadzenText>
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
+                <RadzenCard class="rz-shadow-3" Style="height:100%;">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                        <RadzenIcon Icon="description" Style="font-size:2.5rem; color:var(--rz-info);" />
+                        <RadzenStack Gap="0.25rem">
+                            <RadzenText TextStyle="TextStyle.Caption" class="rz-color-on-surface-variant">@UL["Dashboard:TodayRequests"]</RadzenText>
+                            <RadzenText TextStyle="TextStyle.H4">@_data.TodayAuditLogCount</RadzenText>
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
+                <RadzenCard class="rz-shadow-3" Style="height:100%;">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                        <RadzenIcon Icon="error_outline" Style="font-size:2.5rem; color:var(--rz-danger);" />
+                        <RadzenStack Gap="0.25rem">
+                            <RadzenText TextStyle="TextStyle.Caption" class="rz-color-on-surface-variant">@UL["Dashboard:TodayErrors"]</RadzenText>
+                            <RadzenText TextStyle="TextStyle.H4">@_data.TodayErrorCount</RadzenText>
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+        </RadzenRow>
+
+        @* Charts *@
+        <RadzenRow Gap="1rem">
+            @* Request Trend Chart *@
+            <RadzenColumn Size="12" SizeLG="8">
+                <RadzenCard class="rz-shadow-3">
+                    <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-mb-4">@UL["Dashboard:RequestTrend"]</RadzenText>
+                    <RadzenChart Style="height: 320px;">
+                        <RadzenLineSeries Data="@_data.AuditLogTrend" CategoryProperty="Date"
+                                          Title="@UL["Dashboard:Requests"]" ValueProperty="Count"
+                                          Smooth="true" Stroke="var(--rz-primary)" StrokeWidth="2">
+                            <RadzenMarkers MarkerType="MarkerType.Circle" Size="5" />
+                        </RadzenLineSeries>
+                        <RadzenLineSeries Data="@_data.ErrorTrend" CategoryProperty="Date"
+                                          Title="@UL["Dashboard:Errors"]" ValueProperty="Count"
+                                          Smooth="true" Stroke="var(--rz-danger)" StrokeWidth="2">
+                            <RadzenMarkers MarkerType="MarkerType.Diamond" Size="5" />
+                        </RadzenLineSeries>
+                        <RadzenCategoryAxis FormatString="{0:MM-dd}" />
+                        <RadzenValueAxis>
+                            <RadzenGridLines Visible="true" />
+                        </RadzenValueAxis>
+                        <RadzenLegend Position="LegendPosition.Bottom" />
+                    </RadzenChart>
+                </RadzenCard>
+            </RadzenColumn>
+
+            @* HTTP Status Code Pie Chart *@
+            <RadzenColumn Size="12" SizeLG="4">
+                <RadzenCard class="rz-shadow-3">
+                    <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-mb-4">@UL["Dashboard:StatusCodeDist"]</RadzenText>
+                    @if (_data.HttpStatusCodeStats.Count > 0)
+                    {
+                        <RadzenChart Style="height: 350px;">
+                            <RadzenPieSeries Data="@_data.HttpStatusCodeStats"
+                                              Title="@UL["Dashboard:StatusCode"]"
+                                              CategoryProperty="StatusCode"
+                                              ValueProperty="Count">
+                                <ChildContent>
+                                    <RadzenSeriesDataLabels Visible="false" />
+                                </ChildContent>
+                                <TooltipTemplate Context="item">
+                                    <span>@item.StatusCode: @item.Count</span>
+                                </TooltipTemplate>
+                            </RadzenPieSeries>
+                            <RadzenLegend Position="LegendPosition.Right" />
+                        </RadzenChart>
+                    }
+                    else
+                    {
+                        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="height: 320px;">
+                            <RadzenText TextStyle="TextStyle.Body2" class="rz-color-on-surface-variant">@UL["Dashboard:NoData"]</RadzenText>
+                        </RadzenStack>
+                    }
+                </RadzenCard>
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenStack>
+}
+
+@code {
+    private DashboardDto? _data;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        try
+        {
+            _data = await DashboardAppService.GetAsync();
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(ex);
+        }
+    }
+}

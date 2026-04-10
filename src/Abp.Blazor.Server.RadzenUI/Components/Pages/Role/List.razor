@@ -31,7 +31,7 @@
                 <RadzenBadge Text="@L["DisplayName:IsPublic"]" Visible="context.IsPublic" BadgeStyle="BadgeStyle.Info" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Title="@L["Actions"]" Width="160px" Sortable="false">
+        <RadzenDataGridColumn Title="@L["Actions"]" Width="200px" Sortable="false">
             <Template>
                 @if ((context.Name != "admin" || CurrentUser.UserName == "admin") && HasUpdatePermission)
                 {
@@ -43,6 +43,12 @@
                 {
                     <RadzenButton Icon="productivity" title="@L["Permissions"]" ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small"
                                   Click="@(async () => await OpenAssignPermissionDialog(context))" />
+                }
+
+                @if ((context.Name != "admin" || CurrentUser.UserName == "admin") && HasUpdatePermission)
+                {
+                    <RadzenButton Icon="badge" title="@UL["RoleClaim:Claims"]" ButtonStyle="ButtonStyle.Info" Size="ButtonSize.Small"
+                                  Click="@(async () => await OpenClaimsDialog(context))" />
                 }
 
                 @if (context.Name != "admin" && HasDeletePermission)

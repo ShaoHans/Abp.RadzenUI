@@ -170,7 +170,26 @@
     "ConnectionString:Name": "Name",
     "ConnectionString:Value": "Value",
     "ConnectionString:NameAndValueRequired": "Name and value are required.",
-    "ConnectionString:DeleteConfirm": "Are you sure you want to delete the connection string '{0}'?"
+    "ConnectionString:DeleteConfirm": "Are you sure you want to delete the connection string '{0}'?",
+
+    "RoleClaim:Claims": "Claims",
+    "RoleClaim:AddNew": "Add New Claim",
+    "RoleClaim:ClaimType": "Claim Type",
+    "RoleClaim:ClaimValue": "Claim Value",
+    "RoleClaim:NoClaims": "No claims assigned to this role.",
+    "RoleClaim:DeleteConfirm": "Are you sure you want to delete the claim '{0}'?",
+
+    "Menu:Dashboard": "Dashboard",
+    "Dashboard:TotalUsers": "Total Users",
+    "Dashboard:TotalRoles": "Total Roles",
+    "Dashboard:TodayRequests": "Today's Requests",
+    "Dashboard:TodayErrors": "Today's Errors",
+    "Dashboard:RequestTrend": "Request Trend (Last 7 Days)",
+    "Dashboard:Requests": "Requests",
+    "Dashboard:Errors": "Errors",
+    "Dashboard:StatusCodeDist": "HTTP Status Code Distribution",
+    "Dashboard:StatusCode": "Status Code",
+    "Dashboard:NoData": "No data available."
   }
 }
 

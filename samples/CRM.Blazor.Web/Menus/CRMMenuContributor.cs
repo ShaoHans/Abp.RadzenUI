@@ -1,4 +1,5 @@
-﻿using CRM.Localization;
+﻿using Abp.RadzenUI.Localization;
+using CRM.Localization;
 using CRM.MultiTenancy;
 using CRM.Permissions;
 using Microsoft.Extensions.Localization;
@@ -25,6 +26,12 @@ public class CRMMenuContributor : IMenuContributor
         context.Menu.Items.Insert(
             0,
             new ApplicationMenuItem(CRMMenus.Home, l["Menu:Home"], "/", icon: "home", order: 1)
+        );
+
+        var rl = context.GetLocalizer<AbpRadzenUIResource>();
+        context.Menu.Items.Insert(
+            1,
+            new ApplicationMenuItem(CRMMenus.Dashboard, rl["Menu:Dashboard"], "/dashboard", icon: "dashboard", order: 2)
         );
 
         ConfigProductMenu(context, l);
