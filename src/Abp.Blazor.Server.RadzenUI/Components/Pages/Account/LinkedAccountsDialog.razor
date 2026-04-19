@@ -70,7 +70,7 @@
                             <Columns>
                                 <RadzenDataGridColumn TItem="LinkedAccountDto" Property="TenantName" Title="@L["LinkedAccounts:Tenant"]" />
                                 <RadzenDataGridColumn TItem="LinkedAccountDto" Property="UserName" Title="@L["LinkedAccounts:User"]" />
-                                <RadzenDataGridColumn TItem="LinkedAccountDto" Title="@L["LinkedAccounts:Type"]">
+                                <RadzenDataGridColumn TItem="LinkedAccountDto" Title="@L["LinkedAccounts:Type"]" Sortable="false">
                                     <Template Context="item">
                                         <RadzenBadge BadgeStyle="@(item.IsDirectLink ? BadgeStyle.Primary : BadgeStyle.Light)" Text="@(item.IsDirectLink ? L["LinkedAccounts:Type.Direct"] : L["LinkedAccounts:Type.Indirect"] )" />
                                     </Template>
