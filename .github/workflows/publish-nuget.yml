@@ -5,6 +5,7 @@ run-name: ${{ github.actor }} is publishing a nuget package 🚀
 
 env:
   DATA_DICTIONARY_PROJECT: ./src/Abp.RadzenUI.DataDictionary.EntityFrameworkCore/Abp.RadzenUI.DataDictionary.EntityFrameworkCore.csproj
+  LINK_ACCOUNTS_PROJECT: ./src/Abp.RadzenUI.LinkAccounts/Abp.RadzenUI.LinkAccounts.csproj
   UI_PROJECT: ./src/Abp.Blazor.Server.RadzenUI/Abp.Blazor.Server.RadzenUI.csproj
 
 on:
@@ -28,16 +29,22 @@ jobs:
         dotnet-version: 10.0.x
     - name: Restore data dictionary project
       run: dotnet restore $DATA_DICTIONARY_PROJECT
+    - name: Restore link accounts project
+      run: dotnet restore $LINK_ACCOUNTS_PROJECT
     - name: Restore UI project
       run: dotnet restore $UI_PROJECT
     - name: Build data dictionary project
       run: dotnet build --no-restore -c Release $DATA_DICTIONARY_PROJECT
+    - name: Build link accounts project
+      run: dotnet build --no-restore -c Release $LINK_ACCOUNTS_PROJECT
     - name: Build UI project
       run: dotnet build --no-restore -c Release $UI_PROJECT
     - name: Create the UI package
       run: dotnet pack --no-build -c Release $UI_PROJECT -p:Version=$PACKAGE_VERSION -o ./artifacts
     - name: Create the data dictionary package
       run: dotnet pack --no-build -c Release $DATA_DICTIONARY_PROJECT -p:Version=$PACKAGE_VERSION -o ./artifacts
+    - name: Create the link accounts package
+      run: dotnet pack --no-build -c Release $LINK_ACCOUNTS_PROJECT -p:Version=$PACKAGE_VERSION -o ./artifacts
     - name: Add nuget source
       run: dotnet nuget add source --username ShaoHans --password ${{ secrets.NUGET_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/ShaoHans/index.json"
     - name: Publish the package to Github Packages

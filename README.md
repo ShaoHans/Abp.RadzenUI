@@ -17,6 +17,7 @@ English | [简体中文](README_zh-CN.md)
 
 - [Try the Demo](#-try-the-demo)
 - [Get Started](#-get-started)
+- [Use the Linked Accounts Module](#-use-the-linked-accounts-module)
 - [Use the Data Dictionary Module](#-use-the-data-dictionary-module)
 - [Preview the Interface](#-preview-the-interface)
 
@@ -184,6 +185,51 @@ Configure<SettingManagementComponentOptions>(options =>
 ```
 
 #### 8. Apply database migrations before the first run
+
+## 🔗 Use the Linked Accounts Module
+
+The Linked Accounts capability is now built into the full UI package and can also be consumed as a standalone application-layer package.
+
+### What it provides
+
+- Link another local or cross-tenant account from the current signed-in session.
+- Switch between directly linked and indirectly reachable accounts without logging out manually.
+- Keep a reversible session stack so the user can return to the previous account.
+- Reuse ABP's built-in `IdentityLinkUser` and `IdentityLinkUserManager` instead of introducing a custom link table.
+
+### Use it through the full UI package
+
+If you install `AbpRadzen.Blazor.Server.UI`, the Linked Accounts pages, localization texts, controllers, and menu entry are already wired into the theme module. No extra package installation is required.
+
+The built-in management page route is `/account/linked-accounts`.
+
+### Use it as a standalone package
+
+If you only need the linking and switching services in your own module, install the standalone package below:
+
+```shell
+dotnet add package AbpRadzen.LinkAccounts
+```
+
+Then depend on the module in your application module:
+
+```csharp
+[DependsOn(typeof(AbpRadzenUILinkAccountsModule))]
+public class MyApplicationModule : AbpModule
+{
+}
+```
+
+The standalone package registers the following services for you:
+
+- `ILinkedAccountAppService`
+- `ILinkedAccountFlowStateStore`
+
+### Notes about the authentication flow
+
+- The first link operation still requires a real login for the target account.
+- After the relationship is established, account switching relies on the existing link relationship plus a short-lived flow token to re-issue the authentication ticket.
+- Flow tokens and linked-account sessions are stored in distributed cache and are shared in the host tenant scope so cross-tenant switching can complete correctly.
 
 ## 📚 Use the Data Dictionary Module
 
