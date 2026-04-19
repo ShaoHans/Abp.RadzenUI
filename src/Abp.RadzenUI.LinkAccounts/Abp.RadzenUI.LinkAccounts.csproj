@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net10.0</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<RootNamespace>Abp.RadzenUI.LinkAccounts</RootNamespace>
+		<PackageId>AbpRadzen.LinkAccounts</PackageId>
+		<Authors>ShaoHans</Authors>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageDescription>Linked accounts services for ABP RadzenUI</PackageDescription>
+		<RepositoryUrl>https://github.com/ShaoHans/Abp-RadzenUI</RepositoryUrl>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\README.md" Pack="true" PackagePath="." />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.Ddd.Application" />
+		<PackageReference Include="Volo.Abp.Caching" />
+		<PackageReference Include="Volo.Abp.TenantManagement.Domain" />
+		<PackageReference Include="Volo.Abp.Identity.Domain" />
+	</ItemGroup>
+
+</Project>

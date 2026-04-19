@@ -23,6 +23,8 @@
     <PackageVersion Include="Microsoft.Extensions.Http" Version="$(Net10PackageVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.3.0" />
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.3.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="$(ContainersToolsVersion)" />
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryVersion)" />
@@ -35,6 +37,8 @@
     <PackageVersion Include="Serilog.Sinks.Async" Version="2.1.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />
     <PackageVersion Include="Volo.Abp.Account.Web.OpenIddict" Version="$(AbpVersion)" />
     <PackageVersion Include="Volo.Abp.Account.Application" Version="$(AbpVersion)" />
     <PackageVersion Include="Volo.Abp.Account.Application.Contracts" Version="$(AbpVersion)" />
@@ -56,6 +60,7 @@
     <PackageVersion Include="Volo.Abp.BlobStoring.Database.EntityFrameworkCore" Version="$(AbpVersion)" />
     <PackageVersion Include="Volo.Abp.Caching" Version="$(AbpVersion)" />
     <PackageVersion Include="Volo.Abp.Caching.StackExchangeRedis" Version="$(AbpVersion)" />
+    <PackageVersion Include="Volo.Abp.Ddd.Application" Version="$(AbpVersion)" />
     <PackageVersion Include="Volo.Abp.Emailing" Version="$(AbpVersion)" />
     <PackageVersion Include="Volo.Abp.EntityFrameworkCore" Version="$(AbpVersion)" />
     <PackageVersion Include="Volo.Abp.EntityFrameworkCore.PostgreSql" Version="$(AbpVersion)" />

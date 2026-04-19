@@ -1,0 +1,211 @@
+@page "/account/linked-accounts"
+@using Abp.RadzenUI.LinkAccounts
+@using Abp.RadzenUI.LinkAccounts.Dtos
+@inherits AbpRadzenUIComponentBase
+@inject ILinkedAccountAppService LinkedAccountAppService
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+
+<PageTitle>Linked Accounts</PageTitle>
+
+<RadzenStack Gap="1.5rem" class="rz-p-4 rz-p-md-6">
+    <RadzenRow RowGap="1rem">
+        <RadzenColumn Size="12" SizeLG="4">
+            <RadzenCard>
+                <RadzenStack Gap="0.5rem">
+                    <RadzenText TextStyle="TextStyle.Overline">@L["LinkedAccounts:Title"]</RadzenText>
+                    <RadzenText TextStyle="TextStyle.H5">@_items.Count</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2">@L["LinkedAccounts:OverviewHint"]</RadzenText>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeLG="4">
+            <RadzenCard>
+                <RadzenStack Gap="0.5rem">
+                    <RadzenText TextStyle="TextStyle.Overline">@L["LinkedAccounts:DirectLinks"]</RadzenText>
+                    <RadzenText TextStyle="TextStyle.H5">@_directCount</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2">@L["LinkedAccounts:DirectLinksHint"]</RadzenText>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeLG="4">
+            <RadzenCard>
+                <RadzenStack Gap="0.5rem">
+                    <RadzenText TextStyle="TextStyle.Overline">@L["LinkedAccounts:Session"]</RadzenText>
+                    <RadzenText TextStyle="TextStyle.H6">@(SessionDisplay.CanGoBack ? L["LinkedAccounts:SessionSwitched"] : L["LinkedAccounts:SessionCurrent"])</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2">@GetSessionDescription()</RadzenText>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+
+    <RadzenTabs RenderMode="TabRenderMode.Client">
+        <Tabs>
+            <RadzenTabsItem Text="@L["LinkedAccounts:AccountsTab"]">
+                <RadzenStack Gap="1rem" class="rz-p-2 rz-p-md-4">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                        <RadzenText TextStyle="TextStyle.H6">@L["LinkedAccounts:LinkedAccountsSection"]</RadzenText>
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.75rem">
+                            @if (SessionDisplay.CanGoBack)
+                            {
+                                <RadzenButton Icon="undo" Text="@L["LinkedAccounts:BackToPreviousAccount"]" ButtonStyle="ButtonStyle.Secondary" Variant="Variant.Outlined" Click="BackAsync" />
+                            }
+                            <RadzenButton Icon="add_link" Text="@L["LinkedAccounts:NewLinkUser"]" Click="BeginLinkAsync" />
+                        </RadzenStack>
+                    </RadzenStack>
+
+                    <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" AllowClose="false">
+                        @L["LinkedAccounts:Intro"]
+                    </RadzenAlert>
+
+                    @if (_items.Count == 0)
+                    {
+                        <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" AllowClose="false">
+                            @L["LinkedAccounts:NoLinkedAccounts"]
+                        </RadzenAlert>
+                    }
+                    else
+                    {
+                        <RadzenDataGrid Data="@_items" TItem="LinkedAccountDto" AllowPaging="false" AllowSorting="true" Responsive="true">
+                            <Columns>
+                                <RadzenDataGridColumn TItem="LinkedAccountDto" Property="TenantName" Title="@L["LinkedAccounts:Tenant"]" />
+                                <RadzenDataGridColumn TItem="LinkedAccountDto" Property="UserName" Title="@L["LinkedAccounts:User"]" />
+                                <RadzenDataGridColumn TItem="LinkedAccountDto" Title="@L["LinkedAccounts:Type"]">
+                                    <Template Context="item">
+                                        <RadzenBadge BadgeStyle="@(item.IsDirectLink ? BadgeStyle.Primary : BadgeStyle.Light)" Text="@(item.IsDirectLink ? L["LinkedAccounts:Type.Direct"] : L["LinkedAccounts:Type.Indirect"] )" />
+                                    </Template>
+                                </RadzenDataGridColumn>
+                                <RadzenDataGridColumn TItem="LinkedAccountDto" Title="@L["LinkedAccounts:Actions"]" Sortable="false" Filterable="false" Width="240px">
+                                    <Template Context="item">
+                                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                                            <RadzenButton Size="ButtonSize.Small" Icon="login" Text="@L["LinkedAccounts:Login"]" Click="@(() => SwitchAsync(item))" />
+                                            @if (item.CanBeUnlinked)
+                                            {
+                                                <RadzenButton Size="ButtonSize.Small" Icon="link_off" Text="@L["LinkedAccounts:Unlink"]" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Outlined" Click="@(() => DeleteAsync(item))" />
+                                            }
+                                        </RadzenStack>
+                                    </Template>
+                                </RadzenDataGridColumn>
+                            </Columns>
+                        </RadzenDataGrid>
+                    }
+                </RadzenStack>
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="@L["LinkedAccounts:CurrentSessionTab"]">
+                <RadzenStack Gap="1rem" class="rz-p-2 rz-p-md-4">
+                    @if (!SessionDisplay.HasSession)
+                    {
+                        <RadzenAlert AlertStyle="AlertStyle.Success" Variant="Variant.Flat" AllowClose="false">
+                            @L["LinkedAccounts:CurrentPrimaryAccount"]
+                        </RadzenAlert>
+                    }
+                    else
+                    {
+                        <RadzenCard>
+                            <RadzenStack Gap="0.75rem">
+                                <RadzenText TextStyle="TextStyle.H6">@L["LinkedAccounts:OriginAccount"]</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1">@SessionDisplay.OriginAccountDisplay</RadzenText>
+                                <RadzenText TextStyle="TextStyle.H6">@L["LinkedAccounts:CurrentAccount"]</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1">@SessionDisplay.CurrentAccountDisplay</RadzenText>
+                                @if (SessionDisplay.CanGoBack)
+                                {
+                                    <RadzenButton Icon="undo" Text="@L["LinkedAccounts:BackToPreviousAccount"]" ButtonStyle="ButtonStyle.Secondary" Variant="Variant.Outlined" Click="BackAsync" />
+                                }
+                            </RadzenStack>
+                        </RadzenCard>
+                    }
+                </RadzenStack>
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+</RadzenStack>
+
+@code {
+    List<LinkedAccountDto> _items = [];
+    LinkedAccountSessionDto? _session;
+    int _directCount;
+
+    private LinkedAccountSessionDisplayModel SessionDisplay => LinkedAccountSessionDisplayModel.Create(_session, L["LinkedAccounts:Host"]);
+
+    public LinkedAccountsDialog()
+    {
+        LocalizationResource = typeof(AbpRadzenUIResource);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        _items = (await LinkedAccountAppService.GetListAsync()).ToList();
+        _session = await LinkedAccountAppService.GetCurrentSessionAsync();
+        _directCount = _items.Count(x => x.IsDirectLink);
+    }
+
+    private async Task BeginLinkAsync()
+    {
+        var flow = await LinkedAccountAppService.CreateLinkLoginAsync(new CreateLinkedAccountLinkDto
+        {
+            ReturnUrl = "/"
+        });
+        DialogService.Close();
+        NavigationManager.NavigateTo(flow.LoginUrl, true);
+    }
+
+    private Task BackAsync()
+    {
+        NavigationManager.NavigateTo($"/account/linked-accounts/back?returnUrl={Uri.EscapeDataString("/account/linked-accounts")}", true);
+        return Task.CompletedTask;
+    }
+
+    private async Task SwitchAsync(LinkedAccountDto item)
+    {
+        var flow = await LinkedAccountAppService.CreateSwitchAsync(new LinkedAccountSwitchDto
+        {
+            UserId = item.UserId,
+            TenantId = item.TenantId,
+            ReturnUrl = "/"
+        });
+        DialogService.Close();
+        NavigationManager.NavigateTo(flow.LoginUrl, true);
+    }
+
+    private async Task DeleteAsync(LinkedAccountDto item)
+    {
+        var confirmed = await DialogService.Confirm(
+            L["LinkedAccounts:UnlinkConfirm", item.UserName],
+            L["LinkedAccounts:ConfirmTitle"],
+            new ConfirmOptions { OkButtonText = L["Yes"], CancelButtonText = L["Cancel"] });
+
+        if (confirmed != true)
+        {
+            return;
+        }
+
+        await LinkedAccountAppService.DeleteAsync(new LinkedAccountSwitchDto
+        {
+            UserId = item.UserId,
+            TenantId = item.TenantId,
+        });
+
+        await LoadAsync();
+    }
+
+    private string GetSessionDescription()
+    {
+        if (!SessionDisplay.HasSession)
+        {
+            return L["LinkedAccounts:NoSwitchActiveDescription"];
+        }
+
+        return L[
+            "LinkedAccounts:SwitchActiveDescription",
+            SessionDisplay.OriginTenantDisplay,
+            SessionDisplay.OriginUserDisplay,
+            SessionDisplay.CurrentTenantDisplay,
+            SessionDisplay.CurrentUserDisplay
+        ];
+    }
+}

@@ -43,6 +43,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Abp.RadzenUI.LinkAccounts\Abp.RadzenUI.LinkAccounts.csproj" />
 		<ProjectReference Include="..\Abp.RadzenUI.DataDictionary.EntityFrameworkCore\Abp.RadzenUI.DataDictionary.EntityFrameworkCore.csproj" />
 	</ItemGroup>
 

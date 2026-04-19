@@ -1,4 +1,6 @@
 ﻿@using Abp.RadzenUI.Avatar
+@using Abp.RadzenUI.LinkAccounts
+@using Abp.RadzenUI.LinkAccounts.Dtos
 @using Abp.RadzenUI.UIPlaceHolders
 @using Microsoft.Extensions.Localization
 @using Microsoft.Extensions.Options
@@ -12,6 +14,8 @@
 @inherits AbpRadzenUIComponentBase
 @inject IStringLocalizer<AbpRadzenUIResource> TL
 @inject IIdentityUserRepository IdentityUserRepository
+@inject ILinkedAccountAppService LinkedAccountAppService
+@inject DialogService DialogService
 @inject IJSRuntime JSRuntime
 @inject IMenuManager MenuManager
 @inject NavigationManager NavigationManager
@@ -214,6 +218,11 @@
                                 <ChildContent>
                                     <RadzenProfileMenuItem Text="@CurrentUser.UserName"></RadzenProfileMenuItem>
                                     <Devider />
+                                    <RadzenProfileMenuItem Text="@TL["LinkedAccounts:Title"]" Icon="link" Path="/account/linked-accounts"></RadzenProfileMenuItem>
+                                    @if (_linkedAccountSession?.CanGoBack == true)
+                                    {
+                                        <RadzenProfileMenuItem Text="@TL["LinkedAccounts:BackToPreviousAccount"]" Icon="undo" Path="@GetBackPath()"></RadzenProfileMenuItem>
+                                    }
                                     <RadzenProfileMenuItem Text="@L["MyAccount"]" Icon="person" Path="/account/manage"></RadzenProfileMenuItem>
                                     <RadzenProfileMenuItem Text="@L["LoggedOutTitle"]" Icon="logout" Path="/account/logout"></RadzenProfileMenuItem>
                                 </ChildContent>
@@ -242,6 +251,7 @@
     DotNetObjectReference<Header>? _dotNetReference;
     List<ApplicationMenuItem> _breadcrumbItems = new();
     ApplicationMenu? _applicationMenu;
+    LinkedAccountSessionDto? _linkedAccountSession;
 
     public Header()
     {
@@ -259,6 +269,7 @@
         {
             var user = await IdentityUserRepository.GetAsync(CurrentUser.Id.Value);
             _avatarUrl = user.GetProperty<string>(AvatarConsts.ExtraPropertyName);
+            _linkedAccountSession = await LinkedAccountAppService.GetCurrentSessionAsync();
         }
     }
 
@@ -299,6 +310,11 @@
     void RefreshPage()
     {
         NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+    }
+
+    string GetBackPath()
+    {
+        return $"/account/linked-accounts/back?returnUrl={Uri.EscapeDataString(NavigationManager.Uri)}";
     }
 
     void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)

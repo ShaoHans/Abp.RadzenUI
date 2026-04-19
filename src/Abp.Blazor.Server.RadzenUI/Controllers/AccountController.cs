@@ -1,8 +1,10 @@
 ﻿using System.Net.Mail;
 using System.Security.Claims;
+using Abp.RadzenUI.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Volo.Abp.Account;
@@ -19,12 +21,13 @@ public class AccountController(
     IAccountAppService accountAppService,
     IdentityUserManager userManager,
     IdentityDynamicClaimsPrincipalContributorCache identityDynamicClaimsPrincipalContributorCache,
-    IOptions<IdentityOptions> identityOptions
+    IOptions<IdentityOptions> identityOptions,
+    LinkedAccountSignInManager linkedAccountSignInManager
 ) : AbpRadzenControllerBase
 {
     [HttpPost("/account/locallogin")]
     [DisableAuditing]
-    public async Task<IActionResult> LoginAsync(string username, string password, bool rememberMe)
+    public async Task<IActionResult> LoginAsync(string username, string password, bool rememberMe, string? linkToken = null)
     {
         try
         {
@@ -46,6 +49,18 @@ public class AccountController(
 
             if (result.Succeeded)
             {
+                if (!linkToken.IsNullOrWhiteSpace())
+                {
+                    var linkedUser = await userManager.FindByNameAsync(username);
+                    if (linkedUser == null)
+                    {
+                        return RedirectWithError("~/account/login", "linked account was not found");
+                    }
+
+                    var redirectUrl = await linkedAccountSignInManager.CompleteLinkLoginAsync(linkToken, linkedUser, rememberMe);
+                    return Redirect(redirectUrl);
+                }
+
                 return Redirect("~/");
             }
 
@@ -166,6 +181,16 @@ public class AccountController(
                         user.Id,
                         user.TenantId
                     );
+
+                    var linkedAccountRedirectUrl = await TryCompleteLinkedLoginAsync(
+                        returnUrl,
+                        user,
+                        isPersistent: false
+                    );
+                    if (linkedAccountRedirectUrl != null)
+                    {
+                        return Redirect(linkedAccountRedirectUrl);
+                    }
                 }
 
                 return await RedirectSafelyAsync(returnUrl, returnUrlHash);
@@ -220,6 +245,16 @@ public class AccountController(
             );
 
             await identityDynamicClaimsPrincipalContributorCache.ClearAsync(user.Id, user.TenantId);
+
+            var linkedRedirectUrl = await TryCompleteLinkedLoginAsync(
+                returnUrl,
+                user,
+                isPersistent: false
+            );
+            if (linkedRedirectUrl != null)
+            {
+                return Redirect(linkedRedirectUrl);
+            }
 
             return await RedirectSafelyAsync(returnUrl, returnUrlHash);
         }
@@ -374,5 +409,51 @@ public class AccountController(
 
         var userName = await userManager.GetUserNameFromEmailAsync(emailClaim.Value);
         return (userName, emailClaim.Value);
+    }
+
+    private async Task<string?> TryCompleteLinkedLoginAsync(
+        string? returnUrl,
+        Volo.Abp.Identity.IdentityUser user,
+        bool isPersistent
+    )
+    {
+        var linkToken = ExtractLinkToken(returnUrl);
+        if (linkToken.IsNullOrWhiteSpace())
+        {
+            return null;
+        }
+
+        return await linkedAccountSignInManager.CompleteLinkLoginAsync(
+            linkToken,
+            user,
+            isPersistent
+        );
+    }
+
+    private static string? ExtractLinkToken(string? returnUrl)
+    {
+        if (returnUrl.IsNullOrWhiteSpace())
+        {
+            return null;
+        }
+
+        if (!Uri.TryCreate(returnUrl, UriKind.RelativeOrAbsolute, out var uri))
+        {
+            return null;
+        }
+
+        var query = uri.IsAbsoluteUri
+            ? uri.Query
+            : returnUrl.Contains('?') ? returnUrl[returnUrl.IndexOf('?')..] : string.Empty;
+
+        if (query.IsNullOrWhiteSpace())
+        {
+            return null;
+        }
+
+        var parsed = QueryHelpers.ParseQuery(query);
+        return parsed.TryGetValue("linkToken", out var token)
+            ? token.ToString()
+            : null;
     }
 }

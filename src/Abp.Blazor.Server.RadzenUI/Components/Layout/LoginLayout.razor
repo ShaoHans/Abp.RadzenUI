@@ -25,9 +25,7 @@
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="6">
             <RadzenCard class="rz-shadow-0 rz-border-radius-0 rz-p-12">
-                @if (MultiTenancyOptions.Value.IsEnabled &&
-                                (TenantResolveResultAccessor.Result?.AppliedResolvers?.Contains(CookieTenantResolveContributor.ContributorName) == true ||
-                                TenantResolveResultAccessor.Result?.AppliedResolvers?.Contains(QueryStringTenantResolveContributor.ContributorName) == true))
+                @if (MultiTenancyOptions.Value.IsEnabled)
                 {
                     <RadzenRow>
                         <RadzenColumn Size="8" class="rz-text-truncate">

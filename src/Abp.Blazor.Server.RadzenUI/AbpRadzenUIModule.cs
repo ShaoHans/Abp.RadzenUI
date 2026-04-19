@@ -2,6 +2,7 @@
 using Abp.RadzenUI.Bundling;
 using Abp.RadzenUI.Avatar;
 using Abp.RadzenUI.DataDictionaries;
+using Abp.RadzenUI.LinkAccounts;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Menus;
 using Abp.RadzenUI.Services;
@@ -41,6 +42,7 @@ namespace Abp.RadzenUI;
 
 [DependsOn(
     typeof(AbpAutofacModule),
+    typeof(AbpRadzenUILinkAccountsModule),
     typeof(AbpAuditLoggingEntityFrameworkCoreModule),
     typeof(AbpPermissionManagementEntityFrameworkCoreModule),
     typeof(AbpSettingManagementEntityFrameworkCoreModule),
@@ -174,6 +176,7 @@ public class AbpRadzenUIModule : AbpModule
         context.Services.AddSingleton(typeof(AbpBlazorMessageLocalizerHelper<>));
         context.Services.AddScoped<GridPageSizePreferenceService>();
         context.Services.AddTransient<IUploadService, DefaultUploadService>();
+        context.Services.AddTransient<LinkedAccountSignInManager>();
 
         context.Services.AddAbpDbContext<DataDictionaryDbContext>(options =>
         {
