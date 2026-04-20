@@ -8,7 +8,7 @@
 
 @if (_otherLanguages != null && _otherLanguages.Any())
 {
-    <RadzenMenu class="app-header__menu app-header__menu--language">
+    <RadzenMenu Responsive="false" class="app-header__menu app-header__menu--language">
         <RadzenMenuItem Icon="g_translate">
             @foreach (var language in _otherLanguages)
             {

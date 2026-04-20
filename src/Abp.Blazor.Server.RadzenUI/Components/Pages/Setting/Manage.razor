@@ -10,7 +10,13 @@
 
 <PageTitle>@L["Settings"]</PageTitle>
 
-<RadzenTabs @bind-SelectedIndex=@_selectedIndex Change="@TabChange" TabPosition="TabPosition.Left" RenderMode="TabRenderMode.Client">
+<RadzenMediaQuery Query="(max-width: 768px)" Change="OnCompactChange" />
+
+<RadzenTabs @bind-SelectedIndex=@_selectedIndex
+            Change="@TabChange"
+            TabPosition="@(isCompact ? TabPosition.Top : TabPosition.Left)"
+            RenderMode="TabRenderMode.Client"
+            Style="width:100%;min-width:0;">
     <Tabs>
         @foreach (var group in SettingComponentCreationContext.Groups)
         {
@@ -34,6 +40,7 @@
     public SettingComponentCreationContext SettingComponentCreationContext { get; set; } = default!;
 
     int _selectedIndex = 0;
+    bool isCompact;
 
     public Manage()
     {
@@ -81,6 +88,11 @@
         _selectedIndex = index;
         var uri = Nav.ToAbsoluteUri(Nav.Uri);
         Nav.NavigateTo($"{uri.AbsolutePath}#{SettingComponentCreationContext.Groups[index].Key}");
+    }
+
+    void OnCompactChange(bool matches)
+    {
+        isCompact = matches;
     }
 
     protected RenderFragment RenderComponent(SettingComponentGroup settingGroup) => builder =>

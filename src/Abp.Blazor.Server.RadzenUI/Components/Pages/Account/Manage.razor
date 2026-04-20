@@ -13,7 +13,13 @@
 @inject IJSRuntime JSRuntime
 @inherits AbpRadzenUIComponentBase
 
-<RadzenTabs @bind-SelectedIndex=@_selectedIndex Change="TabChange" TabPosition="TabPosition.Left" RenderMode="TabRenderMode.Client">
+<RadzenMediaQuery Query="(max-width: 768px)" Change="OnCompactChange" />
+
+<RadzenTabs @bind-SelectedIndex=@_selectedIndex
+            Change="TabChange"
+            TabPosition="@(isCompact ? TabPosition.Top : TabPosition.Left)"
+            RenderMode="TabRenderMode.Client"
+            Style="width:100%;min-width:0;">
     <Tabs>
         <RadzenTabsItem Text="@L["ProfileTab:Password"]">
             <RadzenTemplateForm TItem="ChangePasswordModel" Data=@ChangePasswordModel Submit="ChangePasswordAsync">
@@ -152,6 +158,7 @@
 
 @code {
     int _selectedIndex = 0;
+    bool isCompact;
     Dictionary<int, string> _tabs = new Dictionary<int, string>
     {
         { 0,"ChangePassword"},
@@ -206,6 +213,11 @@
     {
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         NavigationManager.NavigateTo($"{uri.AbsolutePath}#{_tabs[index]}");
+    }
+
+    void OnCompactChange(bool matches)
+    {
+        isCompact = matches;
     }
 
     async Task OpenCropDialogAsync()

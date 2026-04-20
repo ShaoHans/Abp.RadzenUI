@@ -18,5 +18,6 @@
 - 共享 LocalizedDataGrid 默认启用 Responsive，并通过样式让表格保留横向滚动，符合 Radzen DataGrid 的移动端用法。
 - 为避免 `RadzenMediaQuery` 首屏不回传当前匹配状态，主布局首次渲染时会主动读取当前 viewport，并据此决定手机端首屏默认收起菜单、桌面端默认展开菜单。
 - viewport helper 已内联到 App 页面，避免外部脚本缓存或加载时机导致首屏判定失效；同时布局增加了 JS 调用容错，防止 circuit 因 helper 缺失直接中断。
+- Header 的语言切换入口改为禁用 `RadzenMenu` 自带的响应式折叠，只保留图标下拉行为，修复了小屏下错误显示为 `menu/close` 按钮的问题。
 - 已多次通过命令 dotnet build src/Abp.Blazor.Server.RadzenUI/Abp.Blazor.Server.RadzenUI.csproj -c Debug 验证编译成功，并重启 samples/CRM.Blazor.Web 运行最新代码。
-- 当前会话内的最终手机态验收仍受限于 VS Code 集成浏览器窗口尺寸，Playwright 回读到的 `window.innerWidth` 仍为 1170，无法在这里严格证明 390 宽度下的首屏表现；需要在真实窄屏浏览器或设备上做最终 UI 确认。
+- 当前会话已在 https://localhost:7201 首页用 390 宽度视口复验 Header：语言入口保持 `g_translate` 图标，展开后直接显示语言列表，不再出现额外的 `menu` 或 `close` 切换按钮。
