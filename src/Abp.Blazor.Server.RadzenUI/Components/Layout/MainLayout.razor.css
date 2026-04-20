@@ -14,6 +14,7 @@
 
 .app-layout-shell ::deep .rz-body {
     margin: var(--app-layout-body-margin);
+    min-width: 0;
 }
 
 .app-layout-shell ::deep .app-layout-main {
@@ -21,20 +22,40 @@
     background: transparent;
     border: none;
     box-shadow: none;
+    min-width: 0;
 }
 
 .app-layout-shell ::deep .app-layout-content {
     padding: var(--app-layout-block-space) var(--app-layout-inline-space);
     row-gap: var(--app-layout-block-space);
+    min-width: 0;
 }
 
 .app-layout-shell ::deep .app-layout-frame {
     margin-inline: auto;
     width: min(100%, var(--app-layout-max-width));
+    min-width: 0;
 }
 
 .app-layout-shell ::deep .demos-sidebar {
     --rz-sidebar-width: var(--app-sidebar-width);
+    max-width: calc(100vw - 0.5rem);
+}
+
+.app-layout-shell ::deep .rz-sidebar-second {
+    max-width: calc(100vw - 0.5rem);
+}
+
+.app-layout-overlay {
+    display: none;
+}
+
+.app-layout-shell ::deep .rz-data-grid {
+    max-width: 100%;
+}
+
+.app-layout-shell ::deep .rz-data-grid table {
+    min-width: max-content;
 }
 
 .app-layout-shell ::deep .demos-sidebar .rz-panel-menu {
@@ -175,6 +196,8 @@ main {
         --app-layout-inline-space: 0.75rem;
         --app-layout-block-space: 0.75rem;
         --app-layout-body-margin: 0;
+        --app-sidebar-width: min(18rem, calc(100vw - 1rem));
+        grid-template-columns: 0 minmax(0, 1fr) 0 !important;
     }
 
     .app-layout-shell ::deep .app-header {
@@ -192,6 +215,38 @@ main {
     .app-layout-shell ::deep .rz-body {
         margin: 0;
         border-radius: 0;
+    }
+
+    .app-layout-shell ::deep .app-layout-content {
+        padding-inline: 0.75rem;
+    }
+
+    .app-layout-shell ::deep .demos-sidebar,
+    .app-layout-shell ::deep .rz-sidebar-second {
+        position: fixed !important;
+        inset-block-start: 50px;
+        inset-block-end: 0;
+        z-index: 1101;
+        overflow: auto;
+        box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.24);
+    }
+
+    .app-layout-shell ::deep .demos-sidebar {
+        inset-inline-start: 0;
+        inset-inline-end: auto;
+    }
+
+    .app-layout-shell ::deep .rz-sidebar-second {
+        inset-inline-start: auto;
+        inset-inline-end: 0;
+    }
+
+    .app-layout-overlay {
+        display: block;
+        position: fixed;
+        inset: 50px 0 0;
+        background: rgba(0, 0, 0, 0.32);
+        z-index: 1100;
     }
 }
 

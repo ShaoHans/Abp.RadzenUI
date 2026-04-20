@@ -11,3 +11,10 @@ window.abpRadzenCookie = window.abpRadzenCookie || {
         document.cookie = `${encodeURIComponent(name)}=${encodedValue}; path=/; max-age=${maxAge}; samesite=lax`;
     }
 };
+
+window.abpRadzenViewport = window.abpRadzenViewport || {
+    isMobile: function (maxWidth) {
+        const width = Number.isFinite(maxWidth) ? maxWidth : 768;
+        return window.matchMedia(`(max-width: ${width}px)`).matches;
+    }
+};

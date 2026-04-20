@@ -141,12 +141,33 @@
     .app-header__breadcrumb .rz-breadcrumb-item .rz-label {
         font-size: 0.875rem;
     }
+
+    @@media (max-width: 640.98px) {
+        .app-header__sidebar-area {
+            min-width: 0;
+            width: 100%;
+        }
+
+        .app-header__title {
+            width: 100%;
+        }
+
+        .app-header__breadcrumb {
+            display: none;
+        }
+
+        .app-header__actions {
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            row-gap: 0.35rem;
+        }
+    }
 </style>
 
 <RadzenHeader class="app-header">
     <ChildContent>
         <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px" class="app-header__row">
-            <RadzenColumn Size="8">
+            <RadzenColumn Size="12" SizeMD="8">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" class="app-header__title">
                     <div class="app-header__sidebar-area">
                         <RadzenSidebarToggle Click="@MenuToggle" />
@@ -170,7 +191,7 @@
                     }
                 </RadzenStack>
             </RadzenColumn>
-            <RadzenColumn Size="4">
+            <RadzenColumn Size="12" SizeMD="4">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" JustifyContent="JustifyContent.End" class="app-header__actions">
                     @if (_titleBar.ShowGithubLink)
                     {

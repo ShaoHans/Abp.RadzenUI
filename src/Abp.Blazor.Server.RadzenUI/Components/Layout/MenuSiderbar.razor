@@ -2,7 +2,8 @@
 @using Volo.Abp.UI.Navigation
 @inject IMenuManager MenuManager
 
-<RadzenSidebar @bind-Expanded="@SidebarExpanded"
+<RadzenSidebar Responsive="true"
+               @bind-Expanded="@SidebarExpanded"
                class="demos-sidebar"
                style="display: flex; flex-direction: column; --rz-sidebar-width: clamp(14rem, 13.5rem + 0.6vw, 15rem);">
     @* <div style="padding: 1rem">

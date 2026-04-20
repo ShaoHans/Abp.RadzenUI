@@ -1,12 +1,14 @@
 ﻿@using Microsoft.AspNetCore.Components
+@inject IJSRuntime JSRuntime
 @using Radzen.Blazor
 @inherits LayoutComponentBase
 
 @if (rendered)
 {
     <RadzenComponents />
+    <RadzenMediaQuery Query="(max-width: 768px)" Change="HandleMobileLayoutChange" />
 
-    <RadzenLayout class="app-layout-shell" Style="grid-template-columns: auto 1fr auto; grid-template-areas: 'rz-header rz-header rz-header' 'rz-sidebar rz-body rz-config-sidebar'">
+    <RadzenLayout class="app-layout-shell" Style="grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'rz-header rz-header rz-header' 'rz-sidebar rz-body rz-config-sidebar'">
         <Header MenuToggle="ToggleMenu"
                 ThemeToggle="ToggleTheme" />
         <RadzenBody>
@@ -30,6 +32,10 @@
         <CascadingValue Value="@themeSidebarExpanded" Name="SidebarExpanded">
             <ThemeSiderbar />
         </CascadingValue>
+        @if (isMobile && (menuSidebarExpanded || themeSidebarExpanded))
+        {
+            <div class="app-layout-overlay" @onclick="CloseMobileSidebars"></div>
+        }
     </RadzenLayout>
 }
 else
@@ -42,6 +48,8 @@ else
 @code {
     bool menuSidebarExpanded = true;
     bool themeSidebarExpanded = false;
+    bool isMobile;
+    bool hasViewportState;
     bool rendered;
     ErrorBoundary? errorBoundary;
 
@@ -50,10 +58,26 @@ else
         System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            if (!hasViewportState)
+            {
+                try
+                {
+                    isMobile = await JSRuntime.InvokeAsync<bool>("abpRadzenViewport.isMobile", 768);
+                }
+                catch (JSException)
+                {
+                    isMobile = false;
+                }
+
+                hasViewportState = true;
+                menuSidebarExpanded = !isMobile;
+                themeSidebarExpanded = false;
+            }
+
             rendered = true;
             StateHasChanged();
         }
@@ -72,5 +96,45 @@ else
     private void ToggleTheme()
     {
         themeSidebarExpanded = !themeSidebarExpanded;
+    }
+
+    private void HandleMobileLayoutChange(bool matches)
+    {
+        if (!hasViewportState)
+        {
+            hasViewportState = true;
+            isMobile = matches;
+
+            if (matches)
+            {
+                menuSidebarExpanded = false;
+                themeSidebarExpanded = false;
+            }
+
+            return;
+        }
+
+        if (isMobile == matches)
+        {
+            return;
+        }
+
+        isMobile = matches;
+
+        if (matches)
+        {
+            menuSidebarExpanded = false;
+            themeSidebarExpanded = false;
+        }
+        else
+        {
+            menuSidebarExpanded = true;
+        }
+    }
+
+    private void CloseMobileSidebars()
+    {
+        menuSidebarExpanded = false;
+        themeSidebarExpanded = false;
     }
 }

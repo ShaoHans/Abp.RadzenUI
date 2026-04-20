@@ -9,7 +9,7 @@
 @inject IHttpContextAccessor HttpContextAccessor
 
 
-<RadzenSidebar Responsive="false" @bind-Expanded="@SidebarExpanded" class="rz-sidebar-second" Style="--rz-sidebar-width: 370px; grid-area: rz-config-sidebar; background-color: var(--rz-body-background-color); color: var(--rz-text-color);">
+<RadzenSidebar Responsive="false" @bind-Expanded="@SidebarExpanded" class="rz-sidebar-second" Style="--rz-sidebar-width: min(370px, calc(100vw - 0.5rem)); grid-area: rz-config-sidebar; background-color: var(--rz-body-background-color); color: var(--rz-text-color);">
     <RadzenStack class="rz-p-4" Gap="0">
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
             <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="rz-m-0">Demos Configuration</RadzenText>
