@@ -11,12 +11,12 @@ public partial class List
     {
         ObjectMapperContext = typeof(AbpRadzenUIModule);
         LocalizationResource = typeof(AuditLoggingResource);
+        _defaultPageSize = 20;
     }
 
     protected override async Task UpdateGetListInputAsync(LoadDataArgs args)
     {
         GetListInput.Filter = args.Filter;
-        _defaultPageSize = 20;
         await base.UpdateGetListInputAsync(args);
     }
 
