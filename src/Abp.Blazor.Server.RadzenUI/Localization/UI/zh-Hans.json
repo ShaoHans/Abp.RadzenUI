@@ -52,6 +52,8 @@
     "AvatarUploadSuccess": "头像上传成功。",
     "AvatarDeleteSuccess": "头像已删除。",
     "AvatarDeleteConfirmMessage": "确定要删除当前头像吗？",
+    "Loading:PreparingWorkspace": "正在准备你的工作区",
+    "Loading:PreparingWorkspaceDescription": "正在加载导航、主题和应用模块...",
 
     "LinkedAccounts:Title": "关联账户",
     "LinkedAccounts:LoginHint": "请使用你要关联的账户进行登录。",

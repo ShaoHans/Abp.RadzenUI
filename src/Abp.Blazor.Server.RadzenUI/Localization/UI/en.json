@@ -51,6 +51,8 @@
     "AvatarUploadSuccess": "Avatar uploaded successfully.",
     "AvatarDeleteSuccess": "Avatar removed successfully.",
     "AvatarDeleteConfirmMessage": "Are you sure you want to remove your current avatar?",
+    "Loading:PreparingWorkspace": "Preparing your workspace",
+    "Loading:PreparingWorkspaceDescription": "Loading navigation, theme, and application modules...",
 
     "LinkedAccounts:Title": "Linked Accounts",
     "LinkedAccounts:LoginHint": "Login with the account you want to link.",

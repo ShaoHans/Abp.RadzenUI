@@ -1,5 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.Extensions.Localization
 @inject IJSRuntime JSRuntime
+@inject IStringLocalizer<Abp.RadzenUI.Localization.AbpRadzenUIResource> TL
+@inject Abp.RadzenUI.UIPlaceHolders.IUIPlaceHolderResolver UIPlaceHolderResolver
 @using Radzen.Blazor
 @inherits LayoutComponentBase
 
@@ -40,8 +43,31 @@
 }
 else
 {
-    <div class="rz-app-loading">
-        <div class="logo-loading"></div>
+    <div class="rz-app-loading" role="status" aria-live="polite" aria-label="Loading application shell">
+        <div class="app-loading-panel">
+            <div class="app-loading-brand-mark">
+                <div class="app-loading-halo"></div>
+                <div class="logo-loading">
+                    <img src="@_loginPage.LogoPath" alt="@_titleBar.Title" class="app-loading-logo" />
+                </div>
+            </div>
+
+            <div class="app-loading-copy">
+                <div class="app-loading-kicker">@_titleBar.Title</div>
+                <div class="app-loading-title">@TL["Loading:PreparingWorkspace"]</div>
+                <div class="app-loading-subtitle">@TL["Loading:PreparingWorkspaceDescription"]</div>
+            </div>
+
+            <div class="app-loading-meter" aria-hidden="true">
+                <span></span>
+            </div>
+
+            <div class="app-loading-dots" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
     </div>
 }
 
@@ -51,11 +77,19 @@ else
     bool isMobile;
     bool hasViewportState;
     bool rendered;
+    Abp.RadzenUI.LoginPageSettings _loginPage = new();
+    Abp.RadzenUI.TitleBarSettings _titleBar = new();
     ErrorBoundary? errorBoundary;
 
     protected override void OnInitialized()
     {
         System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _loginPage = await UIPlaceHolderResolver.GetLoginPageSettingsAsync();
+        _titleBar = await UIPlaceHolderResolver.GetTitleBarSettingsAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
