@@ -45,4 +45,23 @@ public partial class List
             Width = "600px",
         };
     }
+
+    async Task OpenEditProductAsync(ProductDto product)
+    {
+        await OpenEditDialogAsync<Edit>(
+            L["Edit"],
+            product,
+            SetDialogOptions,
+            new Dictionary<string, object?> { { "Code", product.Code } }
+        );
+    }
+
+    async Task DeleteProductAsync(ProductDto product)
+    {
+        await OpenDeleteConfirmDialogAsync(
+            product.Id,
+            L["Delete"],
+            L["ProductDeletionConfirmationMessage", product.Name]
+        );
+    }
 }

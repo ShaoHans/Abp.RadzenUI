@@ -33,16 +33,13 @@
         <RadzenDataGridColumn Property="@nameof(ProductDto.CreationTime)" Filterable="false" Title="@L["CreationTime"]" Width="160px" />
         <RadzenDataGridColumn Title="@L["Actions"]" Width="160px" Filterable="false" Sortable="false">
             <Template>
-                @if (HasUpdatePermission)
-                {
-                    <RadzenButton Icon="edit" title="@L["Edit"]" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small"
-                                  Click="@(async () => await OpenEditDialogAsync<Edit>(@L["Edit"], context, SetDialogOptions,new Dictionary<string, object?>{{"Code",context.Code}}))" />
-                }
-                @if (HasDeletePermission)
-                {
-                    <RadzenButton Icon="delete" title="@L["Delete"]" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small"
-                                  Click=@(async () => await OpenDeleteConfirmDialogAsync(context.Id, L["Delete"], L["ProductDeletionConfirmationMessage",context.Name])) />
-                }
+                <ProductActionButtons Product="context"
+                                      CanEdit="HasUpdatePermission"
+                                      CanDelete="HasDeletePermission"
+                                      EditTitle="@L["Edit"]"
+                                      DeleteTitle="@L["Delete"]"
+                                      OnEdit="OpenEditProductAsync"
+                                      OnDelete="DeleteProductAsync" />
             </Template>
         </RadzenDataGridColumn>
     </Columns>

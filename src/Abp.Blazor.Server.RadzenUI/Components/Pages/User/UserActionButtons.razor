@@ -1,0 +1,64 @@
+@using Volo.Abp.Identity
+
+@if (CanEdit)
+{
+    <RadzenButton Icon="edit" title="@EditTitle" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small"
+                  Click="HandleEditClick" />
+}
+@if (CanManagePermissions)
+{
+    <RadzenButton Icon="productivity" title="@PermissionsTitle" ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small"
+                  Click="HandleManagePermissionsClick" />
+}
+@if (CanDelete)
+{
+    <RadzenButton Icon="delete" title="@DeleteTitle" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small"
+                  Click="HandleDeleteClick" />
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public IdentityUserDto User { get; set; } = default!;
+
+    [Parameter]
+    public bool CanEdit { get; set; }
+
+    [Parameter]
+    public bool CanManagePermissions { get; set; }
+
+    [Parameter]
+    public bool CanDelete { get; set; }
+
+    [Parameter, EditorRequired]
+    public string EditTitle { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public string PermissionsTitle { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public string DeleteTitle { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public EventCallback<IdentityUserDto> OnEdit { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<IdentityUserDto> OnManagePermissions { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<IdentityUserDto> OnDelete { get; set; }
+
+    Task HandleEditClick()
+    {
+        return OnEdit.InvokeAsync(User);
+    }
+
+    Task HandleManagePermissionsClick()
+    {
+        return OnManagePermissions.InvokeAsync(User);
+    }
+
+    Task HandleDeleteClick()
+    {
+        return OnDelete.InvokeAsync(User);
+    }
+}

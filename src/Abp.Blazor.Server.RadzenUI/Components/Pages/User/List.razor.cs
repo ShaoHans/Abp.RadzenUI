@@ -107,4 +107,23 @@ public partial class List
             options: new DialogOptions() { Draggable = true, Width = "800px", }
         );
     }
+
+    async Task OpenEditUserAsync(IdentityUserDto user)
+    {
+        await OpenEditDialogAsync<Edit>(
+            L["Edit"],
+            user,
+            SetDialogOptions,
+            new Dictionary<string, object?> { { "UserId", user.Id } }
+        );
+    }
+
+    async Task DeleteUserAsync(IdentityUserDto user)
+    {
+        await OpenDeleteConfirmDialogAsync(
+            user.Id,
+            L["Delete"],
+            L["UserDeletionConfirmationMessage", user.UserName]
+        );
+    }
 }
