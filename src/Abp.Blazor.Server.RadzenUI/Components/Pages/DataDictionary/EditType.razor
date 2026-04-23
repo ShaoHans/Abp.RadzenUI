@@ -3,9 +3,9 @@
 @using Volo.Abp.AspNetCore.Components
 @inherits AbpRadzenUIComponentBase
 
-<RadzenTemplateForm TItem="UpdateDataDictionaryTypeDto" Data=@DialogFromOption.Model Submit=@DialogFromOption.OnSubmit
+<RadzenTemplateForm TItem="UpdateDataDictionaryTypeDto" Data=@DialogFromOption.Model Submit="@(model => DialogFromOption.SubmitAsync(model, () => InvokeAsync(StateHasChanged)))"
                     Style="max-height:calc(100vh - 200px); display: flex; flex-direction:column">
-    <DialogFormLayout CancelClick="DialogFromOption.OnCancel">
+    <DialogFormLayout CancelClick="DialogFromOption.OnCancel" IsSaving="@DialogFromOption.IsSaving">
         <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">

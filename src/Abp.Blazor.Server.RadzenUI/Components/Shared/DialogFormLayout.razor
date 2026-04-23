@@ -14,11 +14,22 @@ else
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="@FooterJustifyContent">
         @if (ShowCancel)
         {
-            <RadzenButton Icon="@CancelIcon" Click="@CancelClick" Text="@CancelText" ButtonStyle="@CancelButtonStyle" />
+            <RadzenButton Icon="@CancelIcon"
+                          Click="@CancelClick"
+                          Text="@CancelText"
+                          ButtonStyle="@CancelButtonStyle"
+                          Disabled="@IsCancelDisabled" />
         }
         @if (ShowSave)
         {
-            <RadzenButton ButtonType="@SaveButtonType" Icon="@SaveIcon" Text="@SaveText" ButtonStyle="@SaveButtonStyle" Click="@SaveClick" />
+            <RadzenButton ButtonType="@SaveButtonType"
+                          Icon="@SaveIcon"
+                          Text="@SaveText"
+                          ButtonStyle="@SaveButtonStyle"
+                          Click="@SaveClick"
+                          Disabled="@IsSaveDisabled"
+                          IsBusy="@IsSaving"
+                          BusyText="@ResolvedSaveBusyText" />
         }
     </RadzenStack>
 }
@@ -35,6 +46,12 @@ else
 
     [Parameter]
     public EventCallback SaveClick { get; set; }
+
+    [Parameter]
+    public bool IsSaving { get; set; }
+
+    [Parameter]
+    public bool DisableCancelWhileSaving { get; set; } = true;
 
     [Parameter]
     public string BodyStyle { get; set; } = "flex: 1; overflow: auto";
@@ -64,10 +81,21 @@ else
     public string? CancelText { get; set; }
 
     [Parameter]
+    public string? SaveBusyText { get; set; }
+
+    [Parameter]
     public string SaveIcon { get; set; } = "save";
 
     [Parameter]
     public string CancelIcon { get; set; } = "cancel";
+
+    protected bool IsSaveDisabled => IsSaving;
+
+    protected bool IsCancelDisabled => DisableCancelWhileSaving && IsSaving;
+
+    protected string ResolvedSaveBusyText => string.IsNullOrWhiteSpace(SaveBusyText)
+        ? $"{SaveText}..."
+        : SaveBusyText;
 
     protected override void OnInitialized()
     {
