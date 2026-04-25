@@ -9,6 +9,8 @@ public class CreateDataDictionaryTypeDto
     [StringLength(DataDictionaryTypeConsts.MaxCodeLength)]
     public string Code { get; set; } = default!;
 
+    public bool IsShared { get; set; }
+
     [Required]
     [StringLength(DataDictionaryTypeConsts.MaxNameLength)]
     public string Name { get; set; } = default!;

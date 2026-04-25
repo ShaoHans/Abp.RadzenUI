@@ -14,6 +14,7 @@ public static class DataDictionaryDbContextModelCreatingExtensions
         {
             b.ToTable(DataDictionaryDbProperties.DbTablePrefix + "DataDictionaryTypes", DataDictionaryDbProperties.DbSchema);
             b.ConfigureByConvention();
+            b.Property(p => p.IsShared).IsRequired().HasDefaultValue(false);
             b.Property(p => p.Code).IsRequired().HasMaxLength(DataDictionaryTypeConsts.MaxCodeLength);
             b.Property(p => p.Name).IsRequired().HasMaxLength(DataDictionaryTypeConsts.MaxNameLength);
             b.Property(p => p.Description).HasMaxLength(DataDictionaryTypeConsts.MaxDescriptionLength);

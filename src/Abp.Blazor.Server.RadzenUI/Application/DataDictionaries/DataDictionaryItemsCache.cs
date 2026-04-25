@@ -14,24 +14,14 @@ public class DataDictionaryItemsCache(
     IRepository<DataDictionaryType, Guid> typeRepository)
     : IDataDictionaryItemsCache
 {
-    public async Task<List<DataDictionaryItemDto>> GetOrAddByTypeCodeAsync(
-        string typeCode,
+    public async Task<List<DataDictionaryItemDto>> GetOrAddByTypeAsync(
+        DataDictionaryType type,
         Func<Task<List<DataDictionaryItemDto>>> factory)
     {
-        Check.NotNullOrWhiteSpace(typeCode, nameof(typeCode));
+        Check.NotNull(type, nameof(type));
         Check.NotNull(factory, nameof(factory));
 
-        return await cache.GetOrAddAsync(GetCacheKey(typeCode), factory) ?? [];
-    }
-
-    public async Task RemoveByTypeCodeAsync(string typeCode)
-    {
-        if (string.IsNullOrWhiteSpace(typeCode))
-        {
-            return;
-        }
-
-        await cache.RemoveAsync(GetCacheKey(typeCode));
+        return await cache.GetOrAddAsync(GetCacheKey(type), factory) ?? [];
     }
 
     public async Task RemoveByTypeIdAsync(Guid typeId)
@@ -42,11 +32,11 @@ public class DataDictionaryItemsCache(
             return;
         }
 
-        await RemoveByTypeCodeAsync(type.Code);
+        await cache.RemoveAsync(GetCacheKey(type));
     }
 
-    private static string GetCacheKey(string typeCode)
+    private static string GetCacheKey(DataDictionaryType type)
     {
-        return $"DataDictionary:{typeCode}";
+        return $"DataDictionary:{type.TenantId?.ToString("D") ?? "host"}:{type.Code}";
     }
 }

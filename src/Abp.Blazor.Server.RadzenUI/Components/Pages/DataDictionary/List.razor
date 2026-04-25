@@ -10,7 +10,7 @@
 
 <RadzenRow Gap="1rem" Style="height:calc(100vh - 110px)">
     @* Left panel - Dictionary Types *@
-    <RadzenColumn Size="12" SizeMD="4">
+    <RadzenColumn Size="12" SizeMD="6">
         <RadzenCard Variant="Variant.Filled" Style="height:100%; display:flex; flex-direction:column">
             <LocalizedDataGrid @ref="_typeGrid" Data="@_types" TItem="DataDictionaryTypeDto"
                             AllowPaging="true" AllowSorting="true"
@@ -45,17 +45,23 @@
                                           Title="@L["DisplayName:DataDictionaryType.Code"]" Width="130px" />
                     <RadzenDataGridColumn Property="@nameof(DataDictionaryTypeDto.Name)"
                                           Title="@L["DisplayName:DataDictionaryType.Name"]" Width="160px" />
+                    <RadzenDataGridColumn Property="@nameof(DataDictionaryTypeDto.IsShared)"
+                                          Title="@L["DisplayName:DataDictionaryType.IsShared"]" Width="90px" Sortable="false" TextAlign="TextAlign.Center">
+                        <Template Context="type">
+                            <RadzenBadge Text="@L["DataDictionary:SharedBadge"]" Visible="type.IsShared" BadgeStyle="BadgeStyle.Info" />
+                        </Template>
+                    </RadzenDataGridColumn>
                     <RadzenDataGridColumn Property="@nameof(DataDictionaryTypeDto.Description)"
                                           Title="@L["DisplayName:DataDictionaryType.Description"]" />
                     <RadzenDataGridColumn Title="@UL["Actions"]" Width="120px" Sortable="false" TextAlign="TextAlign.Center">
                         <Template Context="type">
-                            @if (HasUpdatePermission)
+                            @if (HasUpdatePermission && CanManageType(type))
                             {
                                 <RadzenButton Icon="edit" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Light"
                                               Click="@(async () => await OpenEditTypeDialogAsync(type))"
                                               Click:stopPropagation="true" />
                             }
-                            @if (HasDeletePermission)
+                            @if (HasDeletePermission && CanManageType(type))
                             {
                                 <RadzenButton Icon="delete" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Danger"
                                               Click="@(async () => await DeleteTypeAsync(type))"
@@ -69,7 +75,7 @@
     </RadzenColumn>
 
     @* Right panel - Dictionary Items *@
-    <RadzenColumn Size="12" SizeMD="8">
+    <RadzenColumn Size="12" SizeMD="6">
         <RadzenCard Variant="Variant.Filled" Style="height:100%; display:flex; flex-direction:column">
             @if (_selectedType == null)
             {
@@ -87,12 +93,18 @@
                     <RadzenText TextStyle="TextStyle.H6" Style="margin:0">
                         @L["DataDictionary:Items"] - @_selectedType.Name
                     </RadzenText>
-                    @if (HasCreatePermission)
+                    @if (HasCreatePermission && CanManageSelectedType)
                     {
                         <RadzenButton Icon="add" Text="@L["Btn:Add"]" Size="ButtonSize.Small"
                                       Click="OpenCreateItemDialogAsync" />
                     }
                 </RadzenStack>
+                @if (IsSelectedTypeReadOnly)
+                {
+                    <RadzenText Style="color:var(--rz-primary); font-size:0.875rem; font-weight:700; line-height:1.4" class="rz-mb-2">
+                        @L["DataDictionary:SharedReadonlyHint"]
+                    </RadzenText>
+                }
                 <LocalizedDataGrid @ref="_itemGrid" Data="@_items" AllowPaging="true" AllowSorting="true"
                                 PagerHorizontalAlign="HorizontalAlign.Center"
                                 Style="flex:1" PageSize="@_defaultPageSize"
@@ -116,7 +128,7 @@
                         <RadzenDataGridColumn Property="@nameof(DataDictionaryItemDto.IsActive)"
                                               Title="@L["DisplayName:DataDictionaryItem.IsActive"]" Width="100px" Sortable="false">
                             <Template Context="item">
-                                <RadzenSwitch Value="@item.IsActive" Disabled="@(!HasUpdatePermission)"
+                                <RadzenSwitch Value="@item.IsActive" Disabled="@(!HasUpdatePermission || !CanManageSelectedType)"
                                               Change="@(async (bool _) => await ToggleItemActiveAsync(item))" />
                             </Template>
                         </RadzenDataGridColumn>
@@ -124,12 +136,12 @@
                                               Title="@L["DisplayName:DataDictionaryItem.Description"]" Sortable="false" />
                         <RadzenDataGridColumn Title="@UL["Actions"]" Width="120px" Sortable="false" TextAlign="TextAlign.Center">
                             <Template Context="item">
-                                @if (HasUpdatePermission)
+                                @if (HasUpdatePermission && CanManageSelectedType)
                                 {
                                     <RadzenButton Icon="edit" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Light"
                                                   Click="@(async () => await OpenEditItemDialogAsync(item))" />
                                 }
-                                @if (HasDeletePermission)
+                                @if (HasDeletePermission && CanManageSelectedType)
                                 {
                                     <RadzenButton Icon="delete" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Danger"
                                                   Click="@(async () => await DeleteItemAsync(item))" class="rz-ml-1" />

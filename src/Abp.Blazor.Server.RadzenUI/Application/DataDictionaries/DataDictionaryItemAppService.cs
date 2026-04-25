@@ -3,9 +3,12 @@ using Abp.RadzenUI.DataDictionaries;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Permissions;
 using Microsoft.AspNetCore.Authorization;
+using Volo.Abp.Application.Dtos;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Data;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.MultiTenancy;
 
 namespace Abp.RadzenUI.Application.DataDictionaries;
 
@@ -22,16 +25,19 @@ public class DataDictionaryItemAppService
 {
     private readonly IRepository<DataDictionaryType, Guid> _typeRepository;
     private readonly IDataDictionaryItemsCache _itemsCache;
+    private readonly IDataFilter _dataFilter;
 
     public DataDictionaryItemAppService(
         IRepository<DataDictionaryItem, Guid> repository,
         IRepository<DataDictionaryType, Guid> typeRepository,
-        IDataDictionaryItemsCache itemsCache
+        IDataDictionaryItemsCache itemsCache,
+        IDataFilter dataFilter
     )
         : base(repository)
     {
         _typeRepository = typeRepository;
         _itemsCache = itemsCache;
+        _dataFilter = dataFilter;
         LocalizationResource = typeof(AbpRadzenUIResource);
 
         GetPolicyName = RadzenUIPermissions.DataDictionary.Default;
@@ -44,6 +50,9 @@ public class DataDictionaryItemAppService
     public override async Task<DataDictionaryItemDto> CreateAsync(CreateDataDictionaryItemDto input)
     {
         input.Code = input.Code.Trim();
+
+        var type = await GetAccessibleTypeByIdAsync(input.DataDictionaryTypeId);
+        EnsureTypeCanBeManaged(type);
 
         if (
             await Repository.AnyAsync(x =>
@@ -92,19 +101,17 @@ public class DataDictionaryItemAppService
     [AllowAnonymous]
     public async Task<List<DataDictionaryItemDto>> GetItemsByTypeCodeAsync(string typeCode)
     {
-        return await _itemsCache.GetOrAddByTypeCodeAsync(
-            typeCode,
+        var type = await FindAccessibleTypeByCodeAsync(typeCode);
+        if (type == null)
+        {
+            return [];
+        }
+
+        return await _itemsCache.GetOrAddByTypeAsync(
+            type,
             async () =>
             {
-                var type = await _typeRepository.FindAsync(x => x.Code == typeCode);
-                if (type == null)
-                {
-                    return [];
-                }
-
-                var items = await Repository.GetListAsync(x =>
-                    x.DataDictionaryTypeId == type.Id && x.IsActive
-                );
+                var items = await GetActiveItemsAsync(type);
 
                 return ObjectMapper.Map<List<DataDictionaryItem>, List<DataDictionaryItemDto>>(
                     items.OrderBy(x => x.Sort).ToList()
@@ -123,11 +130,53 @@ public class DataDictionaryItemAppService
         return items.Find(x => x.Code == itemCode);
     }
 
+    public override async Task<PagedResultDto<DataDictionaryItemDto>> GetListAsync(
+        GetDataDictionaryItemsInput input
+    )
+    {
+        await CheckGetListPolicyAsync();
+
+        var type = await GetAccessibleTypeByIdAsync(input.DataDictionaryTypeId);
+
+        if (!(type.TenantId == null && type.IsShared && CurrentTenant.IsAvailable))
+        {
+            return await base.GetListAsync(input);
+        }
+
+        using (_dataFilter.Disable<IMultiTenant>())
+        {
+            var query = (await Repository.GetQueryableAsync()).Where(x =>
+                x.TenantId == null && x.DataDictionaryTypeId == input.DataDictionaryTypeId
+            );
+
+            if (!string.IsNullOrEmpty(input.Filter))
+            {
+                query = query.Where(x =>
+                    x.Code.Contains(input.Filter) || x.Name.Contains(input.Filter)
+                );
+            }
+
+            var totalCount = await AsyncExecuter.CountAsync(query);
+            query = ApplySorting(query, input);
+            query = ApplyPaging(query, input);
+
+            var entities = await AsyncExecuter.ToListAsync(query);
+
+            return new PagedResultDto<DataDictionaryItemDto>(
+                totalCount,
+                await MapToGetListOutputDtosAsync(entities)
+            );
+        }
+    }
+
     protected override async Task<IQueryable<DataDictionaryItem>> CreateFilteredQueryAsync(
         GetDataDictionaryItemsInput input
     )
     {
-        var query = await base.CreateFilteredQueryAsync(input);
+        var type = await GetAccessibleTypeByIdAsync(input.DataDictionaryTypeId);
+        IQueryable<DataDictionaryItem> query = type.TenantId == null && type.IsShared && CurrentTenant.IsAvailable
+            ? (await Repository.GetQueryableAsync()).Where(x => x.DataDictionaryTypeId == input.DataDictionaryTypeId)
+            : await base.CreateFilteredQueryAsync(input);
 
         query = query.Where(x => x.DataDictionaryTypeId == input.DataDictionaryTypeId);
 
@@ -170,6 +219,68 @@ public class DataDictionaryItemAppService
             }
 
             exception = exception.InnerException;
+        }
+    }
+
+    private async Task<DataDictionaryType> GetAccessibleTypeByIdAsync(Guid typeId)
+    {
+        if (!CurrentTenant.IsAvailable)
+        {
+            return await _typeRepository.GetAsync(typeId);
+        }
+
+        using (_dataFilter.Disable<IMultiTenant>())
+        {
+            var type = await _typeRepository.GetAsync(typeId);
+
+            if (type.TenantId == CurrentTenant.Id || (type.TenantId == null && type.IsShared))
+            {
+                return type;
+            }
+        }
+
+        throw new BusinessException(DataDictionaryErrorCodes.SharedTypeIsReadOnlyForTenant);
+    }
+
+    private async Task<DataDictionaryType?> FindAccessibleTypeByCodeAsync(string typeCode)
+    {
+        if (!CurrentTenant.IsAvailable)
+        {
+            return await _typeRepository.FindAsync(x => x.Code == typeCode);
+        }
+
+        using (_dataFilter.Disable<IMultiTenant>())
+        {
+            var types = await _typeRepository.GetListAsync(x =>
+                x.Code == typeCode
+                && (x.TenantId == CurrentTenant.Id || (x.TenantId == null && x.IsShared))
+            );
+
+            return types.FirstOrDefault(x => x.TenantId == CurrentTenant.Id)
+                ?? types.FirstOrDefault(x => x.TenantId == null && x.IsShared);
+        }
+    }
+
+    private async Task<List<DataDictionaryItem>> GetActiveItemsAsync(DataDictionaryType type)
+    {
+        if (type.TenantId == null && type.IsShared && CurrentTenant.IsAvailable)
+        {
+            using (_dataFilter.Disable<IMultiTenant>())
+            {
+                return await Repository.GetListAsync(x =>
+                    x.TenantId == null && x.DataDictionaryTypeId == type.Id && x.IsActive
+                );
+            }
+        }
+
+        return await Repository.GetListAsync(x => x.DataDictionaryTypeId == type.Id && x.IsActive);
+    }
+
+    private void EnsureTypeCanBeManaged(DataDictionaryType type)
+    {
+        if (CurrentTenant.IsAvailable && type.TenantId == null && type.IsShared)
+        {
+            throw new BusinessException(DataDictionaryErrorCodes.SharedTypeIsReadOnlyForTenant);
         }
     }
 }

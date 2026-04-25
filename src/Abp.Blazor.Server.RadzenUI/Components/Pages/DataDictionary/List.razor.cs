@@ -47,6 +47,8 @@ public partial class List
     public bool HasCreatePermission { get; set; }
     public bool HasUpdatePermission { get; set; }
     public bool HasDeletePermission { get; set; }
+    public bool CanManageSelectedType => _selectedType != null && CanManageType(_selectedType);
+    public bool IsSelectedTypeReadOnly => _selectedType != null && !CanManageType(_selectedType);
 
     public List()
     {
@@ -217,6 +219,7 @@ public partial class List
         var parameters = new Dictionary<string, object?>
         {
             { "DialogFromOption", dialogFromOption },
+            { "CanEditShared", !CurrentTenant.IsAvailable },
         };
 
         var result = await DialogService.OpenAsync<CreateType>(
@@ -237,6 +240,7 @@ public partial class List
         {
             Model = new UpdateDataDictionaryTypeDto
             {
+                IsShared = type.IsShared,
                 Name = type.Name,
                 Description = type.Description,
             },
@@ -260,6 +264,7 @@ public partial class List
         {
             { "DialogFromOption", dialogFromOption },
             { "Code", type.Code },
+            { "CanEditShared", !CurrentTenant.IsAvailable },
         };
 
         var result = await DialogService.OpenAsync<EditType>(
@@ -474,4 +479,9 @@ public partial class List
     }
 
     #endregion
+
+    private bool CanManageType(DataDictionaryTypeDto type)
+    {
+        return !CurrentTenant.IsAvailable || !type.IsShared;
+    }
 }

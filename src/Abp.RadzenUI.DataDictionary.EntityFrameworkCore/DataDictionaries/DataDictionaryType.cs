@@ -8,6 +8,8 @@ public class DataDictionaryType : FullAuditedAggregateRoot<Guid>, IMultiTenant
 {
     public Guid? TenantId { get; set; }
 
+    public bool IsShared { get; set; }
+
     public string Code { get; set; } = default!;
 
     public string Name { get; set; } = default!;

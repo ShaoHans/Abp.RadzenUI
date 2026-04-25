@@ -41,6 +41,17 @@
                                     MaxLength="DataDictionaryTypeConsts.MaxDescriptionLength" />
                 </RadzenColumn>
             </RadzenRow>
+            @if (CanEditShared)
+            {
+                <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                    <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                        <RadzenLabel Text="@L["DisplayName:DataDictionaryType.IsShared"]" Component="IsShared" />
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8">
+                        <RadzenCheckBox Name="IsShared" TValue="bool" @bind-Value=@DialogFromOption.Model.IsShared />
+                    </RadzenColumn>
+                </RadzenRow>
+            }
         </RadzenStack>
     </DialogFormLayout>
 </RadzenTemplateForm>
@@ -48,6 +59,9 @@
 @code {
     [Parameter]
     public DialogFromOption<CreateDataDictionaryTypeDto> DialogFromOption { get; set; } = default!;
+
+    [Parameter]
+    public bool CanEditShared { get; set; }
 
     public CreateType()
     {
