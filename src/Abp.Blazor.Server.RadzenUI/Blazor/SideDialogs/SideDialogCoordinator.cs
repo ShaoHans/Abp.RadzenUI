@@ -4,6 +4,7 @@ using Radzen;
 namespace Abp.RadzenUI;
 
 public sealed class SideDialogCoordinator<T>
+    : IDisposable
     where T : class
 {
     private readonly DialogService _dialogService;
@@ -15,18 +16,8 @@ public sealed class SideDialogCoordinator<T>
     {
         _dialogService = dialogService;
         _dialogState = dialogState;
-    }
-
-    public void Attach()
-    {
         _dialogService.OnSideClose += OnSideClosed;
         _dialogService.OnSideOpen += OnSideOpened;
-    }
-
-    public void Detach()
-    {
-        _dialogService.OnSideClose -= OnSideClosed;
-        _dialogService.OnSideOpen -= OnSideOpened;
     }
 
     public async Task OpenIfClosedAsync<TComponent>(
@@ -67,5 +58,11 @@ public sealed class SideDialogCoordinator<T>
     {
         _sideOpen = false;
         _openedComponentType = null;
+    }
+
+    public void Dispose()
+    {
+        _dialogService.OnSideClose -= OnSideClosed;
+        _dialogService.OnSideOpen -= OnSideOpened;
     }
 }

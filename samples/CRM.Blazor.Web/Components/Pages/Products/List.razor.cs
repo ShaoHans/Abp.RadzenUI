@@ -10,7 +10,7 @@ namespace CRM.Blazor.Web.Components.Pages.Products;
 public partial class List : IDisposable
 {
     [Inject]
-    public SideDialogState<ProductDto> ProductDialogState { get; set; } = default!;
+    public ISideDialogCoordinatorFactory SideDialogCoordinatorFactory { get; set; } = default!;
 
     private SideDialogCoordinator<ProductDto> _sideDialogCoordinator = default!;
 
@@ -27,8 +27,7 @@ public partial class List : IDisposable
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        _sideDialogCoordinator = new SideDialogCoordinator<ProductDto>(DialogService, ProductDialogState);
-        _sideDialogCoordinator.Attach();
+        _sideDialogCoordinator = SideDialogCoordinatorFactory.Create<ProductDto>();
     }
 
     protected override async Task UpdateGetListInputAsync(LoadDataArgs args)
@@ -90,6 +89,6 @@ public partial class List : IDisposable
 
     public void Dispose()
     {
-        _sideDialogCoordinator.Detach();
+        _sideDialogCoordinator.Dispose();
     }
 }

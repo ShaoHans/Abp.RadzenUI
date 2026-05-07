@@ -9,7 +9,7 @@ namespace Abp.RadzenUI.Components.Pages.AuditLog;
 public partial class List : IDisposable
 {
     [Inject]
-    protected SideDialogState<AuditLogDto> AuditLogDialogState { get; set; } = default!;
+    protected ISideDialogCoordinatorFactory SideDialogCoordinatorFactory { get; set; } = default!;
 
     private SideDialogCoordinator<AuditLogDto> _sideDialogCoordinator = default!;
 
@@ -23,8 +23,7 @@ public partial class List : IDisposable
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        _sideDialogCoordinator = new SideDialogCoordinator<AuditLogDto>(DialogService, AuditLogDialogState);
-        _sideDialogCoordinator.Attach();
+        _sideDialogCoordinator = SideDialogCoordinatorFactory.Create<AuditLogDto>();
     }
 
     protected override async Task UpdateGetListInputAsync(LoadDataArgs args)
@@ -50,6 +49,6 @@ public partial class List : IDisposable
 
     public void Dispose()
     {
-        _sideDialogCoordinator.Detach();
+        _sideDialogCoordinator.Dispose();
     }
 }

@@ -176,6 +176,7 @@ public class AbpRadzenUIModule : AbpModule
         context.Services.AddSingleton(typeof(AbpBlazorMessageLocalizerHelper<>));
         context.Services.AddScoped<GridPageSizePreferenceService>();
         context.Services.AddScoped(typeof(SideDialogState<>));
+        context.Services.AddScoped<ISideDialogCoordinatorFactory, SideDialogCoordinatorFactory>();
         context.Services.AddTransient<IUploadService, DefaultUploadService>();
         context.Services.AddTransient<LinkedAccountSignInManager>();
 
