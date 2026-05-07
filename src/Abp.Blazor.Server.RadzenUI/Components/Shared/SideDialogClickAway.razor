@@ -1,0 +1,129 @@
+@implements IAsyncDisposable
+@inject DialogService DialogService
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
+@code {
+    private IJSObjectReference? _module;
+    private DotNetObjectReference<SideDialogClickAway>? _dotNetRef;
+    private bool _registered;
+    private bool _jsUnavailable;
+
+    protected override void OnInitialized()
+    {
+        DialogService.OnSideOpen += OnSideOpen;
+        DialogService.OnSideClose += OnSideClose;
+    }
+
+    private async void OnSideOpen(
+        Type componentType,
+        Dictionary<string, object?> parameters,
+        SideDialogOptions options
+    )
+    {
+        if (_jsUnavailable)
+        {
+            return;
+        }
+
+        try
+        {
+            await EnsureModuleAsync();
+            if (_module == null)
+            {
+                return;
+            }
+
+            _dotNetRef ??= DotNetObjectReference.Create(this);
+            await _module.InvokeVoidAsync("register", _dotNetRef);
+            _registered = true;
+        }
+        catch (JSDisconnectedException)
+        {
+            MarkJsUnavailable();
+        }
+    }
+
+    private async void OnSideClose(dynamic _)
+    {
+        await UnregisterAsync();
+    }
+
+    [JSInvokable]
+    public void CloseFromOutsideClick()
+    {
+        DialogService.CloseSide(null);
+    }
+
+    private async Task EnsureModuleAsync()
+    {
+        if (_jsUnavailable || _module != null)
+        {
+            return;
+        }
+
+        try
+        {
+            _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                NavigationManager.ToAbsoluteUri(
+                    "_content/AbpRadzen.Blazor.Server.UI/js/side-dialog-clickaway.js"
+                ).ToString()
+            );
+        }
+        catch (JSDisconnectedException)
+        {
+            MarkJsUnavailable();
+        }
+    }
+
+    private async Task UnregisterAsync()
+    {
+        if (_module == null || !_registered || _jsUnavailable)
+        {
+            return;
+        }
+
+        try
+        {
+            await _module.InvokeVoidAsync("unregister");
+        }
+        catch (JSDisconnectedException)
+        {
+            MarkJsUnavailable();
+        }
+        finally
+        {
+            _registered = false;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        DialogService.OnSideOpen -= OnSideOpen;
+        DialogService.OnSideClose -= OnSideClose;
+
+        await UnregisterAsync();
+
+        if (_module != null && !_jsUnavailable)
+        {
+            try
+            {
+                await _module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                MarkJsUnavailable();
+            }
+        }
+
+        _dotNetRef?.Dispose();
+    }
+
+    private void MarkJsUnavailable()
+    {
+        _jsUnavailable = true;
+        _registered = false;
+        _module = null;
+    }
+}

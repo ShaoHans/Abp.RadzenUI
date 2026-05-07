@@ -15,13 +15,12 @@
                 PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
                 Count="@_totalCount" IsLoading="@_isLoading">
     <Columns>
-        <RadzenDataGridColumn Title="@L["Actions"]" Width="80px" Filterable="false" Sortable="false" Frozen="true">
+        <RadzenDataGridColumn Property="@nameof(AuditLogDto.Url)" Title="@L["Url"]" Sortable="false" Frozen="true" Width="260px">
             <Template>
-                <RadzenButton Icon="visibility" title="@UL["AuditLog:ViewDetail"]" ButtonStyle="ButtonStyle.Info"
-                              Size="ButtonSize.Small" Click="@(() => OpenDetailDialogAsync(context))" />
+                <SideDialogLink Text="@context.Url"
+                                OnClick="@(() => OpenDetailDialogAsync(context))" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(AuditLogDto.Url)" Title="@L["Url"]" Sortable="false" />
         <RadzenDataGridColumn Property="@nameof(AuditLogDto.UserName)" Title="@L["UserName"]" Sortable="false" />
         <RadzenDataGridColumn Property="@nameof(AuditLogDto.ClientIpAddress)" Title="@L["ClientIpAddress"]" Sortable="false">
             <Template>

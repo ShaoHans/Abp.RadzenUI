@@ -2,12 +2,18 @@ using Abp.RadzenUI;
 using CRM.Localization;
 using CRM.Permissions;
 using CRM.Products;
+using Microsoft.AspNetCore.Components;
 using Radzen;
 
 namespace CRM.Blazor.Web.Components.Pages.Products;
 
-public partial class List
+public partial class List : IDisposable
 {
+    [Inject]
+    public SideDialogState<ProductDto> ProductDialogState { get; set; } = default!;
+
+    private SideDialogCoordinator<ProductDto> _sideDialogCoordinator = default!;
+
     public List()
     {
         ObjectMapperContext = typeof(AbpRadzenUIModule);
@@ -16,6 +22,13 @@ public partial class List
         CreatePolicyName = CRMPermissions.Products.Create;
         UpdatePolicyName = CRMPermissions.Products.Update;
         DeletePolicyName = CRMPermissions.Products.Delete;
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _sideDialogCoordinator = new SideDialogCoordinator<ProductDto>(DialogService, ProductDialogState);
+        _sideDialogCoordinator.Attach();
     }
 
     protected override async Task UpdateGetListInputAsync(LoadDataArgs args)
@@ -56,6 +69,16 @@ public partial class List
         );
     }
 
+    async Task OpenDetailProductAsync(ProductDto product)
+    {
+        await _sideDialogCoordinator.OpenDetailAsync<ProductDto, Detail>(
+            product,
+            product.Name,
+            "Product",
+            "520px"
+        );
+    }
+
     async Task DeleteProductAsync(ProductDto product)
     {
         await OpenDeleteConfirmDialogAsync(
@@ -63,5 +86,10 @@ public partial class List
             L["Delete"],
             L["ProductDeletionConfirmationMessage", product.Name]
         );
+    }
+
+    public void Dispose()
+    {
+        _sideDialogCoordinator.Detach();
     }
 }

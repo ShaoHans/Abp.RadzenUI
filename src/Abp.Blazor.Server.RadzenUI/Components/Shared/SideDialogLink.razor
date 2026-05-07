@@ -1,0 +1,19 @@
+<span class="rz-link side-dialog-ignore"
+      data-side-dialog-ignore="true"
+      style="cursor:pointer;color:var(--rz-primary);"
+      @onclick="OnClick">
+    @if (ChildContent is null)
+    {
+        @Text
+    }
+    else
+    {
+        @ChildContent
+    }
+</span>
+
+@code {
+    [Parameter] public string? Text { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
+}

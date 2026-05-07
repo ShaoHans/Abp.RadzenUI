@@ -1,0 +1,98 @@
+@implements IDisposable
+@using CRM.Enums
+@using CRM.Localization
+@inherits AbpRadzenUIComponentBase
+
+<RadzenStack Gap="1rem" Style="height:calc(100vh - 7rem); min-height: 420px;">
+    <RadzenCard Variant="Variant.Flat" Style="border:1px solid var(--rz-base-300);">
+        <RadzenStack Gap="1rem">
+            @if (!string.IsNullOrWhiteSpace(Product.ImagePath))
+            {
+                <div style="display:flex;justify-content:center;">
+                    <img src="@Product.ImagePath"
+                         alt="@Product.Name"
+                         style="max-width:100%;max-height:220px;border-radius:12px;object-fit:contain;" />
+                </div>
+            }
+
+            <RadzenStack Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenText TextStyle="TextStyle.H5"><strong>@Product.Name</strong></RadzenText>
+                <RadzenBadge BadgeStyle="@GetStatusBadgeStyle(Product.Status)" Text="@Product.Status.ToString()" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenStack Gap="0.75rem" class="rz-px-2">
+        <RadzenRow>
+            <RadzenColumn Size="4"><RadzenText TextStyle="TextStyle.Subtitle2">@L["DisplayName:Code"]</RadzenText></RadzenColumn>
+            <RadzenColumn Size="8"><RadzenText>@Product.Code</RadzenText></RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="4"><RadzenText TextStyle="TextStyle.Subtitle2">@L["DisplayName:Price"]</RadzenText></RadzenColumn>
+            <RadzenColumn Size="8"><RadzenText>@Product.Price</RadzenText></RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="4"><RadzenText TextStyle="TextStyle.Subtitle2">@L["DisplayName:StockCount"]</RadzenText></RadzenColumn>
+            <RadzenColumn Size="8"><RadzenText>@Product.StockCount</RadzenText></RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="4"><RadzenText TextStyle="TextStyle.Subtitle2">@L["CreationTime"]</RadzenText></RadzenColumn>
+            <RadzenColumn Size="8"><RadzenText>@Product.CreationTime.ToLocalTime()</RadzenText></RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="4"><RadzenText TextStyle="TextStyle.Subtitle2">@L["DisplayName:Description"]</RadzenText></RadzenColumn>
+            <RadzenColumn Size="8">
+                <RadzenText style="white-space: pre-wrap; word-break: break-word;">
+                    @(string.IsNullOrWhiteSpace(Product.Description) ? "-" : Product.Description)
+                </RadzenText>
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public ProductDto Product { get; set; } = new();
+
+    [Inject]
+    public SideDialogState<ProductDto> DialogState { get; set; } = default!;
+
+    public Detail()
+    {
+        LocalizationResource = typeof(CRMResource);
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        DialogState.OnChanged += OnStateChangedAsync;
+
+        if (DialogState.Selected != null)
+        {
+            Product = DialogState.Selected;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task OnStateChangedAsync(ProductDto? product)
+    {
+        Product = product ?? new ProductDto();
+        return InvokeAsync(StateHasChanged);
+    }
+
+    private static BadgeStyle GetStatusBadgeStyle(ProductStatus status)
+    {
+        return status switch
+        {
+            ProductStatus.OnSale => BadgeStyle.Success,
+            ProductStatus.OutOfShelf => BadgeStyle.Danger,
+            ProductStatus.Deleted => BadgeStyle.Danger,
+            _ => BadgeStyle.Info
+        };
+    }
+
+    public void Dispose()
+    {
+        DialogState.OnChanged -= OnStateChangedAsync;
+    }
+}
