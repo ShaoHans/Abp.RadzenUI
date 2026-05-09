@@ -349,7 +349,7 @@
         _breadcrumbItems.Clear();
         if (_applicationMenu == null) return;
 
-        var currentPath = "/" + NavigationManager.ToBaseRelativePath(NavigationManager.Uri).TrimStart('/');
+        var currentPath = NormalizePath(NavigationManager.ToAbsoluteUri(NavigationManager.Uri).AbsolutePath);
 
         foreach (var menuItem in _applicationMenu.Items)
         {
@@ -366,8 +366,8 @@
     {
         trail.Add(item);
 
-        var itemUrl = item.Url?.TrimEnd('/') ?? "";
-        if (!string.IsNullOrEmpty(itemUrl) && string.Equals(itemUrl, currentPath.TrimEnd('/'), StringComparison.OrdinalIgnoreCase))
+        var itemUrl = NormalizePath(item.Url);
+        if (!string.IsNullOrEmpty(itemUrl) && string.Equals(itemUrl, currentPath, StringComparison.OrdinalIgnoreCase))
         {
             return true;
         }
@@ -382,6 +382,28 @@
 
         trail.RemoveAt(trail.Count - 1);
         return false;
+    }
+
+    static string NormalizePath(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return "/";
+        }
+
+        var queryIndex = path.IndexOfAny(['?', '#']);
+        var normalizedPath = queryIndex >= 0 ? path[..queryIndex] : path;
+
+        if (string.IsNullOrWhiteSpace(normalizedPath))
+        {
+            return "/";
+        }
+
+        normalizedPath = "/" + normalizedPath.TrimStart('/');
+
+        return normalizedPath.Length > 1
+            ? normalizedPath.TrimEnd('/')
+            : normalizedPath;
     }
 
     public async ValueTask DisposeAsync()
