@@ -1,4 +1,5 @@
 ﻿@using Abp.RadzenUI.Avatar
+@using Abp.RadzenUI.Application.Contracts.Messages
 @using Abp.RadzenUI.LinkAccounts
 @using Abp.RadzenUI.LinkAccounts.Dtos
 @using Abp.RadzenUI.UIPlaceHolders
@@ -19,6 +20,8 @@
 @inject IJSRuntime JSRuntime
 @inject IMenuManager MenuManager
 @inject NavigationManager NavigationManager
+@inject IMessageAppService MessageAppService
+@inject MessageCenterState MessageCenterState
 
 <style>
     /* GitHub-style icon buttons with rounded border box */
@@ -56,6 +59,26 @@
     }
     .app-header__actions .app-header__icon-action .rzi {
         font-size: 1.125rem !important;
+    }
+    .app-header__message-button {
+        position: relative;
+        overflow: visible;
+    }
+    .app-header__message-badge {
+        position: absolute;
+        top: -0.45rem;
+        right: -0.45rem;
+        min-width: 1.15rem;
+        height: 1.15rem;
+        padding: 0 0.3rem;
+        border-radius: 999px;
+        background: var(--rz-danger);
+        color: #fff;
+        font-size: 0.6875rem;
+        font-weight: 700;
+        line-height: 1.15rem;
+        text-align: center;
+        box-shadow: 0 0 0 2px var(--rz-header-background-color, var(--rz-base-000));
     }
     /* Active state (e.g. fullscreen active) */
     .app-header__actions .app-header__icon-action--active {
@@ -207,6 +230,19 @@
                     }
                     <RadzenAppearanceToggle class="app-header__action app-header__icon-action" />
                     <RadzenSidebarToggle Icon="settings" Click="@ThemeToggle" class="app-header__action app-header__icon-action" />
+                    @if (CurrentUser != null && CurrentUser.IsAuthenticated)
+                    {
+                        <button type="button"
+                                class="app-header__action app-header__icon-action app-header__message-button"
+                                title="@TL["Message:MyMessages"]"
+                                @onclick="OpenMessagesAsync">
+                            <i class="rzi rzi-notifications"></i>
+                            @if (_unreadCount > 0)
+                            {
+                                <span class="app-header__message-badge">@FormatUnreadCount(_unreadCount)</span>
+                            }
+                        </button>
+                    }
                     <RadzenButton Icon="@(_isFullscreen ? "fullscreen_exit" : "fullscreen")"
                                   title="@(_isFullscreen ? "Exit full screen" : "Full screen")"
                                   Variant="Variant.Text"
@@ -273,6 +309,7 @@
     List<ApplicationMenuItem> _breadcrumbItems = new();
     ApplicationMenu? _applicationMenu;
     LinkedAccountSessionDto? _linkedAccountSession;
+    long _unreadCount;
 
     public Header()
     {
@@ -291,6 +328,8 @@
             var user = await IdentityUserRepository.GetAsync(CurrentUser.Id.Value);
             _avatarUrl = user.GetProperty<string>(AvatarConsts.ExtraPropertyName);
             _linkedAccountSession = await LinkedAccountAppService.GetCurrentSessionAsync();
+            _unreadCount = await MessageAppService.GetUnreadCountAsync();
+            MessageCenterState.Changed += HandleMessageCenterChangedAsync;
         }
     }
 
@@ -312,6 +351,20 @@
     async Task ToggleFullscreenAsync()
     {
         _isFullscreen = await JSRuntime.InvokeAsync<bool>("abpRadzenFullscreen.toggle");
+    }
+
+    async Task OpenMessagesAsync()
+    {
+        await DialogService.OpenSideAsync<MessageInboxPanel>(
+            TL["Message:MyMessages"],
+            new Dictionary<string, object?>(),
+            new SideDialogOptions
+            {
+                ShowMask = false,
+                CloseDialogOnOverlayClick = true,
+                Width = "420px"
+            }
+        );
     }
 
     string GetFullscreenButtonClass()
@@ -406,9 +459,26 @@
             : normalizedPath;
     }
 
+    async Task HandleMessageCenterChangedAsync()
+    {
+        if (!CurrentUser.IsAuthenticated)
+        {
+            return;
+        }
+
+        _unreadCount = await MessageAppService.GetUnreadCountAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    static string FormatUnreadCount(long unreadCount)
+    {
+        return unreadCount > 99 ? "99+" : unreadCount.ToString();
+    }
+
     public async ValueTask DisposeAsync()
     {
         NavigationManager.LocationChanged -= OnLocationChanged;
+        MessageCenterState.Changed -= HandleMessageCenterChangedAsync;
 
         if (_dotNetReference is null)
         {

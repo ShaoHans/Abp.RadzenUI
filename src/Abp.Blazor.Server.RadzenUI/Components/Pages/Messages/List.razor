@@ -1,0 +1,136 @@
+@page "/messages"
+@using Abp.RadzenUI.Application.Contracts.Messages
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@implements IDisposable
+@inherits AbpRadzenUIComponentBase
+
+<style>
+    .messages-page__title-button {
+        padding: 0;
+        min-height: auto;
+        text-align: left;
+        justify-content: flex-start;
+    }
+
+    .messages-page__title-button .rz-button-text {
+        white-space: normal;
+    }
+
+    .messages-page__meta {
+        color: var(--rz-text-secondary-color);
+        font-size: 0.8125rem;
+    }
+</style>
+
+<PageTitle>@L["PageTitle:Messages"]</PageTitle>
+
+<RadzenCard Variant="Variant.Filled" Style="height:calc(100vh - 110px); display:flex; flex-direction:column;">
+    <RadzenStack Gap="1rem" Style="height:100%;">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Wrap="FlexWrap.Wrap" Gap="0.75rem">
+            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1" Style="margin:0">@L["Message:MyMessages"]</RadzenText>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="0.5rem">
+                <RadzenButton Icon="done_all"
+                              Text="@L["Message:BatchMarkAsRead"]"
+                              Disabled="@(_selectedMessages.Count == 0)"
+                              Click="BatchMarkAsReadAsync" />
+                <RadzenButton Icon="mark_email_read"
+                              Text="@L["Message:MarkAllAsRead"]"
+                              ButtonStyle="ButtonStyle.Light"
+                              Click="MarkAllAsReadAsync" />
+            </RadzenStack>
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap" Gap="0.75rem">
+            <SearchTextBox PlaceHoder="@L["Message:TitlePlaceholder"]"
+                           Style="width: 240px;"
+                           @bind-Keyword="_keyword"
+                           SearchAsync="SearchAsync" />
+            <RadzenDropDown TValue="MessageReadStatus?"
+                            Data="@_readStatusOptions"
+                            TextProperty="Text"
+                            ValueProperty="Value"
+                            Value="@_readStatus"
+                            Change="OnReadStatusChangedAsync"
+                            Style="width: 180px;"
+                            Placeholder="@L["Message:All"]"
+                            AllowClear="true" />
+            <RadzenDropDown TValue="string"
+                            Data="@_messageTypeOptions"
+                            TextProperty="Text"
+                            ValueProperty="Value"
+                            Value="@_selectedMessageType"
+                            Change="OnMessageTypeChangedAsync"
+                            Style="width: 220px;"
+                            Placeholder="@L["Message:TypePlaceholder"]"
+                            AllowClear="true" />
+        </RadzenStack>
+
+        <LocalizedDataGrid @ref="_grid"
+                           Data="@_messages"
+                           TItem="UserMessageDto"
+                           AllowPaging="true"
+                           AllowSorting="true"
+                           Density="Density.Compact"
+                           PagerHorizontalAlign="HorizontalAlign.Center"
+                           Style="flex:1"
+                           PageSize="@_defaultPageSize"
+                           PageSizeOptions="@_pageSizeOptions"
+                           ShowPagingSummary="true"
+                           LoadData="LoadDataAsync"
+                           Count="@_totalCount"
+                           IsLoading="@_isLoading"
+                           SelectionMode="DataGridSelectionMode.Multiple"
+                           @bind-Value="_selectedMessages">
+            <Columns>
+                <RadzenDataGridColumn Width="60px" Sortable="false" Filterable="false">
+                    <HeaderTemplate>
+                        <RadzenCheckBox TabIndex="-1"
+                                        TriState="false"
+                                        TValue="bool?"
+                                        Value="@SelectAllValue"
+                                        InputAttributes="@(new Dictionary<string, object> { ["aria-label"] = "Select all messages" })"
+                                        Change="OnSelectAllChanged" />
+                    </HeaderTemplate>
+                    <Template Context="data">
+                        <RadzenCheckBox TabIndex="-1"
+                                        TriState="false"
+                                        TValue="bool"
+                                        Value="@(_selectedMessages.Contains(data))"
+                                        InputAttributes="@(new Dictionary<string, object> { ["aria-label"] = "Select message" })" />
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(UserMessageDto.Title)" Title="@L["DisplayName:UserMessage.Title"]" Sortable="false">
+                    <Template Context="message">
+                        <RadzenStack Gap="0.35rem">
+                            <RadzenButton Variant="Variant.Text"
+                                          ButtonStyle="ButtonStyle.Base"
+                                          class="messages-page__title-button"
+                                          Text="@message.Title"
+                                          Click="@(async () => await OpenDetailAsync(message))" />
+                            <div class="messages-page__meta">
+                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="0.5rem">
+                                    <span>@message.CreationTime.ToLocalTime()</span>
+                                    <RadzenBadge Text="@message.MessageType" BadgeStyle="BadgeStyle.Info" />
+                                    <RadzenBadge Text="@(message.IsRead ? L["Message:ReadBadge"] : L["Message:UnreadBadge"])"
+                                                 BadgeStyle="@(message.IsRead ? BadgeStyle.Light : BadgeStyle.Warning)" />
+                                </RadzenStack>
+                            </div>
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(UserMessageDto.MessageType)" Title="@L["DisplayName:UserMessage.MessageType"]" Width="180px" />
+                <RadzenDataGridColumn Property="@nameof(UserMessageDto.ReadTime)" Title="@L["DisplayName:UserMessage.ReadTime"]" Width="180px">
+                    <Template Context="message">
+                        @(message.ReadTime?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(UserMessageDto.CreationTime)" Title="@L["DisplayName:UserMessage.ReceivedTime"]" Width="180px">
+                    <Template Context="message">
+                        @message.CreationTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </LocalizedDataGrid>
+    </RadzenStack>
+</RadzenCard>

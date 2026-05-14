@@ -4,6 +4,7 @@ using Abp.RadzenUI.Avatar;
 using Abp.RadzenUI.DataDictionaries;
 using Abp.RadzenUI.LinkAccounts;
 using Abp.RadzenUI.Localization;
+using Abp.RadzenUI.Messages;
 using Abp.RadzenUI.Menus;
 using Abp.RadzenUI.Services;
 using Localization.Resources.AbpUi;
@@ -163,6 +164,7 @@ public class AbpRadzenUIModule : AbpModule
             options.MenuContributors.Add(new AuditLoggingMenuContributor());
             options.MenuContributors.Add(new IdentitySecurityLogMenuContributor());
             options.MenuContributors.Add(new DataDictionaryMenuContributor());
+            options.MenuContributors.Add(new MessageMenuContributor());
             options.MenuContributors.Add(new SettingManagementMenuContributor());
         });
 
@@ -175,12 +177,18 @@ public class AbpRadzenUIModule : AbpModule
 
         context.Services.AddSingleton(typeof(AbpBlazorMessageLocalizerHelper<>));
         context.Services.AddScoped<GridPageSizePreferenceService>();
+        context.Services.AddScoped<MessageCenterState>();
         context.Services.AddScoped(typeof(SideDialogState<>));
         context.Services.AddScoped<ISideDialogCoordinatorFactory, SideDialogCoordinatorFactory>();
         context.Services.AddTransient<IUploadService, DefaultUploadService>();
         context.Services.AddTransient<LinkedAccountSignInManager>();
 
         context.Services.AddAbpDbContext<DataDictionaryDbContext>(options =>
+        {
+            options.AddDefaultRepositories();
+        });
+
+        context.Services.AddAbpDbContext<MessageDbContext>(options =>
         {
             options.AddDefaultRepositories();
         });

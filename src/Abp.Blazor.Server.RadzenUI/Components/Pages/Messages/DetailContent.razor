@@ -1,0 +1,109 @@
+@using Abp.RadzenUI.Application.Contracts.Messages
+@using Abp.RadzenUI.Components.Pages.Messages
+@using Microsoft.AspNetCore.Components
+@inject IMessageAppService MessageAppService
+@inject MessageCenterState MessageCenterState
+@inherits AbpRadzenUIComponentBase
+
+<style>
+    .message-detail {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .message-detail__body {
+        overflow: auto;
+        padding-right: 0.25rem;
+    }
+
+    .message-detail__content {
+        padding: 1rem;
+        border-radius: 0.75rem;
+        background: var(--rz-base-50);
+        line-height: 1.7;
+        word-break: break-word;
+    }
+
+    .message-detail__content :is(p, ul, ol, blockquote, pre) {
+        margin-top: 0;
+    }
+
+    .message-detail__meta {
+        color: var(--rz-text-secondary-color);
+        font-size: 0.875rem;
+    }
+</style>
+
+<div class="message-detail">
+    @if (_isLoading)
+    {
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="height:100%;">
+            <RadzenProgressBarCircular ShowValue="true" Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Medium" />
+        </RadzenStack>
+    }
+    else if (_message is not null)
+    {
+        <RadzenStack Gap="1rem" class="message-detail__body">
+            <RadzenStack Gap="0.5rem">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="0.5rem">
+                    <RadzenBadge Text="@_message.MessageType" BadgeStyle="BadgeStyle.Info" />
+                    <RadzenBadge Text="@(_message.IsRead ? L["Message:ReadBadge"] : L["Message:UnreadBadge"])" BadgeStyle="@(_message.IsRead ? BadgeStyle.Light : BadgeStyle.Warning)" />
+                </RadzenStack>
+                <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2">@_message.Title</RadzenText>
+                <div class="message-detail__meta">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
+                        <span>@L["DisplayName:UserMessage.ReceivedTime"]: @_message.CreationTime.ToLocalTime()</span>
+                        @if (_message.ReadTime.HasValue)
+                        {
+                            <span>@L["DisplayName:UserMessage.ReadTime"]: @_message.ReadTime.Value.ToLocalTime()</span>
+                        }
+                    </RadzenStack>
+                </div>
+            </RadzenStack>
+
+            <div class="message-detail__content">@((MarkupString)_message.Content)</div>
+        </RadzenStack>
+    }
+    else
+    {
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="height:100%;">
+            <RadzenText TextStyle="TextStyle.Body1">@L["Message:NoMessages"]</RadzenText>
+        </RadzenStack>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Guid MessageId { get; set; }
+
+    private Guid _loadedMessageId;
+    private bool _isLoading;
+    private UserMessageDto? _message;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (MessageId == Guid.Empty || MessageId == _loadedMessageId)
+        {
+            return;
+        }
+
+        _loadedMessageId = MessageId;
+        _isLoading = true;
+        _message = null;
+
+        try
+        {
+            _message = await MessageAppService.GetAsync(MessageId);
+            await MessageCenterState.NotifyChangedAsync();
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(ex);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}

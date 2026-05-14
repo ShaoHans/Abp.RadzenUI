@@ -23,5 +23,6 @@
   <Folder Name="/src/">
     <Project Path="src/Abp.Blazor.Server.RadzenUI/Abp.Blazor.Server.RadzenUI.csproj" />
     <Project Path="src/Abp.RadzenUI.DataDictionary.EntityFrameworkCore/Abp.RadzenUI.DataDictionary.EntityFrameworkCore.csproj" />
+    <Project Path="src/Abp.RadzenUI.Messages.EntityFrameworkCore/Abp.RadzenUI.Messages.EntityFrameworkCore.csproj" />
   </Folder>
 </Solution>

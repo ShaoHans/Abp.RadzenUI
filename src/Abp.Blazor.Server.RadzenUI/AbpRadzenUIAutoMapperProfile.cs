@@ -1,8 +1,10 @@
 using Abp.RadzenUI.Application.Contracts.AuditLogs;
 using Abp.RadzenUI.Application.Contracts.DataDictionaries;
 using Abp.RadzenUI.Application.Contracts.IdentitySecurityLogs;
+using Abp.RadzenUI.Application.Contracts.Messages;
 using Abp.RadzenUI.Application.Contracts.Organizations;
 using Abp.RadzenUI.DataDictionaries;
+using Abp.RadzenUI.Messages;
 using Abp.RadzenUI.Models;
 using Riok.Mapperly.Abstractions;
 using Volo.Abp.Account;
@@ -238,4 +240,43 @@ public partial class UpdateDataDictionaryItemDtoToDataDictionaryItemMapper
     [MapperIgnoreTarget(nameof(DataDictionaryItem.DeletionTime))]
     [MapperIgnoreTarget(nameof(DataDictionaryItem.ConcurrencyStamp))]
     public override partial void Map(UpdateDataDictionaryItemDto source, DataDictionaryItem destination);
+}
+
+// Message Mappers
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+public partial class UserMessageToUserMessageDtoMapper : MapperBase<UserMessage, UserMessageDto>
+{
+    public override partial UserMessageDto Map(UserMessage source);
+
+    public override partial void Map(UserMessage source, UserMessageDto destination);
+}
+
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+public partial class SaveUserMessageDtoToUserMessageMapper : MapperBase<SaveUserMessageDto, UserMessage>
+{
+    [MapperIgnoreTarget(nameof(UserMessage.TenantId))]
+    [MapperIgnoreTarget(nameof(UserMessage.IsRead))]
+    [MapperIgnoreTarget(nameof(UserMessage.ReadTime))]
+    [MapperIgnoreTarget(nameof(UserMessage.CreatorId))]
+    [MapperIgnoreTarget(nameof(UserMessage.CreationTime))]
+    [MapperIgnoreTarget(nameof(UserMessage.LastModifierId))]
+    [MapperIgnoreTarget(nameof(UserMessage.LastModificationTime))]
+    [MapperIgnoreTarget(nameof(UserMessage.IsDeleted))]
+    [MapperIgnoreTarget(nameof(UserMessage.DeleterId))]
+    [MapperIgnoreTarget(nameof(UserMessage.DeletionTime))]
+    [MapperIgnoreTarget(nameof(UserMessage.ConcurrencyStamp))]
+    public override partial UserMessage Map(SaveUserMessageDto source);
+
+    [MapperIgnoreTarget(nameof(UserMessage.TenantId))]
+    [MapperIgnoreTarget(nameof(UserMessage.IsRead))]
+    [MapperIgnoreTarget(nameof(UserMessage.ReadTime))]
+    [MapperIgnoreTarget(nameof(UserMessage.CreatorId))]
+    [MapperIgnoreTarget(nameof(UserMessage.CreationTime))]
+    [MapperIgnoreTarget(nameof(UserMessage.LastModifierId))]
+    [MapperIgnoreTarget(nameof(UserMessage.LastModificationTime))]
+    [MapperIgnoreTarget(nameof(UserMessage.IsDeleted))]
+    [MapperIgnoreTarget(nameof(UserMessage.DeleterId))]
+    [MapperIgnoreTarget(nameof(UserMessage.DeletionTime))]
+    [MapperIgnoreTarget(nameof(UserMessage.ConcurrencyStamp))]
+    public override partial void Map(SaveUserMessageDto source, UserMessage destination);
 }
