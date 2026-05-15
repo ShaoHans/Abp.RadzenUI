@@ -1,5 +1,6 @@
 @using Abp.RadzenUI.Application.Contracts.Messages
 @using Abp.RadzenUI.Components.Pages.Messages
+@using Abp.RadzenUI.Localization
 @using Microsoft.AspNetCore.Components
 @inject IMessageAppService MessageAppService
 @inject MessageCenterState MessageCenterState
@@ -53,10 +54,10 @@
                 <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2">@_message.Title</RadzenText>
                 <div class="message-detail__meta">
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
-                        <span>@L["DisplayName:UserMessage.ReceivedTime"]: @_message.CreationTime.ToLocalTime()</span>
+                        <span>@L["DisplayName:UserMessage.ReceivedTime"]: @_message.CreationTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</span>
                         @if (_message.ReadTime.HasValue)
                         {
-                            <span>@L["DisplayName:UserMessage.ReadTime"]: @_message.ReadTime.Value.ToLocalTime()</span>
+                            <span>@L["DisplayName:UserMessage.ReadTime"]: @_message.ReadTime.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</span>
                         }
                     </RadzenStack>
                 </div>
@@ -80,6 +81,11 @@
     private Guid _loadedMessageId;
     private bool _isLoading;
     private UserMessageDto? _message;
+
+    public DetailContent()
+    {
+        LocalizationResource = typeof(AbpRadzenUIResource);
+    }
 
     protected override async Task OnParametersSetAsync()
     {

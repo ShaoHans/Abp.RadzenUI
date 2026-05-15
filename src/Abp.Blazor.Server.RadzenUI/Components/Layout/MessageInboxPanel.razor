@@ -1,6 +1,7 @@
 @using System.Net
 @using System.Text.RegularExpressions
 @using Abp.RadzenUI.Application.Contracts.Messages
+@using Abp.RadzenUI.Localization
 @using Abp.RadzenUI.Components.Pages.Messages
 @implements IDisposable
 @inject IMessageAppService MessageAppService
@@ -9,79 +10,38 @@
 @inject DialogService DialogService
 @inject Volo.Abp.AspNetCore.Components.Notifications.IUiNotificationService UiNotify
 @inherits AbpRadzenUIComponentBase
-
-<style>
-    .message-inbox {
-        height: calc(100vh - 7rem);
-        min-height: 420px;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .message-inbox__list {
-        overflow: auto;
-        padding-right: 0.25rem;
-    }
-
-    .message-inbox__item {
-        padding: 0.875rem 0.75rem;
-        border-radius: 0.875rem;
-        border: 1px solid var(--rz-base-300);
-        background: var(--rz-base-000);
-    }
-
-    .message-inbox__item--unread {
-        border-color: color-mix(in srgb, var(--rz-warning) 45%, var(--rz-base-300));
-        box-shadow: 0 0 0 1px color-mix(in srgb, var(--rz-warning) 18%, transparent);
-    }
-
-    .message-inbox__title {
-        padding: 0;
-        min-height: auto;
-        text-align: left;
-        justify-content: flex-start;
-    }
-
-    .message-inbox__title .rz-button-text {
-        white-space: normal;
-    }
-
-    .message-inbox__preview {
-        color: var(--rz-text-secondary-color);
-        font-size: 0.85rem;
-        line-height: 1.5;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-</style>
-
-<div class="message-inbox">
+<div style="height:calc(100vh - 7rem); min-height:420px; display:flex; flex-direction:column;">
     @if (_selectedMessageId == Guid.Empty)
     {
         <RadzenStack Gap="1rem" Style="height:100%;">
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="0.5rem">
-                <RadzenButton Text="@L["Message:All"]"
-                              ButtonStyle="@(_readStatus is null ? ButtonStyle.Primary : ButtonStyle.Light)"
-                              Click="@(() => ChangeStatusAsync(null))" />
-                <RadzenButton Text="@L["Message:Unread"]"
-                              ButtonStyle="@(_readStatus == MessageReadStatus.Unread ? ButtonStyle.Primary : ButtonStyle.Light)"
-                              Click="@(() => ChangeStatusAsync(MessageReadStatus.Unread))" />
-                <RadzenButton Text="@L["Message:Read"]"
-                              ButtonStyle="@(_readStatus == MessageReadStatus.Read ? ButtonStyle.Primary : ButtonStyle.Light)"
-                              Click="@(() => ChangeStatusAsync(MessageReadStatus.Read))" />
-            </RadzenStack>
+            <RadzenStack Gap="0.75rem">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="0.5rem">
+                    <RadzenButton Icon="mark_email_read"
+                                  Text="@L["Message:MarkAllAsRead"]"
+                                  ButtonStyle="ButtonStyle.Success"
+                                  Size="ButtonSize.Small"
+                                  Click="MarkAllAsReadAsync" />
+                    <RadzenButton Icon="open_in_new"
+                                  Text="@L["Message:ViewMore"]"
+                                  ButtonStyle="ButtonStyle.Light"
+                                  Size="ButtonSize.Small"
+                                  Click="GoToListAsync" />
+                </RadzenStack>
 
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="0.5rem">
-                <RadzenButton Icon="done_all"
-                              Text="@L["Message:BatchMarkAsRead"]"
-                              Disabled="@(_selectedMessages.Count == 0)"
-                              Click="BatchMarkAsReadAsync" />
-                <RadzenButton Icon="mark_email_read"
-                              Text="@L["Message:MarkAllAsRead"]"
-                              ButtonStyle="ButtonStyle.Light"
-                              Click="MarkAllAsReadAsync" />
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="0.5rem">
+                    <RadzenButton Text="@L["Message:All"]"
+                                  ButtonStyle="@(_readStatus is null ? ButtonStyle.Primary : ButtonStyle.Light)"
+                                  Size="ButtonSize.Small"
+                                  Click="@(() => ChangeStatusAsync(null))" />
+                    <RadzenButton Text="@L["Message:Unread"]"
+                                  ButtonStyle="@(_readStatus == MessageReadStatus.Unread ? ButtonStyle.Primary : ButtonStyle.Light)"
+                                  Size="ButtonSize.Small"
+                                  Click="@(() => ChangeStatusAsync(MessageReadStatus.Unread))" />
+                    <RadzenButton Text="@L["Message:Read"]"
+                                  ButtonStyle="@(_readStatus == MessageReadStatus.Read ? ButtonStyle.Primary : ButtonStyle.Light)"
+                                  Size="ButtonSize.Small"
+                                  Click="@(() => ChangeStatusAsync(MessageReadStatus.Read))" />
+                </RadzenStack>
             </RadzenStack>
 
             @if (_isLoading)
@@ -98,38 +58,32 @@
             }
             else
             {
-                <RadzenStack Gap="0.75rem" class="message-inbox__list">
+                <RadzenStack Gap="0.75rem" Style="flex:1; min-height:0; overflow:auto; padding-right:0.25rem;">
                     @foreach (var message in _messages)
                     {
-                        <div class="message-inbox__item @(message.IsRead ? string.Empty : "message-inbox__item--unread")">
-                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Gap="0.75rem">
-                                <RadzenCheckBox TValue="bool"
-                                                Value="@_selectedMessages.Any(x => x.Id == message.Id)"
-                                                Change="@(value => ToggleSelection(message, value))" />
-                                <RadzenStack Gap="0.35rem" Style="width:100%;">
-                                    <RadzenButton Variant="Variant.Text"
-                                                  ButtonStyle="ButtonStyle.Base"
-                                                  class="message-inbox__title"
-                                                  Text="@message.Title"
-                                                  Click="@(() => OpenDetail(message.Id))" />
-                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="0.5rem">
-                                        <span class="rz-text-secondary-color" style="font-size:0.8125rem;">@message.CreationTime.ToLocalTime().ToString("MM-dd HH:mm")</span>
-                                        <RadzenBadge Text="@message.MessageType" BadgeStyle="BadgeStyle.Info" />
-                                        <RadzenBadge Text="@(message.IsRead ? L["Message:ReadBadge"] : L["Message:UnreadBadge"])"
-                                                     BadgeStyle="@(message.IsRead ? BadgeStyle.Light : BadgeStyle.Warning)" />
+                        <RadzenCard Variant="Variant.Flat" Style="padding: 1rem; border: 1px solid var(--rz-base-300); background: var(--rz-base-background-color);">
+                            <RadzenStack Gap="0.35rem" Style="width:100%;">
+                                <RadzenStack Orientation="Orientation.Horizontal"
+                                             AlignItems="AlignItems.Start"
+                                             JustifyContent="JustifyContent.SpaceBetween"
+                                             Wrap="FlexWrap.Wrap"
+                                             Gap="0.75rem">
+                                    <RadzenStack Gap="0.35rem">
+                                        <SideDialogLink Text="@message.Title" OnClick="@(() => OpenDetail(message.Id))" />
+                                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="0.5rem">
+                                            <RadzenBadge Text="@message.MessageType" BadgeStyle="BadgeStyle.Info" />
+                                            <RadzenBadge Text="@(message.IsRead ? L["Message:ReadBadge"] : L["Message:UnreadBadge"] )"
+                                                         BadgeStyle="@(message.IsRead ? BadgeStyle.Light : BadgeStyle.Warning)" />
+                                        </RadzenStack>
                                     </RadzenStack>
-                                    <div class="message-inbox__preview">@GetPreview(message.Content)</div>
+                                    <RadzenText TextStyle="TextStyle.Caption" class="rz-text-secondary-color">@message.CreationTime.ToLocalTime().ToString("MM-dd HH:mm")</RadzenText>
                                 </RadzenStack>
+                                <RadzenText TextStyle="TextStyle.Body2" class="rz-text-secondary-color">@GetPreview(message.Content)</RadzenText>
                             </RadzenStack>
-                        </div>
+                        </RadzenCard>
                     }
                 </RadzenStack>
             }
-
-            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center" Gap="0.5rem">
-                <RadzenText class="rz-text-secondary-color">@L["Message:LatestMessages"]</RadzenText>
-                <RadzenButton Text="@L["Message:ViewMore"]" Variant="Variant.Text" Click="GoToListAsync" />
-            </RadzenStack>
         </RadzenStack>
     }
     else
@@ -147,10 +101,14 @@
     private const int MaxMessages = 10;
 
     private IReadOnlyList<UserMessageDto> _messages = [];
-    private List<UserMessageDto> _selectedMessages = [];
     private bool _isLoading;
     private MessageReadStatus? _readStatus = MessageReadStatus.Unread;
     private Guid _selectedMessageId;
+
+    public MessageInboxPanel()
+    {
+        LocalizationResource = typeof(AbpRadzenUIResource);
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -164,21 +122,6 @@
         await LoadMessagesAsync();
     }
 
-    private void ToggleSelection(UserMessageDto message, bool value)
-    {
-        if (value)
-        {
-            if (_selectedMessages.All(x => x.Id != message.Id))
-            {
-                _selectedMessages.Add(message);
-            }
-
-            return;
-        }
-
-        _selectedMessages.RemoveAll(x => x.Id == message.Id);
-    }
-
     private void OpenDetail(Guid id)
     {
         _selectedMessageId = id;
@@ -189,34 +132,11 @@
         _selectedMessageId = Guid.Empty;
     }
 
-    private async Task BatchMarkAsReadAsync()
-    {
-        if (_selectedMessages.Count == 0)
-        {
-            return;
-        }
-
-        try
-        {
-            await MessageAppService.BatchMarkAsReadAsync(
-                new MarkUserMessagesAsReadInput { Ids = _selectedMessages.Select(x => x.Id).ToList() }
-            );
-            _selectedMessages.Clear();
-            await MessageCenterState.NotifyChangedAsync();
-            await UiNotify.Success(L["SavedSuccessfully"]);
-        }
-        catch (Exception ex)
-        {
-            await HandleErrorAsync(ex);
-        }
-    }
-
     private async Task MarkAllAsReadAsync()
     {
         try
         {
             await MessageAppService.MarkAllAsReadAsync();
-            _selectedMessages.Clear();
             await MessageCenterState.NotifyChangedAsync();
             await UiNotify.Success(L["SavedSuccessfully"]);
         }
@@ -248,7 +168,6 @@
             );
 
             _messages = result.Items.ToList();
-            _selectedMessages.RemoveAll(x => _messages.All(y => y.Id != x.Id));
         }
         finally
         {

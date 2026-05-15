@@ -57,7 +57,7 @@
     .app-header__actions .app-header__icon-action .rz-button-icon-left {
         margin: 0 !important;
     }
-    .app-header__actions .app-header__icon-action .rzi {
+    .app-header__actions .app-header__icon-action :is(.rzi, .rz-icon) {
         font-size: 1.125rem !important;
     }
     .app-header__message-button {
@@ -235,8 +235,9 @@
                         <button type="button"
                                 class="app-header__action app-header__icon-action app-header__message-button"
                                 title="@TL["Message:MyMessages"]"
+                                aria-label="@TL["Message:MyMessages"]"
                                 @onclick="OpenMessagesAsync">
-                            <i class="rzi rzi-notifications"></i>
+                            <RadzenIcon Icon="notifications" />
                             @if (_unreadCount > 0)
                             {
                                 <span class="app-header__message-badge">@FormatUnreadCount(_unreadCount)</span>

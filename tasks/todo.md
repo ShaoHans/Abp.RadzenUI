@@ -48,3 +48,26 @@
 - 已完成 Header 未读消息角标、右侧消息面板、完整消息列表页和详情侧边栏，支持多选批量已读、全部已读、未读数刷新以及 HTML 内容渲染。
 - 已补充中英文消息相关本地化文本，并将新项目加入 `Abp.RadzenUI.sln` 与 `Abp.RadzenUI.slnx`。
 - 已使用 `dotnet build src/Abp.Blazor.Server.RadzenUI/Abp.Blazor.Server.RadzenUI.csproj -nologo` 完成定向编译验证，当前主项目构建通过。
+
+## 消息模块 UI 重构计划（2026-05-15）
+
+- [x] 修复 Header 消息入口图标不可见问题，改为稳定可见的 Radzen 图标呈现。
+- [x] 重做 Header 侧边消息面板，修正文案、筛选和列表层级，减少自定义样式。
+- [x] 重构消息中心列表页布局，对齐客户列表示例：筛选区独立成卡片，操作区放进 Grid Header。
+- [x] 保持消息详情与现有读状态联动逻辑不变，只调整消息列表和入口交互层。
+- [x] 完成 `Abp.Blazor.Server.RadzenUI` 定向编译验证，并补充本轮结果复盘。
+
+## 消息模块 UI 重构结果复盘（2026-05-15）
+
+- 已将 Header 消息入口从自定义 `rzi-notifications` 图标切换为 `RadzenIcon`，并补充无障碍标签，避免图标在当前主题下不可见。
+- 已为 `MessageInboxPanel` 和 `DetailContent` 显式指定 `AbpRadzenUIResource`，修复侧边栏中本地化 key 直接透出的现象。
+- 已将消息侧边栏重排为 Radzen Card + Stack 的结构：头部汇总、筛选切换、批量操作和消息卡片列表均由官方组件承载。
+- 已将消息中心列表页改为“查询卡片 + Grid Header 操作区”的结构，交互样式对齐参考客户列表页，行标题改为 `SideDialogLink`，减少自定义样式依赖。
+- 已使用 `dotnet build src/Abp.Blazor.Server.RadzenUI/Abp.Blazor.Server.RadzenUI.csproj -nologo` 完成定向编译验证，当前构建通过。
+
+## 消息侧栏二次精简结果（2026-05-15）
+
+- 已按反馈移除消息侧栏顶部卡片容器，改为更轻量的按钮区和筛选区。
+- 已移除未读数量展示、批量已读功能和消息列表复选框，保留全部已读与查看更多入口。
+- 已将顶部操作按钮和筛选按钮统一缩为 `ButtonSize.Small`，减轻视觉占用。
+- 已再次执行 `dotnet build src/Abp.Blazor.Server.RadzenUI/Abp.Blazor.Server.RadzenUI.csproj -nologo`，当前构建通过。

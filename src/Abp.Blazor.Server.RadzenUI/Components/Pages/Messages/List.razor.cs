@@ -88,13 +88,17 @@ public partial class List
 
         try
         {
+            var sorting = string.IsNullOrWhiteSpace(args.OrderBy)
+                ? $"{nameof(UserMessageDto.CreationTime)} desc"
+                : args.OrderBy;
+
             var result = await MessageAppService.GetListAsync(
                 new GetUserMessagesInput
                 {
                     Filter = _keyword,
                     MessageType = _selectedMessageType,
                     ReadStatus = _readStatus,
-                    Sorting = args.OrderBy,
+                    Sorting = sorting,
                     SkipCount = args.Skip ?? 0,
                     MaxResultCount = args.Top ?? _defaultPageSize,
                 }
@@ -116,6 +120,14 @@ public partial class List
         {
             await _grid.FirstPage(true);
         }
+    }
+
+    private async Task ResetFiltersAsync()
+    {
+        _keyword = null;
+        _selectedMessageType = null;
+        _readStatus = null;
+        await SearchAsync();
     }
 
     private async Task OnReadStatusChangedAsync(object? value)
