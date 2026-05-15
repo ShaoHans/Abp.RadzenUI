@@ -87,8 +87,7 @@ public class CRMDbContext(DbContextOptions<CRMDbContext> options)
         builder.ConfigureOpenIddict();
         builder.ConfigureTenantManagement();
         builder.ConfigureBlobStoring();
-        builder.ConfigureDataDictionary();
-        builder.ConfigureMessages();
+        builder.ConfigureAbpRadzenUI();
 
         /* Configure your own tables/entities inside here */
 

@@ -29,7 +29,6 @@ public class AbpRadzenUIDbContext(DbContextOptions<AbpRadzenUIDbContext> options
     {
         base.OnModelCreating(builder);
 
-        builder.ConfigureDataDictionary();
-        builder.ConfigureMessages();
+        builder.ConfigureAbpRadzenUI();
     }
 }
