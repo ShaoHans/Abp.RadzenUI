@@ -1,5 +1,6 @@
-using CRM.Products;
 using Abp.RadzenUI.DataDictionaries;
+using Abp.RadzenUI.Messages;
+using CRM.Products;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -22,12 +23,14 @@ namespace CRM.EntityFrameworkCore;
 [ReplaceDbContext(typeof(IIdentityDbContext))]
 [ReplaceDbContext(typeof(ITenantManagementDbContext))]
 [ReplaceDbContext(typeof(IDataDictionaryDbContext))]
+[ReplaceDbContext(typeof(IMessageDbContext))]
 [ConnectionStringName("Default")]
 public class CRMDbContext(DbContextOptions<CRMDbContext> options)
     : AbpDbContext<CRMDbContext>(options),
         ITenantManagementDbContext,
         IIdentityDbContext,
-        IDataDictionaryDbContext
+        IDataDictionaryDbContext,
+        IMessageDbContext
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
 
@@ -66,6 +69,9 @@ public class CRMDbContext(DbContextOptions<CRMDbContext> options)
     public DbSet<DataDictionaryType> DataDictionaryTypes { get; set; }
     public DbSet<DataDictionaryItem> DataDictionaryItems { get; set; }
 
+    // User Messages
+    public DbSet<UserMessage> UserMessages { get; set; }
+
     #endregion
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -84,6 +90,7 @@ public class CRMDbContext(DbContextOptions<CRMDbContext> options)
         builder.ConfigureTenantManagement();
         builder.ConfigureBlobStoring();
         builder.ConfigureDataDictionary();
+        builder.ConfigureMessages();
 
         /* Configure your own tables/entities inside here */
 
