@@ -19,6 +19,7 @@ English | [简体中文](README_zh-CN.md)
 - [Get Started](#-get-started)
 - [Use the Linked Accounts Module](#-use-the-linked-accounts-module)
 - [Use the Data Dictionary Module](#-use-the-data-dictionary-module)
+- [Use the Messages Module](#-use-the-messages-module)
 - [Preview the Interface](#-preview-the-interface)
 
 ## ❤️ Try the Demo
@@ -282,6 +283,57 @@ After integrating the module, create and apply your EF Core migrations in the us
 - Dictionary items are associated with dictionary types through `DataDictionaryTypeId`, but the EF Core mapping does not create a database-level foreign key.
 - Deleting a dictionary type will also remove its child dictionary items at the application-service level.
 - The built-in page uses a master-detail DataGrid layout. Selecting a dictionary type automatically refreshes the item grid on the right.
+
+## ✉️ Use the Messages Module
+
+The messages module is included in the full UI package and provides a built-in in-app messaging experience with a header unread badge, a right-side inbox panel, a message center list page, and rich-text message details.
+
+### Module Guide
+
+#### 1. Install the package
+```shell
+dotnet add package AbpRadzen.Blazor.Server.UI
+```
+
+If you only need message entities and EF Core mappings, install the standalone package below:
+```shell
+dotnet add package AbpRadzen.Messages.EntityFrameworkCore
+```
+
+#### 2. Register the DbContext
+The full UI package already registers `MessageDbContext` inside `AbpRadzenUIModule`. If you integrate only the EF Core package into your own solution, add the DbSet and call `ConfigureMessages()` inside your application's DbContext.
+
+```csharp
+public class MyProjectDbContext : AbpDbContext<MyProjectDbContext>
+{
+    public DbSet<UserMessage> UserMessages { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+
+        builder.ConfigureMessages();
+    }
+}
+```
+
+#### 3. Built-in UI capabilities
+
+- The built-in message center page route is `/messages`.
+- The header includes an unread badge and a right-side inbox sidebar for quick access.
+- Users can mark a single message or all current messages as read, and open full message details from the sidebar or the list page.
+- The message center page supports filtering by title, read status, and message type.
+- Message content supports HTML rendering in the detail view.
+
+#### 4. Apply database changes
+The message module creates a `UserMessages` table and related indexes for tenant, user, read status, message type, and creation time. After integrating the module, create and apply your EF Core migrations in the usual way.
+
+#### 5. Usage notes
+
+- Messages are isolated by current tenant and current user.
+- Opening a message detail marks the message as read automatically.
+- `MessageType` is modeled as a string instead of an enum so consuming applications can extend it without changing the shared module.
+- The message type dropdown is provided through an overridable lookup service, so applications can replace the available options if needed.
 
 ## 🎨 Preview the Interface
 
