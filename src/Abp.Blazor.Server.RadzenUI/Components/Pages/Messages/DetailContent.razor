@@ -21,13 +21,65 @@
     .message-detail__content {
         padding: 1rem;
         border-radius: 0.75rem;
-        background: var(--rz-base-50);
+        background: var(--rz-panel-background-color, var(--rz-base-50));
+        color: var(--rz-text-color);
         line-height: 1.7;
         word-break: break-word;
     }
 
     .message-detail__content :is(p, ul, ol, blockquote, pre) {
         margin-top: 0;
+    }
+
+    .message-detail__content :is(p, div, span, li, td, th, strong, em, b, i, u, blockquote, pre, code, h1, h2, h3, h4, h5, h6) {
+        max-width: 100%;
+    }
+
+    .dark .message-detail__content {
+        background: var(--rz-panel-background-color, var(--rz-base-800));
+        color: var(--rz-text-color);
+    }
+
+    .dark .message-detail__content :is(
+        .text-white,
+        .text-black,
+        .ql-color-white,
+        .ql-color-black,
+        [style*="color:#fff"],
+        [style*="color: #fff"],
+        [style*="color:#ffffff"],
+        [style*="color: #ffffff"],
+        [style*="color:white"],
+        [style*="color: white"],
+        [style*="color:#000"],
+        [style*="color: #000"],
+        [style*="color:#000000"],
+        [style*="color: #000000"],
+        [style*="color:black"],
+        [style*="color: black"],
+        [style*="color:rgb(255,255,255)"],
+        [style*="color: rgb(255, 255, 255)"],
+        [style*="color:rgb(0,0,0)"],
+        [style*="color: rgb(0, 0, 0)"]
+    ) {
+        color: var(--rz-text-color) !important;
+    }
+
+    .dark .message-detail__content :is(
+        [style*="background-color:#fff"],
+        [style*="background-color: #fff"],
+        [style*="background-color:#ffffff"],
+        [style*="background-color: #ffffff"],
+        [style*="background-color:white"],
+        [style*="background-color: white"],
+        .bg-white,
+        .bg-light
+    ) {
+        background-color: transparent !important;
+    }
+
+    .dark .message-detail__content a {
+        color: var(--rz-primary) !important;
     }
 
     .message-detail__meta {
