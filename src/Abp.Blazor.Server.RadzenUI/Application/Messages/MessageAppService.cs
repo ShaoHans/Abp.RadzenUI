@@ -2,6 +2,7 @@ using Abp.RadzenUI.Application.Contracts.Messages;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Messages;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Authorization;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Users;
@@ -220,7 +221,7 @@ public class MessageAppService
 
     private Guid GetCurrentUserId()
     {
-        return CurrentUser.GetId();
+        return CurrentUser.Id ?? throw new AbpAuthorizationException();
     }
 
     private static string TruncateTitle(string title)

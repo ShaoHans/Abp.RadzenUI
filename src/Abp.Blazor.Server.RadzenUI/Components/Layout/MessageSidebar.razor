@@ -12,7 +12,10 @@
         </RadzenStack>
 
         <div style="flex:1; min-height:0; overflow:hidden;">
-            <MessageInboxPanel IsOpen="@SidebarExpanded" NavigateToListRequested="CloseSidebarAsync" />
+            @if (SidebarExpanded && CurrentUser.IsAuthenticated)
+            {
+                <MessageInboxPanel IsOpen="@SidebarExpanded" NavigateToListRequested="CloseSidebarAsync" />
+            }
         </div>
     </RadzenStack>
 </RadzenSidebar>
