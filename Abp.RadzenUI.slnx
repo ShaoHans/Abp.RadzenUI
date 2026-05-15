@@ -22,7 +22,10 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/Abp.Blazor.Server.RadzenUI/Abp.Blazor.Server.RadzenUI.csproj" />
-    <Project Path="src/Abp.RadzenUI.DataDictionary.EntityFrameworkCore/Abp.RadzenUI.DataDictionary.EntityFrameworkCore.csproj" />
-    <Project Path="src/Abp.RadzenUI.Messages.EntityFrameworkCore/Abp.RadzenUI.Messages.EntityFrameworkCore.csproj" />
+    <Project Path="src/Abp.RadzenUI.Application.Contracts/Abp.RadzenUI.Application.Contracts.csproj" />
+    <Project Path="src/Abp.RadzenUI.Application/Abp.RadzenUI.Application.csproj" />
+    <Project Path="src/Abp.RadzenUI.Domain.Shared/Abp.RadzenUI.Domain.Shared.csproj" />
+    <Project Path="src/Abp.RadzenUI.Domain/Abp.RadzenUI.Domain.csproj" />
+    <Project Path="src/Abp.RadzenUI.EntityFrameworkCore/Abp.RadzenUI.EntityFrameworkCore.csproj" />
   </Folder>
 </Solution>

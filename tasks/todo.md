@@ -88,3 +88,30 @@
 - 已为 `MessageInboxPanel` 增加布局侧栏模式参数，移除对 `DialogService.CloseSide` 的依赖，并在侧栏关闭时重置详情视图状态。
 - 已顺手把 `ThemeSiderbar` 改为标准 `@bind-SidebarExpanded` 绑定方式，避免继续依赖单向级联状态。
 - 已使用 `dotnet build src/Abp.Blazor.Server.RadzenUI/Abp.Blazor.Server.RadzenUI.csproj -nologo` 完成定向编译验证，当前构建通过。
+
+## 分层重构计划（2026-05-15）
+
+- [x] 对齐 samples 目录分层，新建 `Abp.RadzenUI.Application.Contracts`、`Abp.RadzenUI.Application`、`Abp.RadzenUI.EntityFrameworkCore` 项目骨架与模块类。
+- [x] 将当前 UI 项目中的应用契约与应用实现迁出到新项目，使 UI 只保留页面、布局、控制器、菜单与宿主相关代码；`LinkAccounts` 继续保持独立项目。
+- [x] 将 `Abp.RadzenUI.DataDictionary.EntityFrameworkCore` 与 `Abp.RadzenUI.Messages.EntityFrameworkCore` 合并进新的 `Abp.RadzenUI.EntityFrameworkCore` 项目，统一 EF Core 模块与仓储注册。
+- [x] 调整 `Abp.Blazor.Server.RadzenUI` 项目引用与模块依赖，移除对旧 EF 项目的直接依赖，改为依赖新的分层项目。
+- [x] 更新解决方案文件并执行面向主 UI 项目的定向编译验证，补充本轮结果复盘。
+
+## 分层重构需求规格（2026-05-15）
+
+- 目标：将 `Abp.Blazor.Server.RadzenUI` 从“UI + Application + EF 聚合项目”重构为接近 `samples` 目录的标准 ABP 分层结构，恢复控制台、后台任务和其他宿主对应用层的可复用性。
+- 新增项目：至少包含 `Abp.RadzenUI.Application.Contracts`、`Abp.RadzenUI.Application`、`Abp.RadzenUI.EntityFrameworkCore`；其中 EF 项目统一承接原 `DataDictionary` 与 `Messages` 两个 EF 类库。
+- 迁移范围：现有 `Application/Contracts`、`Application`、Mapperly 映射、应用层缓存与相关模块注册从 UI 项目迁出；Razor 组件、菜单、控制器、布局、主题与宿主服务保留在 UI 项目。
+- 兼容要求：对外命名空间尽量保持 `Abp.RadzenUI.*` 不变，减少页面、服务注入和消费方的破坏性改动。
+- EF 要求：不再由 UI 模块直接注册 `DataDictionaryDbContext` 与 `MessageDbContext`；改为由新的 `Abp.RadzenUI.EntityFrameworkCore` 模块统一声明并提供默认仓储。
+- 验证要求：至少完成 `Abp.Blazor.Server.RadzenUI` 的定向构建验证，确认分层调整后主项目仍可编译。
+
+## 分层重构结果复盘（2026-05-15）
+
+- 已新增 `src/Abp.RadzenUI.Domain.Shared`、`src/Abp.RadzenUI.Domain`、`src/Abp.RadzenUI.Application.Contracts`、`src/Abp.RadzenUI.Application`、`src/Abp.RadzenUI.EntityFrameworkCore` 五个项目，并分别补齐对应 ABP 模块类。
+- 已将原 `Abp.Blazor.Server.RadzenUI` 中的 `Application/Contracts`、`Application` 与 `Permissions` 代码迁移到新项目；UI 项目保留 Razor 页面、布局、控制器、菜单与 UI 专用 Mapper。
+- 已将原 `Abp.RadzenUI.DataDictionary.EntityFrameworkCore` 与 `Abp.RadzenUI.Messages.EntityFrameworkCore` 的实体、常量、DbContext 配置按层拆散，并统一收口到新的 `Abp.RadzenUI.EntityFrameworkCore` 项目；旧两个 EF 项目的工程引用已清理。
+- 已将本地化资源 `AbpRadzenUIResource` 和 `Localization/UI` 从 UI 项目迁移到 `Domain.Shared`，同时把 UI 模块改为仅对资源补基础类型，不再承担资源根注册。
+- 已将应用层 Mapperly 映射迁入 `Application` 项目，UI 项目仅保留 `Profile`、`EmailSettings` 等页面模型映射，避免再次把应用层依赖拖回 UI。
+- 已更新 `Abp.RadzenUI.sln`、`Abp.RadzenUI.slnx` 以及 `samples/CRM.EntityFrameworkCore/CRM.EntityFrameworkCore.csproj`，使 sample 侧也改为引用新的统一 EF 项目。
+- 已执行 `dotnet build src/Abp.Blazor.Server.RadzenUI/Abp.Blazor.Server.RadzenUI.csproj -nologo --no-restore` 与 `dotnet build samples/CRM.EntityFrameworkCore/CRM.EntityFrameworkCore.csproj -nologo`，当前构建通过。

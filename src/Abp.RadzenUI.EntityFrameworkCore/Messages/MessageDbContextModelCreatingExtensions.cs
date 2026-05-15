@@ -12,7 +12,7 @@ public static class MessageDbContextModelCreatingExtensions
 
         builder.Entity<UserMessage>(b =>
         {
-            b.ToTable(MessageDbProperties.DbTablePrefix + "UserMessages", MessageDbProperties.DbSchema);
+            b.ToTable(AbpRadzenUIDbProperties.DbTablePrefix + "UserMessages", AbpRadzenUIDbProperties.DbSchema);
             b.ConfigureByConvention();
             b.Property(p => p.UserId).IsRequired();
             b.Property(p => p.Title).IsRequired().HasMaxLength(MessageConsts.MaxTitleLength);

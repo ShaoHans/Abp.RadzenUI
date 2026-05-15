@@ -1,4 +1,5 @@
 using Abp.RadzenUI.DataDictionaries;
+using Abp.RadzenUI.EntityFrameworkCore;
 using Abp.RadzenUI.Messages;
 using CRM.Products;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,6 @@ using Volo.Abp.BlobStoring.Database.EntityFrameworkCore;
 using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.EntityFrameworkCore;
-using Volo.Abp.EntityFrameworkCore.Modeling;
 using Volo.Abp.FeatureManagement.EntityFrameworkCore;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.EntityFrameworkCore;
@@ -22,15 +22,13 @@ namespace CRM.EntityFrameworkCore;
 
 [ReplaceDbContext(typeof(IIdentityDbContext))]
 [ReplaceDbContext(typeof(ITenantManagementDbContext))]
-[ReplaceDbContext(typeof(IDataDictionaryDbContext))]
-[ReplaceDbContext(typeof(IMessageDbContext))]
+[ReplaceDbContext(typeof(IAbpRadzenUIDbContext))]
 [ConnectionStringName("Default")]
 public class CRMDbContext(DbContextOptions<CRMDbContext> options)
     : AbpDbContext<CRMDbContext>(options),
         ITenantManagementDbContext,
         IIdentityDbContext,
-        IDataDictionaryDbContext,
-        IMessageDbContext
+        IAbpRadzenUIDbContext
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
 

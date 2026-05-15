@@ -12,7 +12,7 @@ public static class DataDictionaryDbContextModelCreatingExtensions
 
         builder.Entity<DataDictionaryType>(b =>
         {
-            b.ToTable(DataDictionaryDbProperties.DbTablePrefix + "DataDictionaryTypes", DataDictionaryDbProperties.DbSchema);
+            b.ToTable(AbpRadzenUIDbProperties.DbTablePrefix + "DataDictionaryTypes", AbpRadzenUIDbProperties.DbSchema);
             b.ConfigureByConvention();
             b.Property(p => p.IsShared).IsRequired().HasDefaultValue(false);
             b.Property(p => p.Code).IsRequired().HasMaxLength(DataDictionaryTypeConsts.MaxCodeLength);
@@ -23,7 +23,7 @@ public static class DataDictionaryDbContextModelCreatingExtensions
 
         builder.Entity<DataDictionaryItem>(b =>
         {
-            b.ToTable(DataDictionaryDbProperties.DbTablePrefix + "DataDictionaryItems", DataDictionaryDbProperties.DbSchema);
+            b.ToTable(AbpRadzenUIDbProperties.DbTablePrefix + "DataDictionaryItems", AbpRadzenUIDbProperties.DbSchema);
             b.ConfigureByConvention();
             b.Property(p => p.DataDictionaryTypeId).IsRequired();
             b.Property(p => p.Code).IsRequired().HasMaxLength(DataDictionaryItemConsts.MaxCodeLength);

@@ -1,6 +1,6 @@
-namespace Abp.RadzenUI.Messages;
+namespace Abp.RadzenUI;
 
-public static class MessageDbProperties
+public static class AbpRadzenUIDbProperties
 {
     public const string DbTablePrefix = "AbpRadzen_";
 

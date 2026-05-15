@@ -7,9 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Abp.RadzenUI.Messages.EntityFrameworkCore\Abp.RadzenUI.Messages.EntityFrameworkCore.csproj" />
+	<ProjectReference Include="..\..\src\Abp.RadzenUI.EntityFrameworkCore\Abp.RadzenUI.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\CRM.Domain\CRM.Domain.csproj" />
-    <ProjectReference Include="..\..\src\Abp.RadzenUI.DataDictionary.EntityFrameworkCore\Abp.RadzenUI.DataDictionary.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>

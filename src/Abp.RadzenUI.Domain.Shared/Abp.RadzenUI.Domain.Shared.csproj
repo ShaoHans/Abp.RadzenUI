@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net10.0</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<RootNamespace>Abp.RadzenUI</RootNamespace>
+		<PackageId>AbpRadzen.Domain.Shared</PackageId>
+		<Authors>ShaoHans</Authors>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageDescription>Shared domain definitions and localization resources for ABP RadzenUI</PackageDescription>
+		<RepositoryUrl>https://github.com/ShaoHans/Abp-RadzenUI</RepositoryUrl>
+		<GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\README.md" Pack="true" PackagePath="." />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.BackgroundJobs.Domain.Shared" />
+		<PackageReference Include="Volo.Abp.AuditLogging.Domain.Shared" />
+		<PackageReference Include="Volo.Abp.FeatureManagement.Domain.Shared" />
+		<PackageReference Include="Volo.Abp.PermissionManagement.Domain.Shared" />
+		<PackageReference Include="Volo.Abp.SettingManagement.Domain.Shared" />
+		<PackageReference Include="Volo.Abp.GlobalFeatures" />
+		<PackageReference Include="Volo.Abp.Identity.Domain.Shared" />
+		<PackageReference Include="Volo.Abp.TenantManagement.Domain.Shared" />
+		<PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Localization\UI\*.json" />
+		<Content Remove="Localization\UI\*.json" />
+	</ItemGroup>
+
+</Project>
