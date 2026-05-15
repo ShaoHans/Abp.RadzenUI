@@ -16,7 +16,6 @@
 @inject IStringLocalizer<AbpRadzenUIResource> TL
 @inject IIdentityUserRepository IdentityUserRepository
 @inject ILinkedAccountAppService LinkedAccountAppService
-@inject DialogService DialogService
 @inject IJSRuntime JSRuntime
 @inject IMenuManager MenuManager
 @inject NavigationManager NavigationManager
@@ -233,10 +232,10 @@
                     @if (CurrentUser != null && CurrentUser.IsAuthenticated)
                     {
                         <button type="button"
-                                class="app-header__action app-header__icon-action app-header__message-button"
+                                class="@GetMessageButtonClass()"
                                 title="@TL["Message:MyMessages"]"
                                 aria-label="@TL["Message:MyMessages"]"
-                                @onclick="OpenMessagesAsync">
+                                @onclick="ToggleMessagesAsync">
                             <RadzenIcon Icon="notifications" />
                             @if (_unreadCount > 0)
                             {
@@ -302,6 +301,8 @@
 @code {
     [Parameter] public EventCallback<EventArgs> MenuToggle { get; set; }
     [Parameter] public EventCallback<EventArgs> ThemeToggle { get; set; }
+    [Parameter] public EventCallback<EventArgs> MessageToggle { get; set; }
+    [Parameter] public bool MessagePanelOpen { get; set; }
     [Inject] IUIPlaceHolderResolver UIPlaceHolderResolver { get; set; } = default!;
     TitleBarSettings _titleBar = new();
     string? _avatarUrl;
@@ -354,18 +355,9 @@
         _isFullscreen = await JSRuntime.InvokeAsync<bool>("abpRadzenFullscreen.toggle");
     }
 
-    async Task OpenMessagesAsync()
+    async Task ToggleMessagesAsync()
     {
-        await DialogService.OpenSideAsync<MessageInboxPanel>(
-            TL["Message:MyMessages"],
-            new Dictionary<string, object?>(),
-            new SideDialogOptions
-            {
-                ShowMask = false,
-                CloseDialogOnOverlayClick = true,
-                Width = "420px"
-            }
-        );
+        await MessageToggle.InvokeAsync(EventArgs.Empty);
     }
 
     string GetFullscreenButtonClass()
@@ -373,6 +365,13 @@
         return _isFullscreen
             ? "app-header__action app-header__icon-action app-header__icon-action--active"
             : "app-header__action app-header__icon-action";
+    }
+
+    string GetMessageButtonClass()
+    {
+        return MessagePanelOpen
+            ? "app-header__action app-header__icon-action app-header__message-button app-header__icon-action--active"
+            : "app-header__action app-header__icon-action app-header__message-button";
     }
 
     [JSInvokable]

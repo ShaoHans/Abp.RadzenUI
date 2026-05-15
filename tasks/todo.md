@@ -71,3 +71,20 @@
 - 已移除未读数量展示、批量已读功能和消息列表复选框，保留全部已读与查看更多入口。
 - 已将顶部操作按钮和筛选按钮统一缩为 `ButtonSize.Small`，减轻视觉占用。
 - 已再次执行 `dotnet build src/Abp.Blazor.Server.RadzenUI/Abp.Blazor.Server.RadzenUI.csproj -nologo`，当前构建通过。
+
+## 消息侧栏布局化计划（2026-05-15）
+
+- [x] 将 Header 消息入口从 `DialogService.OpenSideAsync` 改为布局级 `RadzenSidebar` 切换。
+- [x] 在 `MainLayout` 中增加消息侧栏展开状态，并与主题侧栏共享右侧布局区域。
+- [x] 新增消息侧栏壳组件，复用现有消息面板内容，同时提供与主题侧栏一致的标题栏和关闭方式。
+- [x] 调整消息面板内部“查看更多”导航逻辑，去掉对 `DialogService.CloseSide` 的依赖。
+- [x] 完成 `Abp.Blazor.Server.RadzenUI` 定向编译验证，并补充结果复盘。
+
+## 消息侧栏布局化结果（2026-05-15）
+
+- 已新增布局级消息侧栏组件 `Components/Layout/MessageSidebar.razor`，承接消息标题栏、关闭按钮和现有消息内容区。
+- 已在 `MainLayout` 中加入 `messageSidebarExpanded` 状态，并让消息侧栏与主题侧栏共用右侧布局区域；打开一个时会关闭另一个。
+- 已将 Header 消息按钮从 `DialogService.OpenSideAsync` 改为切换布局状态，并补充打开态样式类，交互机制与主题侧栏保持一致。
+- 已为 `MessageInboxPanel` 增加布局侧栏模式参数，移除对 `DialogService.CloseSide` 的依赖，并在侧栏关闭时重置详情视图状态。
+- 已顺手把 `ThemeSiderbar` 改为标准 `@bind-SidebarExpanded` 绑定方式，避免继续依赖单向级联状态。
+- 已使用 `dotnet build src/Abp.Blazor.Server.RadzenUI/Abp.Blazor.Server.RadzenUI.csproj -nologo` 完成定向编译验证，当前构建通过。

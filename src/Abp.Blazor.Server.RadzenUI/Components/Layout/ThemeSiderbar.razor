@@ -178,7 +178,7 @@
     RadzenButton rtlInfo = default!;
     RadzenButton freeThemesInfo = default!;
     RadzenButton premiumThemesInfo = default!;
-    [CascadingParameter(Name = "SidebarExpanded")]
+    [Parameter]
     public bool SidebarExpanded { get; set; }
     [Parameter]
     public EventCallback<bool> SidebarExpandedChanged { get; set; }

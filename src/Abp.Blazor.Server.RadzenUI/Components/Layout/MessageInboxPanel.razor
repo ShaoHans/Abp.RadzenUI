@@ -1,13 +1,12 @@
 @using System.Net
 @using System.Text.RegularExpressions
 @using Abp.RadzenUI.Application.Contracts.Messages
-@using Abp.RadzenUI.Localization
 @using Abp.RadzenUI.Components.Pages.Messages
+@using Abp.RadzenUI.Localization
 @implements IDisposable
 @inject IMessageAppService MessageAppService
 @inject MessageCenterState MessageCenterState
 @inject NavigationManager NavigationManager
-@inject DialogService DialogService
 @inject Volo.Abp.AspNetCore.Components.Notifications.IUiNotificationService UiNotify
 @inherits AbpRadzenUIComponentBase
 <div style="height:calc(100vh - 7rem); min-height:420px; display:flex; flex-direction:column;">
@@ -98,6 +97,12 @@
 </div>
 
 @code {
+    [Parameter]
+    public bool IsOpen { get; set; }
+
+    [Parameter]
+    public EventCallback NavigateToListRequested { get; set; }
+
     private const int MaxMessages = 10;
 
     private IReadOnlyList<UserMessageDto> _messages = [];
@@ -114,6 +119,14 @@
     {
         MessageCenterState.Changed += HandleMessageCenterChangedAsync;
         await LoadMessagesAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (!IsOpen)
+        {
+            _selectedMessageId = Guid.Empty;
+        }
     }
 
     private async Task ChangeStatusAsync(MessageReadStatus? status)
@@ -148,7 +161,11 @@
 
     private async Task GoToListAsync()
     {
-        DialogService.CloseSide(null);
+        if (NavigateToListRequested.HasDelegate)
+        {
+            await NavigateToListRequested.InvokeAsync();
+        }
+
         await InvokeAsync(() => NavigationManager.NavigateTo("/messages"));
     }
 

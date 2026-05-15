@@ -13,7 +13,9 @@
 
     <RadzenLayout class="app-layout-shell" Style="grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'rz-header rz-header rz-header' 'rz-sidebar rz-body rz-config-sidebar'">
         <Header MenuToggle="ToggleMenu"
-                ThemeToggle="ToggleTheme" />
+            ThemeToggle="ToggleTheme"
+            MessageToggle="ToggleMessages"
+            MessagePanelOpen="messageSidebarExpanded" />
         <RadzenBody>
             <ChildContent>
                 <RadzenContentContainer Name="main" class="app-layout-main">
@@ -32,10 +34,9 @@
             </ChildContent>
         </RadzenBody>
         <MenuSiderbar @bind-SidebarExpanded="menuSidebarExpanded" />
-        <CascadingValue Value="@themeSidebarExpanded" Name="SidebarExpanded">
-            <ThemeSiderbar />
-        </CascadingValue>
-        @if (isMobile && (menuSidebarExpanded || themeSidebarExpanded))
+        <ThemeSiderbar @bind-SidebarExpanded="themeSidebarExpanded" />
+        <MessageSidebar @bind-SidebarExpanded="messageSidebarExpanded" />
+        @if (isMobile && (menuSidebarExpanded || themeSidebarExpanded || messageSidebarExpanded))
         {
             <div class="app-layout-overlay" @onclick="CloseMobileSidebars"></div>
         }
@@ -75,6 +76,7 @@ else
 @code {
     bool menuSidebarExpanded = true;
     bool themeSidebarExpanded = false;
+    bool messageSidebarExpanded = false;
     bool isMobile;
     bool hasViewportState;
     bool rendered;
@@ -131,6 +133,21 @@ else
     private void ToggleTheme()
     {
         themeSidebarExpanded = !themeSidebarExpanded;
+
+        if (themeSidebarExpanded)
+        {
+            messageSidebarExpanded = false;
+        }
+    }
+
+    private void ToggleMessages()
+    {
+        messageSidebarExpanded = !messageSidebarExpanded;
+
+        if (messageSidebarExpanded)
+        {
+            themeSidebarExpanded = false;
+        }
     }
 
     private void HandleMobileLayoutChange(bool matches)
@@ -144,6 +161,7 @@ else
             {
                 menuSidebarExpanded = false;
                 themeSidebarExpanded = false;
+                messageSidebarExpanded = false;
             }
 
             return;
@@ -160,6 +178,7 @@ else
         {
             menuSidebarExpanded = false;
             themeSidebarExpanded = false;
+            messageSidebarExpanded = false;
         }
         else
         {
@@ -171,5 +190,6 @@ else
     {
         menuSidebarExpanded = false;
         themeSidebarExpanded = false;
+        messageSidebarExpanded = false;
     }
 }
