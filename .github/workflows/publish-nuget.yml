@@ -4,10 +4,14 @@ name: publish-nuget
 run-name: ${{ github.actor }} is publishing a nuget package 🚀
 
 env:
-  DATA_DICTIONARY_PROJECT: ./src/Abp.RadzenUI.DataDictionary.EntityFrameworkCore/Abp.RadzenUI.DataDictionary.EntityFrameworkCore.csproj
-  LINK_ACCOUNTS_PROJECT: ./src/Abp.RadzenUI.LinkAccounts/Abp.RadzenUI.LinkAccounts.csproj
-  MESSAGE_PROJECT: ./src/Abp.RadzenUI.Messages.EntityFrameworkCore/Abp.RadzenUI.Messages.EntityFrameworkCore.csproj
-  UI_PROJECT: ./src/Abp.Blazor.Server.RadzenUI/Abp.Blazor.Server.RadzenUI.csproj
+  PACKAGE_PROJECTS: |
+    ./src/Abp.RadzenUI.Domain.Shared/Abp.RadzenUI.Domain.Shared.csproj
+    ./src/Abp.RadzenUI.Domain/Abp.RadzenUI.Domain.csproj
+    ./src/Abp.RadzenUI.Application.Contracts/Abp.RadzenUI.Application.Contracts.csproj
+    ./src/Abp.RadzenUI.Application/Abp.RadzenUI.Application.csproj
+    ./src/Abp.RadzenUI.EntityFrameworkCore/Abp.RadzenUI.EntityFrameworkCore.csproj
+    ./src/Abp.RadzenUI.LinkAccounts/Abp.RadzenUI.LinkAccounts.csproj
+    ./src/Abp.Blazor.Server.RadzenUI/Abp.Blazor.Server.RadzenUI.csproj
 
 on:
   push:
@@ -28,30 +32,30 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 10.0.x
-    - name: Restore data dictionary project
-      run: dotnet restore $DATA_DICTIONARY_PROJECT
-    - name: Restore link accounts project
-      run: dotnet restore $LINK_ACCOUNTS_PROJECT
-    - name: Restore message project
-      run: dotnet restore $MESSAGE_PROJECT
-    - name: Restore UI project
-      run: dotnet restore $UI_PROJECT
-    - name: Build data dictionary project
-      run: dotnet build --no-restore -c Release $DATA_DICTIONARY_PROJECT
-    - name: Build link accounts project
-      run: dotnet build --no-restore -c Release $LINK_ACCOUNTS_PROJECT
-    - name: Build message project
-      run: dotnet build --no-restore -c Release $MESSAGE_PROJECT
-    - name: Build UI project
-      run: dotnet build --no-restore -c Release $UI_PROJECT
-    - name: Create the UI package
-      run: dotnet pack --no-build -c Release $UI_PROJECT -p:Version=$PACKAGE_VERSION -o ./artifacts
-    - name: Create the data dictionary package
-      run: dotnet pack --no-build -c Release $DATA_DICTIONARY_PROJECT -p:Version=$PACKAGE_VERSION -o ./artifacts
-    - name: Create the link accounts package
-      run: dotnet pack --no-build -c Release $LINK_ACCOUNTS_PROJECT -p:Version=$PACKAGE_VERSION -o ./artifacts
-    - name: Create the message package
-      run: dotnet pack --no-build -c Release $MESSAGE_PROJECT -p:Version=$PACKAGE_VERSION -o ./artifacts
+    - name: Restore package projects
+      shell: bash
+      run: |
+        while IFS= read -r project; do
+          [ -z "$project" ] && continue
+          echo "Restoring $project"
+          dotnet restore "$project"
+        done <<< "$PACKAGE_PROJECTS"
+    - name: Build package projects
+      shell: bash
+      run: |
+        while IFS= read -r project; do
+          [ -z "$project" ] && continue
+          echo "Building $project"
+          dotnet build --no-restore -c Release "$project"
+        done <<< "$PACKAGE_PROJECTS"
+    - name: Create NuGet packages
+      shell: bash
+      run: |
+        while IFS= read -r project; do
+          [ -z "$project" ] && continue
+          echo "Packing $project"
+          dotnet pack --no-build -c Release "$project" -p:Version=$PACKAGE_VERSION -o ./artifacts
+        done <<< "$PACKAGE_PROJECTS"
     - name: Add nuget source
       run: dotnet nuget add source --username ShaoHans --password ${{ secrets.NUGET_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/ShaoHans/index.json"
     - name: Publish the package to Github Packages

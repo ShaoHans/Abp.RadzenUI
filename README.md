@@ -31,6 +31,13 @@ Password:  **1q2w#E***
 
 ## 🌱 Get Started
 
+### Published Packages
+
+- `AbpRadzen.Blazor.Server.UI`: the full Blazor Server UI theme package with built-in pages, menus, localization, and host-side integration.
+- `AbpRadzen.LinkAccounts`: the standalone linked-accounts application package.
+- `AbpRadzen.EntityFrameworkCore`: the unified EF Core package for the built-in Data Dictionary and Messages modules.
+- `AbpRadzen.Application.Contracts`, `AbpRadzen.Application`, `AbpRadzen.Domain`, `AbpRadzen.Domain.Shared`: layered building blocks for custom composition outside the full UI package.
+
 ### Integration Steps
 
 #### 1. Create a new solution with the ABP CLI
@@ -168,7 +175,7 @@ In real-world projects, it is common to manage system-level or business-level se
 
 Follow the steps below to add your own settings component:
 
-##### (1) Create an application service for your settings, for example: [AccountSettingsAppService](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Application/AccountSettingsAppService.cs)
+##### (1) Create an application service for your settings, for example: [AccountSettingsAppService](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.RadzenUI.Application/AccountSettingsAppService.cs)
 
 ##### (2) Create a Blazor component for the settings UI, for example: [AccountSettingComponent](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Components/Pages/Setting/AccountSettingComponent.razor)
 
@@ -232,24 +239,27 @@ The standalone package registers the following services for you:
 - After the relationship is established, account switching relies on the existing link relationship plus a short-lived flow token to re-issue the authentication ticket.
 - Flow tokens and linked-account sessions are stored in distributed cache and are shared in the host tenant scope so cross-tenant switching can complete correctly.
 
-## 📚 Use the Data Dictionary Module
+## 🧱 Shared EF Core Integration
 
-The data dictionary module is included in the UI package and provides an out-of-the-box page for managing dictionary types and dictionary items.
+The Data Dictionary and Messages modules now share the same standalone EF Core package and the same DbContext configuration entry.
 
-### Module Guide
+### Install the package
 
-#### 1. Install the package
+If you use the full UI package, no extra installation is required:
+
 ```shell
 dotnet add package AbpRadzen.Blazor.Server.UI
 ```
 
-If you only need the entity definitions and EF Core mappings, you can install the standalone package below:
+If you only need the entity definitions and EF Core mappings for these built-in modules, install the unified package below:
+
 ```shell
-dotnet add package AbpRadzen.DataDictionary.EntityFrameworkCore
+dotnet add package AbpRadzen.EntityFrameworkCore
 ```
 
-#### 2. Register the DbContext
-The full UI module already registers `DataDictionaryDbContext` inside `AbpRadzenUIModule`. If you integrate only the EF Core package into your own solution, add the DbSets and call `ConfigureDataDictionary()` inside your application's DbContext.
+### Register the DbContext
+
+The full UI package already depends on `AbpRadzen.EntityFrameworkCore` and wires the unified EF module for you. If you integrate only the EF Core package into your own solution, add the required DbSets and call `ConfigureAbpRadzenUI()` inside your application's DbContext.
 
 ```csharp
 public class MyProjectDbContext : AbpDbContext<MyProjectDbContext>
@@ -258,19 +268,27 @@ public class MyProjectDbContext : AbpDbContext<MyProjectDbContext>
 
     public DbSet<DataDictionaryItem> DataDictionaryItems { get; set; }
 
+    public DbSet<UserMessage> UserMessages { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
 
-        builder.ConfigureDataDictionary();
+        builder.ConfigureAbpRadzenUI();
     }
 }
 ```
 
-#### 3. Add localization and menu support
+## 📚 Use the Data Dictionary Module
+
+The data dictionary module is included in the UI package and provides an out-of-the-box page for managing dictionary types and dictionary items.
+
+### Module Guide
+
+#### 1. Add localization and menu support
 The built-in page route is `/data-dictionary`. When you use the full UI package, menu contributions and localization resources are already wired up. If you are composing your own application module, make sure your localization resource inherits from `AbpRadzenUIResource`.
 
-#### 4. Apply database changes
+#### 2. Apply database changes
 The data dictionary module creates the following two tables:
 
 - `DataDictionaryTypes`
@@ -278,7 +296,7 @@ The data dictionary module creates the following two tables:
 
 After integrating the module, create and apply your EF Core migrations in the usual way.
 
-#### 5. Usage notes
+#### 3. Usage notes
 
 - Dictionary items are associated with dictionary types through `DataDictionaryTypeId`, but the EF Core mapping does not create a database-level foreign key.
 - Deleting a dictionary type will also remove its child dictionary items at the application-service level.
@@ -290,34 +308,7 @@ The messages module is included in the full UI package and provides a built-in i
 
 ### Module Guide
 
-#### 1. Install the package
-```shell
-dotnet add package AbpRadzen.Blazor.Server.UI
-```
-
-If you only need message entities and EF Core mappings, install the standalone package below:
-```shell
-dotnet add package AbpRadzen.Messages.EntityFrameworkCore
-```
-
-#### 2. Register the DbContext
-The full UI package already registers `MessageDbContext` inside `AbpRadzenUIModule`. If you integrate only the EF Core package into your own solution, add the DbSet and call `ConfigureMessages()` inside your application's DbContext.
-
-```csharp
-public class MyProjectDbContext : AbpDbContext<MyProjectDbContext>
-{
-    public DbSet<UserMessage> UserMessages { get; set; }
-
-    protected override void OnModelCreating(ModelBuilder builder)
-    {
-        base.OnModelCreating(builder);
-
-        builder.ConfigureMessages();
-    }
-}
-```
-
-#### 3. Built-in UI capabilities
+#### 1. Built-in UI capabilities
 
 - The built-in message center page route is `/messages`.
 - The header includes an unread badge and a right-side inbox sidebar for quick access.
@@ -325,10 +316,10 @@ public class MyProjectDbContext : AbpDbContext<MyProjectDbContext>
 - The message center page supports filtering by title, read status, and message type.
 - Message content supports HTML rendering in the detail view.
 
-#### 4. Apply database changes
+#### 2. Apply database changes
 The message module creates a `UserMessages` table and related indexes for tenant, user, read status, message type, and creation time. After integrating the module, create and apply your EF Core migrations in the usual way.
 
-#### 5. Usage notes
+#### 3. Usage notes
 
 - Messages are isolated by current tenant and current user.
 - Opening a message detail marks the message as read automatically.
