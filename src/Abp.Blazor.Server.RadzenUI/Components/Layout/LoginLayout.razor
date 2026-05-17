@@ -35,6 +35,30 @@
             padding: 0;
         }
     }
+
+    .auth-layout-shell .auth-language-switch {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+    }
+
+    .auth-layout-shell .auth-language-switch > li > .rz-navigation-item-wrapper > .rz-navigation-item-link {
+        min-height: 2.25rem;
+        padding: 0.375rem 0.625rem;
+        border: 1px solid color-mix(in srgb, var(--rz-text-color) 20%, transparent);
+        border-radius: calc(var(--rz-border-radius) * 3);
+        background: transparent;
+        box-sizing: border-box;
+    }
+
+    .auth-layout-shell .auth-language-switch > li > .rz-navigation-item-wrapper > .rz-navigation-item-link:hover {
+        background: color-mix(in srgb, var(--rz-text-color) 6%, transparent);
+        border-color: color-mix(in srgb, var(--rz-text-color) 35%, transparent);
+    }
+
+    .auth-layout-shell .auth-language-switch .rz-navigation-item-link .rzi {
+        font-size: 1.05rem;
+    }
 </style>
 
 <RadzenComponents />
@@ -50,6 +74,13 @@
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="6">
             <RadzenCard class="rz-shadow-0 rz-border-radius-0 rz-p-12">
+                @if (_titleBar.ShowLanguageMenu)
+                {
+                    <div class="rz-display-flex rz-justify-content-end rz-mb-4">
+                        <LanguageSwitch MenuClass="auth-language-switch" />
+                    </div>
+                }
+
                 @if (MultiTenancyOptions.Value.IsEnabled)
                 {
                     <RadzenRow>
@@ -82,10 +113,12 @@
     [Inject] ICurrentTenant? CurrentTenant { get; set; }
     [Inject] IUIPlaceHolderResolver UIPlaceHolderResolver { get; set; } = default!;
     LoginPageSettings _loginPage = new();
+    TitleBarSettings _titleBar = new();
 
     protected override async Task OnInitializedAsync()
     {
         _loginPage = await UIPlaceHolderResolver.GetLoginPageSettingsAsync();
+        _titleBar = await UIPlaceHolderResolver.GetTitleBarSettingsAsync();
     }
 
     async Task OpenTenantSwitchDialog()

@@ -252,7 +252,7 @@
                     @if (_titleBar.ShowLanguageMenu)
                     {
                         <div class="app-header__action">
-                            <LanguageSwitch />
+                            <LanguageSwitch MenuClass="app-header__menu app-header__menu--language" />
                         </div>
                     }
                     @if (CurrentUser != null && CurrentUser.IsAuthenticated)
