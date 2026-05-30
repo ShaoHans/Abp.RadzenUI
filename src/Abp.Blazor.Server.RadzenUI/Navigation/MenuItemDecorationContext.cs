@@ -10,5 +10,7 @@ public class MenuItemDecorationContext(ApplicationMenuItem menuItem)
 
     public List<MenuItemBadgeDefinition> Badges { get; } = [];
 
+    public HashSet<string> RefreshKeys { get; } = new(StringComparer.Ordinal);
+
     public bool HasVisibleBadges => Badges.Any(static badge => badge.Visible);
 }

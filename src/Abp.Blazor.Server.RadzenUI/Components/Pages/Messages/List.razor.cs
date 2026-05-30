@@ -1,5 +1,6 @@
 using Abp.RadzenUI.Application.Contracts.Messages;
 using Abp.RadzenUI.Localization;
+using Abp.RadzenUI.Navigation;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 using Radzen;
@@ -21,6 +22,9 @@ public partial class List
 
     [Inject]
     protected MessageCenterState MessageCenterState { get; set; } = default!;
+
+    [Inject]
+    protected MenuItemDecorationState MenuItemDecorationState { get; set; } = default!;
 
     [Inject]
     protected new IUiNotificationService Notify { get; set; } = default!;
@@ -171,6 +175,7 @@ public partial class List
             );
             _selectedMessages.Clear();
             await MessageCenterState.NotifyChangedAsync();
+            await MenuItemDecorationState.NotifyChangedAsync(MenuItemDecorationRefreshKeys.UnreadMessages);
             await Notify.Success(UL["SavedSuccessfully"]);
         }
         catch (Exception ex)
@@ -186,6 +191,7 @@ public partial class List
             await MessageAppService.MarkAllAsReadAsync();
             _selectedMessages.Clear();
             await MessageCenterState.NotifyChangedAsync();
+            await MenuItemDecorationState.NotifyChangedAsync(MenuItemDecorationRefreshKeys.UnreadMessages);
             await Notify.Success(UL["SavedSuccessfully"]);
         }
         catch (Exception ex)

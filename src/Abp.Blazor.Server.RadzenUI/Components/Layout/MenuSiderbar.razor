@@ -1,8 +1,11 @@
 ﻿@using Abp.RadzenUI.Navigation
 @using Abp.RadzenUI.UIPlaceHolders
 @using Volo.Abp.UI.Navigation
+@implements IAsyncDisposable
 @inject IMenuManager MenuManager
 @inject IEnumerable<IMenuItemDecorationContributor> MenuItemDecorationContributors
+@inject NavigationManager NavigationManager
+@inject MenuItemDecorationState MenuItemDecorationState
 
 <RadzenSidebar Responsive="true"
                @bind-Expanded="@SidebarExpanded"
@@ -36,7 +39,10 @@
     {
         _applicationMenu = await MenuManager.GetMainMenuAsync();
         _titleBarSettings = await UIPlaceHolderResolver.GetTitleBarSettingsAsync();
-        await LoadMenuDecorationsAsync(_applicationMenu.Items);
+        await ReloadMenuDecorationsAsync();
+
+        NavigationManager.LocationChanged += OnLocationChanged;
+        MenuItemDecorationState.Changed += HandleDecorationsChangedAsync;
     }
 
     void FilterPanelMenu(ChangeEventArgs args)
@@ -64,22 +70,79 @@
         }
     };
 
+    async Task ReloadMenuDecorationsAsync()
+    {
+        _menuItemDecorations.Clear();
+
+        if (_applicationMenu is null)
+        {
+            return;
+        }
+
+        await LoadMenuDecorationsAsync(_applicationMenu.Items);
+    }
+
+    async Task ReloadMenuDecorationsAsync(IReadOnlyCollection<string> refreshKeys)
+    {
+        if (_applicationMenu is null)
+        {
+            return;
+        }
+
+        if (refreshKeys.Count == 0)
+        {
+            await ReloadMenuDecorationsAsync();
+            return;
+        }
+
+        foreach (var menuItem in EnumerateMenuItems(_applicationMenu.Items))
+        {
+            var decoration = GetDecoration(menuItem);
+
+            if (decoration is null || decoration.RefreshKeys.Overlaps(refreshKeys))
+            {
+                _menuItemDecorations[menuItem.Name] = await BuildMenuDecorationAsync(menuItem);
+            }
+        }
+    }
+
     async Task LoadMenuDecorationsAsync(IReadOnlyList<ApplicationMenuItem> menuItems)
     {
         foreach (var menuItem in menuItems)
         {
-            var context = new MenuItemDecorationContext(menuItem);
-
-            foreach (var contributor in MenuItemDecorationContributors)
-            {
-                await contributor.ConfigureAsync(context);
-            }
-
-            _menuItemDecorations[menuItem.Name] = context;
+            _menuItemDecorations[menuItem.Name] = await BuildMenuDecorationAsync(menuItem);
 
             if (!menuItem.Items.IsNullOrEmpty())
             {
                 await LoadMenuDecorationsAsync(menuItem.Items);
+            }
+        }
+    }
+
+    async Task<MenuItemDecorationContext> BuildMenuDecorationAsync(ApplicationMenuItem menuItem)
+    {
+        var context = new MenuItemDecorationContext(menuItem);
+
+        foreach (var contributor in MenuItemDecorationContributors)
+        {
+            await contributor.ConfigureAsync(context);
+        }
+
+        return context;
+    }
+
+    static IEnumerable<ApplicationMenuItem> EnumerateMenuItems(IReadOnlyList<ApplicationMenuItem> menuItems)
+    {
+        foreach (var menuItem in menuItems)
+        {
+            yield return menuItem;
+
+            if (!menuItem.Items.IsNullOrEmpty())
+            {
+                foreach (var child in EnumerateMenuItems(menuItem.Items))
+                {
+                    yield return child;
+                }
             }
         }
     }
@@ -115,4 +178,26 @@
             }
         }
     };
+
+    void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        _ = InvokeAsync(async () =>
+        {
+            await ReloadMenuDecorationsAsync();
+            StateHasChanged();
+        });
+    }
+
+    async Task HandleDecorationsChangedAsync(MenuItemDecorationChange change)
+    {
+        await ReloadMenuDecorationsAsync(change.RefreshKeys);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+        MenuItemDecorationState.Changed -= HandleDecorationsChangedAsync;
+        return ValueTask.CompletedTask;
+    }
 }

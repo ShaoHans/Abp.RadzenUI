@@ -3,9 +3,11 @@
 @using Abp.RadzenUI.Application.Contracts.Messages
 @using Abp.RadzenUI.Components.Pages.Messages
 @using Abp.RadzenUI.Localization
+@using Abp.RadzenUI.Navigation
 @implements IDisposable
 @inject IMessageAppService MessageAppService
 @inject MessageCenterState MessageCenterState
+@inject MenuItemDecorationState MenuItemDecorationState
 @inject NavigationManager NavigationManager
 @inject Volo.Abp.AspNetCore.Components.Notifications.IUiNotificationService UiNotify
 @inherits AbpRadzenUIComponentBase
@@ -162,6 +164,7 @@
         {
             await MessageAppService.MarkAllAsReadAsync();
             await MessageCenterState.NotifyChangedAsync();
+            await MenuItemDecorationState.NotifyChangedAsync(MenuItemDecorationRefreshKeys.UnreadMessages);
             await UiNotify.Success(L["SavedSuccessfully"]);
         }
         catch (Exception ex)
