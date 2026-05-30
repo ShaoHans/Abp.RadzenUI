@@ -1,6 +1,8 @@
-﻿@using Abp.RadzenUI.UIPlaceHolders
+﻿@using Abp.RadzenUI.Navigation
+@using Abp.RadzenUI.UIPlaceHolders
 @using Volo.Abp.UI.Navigation
 @inject IMenuManager MenuManager
+@inject IEnumerable<IMenuItemDecorationContributor> MenuItemDecorationContributors
 
 <RadzenSidebar Responsive="true"
                @bind-Expanded="@SidebarExpanded"
@@ -25,6 +27,7 @@
     [Parameter] public EventCallback<bool> SidebarExpandedChanged { get; set; }
     [Inject] IUIPlaceHolderResolver UIPlaceHolderResolver { get; set; } = default!;
     TitleBarSettings _titleBarSettings = new();
+    readonly Dictionary<string, MenuItemDecorationContext> _menuItemDecorations = [];
 
 
     ApplicationMenu _applicationMenu = default!;
@@ -33,6 +36,7 @@
     {
         _applicationMenu = await MenuManager.GetMainMenuAsync();
         _titleBarSettings = await UIPlaceHolderResolver.GetTitleBarSettingsAsync();
+        await LoadMenuDecorationsAsync(_applicationMenu.Items);
     }
 
     void FilterPanelMenu(ChangeEventArgs args)
@@ -42,18 +46,73 @@
 
     RenderFragment BuildMenuTree(ApplicationMenuItem menuItem) => __builder =>
     {
-        @if (menuItem.Items.IsNullOrEmpty())
+        var displayName = GetDisplayName(menuItem);
+
+        <RadzenPanelMenuItem aria-label="@menuItem.Name"
+                             Icon="@menuItem.Icon"
+                             Text="@displayName"
+                             Path="@menuItem.Url"
+                             Template="@(UseTemplate(menuItem) ? BuildMenuTemplate(menuItem) : null)"
+                             ChildContent="@(menuItem.Items.IsNullOrEmpty() ? null : BuildMenuChildren(menuItem.Items))" />
+    };
+
+    RenderFragment BuildMenuChildren(IReadOnlyList<ApplicationMenuItem> menuItems) => __builder =>
+    {
+        foreach (var child in menuItems)
         {
-            <RadzenPanelMenuItem aria-label="@menuItem.Name" Icon="@menuItem.Icon" Text="@menuItem.DisplayName" Path="@menuItem.Url" />
+            @BuildMenuTree(child)
         }
-        else
+    };
+
+    async Task LoadMenuDecorationsAsync(IReadOnlyList<ApplicationMenuItem> menuItems)
+    {
+        foreach (var menuItem in menuItems)
         {
-            <RadzenPanelMenuItem aria-label="@menuItem.Name" Icon="@menuItem.Icon" Text="@menuItem.DisplayName">
-                @foreach (var child in menuItem.Items)
-                {
-                    @BuildMenuTree(child);
-                }
-            </RadzenPanelMenuItem>
+            var context = new MenuItemDecorationContext(menuItem);
+
+            foreach (var contributor in MenuItemDecorationContributors)
+            {
+                await contributor.ConfigureAsync(context);
+            }
+
+            _menuItemDecorations[menuItem.Name] = context;
+
+            if (!menuItem.Items.IsNullOrEmpty())
+            {
+                await LoadMenuDecorationsAsync(menuItem.Items);
+            }
+        }
+    }
+
+    string GetDisplayName(ApplicationMenuItem menuItem)
+    {
+        return GetDecoration(menuItem)?.DisplayName ?? menuItem.DisplayName;
+    }
+
+    bool UseTemplate(ApplicationMenuItem menuItem)
+    {
+        return GetDecoration(menuItem)?.HasVisibleBadges == true;
+    }
+
+    MenuItemDecorationContext? GetDecoration(ApplicationMenuItem menuItem)
+    {
+        return _menuItemDecorations.GetValueOrDefault(menuItem.Name);
+    }
+
+    RenderFragment BuildMenuTemplate(ApplicationMenuItem menuItem) => __builder =>
+    {
+        var decoration = GetDecoration(menuItem);
+        var displayName = decoration?.DisplayName ?? menuItem.DisplayName;
+
+        @displayName
+        @if (decoration is not null)
+        {
+            foreach (var badge in decoration.Badges.Where(static badge => badge.Visible).OrderBy(badge => badge.Order))
+            {
+                <RadzenBadge Text="@badge.Text"
+                             BadgeStyle="@badge.BadgeStyle"
+                             Style="@badge.Style" />
+            }
         }
     };
 }
