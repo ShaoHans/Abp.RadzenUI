@@ -2,7 +2,7 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
-    <AbpRadzenUIPackageVersion>2.1.1</AbpRadzenUIPackageVersion>
+    <AbpRadzenUIPackageVersion>2.1.5</AbpRadzenUIPackageVersion>
     <Version Condition="'$(Version)' == ''">$(AbpRadzenUIPackageVersion)</Version>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <AbpProjectType>app</AbpProjectType>

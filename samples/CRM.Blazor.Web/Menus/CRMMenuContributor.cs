@@ -1,4 +1,5 @@
 ﻿using Abp.RadzenUI.Localization;
+using Abp.RadzenUI.Navigation;
 using CRM.Localization;
 using CRM.MultiTenancy;
 using CRM.Permissions;
@@ -26,12 +27,14 @@ public class CRMMenuContributor : IMenuContributor
         context.Menu.Items.Insert(
             0,
             new ApplicationMenuItem(CRMMenus.Home, l["Menu:Home"], "/", icon: "home", order: 1)
+                .WithIconColor("#2563eb")
         );
 
         var rl = context.GetLocalizer<AbpRadzenUIResource>();
         context.Menu.Items.Insert(
             1,
             new ApplicationMenuItem(CRMMenus.Dashboard, rl["Menu:Dashboard"], "/dashboard", icon: "dashboard", order: 2)
+                .WithIconColor("#0f766e")
         );
 
         ConfigProductMenu(context, l);
@@ -63,7 +66,7 @@ public class CRMMenuContributor : IMenuContributor
             l["Menu:Product"],
             icon: "inventory_2",
             order: 2
-        );
+        ).WithIconColor("#ea580c");
 
         productMenu.AddItem(
             new ApplicationMenuItem(

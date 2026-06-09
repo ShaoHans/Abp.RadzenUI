@@ -56,6 +56,7 @@
 
         <RadzenPanelMenuItem aria-label="@menuItem.Name"
                              Icon="@menuItem.Icon"
+                             IconColor="@GetIconColor(menuItem)"
                              Text="@displayName"
                              Path="@menuItem.Url"
                              Template="@(UseTemplate(menuItem) ? BuildMenuTemplate(menuItem) : null)"
@@ -150,6 +151,11 @@
     string GetDisplayName(ApplicationMenuItem menuItem)
     {
         return GetDecoration(menuItem)?.DisplayName ?? menuItem.DisplayName;
+    }
+
+    string? GetIconColor(ApplicationMenuItem menuItem)
+    {
+        return GetDecoration(menuItem)?.IconColor ?? menuItem.GetIconColor();
     }
 
     bool UseTemplate(ApplicationMenuItem menuItem)

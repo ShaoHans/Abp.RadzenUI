@@ -8,6 +8,8 @@ public class MenuItemDecorationContext(ApplicationMenuItem menuItem)
 
     public string DisplayName { get; set; } = menuItem.DisplayName;
 
+    public string? IconColor { get; set; } = menuItem.GetIconColor();
+
     public List<MenuItemBadgeDefinition> Badges { get; } = [];
 
     public HashSet<string> RefreshKeys { get; } = new(StringComparer.Ordinal);
