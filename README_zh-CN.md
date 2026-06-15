@@ -239,7 +239,7 @@ private void ConfigureOidcAuthentication(
 
 ##### （1）创建参数配置服务，例如：[AccountSettingsAppService](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.RadzenUI.Application/AccountSettingsAppService.cs)
 ##### （2）创建参数配置 Blazor 组件，例如：[AccountSettingComponent](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Components/Pages/Setting/AccountSettingComponent.razor)
-##### （3）定义参数配置 Contributor，实现接口 `ISettingComponentContributor`。该 Contributor 负责注册你的配置组件，例如：[AccountPageContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Blazor/SettingManagement/AccountPageContributor.cs)
+##### （3）定义参数配置 Contributor，实现接口 `ISettingComponentContributor`。该 Contributor 负责注册你的配置组件，例如：[AccountPageContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Features/Settings/AccountPageContributor.cs)
 ##### （4）最后将 Contributor 添加到 Module 配置中
 ```chsarp
 Configure<SettingManagementComponentOptions>(options =>

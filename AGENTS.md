@@ -176,7 +176,7 @@ app.UseRadzenUI();
 - `MessageMenuContributor`：消息菜单。
 - `SettingManagementMenuContributor`：设置管理菜单。
 
-菜单图标使用 Radzen/Material Symbols 风格的字符串图标名。菜单颜色扩展在 `Navigation/ApplicationMenuItemIconColorExtensions.cs`。
+菜单图标使用 Radzen/Material Symbols 风格的字符串图标名。菜单颜色扩展在 `Infrastructure/Navigation/ApplicationMenuItemIconColorExtensions.cs`。
 
 示例业务菜单：`samples/CRM.Blazor.Web/Menus/CRMMenuContributor.cs`
 
@@ -206,8 +206,8 @@ app.UseRadzenUI();
 
 - `Components/Shared`：搜索框、分页跳转、布尔图标、错误边界、语言切换、表单布局等。
 - `Components/ObjectExtending`：ABP 对象扩展属性的 Radzen 表单组件。
-- `Blazor/SideDialogs`：侧边弹窗协调器。
-- `Blazor/SettingManagement`：设置页贡献器机制。
+- `Features/SideDialogs`：侧边弹窗协调器。
+- `Features/Settings`：设置页贡献器机制。
 
 ## 内置业务模块
 
@@ -273,7 +273,7 @@ UI 包已经内置关联账户页面，主要页面在：
 
 ### 头像上传
 
-相关目录：`src/Abp.Blazor.Server.RadzenUI/Avatar`
+相关目录：`src/Abp.Blazor.Server.RadzenUI/Features/Avatar`
 
 默认服务：
 
@@ -358,9 +358,9 @@ builder.ConfigureAbpRadzenUI();
 
 全局 Bundle 定义：
 
-- `Bundling/BlazorRadzenThemeBundles.cs`
-- `Bundling/BlazorGlobalStyleContributor.cs`
-- `Bundling/BlazorGlobalScriptContributor.cs`
+- `Infrastructure/Bundling/BlazorRadzenThemeBundles.cs`
+- `Infrastructure/Bundling/BlazorGlobalStyleContributor.cs`
+- `Infrastructure/Bundling/BlazorGlobalScriptContributor.cs`
 
 ## 开发和维护约定
 

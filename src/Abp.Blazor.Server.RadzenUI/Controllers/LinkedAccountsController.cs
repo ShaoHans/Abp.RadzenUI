@@ -1,4 +1,4 @@
-using Abp.RadzenUI.Services;
+using Abp.RadzenUI.Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Abp.RadzenUI.Controllers;

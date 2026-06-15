@@ -243,7 +243,7 @@ Follow the steps below to add your own settings component:
 
 ##### (2) Create a Blazor component for the settings UI, for example: [AccountSettingComponent](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Components/Pages/Setting/AccountSettingComponent.razor)
 
-##### (3) Create a contributor by implementing `ISettingComponentContributor`. The contributor is responsible for registering your settings component, for example: [AccountPageContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Blazor/SettingManagement/AccountPageContributor.cs)
+##### (3) Create a contributor by implementing `ISettingComponentContributor`. The contributor is responsible for registering your settings component, for example: [AccountPageContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Features/Settings/AccountPageContributor.cs)
 
 ##### (4) Finally, register the contributor in your module configuration
 

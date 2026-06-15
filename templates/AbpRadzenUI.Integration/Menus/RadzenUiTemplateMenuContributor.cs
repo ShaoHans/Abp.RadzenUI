@@ -1,4 +1,4 @@
-using Abp.RadzenUI.Navigation;
+using Abp.RadzenUI.Infrastructure.Navigation;
 using Volo.Abp.UI.Navigation;
 
 namespace RadzenUiTemplateNamespace.Menus;

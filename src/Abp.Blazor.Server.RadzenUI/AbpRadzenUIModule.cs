@@ -1,12 +1,12 @@
-﻿using Abp.RadzenUI.Blazor.SettingManagement;
-using Abp.RadzenUI.Bundling;
-using Abp.RadzenUI.Avatar;
+using Abp.RadzenUI.Features.Settings;
+using Abp.RadzenUI.Infrastructure.Bundling;
+using Abp.RadzenUI.Features.Avatar;
 using Abp.RadzenUI.EntityFrameworkCore;
 using Abp.RadzenUI.LinkAccounts;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Menus;
-using Abp.RadzenUI.Navigation;
-using Abp.RadzenUI.Services;
+using Abp.RadzenUI.Infrastructure.Navigation;
+using Abp.RadzenUI.Infrastructure.Services;
 using Localization.Resources.AbpUi;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;

@@ -1,4 +1,4 @@
-using Abp.RadzenUI.Utils;
+using Abp.RadzenUI.Infrastructure.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Radzen;

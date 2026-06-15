@@ -1,6 +1,6 @@
 using Abp.RadzenUI.Application.Contracts.Messages;
 using Abp.RadzenUI.Localization;
-using Abp.RadzenUI.Navigation;
+using Abp.RadzenUI.Infrastructure.Navigation;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 using Radzen;

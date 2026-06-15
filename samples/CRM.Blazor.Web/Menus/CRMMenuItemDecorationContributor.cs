@@ -1,5 +1,5 @@
 using Abp.RadzenUI.Application.Contracts.Messages;
-using Abp.RadzenUI.Navigation;
+using Abp.RadzenUI.Infrastructure.Navigation;
 using Radzen;
 using static Abp.RadzenUI.Menus.RadzenUI;
 

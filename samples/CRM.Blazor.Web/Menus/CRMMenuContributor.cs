@@ -1,5 +1,5 @@
-﻿using Abp.RadzenUI.Localization;
-using Abp.RadzenUI.Navigation;
+using Abp.RadzenUI.Localization;
+using Abp.RadzenUI.Infrastructure.Navigation;
 using CRM.Localization;
 using CRM.MultiTenancy;
 using CRM.Permissions;

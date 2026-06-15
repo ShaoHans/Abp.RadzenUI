@@ -1,6 +1,6 @@
-using Abp.RadzenUI.Avatar;
+using Abp.RadzenUI.Features.Avatar;
 using Abp.RadzenUI.Localization;
-using Abp.RadzenUI.Utils;
+using Abp.RadzenUI.Infrastructure.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;

@@ -1,6 +1,6 @@
-﻿using System.Net.Mail;
+using System.Net.Mail;
 using System.Security.Claims;
-using Abp.RadzenUI.Services;
+using Abp.RadzenUI.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

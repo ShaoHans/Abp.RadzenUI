@@ -1,4 +1,4 @@
-﻿using Abp.RadzenUI.Blazor.SettingManagement;
+using Abp.RadzenUI.Features.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Volo.Abp.Features;
