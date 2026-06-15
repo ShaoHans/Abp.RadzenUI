@@ -17,6 +17,7 @@ English | [简体中文](README_zh-CN.md)
 
 - [Try the Demo](#-try-the-demo)
 - [Get Started](#-get-started)
+- [Use the dotnet new Template](#use-the-dotnet-new-template)
 - [Use the Linked Accounts Module](#-use-the-linked-accounts-module)
 - [Use the Data Dictionary Module](#-use-the-data-dictionary-module)
 - [Use the Messages Module](#-use-the-messages-module)
@@ -37,6 +38,69 @@ Password:  **1q2w#E***
 - `AbpRadzen.LinkAccounts`: the standalone linked-accounts application package.
 - `AbpRadzen.EntityFrameworkCore`: the unified EF Core package for the built-in Data Dictionary and Messages modules.
 - `AbpRadzen.Application.Contracts`, `AbpRadzen.Application`, `AbpRadzen.Domain`, `AbpRadzen.Domain.Shared`: layered building blocks for custom composition outside the full UI package.
+
+### Use the dotnet new Template
+
+This repository includes a `dotnet new` item template that generates the common integration files for an existing ABP Blazor Server web project, including the RadzenUI integration helper, menu contributor, minimal home page, and an integration checklist.
+
+Install the template from the repository root:
+
+```shell
+dotnet new install .\templates\AbpRadzenUI.Integration
+```
+
+Go to your Blazor Server web project directory, for example `src\MyCompany.MyProject.Blazor`, and run:
+
+```shell
+dotnet new abp-radzenui-integration -n MyProject --rootNamespace MyCompany.MyProject.Blazor --title "My Project"
+```
+
+To enable Radzen premium themes:
+
+```shell
+dotnet new abp-radzenui-integration -n MyProject --rootNamespace MyCompany.MyProject.Blazor --title "My Project" --premiumTheme true
+```
+
+Parameters:
+
+- `-n`: the short project name used for generated C# type names. Avoid dots.
+- `--rootNamespace`: the real root namespace of the target Blazor Server web project.
+- `--title`: the system title shown in the title bar and login page.
+- `--premiumTheme`: enables Radzen premium themes.
+
+The template generates:
+
+- `RadzenUI/<ProjectName>RadzenUIIntegrationExtensions.cs`
+- `Menus/<ProjectName>Menus.cs`
+- `Menus/<ProjectName>MenuContributor.cs`
+- `Components/Pages/Home.razor`
+- `RadzenUI/RADZENUI-INTEGRATION.md`
+
+After generation, complete the manual integration checklist:
+
+```shell
+dotnet add package AbpRadzen.Blazor.Server.UI
+```
+
+Add the module dependency to your web module:
+
+```csharp
+typeof(AbpRadzenUIModule)
+```
+
+Call the generated extension method in `ConfigureServices`:
+
+```csharp
+context.Services.AddRadzenUIIntegration<Home, MyProjectResource, MyProjectMenuContributor>();
+```
+
+Finally, call RadzenUI at the end of `OnApplicationInitialization`:
+
+```csharp
+app.UseRadzenUI();
+```
+
+See [docs/getting-started-template.md](docs/getting-started-template.md) for the full guide.
 
 ### Integration Steps
 
