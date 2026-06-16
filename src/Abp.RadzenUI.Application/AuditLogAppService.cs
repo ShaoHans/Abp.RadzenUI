@@ -57,6 +57,8 @@ public class AuditLogAppService
 
         var query = await base.CreateFilteredQueryAsync(input);
 
+        query = query.Where(x => x.Url != null && x.Url != "");
+
         if (!string.IsNullOrEmpty(input.Filter))
         {
             query = query.Where(input.Filter);
