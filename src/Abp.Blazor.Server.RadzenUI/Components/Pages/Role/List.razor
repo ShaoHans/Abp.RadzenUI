@@ -41,6 +41,8 @@
 
                 @if ((context.Name != "admin" || CurrentUser.UserName == "admin") && HasManagePermissionsPermission)
                 {
+                    <RadzenButton Icon="visibility" title="@UL["PermissionVisualizer:Title"]" ButtonStyle="ButtonStyle.Info" Size="ButtonSize.Small"
+                                  Click="@(async () => await OpenPermissionVisualizerDialog(context))" />
                     <RadzenButton Icon="productivity" title="@L["Permissions"]" ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small"
                                   Click="@(async () => await OpenAssignPermissionDialog(context))" />
                 }

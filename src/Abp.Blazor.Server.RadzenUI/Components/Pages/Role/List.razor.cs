@@ -60,6 +60,23 @@ public partial class List
         );
     }
 
+    private async Task OpenPermissionVisualizerDialog(IdentityRoleDto role)
+    {
+        await DialogService.OpenAsync<Abp.RadzenUI.Components.Pages.Permission.Visualizer>(
+            $"{UL["PermissionVisualizer:Title"]} - {role.Name}",
+            parameters: new Dictionary<string, object?>()
+            {
+                { "ProviderName", "R" },
+                { "ProviderKey", role.Name },
+            },
+            options: new DialogOptions()
+            {
+                Draggable = true,
+                Width = "1000px",
+            }
+        );
+    }
+
     private async Task OpenClaimsDialog(IdentityRoleDto role)
     {
         await DialogService.OpenAsync<Claims>(

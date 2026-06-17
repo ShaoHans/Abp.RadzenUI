@@ -79,9 +79,11 @@
                                    CanDelete="@(context.UserName != "admin" && HasDeletePermission)"
                                    EditTitle="@L["Edit"]"
                                    PermissionsTitle="@L["Permissions"]"
+                                   PermissionsVisualizerTitle="@IL["PermissionVisualizer:Title"]"
                                    DeleteTitle="@L["Delete"]"
                                    OnEdit="OpenEditUserAsync"
                                    OnManagePermissions="OpenAssignPermissionDialog"
+                                   OnViewPermissions="OpenPermissionVisualizerDialog"
                                    OnDelete="DeleteUserAsync" />
             </Template>
         </RadzenDataGridColumn>

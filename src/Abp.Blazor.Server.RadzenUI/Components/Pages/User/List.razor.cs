@@ -108,6 +108,19 @@ public partial class List
         );
     }
 
+    async Task OpenPermissionVisualizerDialog(IdentityUserDto user)
+    {
+        await DialogService.OpenAsync<Abp.RadzenUI.Components.Pages.Permission.Visualizer>(
+            $"{IL["PermissionVisualizer:Title"]} - {user.UserName}",
+            parameters: new Dictionary<string, object?>()
+            {
+                { "ProviderName", "U" },
+                { "ProviderKey", user.Id.ToString() },
+            },
+            options: new DialogOptions() { Draggable = true, Width = "1000px", }
+        );
+    }
+
     async Task OpenEditUserAsync(IdentityUserDto user)
     {
         await OpenEditDialogAsync<Edit>(

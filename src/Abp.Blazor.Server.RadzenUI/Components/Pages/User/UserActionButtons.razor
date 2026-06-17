@@ -7,6 +7,8 @@
 }
 @if (CanManagePermissions)
 {
+    <RadzenButton Icon="visibility" title="@PermissionsVisualizerTitle" ButtonStyle="ButtonStyle.Info" Size="ButtonSize.Small"
+                  Click="HandleViewPermissionsClick" />
     <RadzenButton Icon="productivity" title="@PermissionsTitle" ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small"
                   Click="HandleManagePermissionsClick" />
 }
@@ -36,6 +38,9 @@
     public string PermissionsTitle { get; set; } = default!;
 
     [Parameter, EditorRequired]
+    public string PermissionsVisualizerTitle { get; set; } = default!;
+
+    [Parameter, EditorRequired]
     public string DeleteTitle { get; set; } = default!;
 
     [Parameter, EditorRequired]
@@ -43,6 +48,9 @@
 
     [Parameter, EditorRequired]
     public EventCallback<IdentityUserDto> OnManagePermissions { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<IdentityUserDto> OnViewPermissions { get; set; }
 
     [Parameter, EditorRequired]
     public EventCallback<IdentityUserDto> OnDelete { get; set; }
@@ -55,6 +63,11 @@
     Task HandleManagePermissionsClick()
     {
         return OnManagePermissions.InvokeAsync(User);
+    }
+
+    Task HandleViewPermissionsClick()
+    {
+        return OnViewPermissions.InvokeAsync(User);
     }
 
     Task HandleDeleteClick()

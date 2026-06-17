@@ -1,0 +1,410 @@
+@using Volo.Abp.PermissionManagement
+@using Volo.Abp.PermissionManagement.Localization
+@using Microsoft.Extensions.Localization
+@using Abp.RadzenUI.Localization
+@using Abp.RadzenUI.Permissions
+@inject IPermissionAppService PermissionAppService
+@inject DialogService DialogService
+@inject IStringLocalizer<AbpRadzenUIResource> UI
+@inherits AbpRadzenUIComponentBase
+
+<RadzenStack Gap="1rem" Style="height:calc(100vh - 180px); min-height: 480px;">
+    @if (_isLoading)
+    {
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="height:100%;">
+            <RadzenProgressBarCircular ShowValue="true" Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Medium" />
+        </RadzenStack>
+    }
+    else
+    {
+        <RadzenStack Gap="1rem" Style="height:100%; min-height:0;">
+            <RadzenRow Gap="0.75rem" RowGap="0.75rem">
+                <RadzenColumn Size="6" SizeMD="3">
+                    @SummaryCard(UI["PermissionVisualizer:Total"], _totalCount.ToString(), "account_tree", BadgeStyle.Info)
+                </RadzenColumn>
+                <RadzenColumn Size="6" SizeMD="3">
+                    @SummaryCard(UI["PermissionVisualizer:Granted"], _grantedCount.ToString(), "verified", BadgeStyle.Success)
+                </RadzenColumn>
+                <RadzenColumn Size="6" SizeMD="3">
+                    @SummaryCard(UI["PermissionVisualizer:NotGranted"], _notGrantedCount.ToString(), "block", BadgeStyle.Light)
+                </RadzenColumn>
+                <RadzenColumn Size="6" SizeMD="3">
+                    @SummaryCard(UI["PermissionVisualizer:ExternalGranted"], _externalGrantedCount.ToString(), "hub", BadgeStyle.Warning)
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.75rem" Wrap="FlexWrap.Wrap">
+                <RadzenTextBox @bind-Value="_keyword"
+                               Placeholder="@UI["PermissionVisualizer:SearchPlaceholder"]"
+                               Change="@(_ => ApplyFilter())"
+                               Style="width:min(360px, 100%);" />
+                <RadzenButton Icon="search" Text="@UI["Btn:Search"]" Click="ApplyFilter" />
+                <RadzenButton Icon="refresh" Text="@UI["Btn:Reset"]" ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" Click="ResetFilter" />
+                <RadzenDropDown TValue="PermissionVisualFilter"
+                                Data="@_filterOptions"
+                                TextProperty="@nameof(FilterOption.Text)"
+                                ValueProperty="@nameof(FilterOption.Value)"
+                                @bind-Value="_filter"
+                                Change="@(_ => ApplyFilter())"
+                                Style="width:220px;" />
+            </RadzenStack>
+
+            <RadzenTabs RenderMode="TabRenderMode.Client" Style="height:100%; min-height:0;">
+                <Tabs>
+                    <RadzenTabsItem Text="@UI["PermissionVisualizer:Groups"]">
+                        <RadzenDataGrid Data="@_filteredGroups" TItem="PermissionGroupVm" AllowSorting="true" Style="height:100%;">
+                            <Columns>
+                                <RadzenDataGridColumn Property="@nameof(PermissionGroupVm.DisplayName)" Title="@UI["PermissionVisualizer:Group"]" Width="260px" />
+                                <RadzenDataGridColumn Title="@UI["PermissionVisualizer:Granted"]" Width="140px">
+                                    <Template>
+                                        @{
+                                            var stats = GetGroupStats(context);
+                                        }
+                                        <RadzenBadge BadgeStyle="@GetCoverageBadgeStyle(stats.Total, stats.Granted)" Text="@($"{stats.Granted}/{stats.Total}")" />
+                                    </Template>
+                                </RadzenDataGridColumn>
+                                <RadzenDataGridColumn Title="@UI["PermissionVisualizer:Coverage"]">
+                                    <Template>
+                                        @{
+                                            var stats = GetGroupStats(context);
+                                            var percent = stats.Total == 0 ? 0 : (int)Math.Round(stats.Granted * 100m / stats.Total);
+                                        }
+                                        <RadzenProgressBar Value="@percent" ShowValue="true" />
+                                    </Template>
+                                </RadzenDataGridColumn>
+                                <RadzenDataGridColumn Title="@UI["PermissionVisualizer:ExternalGranted"]" Width="150px">
+                                    <Template>
+                                        @{
+                                            var stats = GetGroupStats(context);
+                                        }
+                                        <RadzenBadge BadgeStyle="BadgeStyle.Warning" Text="@stats.ExternalGranted.ToString()" />
+                                    </Template>
+                                </RadzenDataGridColumn>
+                            </Columns>
+                        </RadzenDataGrid>
+                    </RadzenTabsItem>
+
+                    <RadzenTabsItem Text="@UI["PermissionVisualizer:Tree"]">
+                        @if (_filteredGroups.Count == 0)
+                        {
+                            @EmptyState(UI["PermissionVisualizer:NoPermissions"])
+                        }
+                        else
+                        {
+                            <RadzenTabs TabPosition="TabPosition.Left" RenderMode="TabRenderMode.Client" Style="height:100%;">
+                                <Tabs>
+                                    @foreach (var group in _filteredGroups)
+                                    {
+                                        <RadzenTabsItem Text="@GetTabShowName(group)">
+                                            @if (group.TreeItems.Count == 0)
+                                            {
+                                                @EmptyState(UI["PermissionVisualizer:NoPermissions"])
+                                            }
+                                            else
+                                            {
+                                                <RadzenTree Style="width:100%;height:100%;max-height:calc(100vh - 360px);overflow:auto;" Data="@group.TreeItems">
+                                                    <RadzenTreeLevel Text="(i => GetPermissionShownName(((PermissionTreeItemVm)i).Permission))"
+                                                                     ChildrenProperty="Children"
+                                                                     Expanded="(i => true)"
+                                                                     HasChildren="(i => ((PermissionTreeItemVm)i).Children.Count > 0)">
+                                                        <Template>
+                                                            @if (context.Value is PermissionTreeItemVm treeItem)
+                                                            {
+                                                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+                                                                    <RadzenBadge BadgeStyle="@(treeItem.Permission.IsGranted ? BadgeStyle.Success : BadgeStyle.Light)"
+                                                                                 Text="@(treeItem.Permission.IsGranted ? UI["PermissionVisualizer:Granted"] : UI["PermissionVisualizer:NotGranted"])" />
+                                                                    <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0">@context.Text</RadzenText>
+                                                                    <RadzenText TextStyle="TextStyle.Caption" class="rz-color-secondary rz-m-0">@treeItem.Permission.Name</RadzenText>
+                                                                    @foreach (var provider in GetExternalProviders(treeItem.Permission))
+                                                                    {
+                                                                        <RadzenBadge BadgeStyle="BadgeStyle.Warning" Text="@GetProviderText(provider)" />
+                                                                    }
+                                                                </RadzenStack>
+                                                            }
+                                                        </Template>
+                                                    </RadzenTreeLevel>
+                                                </RadzenTree>
+                                            }
+                                        </RadzenTabsItem>
+                                    }
+                                </Tabs>
+                            </RadzenTabs>
+                        }
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+                <RadzenButton Text="@UI["Close"]" ButtonStyle="ButtonStyle.Base" Click="@(() => DialogService.Close(false))" />
+            </RadzenStack>
+        </RadzenStack>
+    }
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public string ProviderName { get; set; } = default!;
+
+    [Parameter]
+    public string ProviderKey { get; set; } = default!;
+
+    private static readonly HashSet<string> SystemMgmtGroupNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "AbpIdentity",
+        "AbpTenantManagement",
+        "SettingManagement",
+        "FeatureManagement",
+        RadzenUIPermissions.GroupName
+    };
+
+    readonly List<FilterOption> _filterOptions = [];
+    List<PermissionGroupVm> _groups = [];
+    List<PermissionGroupVm> _filteredGroups = [];
+    string? _keyword;
+    PermissionVisualFilter _filter = PermissionVisualFilter.All;
+    int _totalCount;
+    int _grantedCount;
+    int _notGrantedCount;
+    int _externalGrantedCount;
+    bool _isLoading = true;
+
+    public Visualizer()
+    {
+        LocalizationResource = typeof(AbpPermissionManagementResource);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _filterOptions.AddRange(
+        [
+            new FilterOption(PermissionVisualFilter.All, UI["PermissionVisualizer:Filter.All"]),
+            new FilterOption(PermissionVisualFilter.Granted, UI["PermissionVisualizer:Filter.Granted"]),
+            new FilterOption(PermissionVisualFilter.NotGranted, UI["PermissionVisualizer:Filter.NotGranted"]),
+            new FilterOption(PermissionVisualFilter.ExternalGranted, UI["PermissionVisualizer:Filter.ExternalGranted"]),
+        ]);
+
+        var result = await PermissionAppService.GetAsync(ProviderName, ProviderKey);
+        _groups = BuildGroups(result);
+        UpdateSummary();
+        ApplyFilter();
+        _isLoading = false;
+    }
+
+    List<PermissionGroupVm> BuildGroups(GetPermissionListResultDto result)
+    {
+        var groups = new List<PermissionGroupVm>();
+        var sysMgmtApiGroups = result.Groups
+            .Where(g => SystemMgmtGroupNames.Contains(g.Name))
+            .ToList();
+        var otherApiGroups = result.Groups
+            .Where(g => !SystemMgmtGroupNames.Contains(g.Name))
+            .ToList();
+
+        if (sysMgmtApiGroups.Count > 0)
+        {
+            var mergedTreeItems = new List<PermissionTreeItemVm>();
+            foreach (var group in sysMgmtApiGroups)
+            {
+                mergedTreeItems.AddRange(GenerateTree(group.Permissions, null, 0, null));
+            }
+
+            groups.Add(new PermissionGroupVm
+            {
+                Name = "SystemManagement",
+                DisplayName = UI["Permission:SystemGroupName"],
+                TreeItems = mergedTreeItems
+            });
+        }
+
+        foreach (var group in otherApiGroups)
+        {
+            groups.Add(new PermissionGroupVm
+            {
+                Name = group.Name,
+                DisplayName = group.DisplayName,
+                TreeItems = GenerateTree(group.Permissions, null, 0, null)
+            });
+        }
+
+        return groups;
+    }
+
+    List<PermissionTreeItemVm> GenerateTree(List<PermissionGrantInfoDto> allPermissions, string? parentName, int depth, PermissionTreeItemVm? parent)
+    {
+        var treeItems = new List<PermissionTreeItemVm>();
+        var subPermissions = allPermissions.Where(p => p.ParentName == parentName);
+
+        foreach (var item in subPermissions)
+        {
+            var treeItem = new PermissionTreeItemVm(depth, item);
+            treeItem.SetParent(parent);
+            treeItem.Children = GenerateTree(allPermissions, item.Name, depth + 1, treeItem);
+            treeItems.Add(treeItem);
+        }
+
+        return treeItems;
+    }
+
+    void UpdateSummary()
+    {
+        var permissions = _groups.SelectMany(x => x.Expand()).Select(x => x.Permission).ToList();
+        _totalCount = permissions.Count;
+        _grantedCount = permissions.Count(x => x.IsGranted);
+        _notGrantedCount = _totalCount - _grantedCount;
+        _externalGrantedCount = permissions.Count(HasExternalProvider);
+    }
+
+    void ApplyFilter()
+    {
+        _filteredGroups = _groups
+            .Select(FilterGroup)
+            .Where(x => x.TreeItems.Count > 0)
+            .ToList();
+    }
+
+    void ResetFilter()
+    {
+        _keyword = null;
+        _filter = PermissionVisualFilter.All;
+        ApplyFilter();
+    }
+
+    PermissionGroupVm FilterGroup(PermissionGroupVm group)
+    {
+        return new PermissionGroupVm
+        {
+            Name = group.Name,
+            DisplayName = group.DisplayName,
+            TreeItems = group.TreeItems
+                .Select(FilterTree)
+                .Where(x => x is not null)
+                .Cast<PermissionTreeItemVm>()
+                .ToList()
+        };
+    }
+
+    PermissionTreeItemVm? FilterTree(PermissionTreeItemVm item)
+    {
+        var children = item.Children
+            .Select(FilterTree)
+            .Where(x => x is not null)
+            .Cast<PermissionTreeItemVm>()
+            .ToList();
+
+        if (!MatchesFilter(item.Permission) && children.Count == 0)
+        {
+            return null;
+        }
+
+        var clone = new PermissionTreeItemVm(item.Depth, item.Permission)
+        {
+            Children = children
+        };
+
+        foreach (var child in clone.Children)
+        {
+            child.SetParent(clone);
+        }
+
+        return clone;
+    }
+
+    bool MatchesFilter(PermissionGrantInfoDto permission)
+    {
+        var matchesState = _filter switch
+        {
+            PermissionVisualFilter.Granted => permission.IsGranted,
+            PermissionVisualFilter.NotGranted => !permission.IsGranted,
+            PermissionVisualFilter.ExternalGranted => HasExternalProvider(permission),
+            _ => true
+        };
+
+        if (!matchesState)
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(_keyword))
+        {
+            return true;
+        }
+
+        return permission.Name.Contains(_keyword, StringComparison.OrdinalIgnoreCase)
+               || permission.DisplayName.Contains(_keyword, StringComparison.OrdinalIgnoreCase)
+               || permission.GrantedProviders.Any(x =>
+                   x.ProviderName.Contains(_keyword, StringComparison.OrdinalIgnoreCase)
+                   || x.ProviderKey.Contains(_keyword, StringComparison.OrdinalIgnoreCase));
+    }
+
+    (int Total, int Granted, int ExternalGranted) GetGroupStats(PermissionGroupVm group)
+    {
+        var permissions = group.Expand().Select(x => x.Permission).ToList();
+        return (
+            permissions.Count,
+            permissions.Count(x => x.IsGranted),
+            permissions.Count(HasExternalProvider)
+        );
+    }
+
+    string GetTabShowName(PermissionGroupVm group)
+    {
+        var stats = GetGroupStats(group);
+        return $"{group.DisplayName} ({stats.Granted}/{stats.Total})";
+    }
+
+    string GetPermissionShownName(PermissionGrantInfoDto permission)
+    {
+        return permission.DisplayName;
+    }
+
+    IEnumerable<ProviderInfoDto> GetExternalProviders(PermissionGrantInfoDto permission)
+    {
+        return permission.GrantedProviders.Where(x => x.ProviderName != ProviderName);
+    }
+
+    bool HasExternalProvider(PermissionGrantInfoDto permission)
+    {
+        return GetExternalProviders(permission).Any();
+    }
+
+    string GetProviderText(ProviderInfoDto provider)
+    {
+        return $"{provider.ProviderName}: {provider.ProviderKey}";
+    }
+
+    BadgeStyle GetCoverageBadgeStyle(int total, int granted)
+    {
+        if (total == 0 || granted == 0)
+        {
+            return BadgeStyle.Light;
+        }
+
+        return granted == total ? BadgeStyle.Success : BadgeStyle.Info;
+    }
+
+    RenderFragment<string> EmptyState => text =>
+        @<RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" Style="height:100%; min-height:260px;">
+            <RadzenIcon Icon="policy" Style="font-size:2.5rem;color:var(--rz-text-disabled-color);" />
+            <RadzenText TextStyle="TextStyle.Body2" class="rz-color-secondary">@text</RadzenText>
+        </RadzenStack>;
+
+    RenderFragment SummaryCard(string title, string value, string icon, BadgeStyle badgeStyle) =>
+        @<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.75rem"
+                      Style="padding:0.75rem;border:1px solid var(--rz-border-color);border-radius:var(--rz-border-radius);height:100%;">
+            <RadzenIcon Icon="@icon" Style="font-size:1.75rem;color:var(--rz-primary);" />
+            <RadzenStack Gap="0.15rem">
+                <RadzenText TextStyle="TextStyle.Caption" class="rz-m-0">@title</RadzenText>
+                <RadzenBadge BadgeStyle="@badgeStyle" Text="@value" Style="width:max-content;" />
+            </RadzenStack>
+        </RadzenStack>;
+
+    record FilterOption(PermissionVisualFilter Value, string Text);
+
+    enum PermissionVisualFilter
+    {
+        All,
+        Granted,
+        NotGranted,
+        ExternalGranted
+    }
+}
