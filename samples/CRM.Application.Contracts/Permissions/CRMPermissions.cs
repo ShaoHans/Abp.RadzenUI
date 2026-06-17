@@ -14,6 +14,16 @@ public static class CRMPermissions
         public const string Create = Default + ".Create";
     }
 
+    public static class Operations
+    {
+        public const string Default = GroupName + ".Operations";
+        public const string Dashboard = Default + ".Dashboard";
+        public const string WorkOrders = Default + ".WorkOrders";
+        public const string WorkOrderActions = WorkOrders + ".Actions";
+        public const string Assets = Default + ".Assets";
+        public const string Shifts = Default + ".Shifts";
+    }
+
     public static string[] GetAll()
     {
         return ReflectionHelper.GetPublicConstantsRecursively(typeof(CRMPermissions));

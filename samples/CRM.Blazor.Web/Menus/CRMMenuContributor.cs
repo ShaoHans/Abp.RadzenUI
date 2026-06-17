@@ -37,6 +37,7 @@ public class CRMMenuContributor : IMenuContributor
                 .WithIconColor("#0f766e")
         );
 
+        ConfigOperationMenu(context, l);
         ConfigProductMenu(context, l);
 
         //Administration
@@ -78,5 +79,67 @@ public class CRMMenuContributor : IMenuContributor
         );
 
         context.Menu.Items.Add(productMenu);
+    }
+
+    private static void ConfigOperationMenu(MenuConfigurationContext context, IStringLocalizer l)
+    {
+        var operationsMenu = new ApplicationMenuItem(
+            CRMMenus.Operations,
+            l["Menu:Operations"],
+            icon: "support_agent",
+            order: 3
+        ).WithIconColor("#0f766e");
+
+        operationsMenu.AddItem(
+            new ApplicationMenuItem(
+                CRMMenus.OperationsDashboard,
+                l["Menu:Operations.Dashboard"],
+                "/operations",
+                icon: "monitoring",
+                order: 1
+            ).RequirePermissions(CRMPermissions.Operations.Dashboard)
+        );
+
+        operationsMenu.AddItem(
+            new ApplicationMenuItem(
+                CRMMenus.WorkOrders,
+                l["Menu:Operations.WorkOrders"],
+                "/operations/work-orders",
+                icon: "fact_check",
+                order: 2
+            ).RequirePermissions(CRMPermissions.Operations.WorkOrders)
+        );
+
+        operationsMenu.AddItem(
+            new ApplicationMenuItem(
+                CRMMenus.WorkOrderBoard,
+                l["Menu:Operations.Board"],
+                "/operations/board",
+                icon: "view_kanban",
+                order: 3
+            ).RequirePermissions(CRMPermissions.Operations.WorkOrders)
+        );
+
+        operationsMenu.AddItem(
+            new ApplicationMenuItem(
+                CRMMenus.OperationShifts,
+                l["Menu:Operations.Shifts"],
+                "/operations/shifts",
+                icon: "calendar_month",
+                order: 4
+            ).RequirePermissions(CRMPermissions.Operations.Shifts)
+        );
+
+        operationsMenu.AddItem(
+            new ApplicationMenuItem(
+                CRMMenus.OperationAssets,
+                l["Menu:Operations.Assets"],
+                "/operations/assets",
+                icon: "precision_manufacturing",
+                order: 5
+            ).RequirePermissions(CRMPermissions.Operations.Assets)
+        );
+
+        context.Menu.Items.Add(operationsMenu);
     }
 }

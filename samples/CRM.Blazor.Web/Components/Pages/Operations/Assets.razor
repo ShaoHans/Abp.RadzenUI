@@ -1,0 +1,120 @@
+@page "/operations/assets"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(CRMPermissions.Operations.Assets)]
+@inject IOperationAppService OperationAppService
+@inherits AbpRadzenUIComponentBase
+
+<PageTitle>@L["OperationAssets"]</PageTitle>
+
+<RadzenStack Gap="1rem" class="rz-p-4">
+    <RadzenCard Variant="Variant.Flat" Style="border:1px solid var(--rz-base-300);">
+        <RadzenStack Gap="0.75rem">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="1rem" Wrap="FlexWrap.Wrap">
+                <RadzenStack Gap="0.15rem">
+                    <RadzenText TextStyle="TextStyle.H5"><strong>@L["OperationAssets"]</strong></RadzenText>
+                    <RadzenText TextStyle="TextStyle.Caption" class="rz-color-on-surface-variant">@L["OperationAssetsSubtitle"]</RadzenText>
+                </RadzenStack>
+                <RadzenButton Icon="refresh" Text="@L["Refresh"]" ButtonStyle="ButtonStyle.Light" Click="ReloadAsync" />
+            </RadzenStack>
+
+            <RadzenRow Gap="0.75rem">
+                <RadzenColumn Size="12" SizeMD="5">
+                    <RadzenTextBox @bind-Value="_filter" Placeholder="@L["Keyword"]" Style="width:100%;" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="3">
+                    <RadzenDropDown TValue="AssetStatus?" @bind-Value="_status" Data="@_statuses" AllowClear="true" Placeholder="@L["Status"]" Style="width:100%;" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="2">
+                    <RadzenTextBox @bind-Value="_category" Placeholder="@L["Category"]" Style="width:100%;" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="2">
+                    <RadzenButton Icon="search" Text="@L["Search"]" Style="width:100%;" Click="ReloadAsync" />
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenStack>
+    </RadzenCard>
+
+    <LocalizedDataGrid @ref="_grid"
+                       TItem="OperationAssetDto"
+                       Data="@_items"
+                       Count="@_totalCount"
+                       LoadData="LoadDataAsync"
+                       IsLoading="@_isLoading"
+                       AllowPaging="true"
+                       AllowSorting="true"
+                       PageSize="20"
+                       PagerHorizontalAlign="HorizontalAlign.Center"
+                       Style="height:calc(100vh - 260px); min-height:460px;">
+        <Columns>
+            <RadzenDataGridColumn TItem="OperationAssetDto" Property="@nameof(OperationAssetDto.Code)" Title="@L["DisplayName:Code"]" Width="130px" />
+            <RadzenDataGridColumn TItem="OperationAssetDto" Property="@nameof(OperationAssetDto.Name)" Title="@L["DisplayName:Name"]" Width="180px" />
+            <RadzenDataGridColumn TItem="OperationAssetDto" Property="@nameof(OperationAssetDto.Category)" Title="@L["Category"]" Width="140px" />
+            <RadzenDataGridColumn TItem="OperationAssetDto" Property="@nameof(OperationAssetDto.Location)" Title="@L["Location"]" Width="180px" />
+            <RadzenDataGridColumn TItem="OperationAssetDto" Property="@nameof(OperationAssetDto.Status)" Title="@L["Status"]" Width="130px">
+                <Template Context="item">
+                    <RadzenBadge BadgeStyle="@OperationUi.GetAssetStyle(item.Status)" Text="@item.Status.ToString()" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="OperationAssetDto" Property="@nameof(OperationAssetDto.HealthScore)" Title="@L["HealthScore"]" Width="180px">
+                <Template Context="item">
+                    <RadzenStack Gap="0.25rem">
+                        <RadzenProgressBar Value="@item.HealthScore" ShowValue="true" Style="@($"--rz-progressbar-value-background-color:{OperationUi.GetHealthColor(item.HealthScore)}")" />
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="OperationAssetDto" Property="@nameof(OperationAssetDto.LastInspectionTime)" Title="@L["LastInspectionTime"]" Width="180px" FormatString="{0:yyyy-MM-dd HH:mm}" />
+        </Columns>
+    </LocalizedDataGrid>
+</RadzenStack>
+
+@code {
+    private readonly List<AssetStatus> _statuses = Enum.GetValues<AssetStatus>().ToList();
+    private RadzenDataGrid<OperationAssetDto> _grid = default!;
+    private IReadOnlyList<OperationAssetDto> _items = [];
+    private int _totalCount;
+    private bool _isLoading;
+    private string? _filter;
+    private AssetStatus? _status;
+    private string? _category;
+
+    public Assets()
+    {
+        LocalizationResource = typeof(CRMResource);
+    }
+
+    private async Task LoadDataAsync(LoadDataArgs args)
+    {
+        try
+        {
+            _isLoading = true;
+            var result = await OperationAppService.GetAssetsAsync(new GetAssetsInput
+            {
+                Filter = _filter,
+                Status = _status,
+                Category = _category,
+                SkipCount = args.Skip ?? 0,
+                MaxResultCount = args.Top ?? 20,
+                Sorting = args.OrderBy
+            });
+
+            _items = result.Items;
+            _totalCount = (int)result.TotalCount;
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(ex);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task ReloadAsync()
+    {
+        if (_grid is not null)
+        {
+            await _grid.FirstPage(true);
+        }
+    }
+}

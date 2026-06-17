@@ -15,6 +15,7 @@
     <PackageVersion Include="IdentityModel" Version="7.0.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.8" />
     <PackageVersion Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="10.0.8" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.8" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="10.7.2" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.8" />
     <PackageVersion Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.8" />

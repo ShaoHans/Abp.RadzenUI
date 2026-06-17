@@ -1,0 +1,119 @@
+@page "/operations/board"
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.Application.Dtos
+@attribute [Authorize(CRMPermissions.Operations.WorkOrders)]
+@inject IOperationAppService OperationAppService
+@inherits AbpRadzenUIComponentBase
+
+<PageTitle>@L["OperationBoard"]</PageTitle>
+
+<RadzenStack Gap="1rem" class="rz-p-4">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenStack Gap="0.2rem">
+            <RadzenText TextStyle="TextStyle.H5"><strong>@L["OperationBoard"]</strong></RadzenText>
+            <RadzenText TextStyle="TextStyle.Caption" class="rz-color-on-surface-variant">@L["OperationBoardSubtitle"]</RadzenText>
+        </RadzenStack>
+        <RadzenButton Icon="refresh" Text="@L["Refresh"]" ButtonStyle="ButtonStyle.Light" Click="LoadAsync" />
+    </RadzenStack>
+
+    @if (_items is null)
+    {
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="height:50vh;">
+            <RadzenProgressBarCircular ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+        </RadzenStack>
+    }
+    else
+    {
+        <div style="display:grid;grid-template-columns:repeat(6,minmax(220px,1fr));gap:1rem;overflow-x:auto;padding-bottom:0.5rem;">
+            @foreach (var status in _statuses)
+            {
+                var cards = _items.Where(x => x.Status == status).Take(8).ToList();
+                <RadzenCard Variant="Variant.Flat" Style="border:1px solid var(--rz-base-300);min-width:220px;background:var(--rz-base-50);">
+                    <RadzenStack Gap="0.75rem">
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                            <RadzenBadge BadgeStyle="@OperationUi.GetStatusStyle(status)" Text="@status.ToString()" />
+                            <RadzenBadge BadgeStyle="BadgeStyle.Light" Text="@cards.Count.ToString()" />
+                        </RadzenStack>
+
+                        @foreach (var item in cards)
+                        {
+                            <RadzenCard class="rz-shadow-1" Style="border-left:4px solid var(--rz-primary);">
+                                <RadzenStack Gap="0.5rem">
+                                    <RadzenText TextStyle="TextStyle.Subtitle2">@item.Code</RadzenText>
+                                    <RadzenText Style="line-height:1.35;">@item.Title</RadzenText>
+                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.4rem" Wrap="FlexWrap.Wrap">
+                                        <RadzenBadge BadgeStyle="@OperationUi.GetPriorityStyle(item.Priority)" Text="@item.Priority.ToString()" />
+                                        <RadzenText TextStyle="TextStyle.Caption">@item.OwnerName</RadzenText>
+                                    </RadzenStack>
+                                    <RadzenButton Size="ButtonSize.Small" Icon="arrow_forward" Text="@L["NextStatus"]" ButtonStyle="ButtonStyle.Light" Disabled="@(GetNextStatus(item.Status) is null)" Click="@(() => MoveNextAsync(item))" />
+                                </RadzenStack>
+                            </RadzenCard>
+                        }
+                    </RadzenStack>
+                </RadzenCard>
+            }
+        </div>
+    }
+</RadzenStack>
+
+@code {
+    private readonly List<WorkOrderStatus> _statuses = Enum.GetValues<WorkOrderStatus>().ToList();
+    private IReadOnlyList<WorkOrderDto>? _items;
+
+    public Board()
+    {
+        LocalizationResource = typeof(CRMResource);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        try
+        {
+            var result = await OperationAppService.GetWorkOrdersAsync(new GetWorkOrdersInput
+            {
+                MaxResultCount = 200,
+                Sorting = nameof(WorkOrderDto.PlannedAt)
+            });
+            _items = result.Items;
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(ex);
+        }
+    }
+
+    private async Task MoveNextAsync(WorkOrderDto item)
+    {
+        var next = GetNextStatus(item.Status);
+        if (next is null)
+        {
+            return;
+        }
+
+        await OperationAppService.ChangeWorkOrderStatusAsync(item.Id, new ChangeWorkOrderStatusDto
+        {
+            Status = next.Value,
+            Summary = L["Operation:BoardMove", next.Value]
+        });
+        await LoadAsync();
+    }
+
+    private static WorkOrderStatus? GetNextStatus(WorkOrderStatus status)
+    {
+        return status switch
+        {
+            WorkOrderStatus.New => WorkOrderStatus.Assigned,
+            WorkOrderStatus.Assigned => WorkOrderStatus.InProgress,
+            WorkOrderStatus.InProgress => WorkOrderStatus.Resolved,
+            WorkOrderStatus.Paused => WorkOrderStatus.InProgress,
+            WorkOrderStatus.Resolved => WorkOrderStatus.Closed,
+            _ => null
+        };
+    }
+}

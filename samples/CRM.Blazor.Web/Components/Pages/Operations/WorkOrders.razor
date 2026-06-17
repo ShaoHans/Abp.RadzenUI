@@ -1,0 +1,102 @@
+@page "/operations/work-orders"
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.Application.Dtos
+@attribute [Authorize(CRMPermissions.Operations.WorkOrders)]
+@inherits AbpRadzenUIComponentBase
+
+<PageTitle>@L["WorkOrders"]</PageTitle>
+
+<RadzenStack Gap="1rem" class="rz-p-4">
+    <RadzenCard Variant="Variant.Flat" Style="border:1px solid var(--rz-base-300);">
+        <RadzenStack Gap="0.75rem">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="1rem" Wrap="FlexWrap.Wrap">
+                <RadzenStack Gap="0.15rem">
+                    <RadzenText TextStyle="TextStyle.H5"><strong>@L["WorkOrders"]</strong></RadzenText>
+                    <RadzenText TextStyle="TextStyle.Caption" class="rz-color-on-surface-variant">@L["WorkOrdersSubtitle"]</RadzenText>
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+                    <RadzenButton Icon="person_add" Text="@L["BatchAssign"]" ButtonStyle="ButtonStyle.Primary" Disabled="@(!_selectedWorkOrders.Any())" Click="BatchAssignAsync" />
+                    <RadzenButton Icon="refresh" Text="@L["Refresh"]" ButtonStyle="ButtonStyle.Light" Click="ReloadAsync" />
+                </RadzenStack>
+            </RadzenStack>
+
+            <RadzenRow Gap="0.75rem">
+                <RadzenColumn Size="12" SizeMD="4" SizeXL="3">
+                    <RadzenTextBox @bind-Value="_filter" Placeholder="@L["Keyword"]" Style="width:100%;" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="4" SizeXL="2">
+                    <RadzenDropDown TValue="WorkOrderStatus?" @bind-Value="_status" Data="@_statuses" AllowClear="true" Placeholder="@L["Status"]" Style="width:100%;" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="4" SizeXL="2">
+                    <RadzenDropDown TValue="OperationPriority?" @bind-Value="_priority" Data="@_priorities" AllowClear="true" Placeholder="@L["Priority"]" Style="width:100%;" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="4" SizeXL="2">
+                    <RadzenDropDown TValue="WorkOrderType?" @bind-Value="_type" Data="@_types" AllowClear="true" Placeholder="@L["WorkOrderType"]" Style="width:100%;" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="4" SizeXL="2">
+                    <RadzenTextBox @bind-Value="_ownerName" Placeholder="@L["OwnerName"]" Style="width:100%;" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="4" SizeXL="1">
+                    <RadzenButton Icon="search" Text="@L["Search"]" Style="width:100%;" Click="ReloadAsync" />
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenStack>
+    </RadzenCard>
+
+    <LocalizedDataGrid @ref="_grid"
+                       TItem="WorkOrderDto"
+                       Data="@_items"
+                       Count="@_totalCount"
+                       LoadData="LoadDataAsync"
+                       IsLoading="@_isLoading"
+                       AllowPaging="true"
+                       AllowSorting="true"
+                       PageSize="20"
+                       SelectionMode="DataGridSelectionMode.Multiple"
+                       @bind-Value="_selectedWorkOrders"
+                       PagerHorizontalAlign="HorizontalAlign.Center"
+                       Style="height:calc(100vh - 270px); min-height:460px;">
+        <Columns>
+            <RadzenDataGridColumn TItem="WorkOrderDto" Width="48px" Sortable="false" Filterable="false">
+                <HeaderTemplate>
+                    <RadzenCheckBox TriState="false" TValue="bool?" Value="@IsAllSelected()" Change="ToggleSelectAll" />
+                </HeaderTemplate>
+                <Template Context="item">
+                    <RadzenCheckBox TriState="false" TValue="bool" Value="@_selectedWorkOrders.Contains(item)" Change="@((bool selected) => ToggleSelection(item, selected))" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="WorkOrderDto" Property="@nameof(WorkOrderDto.Code)" Title="@L["DisplayName:Code"]" Width="130px">
+                <Template Context="item">
+                    <SideDialogLink Text="@item.Code" OnClick="@(() => OpenDetailAsync(item))" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="WorkOrderDto" Property="@nameof(WorkOrderDto.Title)" Title="@L["DisplayName:Title"]" Width="260px" />
+            <RadzenDataGridColumn TItem="WorkOrderDto" Property="@nameof(WorkOrderDto.Type)" Title="@L["WorkOrderType"]" Width="140px" />
+            <RadzenDataGridColumn TItem="WorkOrderDto" Property="@nameof(WorkOrderDto.Status)" Title="@L["Status"]" Width="130px">
+                <Template Context="item">
+                    <RadzenBadge BadgeStyle="@OperationUi.GetStatusStyle(item.Status)" Text="@item.Status.ToString()" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="WorkOrderDto" Property="@nameof(WorkOrderDto.Priority)" Title="@L["Priority"]" Width="120px">
+                <Template Context="item">
+                    <RadzenBadge BadgeStyle="@OperationUi.GetPriorityStyle(item.Priority)" Text="@item.Priority.ToString()" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="WorkOrderDto" Property="@nameof(WorkOrderDto.OwnerName)" Title="@L["OwnerName"]" Width="120px" />
+            <RadzenDataGridColumn TItem="WorkOrderDto" Property="@nameof(WorkOrderDto.Location)" Title="@L["Location"]" Width="160px" />
+            <RadzenDataGridColumn TItem="WorkOrderDto" Property="@nameof(WorkOrderDto.PlannedAt)" Title="@L["PlannedAt"]" Width="170px" FormatString="{0:yyyy-MM-dd HH:mm}" />
+            <RadzenDataGridColumn TItem="WorkOrderDto" Title="@L["Actions"]" Width="190px" Sortable="false" Filterable="false">
+                <Template Context="item">
+                    <RadzenSplitButton Icon="published_with_changes" Text="@L["ChangeStatus"]" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Primary" Click="@((RadzenSplitButtonItem args) => ChangeStatusAsync(item, args))">
+                        <ChildContent>
+                            @foreach (var status in _statuses)
+                            {
+                                <RadzenSplitButtonItem Text="@status.ToString()" Value="@status.ToString()" />
+                            }
+                        </ChildContent>
+                    </RadzenSplitButton>
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </LocalizedDataGrid>
+</RadzenStack>

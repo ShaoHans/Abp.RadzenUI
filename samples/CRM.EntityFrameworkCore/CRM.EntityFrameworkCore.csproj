@@ -29,6 +29,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>compile; build; native; contentfiles; analyzers; buildtransitive</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>compile; build; native; contentfiles; analyzers; buildtransitive</PrivateAssets>

@@ -2,6 +2,7 @@ using Abp.RadzenUI.DataDictionaries;
 using Abp.RadzenUI.EntityFrameworkCore;
 using Abp.RadzenUI.Messages;
 using CRM.Products;
+using CRM.Operations;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -62,6 +63,10 @@ public class CRMDbContext(DbContextOptions<CRMDbContext> options)
 
     // Business Modules
     public DbSet<Product> Products { get; set; }
+    public DbSet<WorkOrder> WorkOrders { get; set; }
+    public DbSet<WorkOrderEvent> WorkOrderEvents { get; set; }
+    public DbSet<OperationAsset> OperationAssets { get; set; }
+    public DbSet<OperationShift> OperationShifts { get; set; }
 
     // Data Dictionary
     public DbSet<DataDictionaryType> DataDictionaryTypes { get; set; }
@@ -107,6 +112,46 @@ public class CRMDbContext(DbContextOptions<CRMDbContext> options)
             b.Property(p => p.StockCount).IsRequired();
             b.Property(p => p.ImagePath).HasMaxLength(ProductConsts.MaxImagePathLength);
             b.Property(p => p.Status).HasConversion<string>().HasMaxLength(100);
+        });
+
+        builder.Entity<WorkOrder>(b =>
+        {
+            b.ToTable("OperationWorkOrders", CRMConsts.DbSchema);
+            b.Property(p => p.Code).IsRequired().HasMaxLength(OperationConsts.MaxCodeLength);
+            b.Property(p => p.Title).IsRequired().HasMaxLength(OperationConsts.MaxTitleLength);
+            b.Property(p => p.Type).HasConversion<string>().HasMaxLength(64);
+            b.Property(p => p.Status).HasConversion<string>().HasMaxLength(64);
+            b.Property(p => p.Priority).HasConversion<string>().HasMaxLength(64);
+            b.Property(p => p.OwnerName).IsRequired().HasMaxLength(OperationConsts.MaxOwnerLength);
+            b.Property(p => p.Location).IsRequired().HasMaxLength(OperationConsts.MaxLocationLength);
+            b.Property(p => p.Description).HasMaxLength(OperationConsts.MaxDescriptionLength);
+        });
+
+        builder.Entity<WorkOrderEvent>(b =>
+        {
+            b.ToTable("OperationWorkOrderEvents", CRMConsts.DbSchema);
+            b.Property(p => p.Status).HasConversion<string>().HasMaxLength(64);
+            b.Property(p => p.OperatorName).IsRequired().HasMaxLength(OperationConsts.MaxOwnerLength);
+            b.Property(p => p.Summary).IsRequired().HasMaxLength(OperationConsts.MaxSummaryLength);
+            b.HasIndex(p => p.WorkOrderId);
+        });
+
+        builder.Entity<OperationAsset>(b =>
+        {
+            b.ToTable("OperationAssets", CRMConsts.DbSchema);
+            b.Property(p => p.Code).IsRequired().HasMaxLength(OperationConsts.MaxCodeLength);
+            b.Property(p => p.Name).IsRequired().HasMaxLength(OperationConsts.MaxNameLength);
+            b.Property(p => p.Category).IsRequired().HasMaxLength(OperationConsts.MaxNameLength);
+            b.Property(p => p.Location).IsRequired().HasMaxLength(OperationConsts.MaxLocationLength);
+            b.Property(p => p.Status).HasConversion<string>().HasMaxLength(64);
+        });
+
+        builder.Entity<OperationShift>(b =>
+        {
+            b.ToTable("OperationShifts", CRMConsts.DbSchema);
+            b.Property(p => p.ShiftType).HasConversion<string>().HasMaxLength(64);
+            b.Property(p => p.OwnerName).IsRequired().HasMaxLength(OperationConsts.MaxOwnerLength);
+            b.Property(p => p.Responsibility).IsRequired().HasMaxLength(OperationConsts.MaxSummaryLength);
         });
     }
 }
