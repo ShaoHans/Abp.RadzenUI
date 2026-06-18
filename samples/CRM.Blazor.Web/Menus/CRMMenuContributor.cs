@@ -94,7 +94,7 @@ public class CRMMenuContributor : IMenuContributor
             new ApplicationMenuItem(
                 CRMMenus.OperationsDashboard,
                 l["Menu:Operations.Dashboard"],
-                "/operations",
+                "/operations/dashboard",
                 icon: "monitoring",
                 order: 1
             ).RequirePermissions(CRMPermissions.Operations.Dashboard)

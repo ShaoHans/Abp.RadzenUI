@@ -1,6 +1,8 @@
 using Abp.RadzenUI.Application.Contracts.Tenants;
+using System.Data.Common;
 using Microsoft.AspNetCore.Authorization;
 using Volo.Abp.Application.Services;
+using Volo.Abp;
 using Volo.Abp.TenantManagement;
 
 namespace Abp.RadzenUI.Application;
@@ -37,6 +39,8 @@ public class TenantConnectionStringAppService
             TenantManagementPermissions.Tenants.ManageConnectionStrings
         );
 
+        ValidateConnectionString(input.Value);
+
         var tenant = await _tenantRepository.GetAsync(tenantId, includeDetails: true);
         tenant.SetConnectionString(input.Name, input.Value);
         await _tenantRepository.UpdateAsync(tenant);
@@ -51,5 +55,19 @@ public class TenantConnectionStringAppService
         var tenant = await _tenantRepository.GetAsync(tenantId, includeDetails: true);
         tenant.RemoveConnectionString(name);
         await _tenantRepository.UpdateAsync(tenant);
+    }
+
+    private static void ValidateConnectionString(string connectionString)
+    {
+        try
+        {
+            _ = new DbConnectionStringBuilder { ConnectionString = connectionString };
+        }
+        catch (ArgumentException ex)
+        {
+            throw new UserFriendlyException(
+                $"Invalid connection string format: {ex.Message}"
+            );
+        }
     }
 }

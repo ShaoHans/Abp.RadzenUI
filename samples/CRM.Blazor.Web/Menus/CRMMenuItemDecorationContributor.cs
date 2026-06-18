@@ -72,6 +72,17 @@ public class CRMMenuItemDecorationContributor(
                     var unreadCount = await messageAppService.GetUnreadCountAsync();
                     AddCountBadge(context, unreadCount, BadgeStyle.Danger, 1);
                     break;
+
+                case CRMMenus.Operations:
+                    context.Badges.Add(
+                        new MenuItemBadgeDefinition
+                        {
+                            Text = "New",
+                            BadgeStyle = BadgeStyle.Success,
+                            Order = 1,
+                        }
+                    );
+                    break;
             }
         }
         catch (Exception ex)

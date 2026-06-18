@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -111,10 +111,17 @@ namespace CRM.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(name: "OperationAssets");
-            migrationBuilder.DropTable(name: "OperationShifts");
-            migrationBuilder.DropTable(name: "OperationWorkOrderEvents");
-            migrationBuilder.DropTable(name: "OperationWorkOrders");
+            migrationBuilder.DropTable(
+                name: "OperationAssets");
+
+            migrationBuilder.DropTable(
+                name: "OperationShifts");
+
+            migrationBuilder.DropTable(
+                name: "OperationWorkOrderEvents");
+
+            migrationBuilder.DropTable(
+                name: "OperationWorkOrders");
         }
     }
 }

@@ -17,13 +17,16 @@ public partial class WorkOrders : IDisposable
     [Inject]
     public ISideDialogCoordinatorFactory SideDialogCoordinatorFactory { get; set; } = default!;
 
+    [Inject]
+    public DialogService DialogService { get; set; } = default!;
+
     private readonly List<WorkOrderStatus> _statuses = Enum.GetValues<WorkOrderStatus>().ToList();
     private readonly List<OperationPriority> _priorities = Enum.GetValues<OperationPriority>().ToList();
     private readonly List<WorkOrderType> _types = Enum.GetValues<WorkOrderType>().ToList();
 
     private RadzenDataGrid<WorkOrderDto> _grid = default!;
     private IReadOnlyList<WorkOrderDto> _items = [];
-    private IList<WorkOrderDto> _selectedWorkOrders = [];
+    private HashSet<Guid> _selectedWorkOrderIds = [];
     private int _totalCount;
     private bool _isLoading;
     private string? _filter;
@@ -42,6 +45,16 @@ public partial class WorkOrders : IDisposable
     {
         base.OnInitialized();
         _sideDialogCoordinator = SideDialogCoordinatorFactory.Create<WorkOrderDetailDto>();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await ReloadAsync();
+        }
     }
 
     private async Task LoadDataAsync(LoadDataArgs args)
@@ -63,7 +76,7 @@ public partial class WorkOrders : IDisposable
 
             _items = result.Items;
             _totalCount = (int)result.TotalCount;
-            _selectedWorkOrders = _selectedWorkOrders.Where(selected => _items.Any(item => item.Id == selected.Id)).ToList();
+            _selectedWorkOrderIds.RemoveWhere(id => _items.All(item => item.Id != id));
         }
         catch (Exception ex)
         {
@@ -108,43 +121,71 @@ public partial class WorkOrders : IDisposable
 
     private async Task BatchAssignAsync()
     {
+        if (!_selectedWorkOrderIds.Any())
+        {
+            return;
+        }
+
+        var ownerName = await DialogService.OpenAsync<BatchAssignDialog>(
+            L["BatchAssign"],
+            new Dictionary<string, object?>
+            {
+                { "SelectedCount", _selectedWorkOrderIds.Count }
+            },
+            new DialogOptions
+            {
+                Draggable = true,
+                Width = "420px"
+            }
+        ) as string;
+
+        if (string.IsNullOrWhiteSpace(ownerName))
+        {
+            return;
+        }
+
         await OperationAppService.AssignWorkOrdersAsync(new AssignWorkOrdersDto
         {
-            WorkOrderIds = _selectedWorkOrders.Select(x => x.Id).ToList(),
-            OwnerName = "调度专员"
+            WorkOrderIds = _selectedWorkOrderIds.ToList(),
+            OwnerName = ownerName.Trim()
         });
-        _selectedWorkOrders = [];
+
+        _selectedWorkOrderIds = [];
         await ReloadAsync();
     }
 
     private bool? IsAllSelected()
     {
-        if (!_items.Any() || !_selectedWorkOrders.Any())
+        if (!_items.Any() || !_selectedWorkOrderIds.Any())
         {
             return false;
         }
 
-        return _selectedWorkOrders.Count == _items.Count ? true : null;
+        return _items.All(item => _selectedWorkOrderIds.Contains(item.Id)) ? true : null;
     }
 
     private void ToggleSelectAll(bool? selected)
     {
-        _selectedWorkOrders = selected == true ? _items.ToList() : [];
+        _selectedWorkOrderIds = selected == true
+            ? _items.Select(x => x.Id).ToHashSet()
+            : [];
+    }
+
+    private bool IsSelected(WorkOrderDto item)
+    {
+        return _selectedWorkOrderIds.Contains(item.Id);
     }
 
     private void ToggleSelection(WorkOrderDto item, bool selected)
     {
-        var current = _selectedWorkOrders.ToList();
-        if (selected && current.All(x => x.Id != item.Id))
+        if (selected)
         {
-            current.Add(item);
+            _selectedWorkOrderIds.Add(item.Id);
         }
-        else if (!selected)
+        else
         {
-            current.RemoveAll(x => x.Id == item.Id);
+            _selectedWorkOrderIds.Remove(item.Id);
         }
-
-        _selectedWorkOrders = current;
     }
 
     public void Dispose()

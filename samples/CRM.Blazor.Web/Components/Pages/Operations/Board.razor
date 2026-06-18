@@ -24,11 +24,11 @@
     }
     else
     {
-        <div style="display:grid;grid-template-columns:repeat(6,minmax(220px,1fr));gap:1rem;overflow-x:auto;padding-bottom:0.5rem;">
+        <div class="operation-board-grid">
             @foreach (var status in _statuses)
             {
                 var cards = _items.Where(x => x.Status == status).Take(8).ToList();
-                <RadzenCard Variant="Variant.Flat" Style="border:1px solid var(--rz-base-300);min-width:220px;background:var(--rz-base-50);">
+                <RadzenCard class="operation-board-column" Variant="Variant.Flat">
                     <RadzenStack Gap="0.75rem">
                         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
                             <RadzenBadge BadgeStyle="@OperationUi.GetStatusStyle(status)" Text="@status.ToString()" />
@@ -37,13 +37,13 @@
 
                         @foreach (var item in cards)
                         {
-                            <RadzenCard class="rz-shadow-1" Style="border-left:4px solid var(--rz-primary);">
+                            <RadzenCard class="operation-board-card rz-shadow-1">
                                 <RadzenStack Gap="0.5rem">
-                                    <RadzenText TextStyle="TextStyle.Subtitle2">@item.Code</RadzenText>
-                                    <RadzenText Style="line-height:1.35;">@item.Title</RadzenText>
+                                    <RadzenText class="operation-board-code" TextStyle="TextStyle.Subtitle2">@item.Code</RadzenText>
+                                    <RadzenText class="operation-board-title">@item.Title</RadzenText>
                                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.4rem" Wrap="FlexWrap.Wrap">
                                         <RadzenBadge BadgeStyle="@OperationUi.GetPriorityStyle(item.Priority)" Text="@item.Priority.ToString()" />
-                                        <RadzenText TextStyle="TextStyle.Caption">@item.OwnerName</RadzenText>
+                                        <RadzenText class="operation-board-owner" TextStyle="TextStyle.Caption">@item.OwnerName</RadzenText>
                                     </RadzenStack>
                                     <RadzenButton Size="ButtonSize.Small" Icon="arrow_forward" Text="@L["NextStatus"]" ButtonStyle="ButtonStyle.Light" Disabled="@(GetNextStatus(item.Status) is null)" Click="@(() => MoveNextAsync(item))" />
                                 </RadzenStack>
@@ -117,3 +117,49 @@
         };
     }
 }
+
+<style>
+    .operation-board-grid {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(220px, 1fr));
+        gap: 1rem;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+    }
+
+    .operation-board-column {
+        min-width: 220px;
+        border: 1px solid var(--rz-base-300);
+        background: color-mix(in srgb, var(--rz-base-400) 86%, var(--rz-base-500));
+    }
+
+    .operation-board-card {
+        border-left: 4px solid var(--rz-primary);
+        background: color-mix(in srgb, var(--rz-base-400) 76%, var(--rz-base-500));
+        color: var(--rz-text-color);
+    }
+
+    .operation-board-code {
+        color: var(--rz-text-title-color);
+        font-weight: 700;
+    }
+
+    .operation-board-title {
+        color: var(--rz-text-color);
+        line-height: 1.35;
+        font-weight: 600;
+    }
+
+    .operation-board-owner {
+        color: color-mix(in srgb, var(--rz-text-color) 78%, transparent);
+    }
+
+    .operation-board-card .rz-button.rz-button-light {
+        color: var(--rz-on-base-dark);
+        background-color: var(--rz-base-dark);
+    }
+
+    .operation-board-card .rz-button.rz-state-disabled {
+        opacity: 0.55;
+    }
+</style>

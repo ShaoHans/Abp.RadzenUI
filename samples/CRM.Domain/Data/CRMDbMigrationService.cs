@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -46,6 +47,11 @@ public class CRMDbMigrationService(
         var migratedDatabaseSchemas = new HashSet<string>();
         foreach (var tenant in tenants)
         {
+            if (!HasValidConnectionStrings(tenant))
+            {
+                continue;
+            }
+
             using (currentTenant.Change(tenant.Id))
             {
                 if (tenant.ConnectionStrings.Count != 0)
@@ -73,6 +79,42 @@ public class CRMDbMigrationService(
 
         Logger.LogInformation("Successfully completed all database migrations.");
         Logger.LogInformation("You can safely end this process...");
+    }
+
+    private bool HasValidConnectionStrings(Tenant tenant)
+    {
+        foreach (var connectionString in tenant.ConnectionStrings)
+        {
+            if (connectionString.Value.IsNullOrWhiteSpace())
+            {
+                Logger.LogWarning(
+                    "Skipped {TenantName} tenant database migrations because connection string {ConnectionStringName} is empty.",
+                    tenant.Name,
+                    connectionString.Name
+                );
+                return false;
+            }
+
+            try
+            {
+                _ = new DbConnectionStringBuilder
+                {
+                    ConnectionString = connectionString.Value
+                };
+            }
+            catch (ArgumentException ex)
+            {
+                Logger.LogError(
+                    ex,
+                    "Skipped {TenantName} tenant database migrations because connection string {ConnectionStringName} has an invalid format.",
+                    tenant.Name,
+                    connectionString.Name
+                );
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private async Task MigrateDatabaseSchemaAsync(Tenant? tenant = null)
