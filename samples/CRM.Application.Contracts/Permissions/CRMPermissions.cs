@@ -14,6 +14,12 @@ public static class CRMPermissions
         public const string Create = Default + ".Create";
     }
 
+    public static class Sales
+    {
+        public const string Default = GroupName + ".Sales";
+        public const string Workspace = Default + ".Workspace";
+    }
+
     public static class Operations
     {
         public const string Default = GroupName + ".Operations";

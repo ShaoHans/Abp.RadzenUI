@@ -17,6 +17,9 @@ public class CRMPermissionDefinitionProvider : PermissionDefinitionProvider
         products.AddChild(CRMPermissions.Products.Delete, L("Permission:Products.Delete"));
         products.AddChild(CRMPermissions.Products.Create, L("Permission:Products.Create"));
 
+        var sales = productManagementGroup.AddPermission(CRMPermissions.Sales.Default, L("Permission:Sales"));
+        sales.AddChild(CRMPermissions.Sales.Workspace, L("Permission:Sales.Workspace"));
+
         var operations = productManagementGroup.AddPermission(CRMPermissions.Operations.Default, L("Permission:Operations"));
         operations.AddChild(CRMPermissions.Operations.Dashboard, L("Permission:Operations.Dashboard"));
         operations.AddChild(CRMPermissions.Operations.WorkOrders, L("Permission:Operations.WorkOrders"));

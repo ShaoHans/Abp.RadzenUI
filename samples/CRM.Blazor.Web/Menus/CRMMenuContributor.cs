@@ -37,6 +37,7 @@ public class CRMMenuContributor : IMenuContributor
                 .WithIconColor("#0f766e")
         );
 
+        ConfigSalesMenu(context, l);
         ConfigOperationMenu(context, l);
         ConfigProductMenu(context, l);
 
@@ -66,7 +67,7 @@ public class CRMMenuContributor : IMenuContributor
             CRMMenus.Product,
             l["Menu:Product"],
             icon: "inventory_2",
-            order: 2
+            order: 4
         ).WithIconColor("#ea580c");
 
         productMenu.AddItem(
@@ -79,6 +80,28 @@ public class CRMMenuContributor : IMenuContributor
         );
 
         context.Menu.Items.Add(productMenu);
+    }
+
+    private static void ConfigSalesMenu(MenuConfigurationContext context, IStringLocalizer l)
+    {
+        var salesMenu = new ApplicationMenuItem(
+            CRMMenus.Sales,
+            l["Menu:Sales"],
+            icon: "trending_up",
+            order: 2
+        ).WithIconColor("#7c3aed");
+
+        salesMenu.AddItem(
+            new ApplicationMenuItem(
+                CRMMenus.SalesWorkspace,
+                l["Menu:Sales.Workspace"],
+                "/sales/workspace",
+                icon: "space_dashboard",
+                order: 1
+            ).RequirePermissions(CRMPermissions.Sales.Workspace)
+        );
+
+        context.Menu.Items.Add(salesMenu);
     }
 
     private static void ConfigOperationMenu(MenuConfigurationContext context, IStringLocalizer l)

@@ -10,6 +10,9 @@ public class CRMMenus
     public const string Product = Prefix + ".Product";
     public const string ProductList = Product + ".List";
 
+    public const string Sales = Prefix + ".Sales";
+    public const string SalesWorkspace = Sales + ".Workspace";
+
     public const string Operations = Prefix + ".Operations";
     public const string OperationsDashboard = Operations + ".Dashboard";
     public const string WorkOrders = Operations + ".WorkOrders";
