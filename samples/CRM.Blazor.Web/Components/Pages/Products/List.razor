@@ -1,7 +1,5 @@
 ﻿@page "/products"
 @using Microsoft.AspNetCore.Authorization
-@using Volo.Abp.Identity
-@using Volo.Abp.Users
 @attribute [Authorize(CRMPermissions.Products.Default)]
 @inherits AbpCrudPageBase<IProductAppService, ProductDto, Guid, GetProductsInput, CreateProductDto, UpdateProductDto>
 

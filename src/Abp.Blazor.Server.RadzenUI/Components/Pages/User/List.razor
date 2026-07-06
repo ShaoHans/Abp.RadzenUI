@@ -1,7 +1,6 @@
 ﻿@page "/identity/users"
 @using Microsoft.AspNetCore.Authorization
 @using Volo.Abp.Identity
-@using Volo.Abp.Users
 @attribute [Authorize(IdentityPermissions.Users.Default)]
 @inherits AbpCrudPageBase<IIdentityUserAppService, IdentityUserDto, Guid, GetIdentityUsersInput, IdentityUserCreateDto, IdentityUserUpdateDto>
 
