@@ -24,6 +24,13 @@ public static class RadzenUIPermissions
         public const string Delete = Default + ".Delete";
     }
 
+    public static class Localization
+    {
+        public const string Default = GroupName + ".Localization";
+        public const string Edit = Default + ".Edit";
+        public const string Delete = Default + ".Delete";
+    }
+
     public static string[] GetAll()
     {
         return ReflectionHelper.GetPublicConstantsRecursively(typeof(RadzenUIPermissions));

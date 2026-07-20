@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Radzen;
 using Volo.Abp.AspNetCore.Components.Messages;
 using Volo.Abp.AspNetCore.Components.Notifications;
@@ -149,9 +150,16 @@ public class AbpRadzenUIModule : AbpModule
             options.MenuContributors.Add(new AuditLoggingMenuContributor());
             options.MenuContributors.Add(new IdentitySecurityLogMenuContributor());
             options.MenuContributors.Add(new DataDictionaryMenuContributor());
+            options.MenuContributors.Add(new LocalizationMenuContributor());
             options.MenuContributors.Add(new MessageMenuContributor());
             options.MenuContributors.Add(new SettingManagementMenuContributor());
         });
+
+        // Overlay database localization overrides on top of the static JSON texts.
+        context.Services.AddSingleton<
+            IPostConfigureOptions<AbpLocalizationOptions>,
+            AbpRadzenUILocalizationPostConfigureOptions
+        >();
 
         Configure<SettingManagementComponentOptions>(options =>
         {

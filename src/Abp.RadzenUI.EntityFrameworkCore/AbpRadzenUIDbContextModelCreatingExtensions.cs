@@ -1,4 +1,5 @@
 using Abp.RadzenUI.DataDictionaries;
+using Abp.RadzenUI.LocalizationTexts;
 using Abp.RadzenUI.Messages;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp;
@@ -34,6 +35,18 @@ public static class AbpRadzenUIDbContextModelCreatingExtensions
             b.Property(p => p.Sort).IsRequired();
             b.Property(p => p.IsActive).IsRequired().HasDefaultValue(true);
             b.HasIndex(p => new { p.TenantId, p.DataDictionaryTypeId, p.Code }).IsUnique();
+        });
+
+        builder.Entity<LocalizationText>(b =>
+        {
+            b.ToTable(AbpRadzenUIDbProperties.DbTablePrefix + "LocalizationTexts", AbpRadzenUIDbProperties.DbSchema);
+            b.ConfigureByConvention();
+            b.Property(p => p.ResourceName).IsRequired().HasMaxLength(LocalizationTextConsts.MaxResourceNameLength);
+            b.Property(p => p.CultureName).IsRequired().HasMaxLength(LocalizationTextConsts.MaxCultureNameLength);
+            b.Property(p => p.Key).IsRequired().HasMaxLength(LocalizationTextConsts.MaxKeyLength);
+            b.Property(p => p.Value).IsRequired().HasColumnType("text");
+            b.HasIndex(p => new { p.TenantId, p.ResourceName, p.CultureName, p.Key }).IsUnique();
+            b.HasIndex(p => new { p.TenantId, p.ResourceName, p.CultureName });
         });
 
         builder.Entity<UserMessage>(b =>

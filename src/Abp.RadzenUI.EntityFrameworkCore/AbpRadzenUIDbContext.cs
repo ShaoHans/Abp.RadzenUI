@@ -1,4 +1,5 @@
 using Abp.RadzenUI.DataDictionaries;
+using Abp.RadzenUI.LocalizationTexts;
 using Abp.RadzenUI.Messages;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.Data;
@@ -13,6 +14,8 @@ public interface IAbpRadzenUIDbContext : IEfCoreDbContext
     DbSet<DataDictionaryItem> DataDictionaryItems { get; set; }
 
     DbSet<UserMessage> UserMessages { get; set; }
+
+    DbSet<LocalizationText> LocalizationTexts { get; set; }
 }
 
 [ConnectionStringName("Default")]
@@ -24,6 +27,8 @@ public class AbpRadzenUIDbContext(DbContextOptions<AbpRadzenUIDbContext> options
     public DbSet<DataDictionaryItem> DataDictionaryItems { get; set; }
 
     public DbSet<UserMessage> UserMessages { get; set; }
+
+    public DbSet<LocalizationText> LocalizationTexts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

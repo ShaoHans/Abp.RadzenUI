@@ -1,5 +1,6 @@
 using Abp.RadzenUI.DataDictionaries;
 using Abp.RadzenUI.EntityFrameworkCore;
+using Abp.RadzenUI.LocalizationTexts;
 using Abp.RadzenUI.Messages;
 using CRM.Products;
 using CRM.Operations;
@@ -74,6 +75,9 @@ public class CRMDbContext(DbContextOptions<CRMDbContext> options)
 
     // User Messages
     public DbSet<UserMessage> UserMessages { get; set; }
+
+    // Localization Texts
+    public DbSet<LocalizationText> LocalizationTexts { get; set; }
 
     #endregion
 

@@ -1,0 +1,82 @@
+@page "/localization-texts"
+@using Abp.RadzenUI.Application.Contracts.LocalizationTexts
+@using Abp.RadzenUI.Permissions
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(RadzenUIPermissions.Localization.Default)]
+@inherits AbpRadzenUIComponentBase
+
+<PageTitle>@L["Menu:Localization"]</PageTitle>
+
+<RadzenRow Gap="1rem" Style="height:calc(100vh - 110px)">
+    <RadzenColumn Size="12">
+        <RadzenCard Variant="Variant.Filled" Style="height:100%; display:flex; flex-direction:column">
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween"
+                         AlignItems="AlignItems.Center" class="rz-mb-2">
+                <RadzenText Text="@L["Menu:Localization"]" TextStyle="TextStyle.H6" Style="margin:0" />
+            </RadzenStack>
+
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap"
+                         Gap="12px" class="rz-mb-3">
+                <RadzenFormField Text="@L["Localization:Resource"]" Variant="Variant.Outlined" Style="min-width:220px">
+                    <RadzenDropDown TValue="string" Data="@_resources" @bind-Value="_selectedResource"
+                                    TextProperty="@nameof(LocalizationResourceInfoDto.Name)"
+                                    ValueProperty="@nameof(LocalizationResourceInfoDto.Name)"
+                                    AllowFiltering="true" Change="@(async () => await ReloadAsync())" />
+                </RadzenFormField>
+
+                <RadzenFormField Text="@L["Localization:Culture"]" Variant="Variant.Outlined" Style="min-width:200px">
+                    <RadzenDropDown TValue="string" Data="@_cultures" @bind-Value="_selectedCulture"
+                                    TextProperty="@nameof(LocalizationCultureDto.DisplayName)"
+                                    ValueProperty="@nameof(LocalizationCultureDto.CultureName)"
+                                    AllowFiltering="true" Change="@(async () => await ReloadAsync())" />
+                </RadzenFormField>
+
+                <SearchTextBox PlaceHoder="@L["Localization:SearchPlaceholder"]" Style="width:260px"
+                               @bind-Keyword="_filter" SearchAsync="ReloadAsync" />
+
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="6px">
+                    <RadzenSwitch @bind-Value="_onlyOverridden" Change="@(async (bool _) => await ReloadAsync())" />
+                    <RadzenText Text="@L["Localization:OnlyOverridden"]" Style="margin:0" />
+                </RadzenStack>
+            </RadzenStack>
+
+            <LocalizedDataGrid @ref="_grid" Data="@_items" TItem="LocalizationTextItemDto"
+                            AllowPaging="true" AllowSorting="true"
+                            PagerHorizontalAlign="HorizontalAlign.Center"
+                            Style="flex:1" PageSize="@_defaultPageSize"
+                            PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="true"
+                            IsLoading="@_isLoading"
+                            LoadData="LoadDataAsync" Count="@_totalCount">
+                <Columns>
+                    <RadzenDataGridColumn Property="@nameof(LocalizationTextItemDto.Key)"
+                                          Title="@L["Localization:Key"]" Width="280px" />
+                    <RadzenDataGridColumn Property="@nameof(LocalizationTextItemDto.BaseValue)"
+                                          Title="@L["Localization:BaseValue"]" Sortable="false" />
+                    <RadzenDataGridColumn Property="@nameof(LocalizationTextItemDto.OverrideValue)"
+                                          Title="@L["Localization:OverrideValue"]" Sortable="false">
+                        <Template Context="item">
+                            @if (item.IsOverridden)
+                            {
+                                <RadzenText Text="@item.OverrideValue" Style="margin:0; color:var(--rz-primary); font-weight:600" />
+                            }
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Title="@L["Localization:Status"]" Width="110px" Sortable="false" TextAlign="TextAlign.Center">
+                        <Template Context="item">
+                            <RadzenBadge Text="@L["Localization:OverriddenBadge"]" Visible="item.IsOverridden" BadgeStyle="BadgeStyle.Info" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Title="@UL["Actions"]" Width="100px" Sortable="false" TextAlign="TextAlign.Center">
+                        <Template Context="item">
+                            @if (HasEditPermission)
+                            {
+                                <RadzenButton Icon="edit" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Light"
+                                              Click="@(async () => await OpenEditDialogAsync(item))" />
+                            }
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </LocalizedDataGrid>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>

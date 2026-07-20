@@ -16,6 +16,10 @@ public class RadzenUIPermissionDefinitionProvider : PermissionDefinitionProvider
         dataDictionaryPermission.AddChild(RadzenUIPermissions.DataDictionary.Create, L("Permission:DataDictionary.Create"));
         dataDictionaryPermission.AddChild(RadzenUIPermissions.DataDictionary.Update, L("Permission:DataDictionary.Update"));
         dataDictionaryPermission.AddChild(RadzenUIPermissions.DataDictionary.Delete, L("Permission:DataDictionary.Delete"));
+
+        var localizationPermission = radzenUIGroup.AddPermission(RadzenUIPermissions.Localization.Default, L("Permission:Localization"));
+        localizationPermission.AddChild(RadzenUIPermissions.Localization.Edit, L("Permission:Localization.Edit"));
+        localizationPermission.AddChild(RadzenUIPermissions.Localization.Delete, L("Permission:Localization.Delete"));
     }
 
     private static LocalizableString L(string name)
