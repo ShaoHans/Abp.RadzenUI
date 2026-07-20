@@ -36,12 +36,7 @@ public class CRMUIPlaceHolderResolver(
         var displayName = await GetTenantDisplayNameAsync();
         if (!string.IsNullOrEmpty(displayName))
         {
-            return new TitleBarSettings
-            {
-                Title = displayName,
-                ShowGithubLink = _radzenUIOptions.TitleBar.ShowGithubLink,
-                ShowLanguageMenu = _radzenUIOptions.TitleBar.ShowLanguageMenu
-            };
+            _radzenUIOptions.TitleBar.Title = displayName;
         }
         return _radzenUIOptions.TitleBar;
     }
