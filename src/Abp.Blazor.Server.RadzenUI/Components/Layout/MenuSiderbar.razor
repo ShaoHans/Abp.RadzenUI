@@ -1,5 +1,6 @@
 @using Abp.RadzenUI.Infrastructure.Navigation
 @using Abp.RadzenUI.UIPlaceHolders
+@using Radzen
 @using Volo.Abp.UI.Navigation
 @implements IAsyncDisposable
 @inject IMenuManager MenuManager
@@ -9,14 +10,16 @@
 
 <RadzenSidebar Responsive="true"
                @bind-Expanded="@SidebarExpanded"
-               class="demos-sidebar"
-               style="display: flex; flex-direction: column; --rz-sidebar-width: clamp(14rem, 13.5rem + 0.6vw, 15rem);">
+               class="@SidebarCssClass"
+               style="@SidebarStyle">
     @* <div style="padding: 1rem">
         <RadzenTextBox id="find" Placeholder="Find menu ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" class="rz-search-input" aria-label="find" />
     </div> *@
     <div style="flex: 1; overflow: auto">
         <RadzenPanelMenu Match="NavLinkMatch.Prefix" Multiple="@_titleBarSettings.AllowSideMenuMultipleExpand"
-                         Style="--rz-panel-menu-icon-margin-inline: 0 0.75rem; --rz-panel-menu-item-padding: 0.75rem 0.875rem; --rz-panel-menu-item-2nd-level-padding: 0.625rem 0.875rem 0.625rem 2.5rem; --rz-panel-menu-item-3rd-level-padding: 0.5rem 0.875rem 0.5rem 3rem;">
+                         DisplayStyle="@(Collapsed ? MenuItemDisplayStyle.Icon : MenuItemDisplayStyle.IconAndText)"
+                         ShowArrow="@(!Collapsed)"
+                         Style="@PanelMenuStyle">
             @foreach (var menu in _applicationMenu?.Items ?? [])
             {
                 @BuildMenuTree(menu);
@@ -28,9 +31,20 @@
 @code {
     [Parameter] public bool SidebarExpanded { get; set; }
     [Parameter] public EventCallback<bool> SidebarExpandedChanged { get; set; }
+    [Parameter] public bool Collapsed { get; set; }
     [Inject] IUIPlaceHolderResolver UIPlaceHolderResolver { get; set; } = default!;
     TitleBarSettings _titleBarSettings = new();
     readonly Dictionary<string, MenuItemDecorationContext> _menuItemDecorations = [];
+
+    string SidebarCssClass => Collapsed ? "demos-sidebar demos-sidebar--collapsed" : "demos-sidebar";
+
+    string SidebarWidth => Collapsed ? "4rem" : "clamp(14rem, 13.5rem + 0.6vw, 15rem)";
+
+    string SidebarStyle => $"display: flex; flex-direction: column; --rz-sidebar-width: {SidebarWidth};";
+
+    string PanelMenuStyle => Collapsed
+        ? "--rz-panel-menu-icon-margin-inline: 0; --rz-panel-menu-item-padding: 0.75rem 0; --rz-panel-menu-item-2nd-level-padding: 0.75rem 0; --rz-panel-menu-item-3rd-level-padding: 0.75rem 0;"
+        : "--rz-panel-menu-icon-margin-inline: 0 0.75rem; --rz-panel-menu-item-padding: 0.75rem 0.875rem; --rz-panel-menu-item-2nd-level-padding: 0.625rem 0.875rem 0.625rem 2.5rem; --rz-panel-menu-item-3rd-level-padding: 0.5rem 0.875rem 0.5rem 3rem;";
 
 
     ApplicationMenu _applicationMenu = default!;
@@ -59,7 +73,7 @@
                              IconColor="@GetIconColor(menuItem)"
                              Text="@displayName"
                              Path="@menuItem.Url"
-                             Template="@(UseTemplate(menuItem) ? BuildMenuTemplate(menuItem) : null)"
+                             Template="@(!Collapsed && UseTemplate(menuItem) ? BuildMenuTemplate(menuItem) : null)"
                              ChildContent="@(menuItem.Items.IsNullOrEmpty() ? null : BuildMenuChildren(menuItem.Items))" />
     };
 

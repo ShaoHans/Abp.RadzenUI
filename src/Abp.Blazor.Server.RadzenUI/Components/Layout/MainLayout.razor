@@ -33,7 +33,7 @@
                 </RadzenContentContainer>
             </ChildContent>
         </RadzenBody>
-        <MenuSiderbar @bind-SidebarExpanded="menuSidebarExpanded" />
+        <MenuSiderbar @bind-SidebarExpanded="menuSidebarExpanded" Collapsed="menuCollapsed" />
         <ThemeSiderbar @bind-SidebarExpanded="themeSidebarExpanded" />
         <MessageSidebar @bind-SidebarExpanded="messageSidebarExpanded" />
         @if (isMobile && (menuSidebarExpanded || themeSidebarExpanded || messageSidebarExpanded))
@@ -75,6 +75,7 @@ else
 
 @code {
     bool menuSidebarExpanded = true;
+    bool menuCollapsed = false;
     bool themeSidebarExpanded = false;
     bool messageSidebarExpanded = false;
     bool isMobile;
@@ -127,7 +128,16 @@ else
 
     private void ToggleMenu()
     {
-        menuSidebarExpanded = !menuSidebarExpanded;
+        if (isMobile)
+        {
+            // On mobile the sidebar is a full overlay: toggle show/hide.
+            menuSidebarExpanded = !menuSidebarExpanded;
+        }
+        else
+        {
+            // On desktop keep the sidebar visible but collapse it to an icon-only rail.
+            menuCollapsed = !menuCollapsed;
+        }
     }
 
     private void ToggleTheme()
@@ -160,6 +170,7 @@ else
             if (matches)
             {
                 menuSidebarExpanded = false;
+                menuCollapsed = false;
                 themeSidebarExpanded = false;
                 messageSidebarExpanded = false;
             }
@@ -177,6 +188,7 @@ else
         if (matches)
         {
             menuSidebarExpanded = false;
+            menuCollapsed = false;
             themeSidebarExpanded = false;
             messageSidebarExpanded = false;
         }

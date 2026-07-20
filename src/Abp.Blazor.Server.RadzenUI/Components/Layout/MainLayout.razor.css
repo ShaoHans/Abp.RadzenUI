@@ -72,6 +72,16 @@
     box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--rz-text-color) 10%, transparent);
 }
 
+/* Collapsed icon-only rail */
+.app-layout-shell ::deep .demos-sidebar--collapsed .rz-navigation-item-link {
+    justify-content: center;
+    margin-inline: 0.35rem;
+}
+
+.app-layout-shell ::deep .demos-sidebar--collapsed .rz-navigation-item-icon {
+    margin: 0;
+}
+
 .app-layout-shell ::deep .demos-sidebar .rz-navigation-item-wrapper-active > .rz-navigation-item-link .rz-navigation-item-text {
     font-weight: 600;
 }
