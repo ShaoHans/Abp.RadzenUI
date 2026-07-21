@@ -65,7 +65,10 @@ public partial class List
     {
         await base.OnAfterRenderAsync(firstRender);
 
-        if (firstRender && !_hasTriggeredInitialLoad && _grid is not null && CanQuery)
+        // The initial resource/culture come from an async load in OnInitializedAsync, so the very
+        // first render can happen before CanQuery is true. Trigger the initial load on whichever
+        // render CanQuery first becomes true (not only firstRender).
+        if (!_hasTriggeredInitialLoad && _grid is not null && CanQuery)
         {
             _hasTriggeredInitialLoad = true;
             await _grid.FirstPage(true);

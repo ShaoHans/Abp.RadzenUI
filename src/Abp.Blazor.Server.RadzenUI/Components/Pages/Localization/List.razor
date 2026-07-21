@@ -21,14 +21,16 @@
                     <RadzenDropDown TValue="string" Data="@_resources" @bind-Value="_selectedResource"
                                     TextProperty="@nameof(LocalizationResourceInfoDto.Name)"
                                     ValueProperty="@nameof(LocalizationResourceInfoDto.Name)"
-                                    AllowFiltering="true" Change="@(async () => await ReloadAsync())" />
+                                    AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                    Change="@(async () => await ReloadAsync())" />
                 </RadzenFormField>
 
                 <RadzenFormField Text="@L["Localization:Culture"]" Variant="Variant.Outlined" Style="min-width:200px">
                     <RadzenDropDown TValue="string" Data="@_cultures" @bind-Value="_selectedCulture"
                                     TextProperty="@nameof(LocalizationCultureDto.DisplayName)"
                                     ValueProperty="@nameof(LocalizationCultureDto.CultureName)"
-                                    AllowFiltering="true" Change="@(async () => await ReloadAsync())" />
+                                    AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                    Change="@(async () => await ReloadAsync())" />
                 </RadzenFormField>
 
                 <SearchTextBox PlaceHoder="@L["Localization:SearchPlaceholder"]" Style="width:260px"

@@ -14,6 +14,7 @@ using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Localization;
+using Volo.Abp.Uow;
 
 namespace Abp.RadzenUI.Application.LocalizationTexts;
 
@@ -23,17 +24,20 @@ public class LocalizationTextAppService : ApplicationService, ILocalizationTextA
     private readonly IRepository<LocalizationText, Guid> _repository;
     private readonly LocalizationTextStore _store;
     private readonly IStringLocalizerFactory _stringLocalizerFactory;
+    private readonly IUnitOfWorkManager _unitOfWorkManager;
     private readonly AbpLocalizationOptions _localizationOptions;
 
     public LocalizationTextAppService(
         IRepository<LocalizationText, Guid> repository,
         LocalizationTextStore store,
         IStringLocalizerFactory stringLocalizerFactory,
+        IUnitOfWorkManager unitOfWorkManager,
         IOptions<AbpLocalizationOptions> localizationOptions)
     {
         _repository = repository;
         _store = store;
         _stringLocalizerFactory = stringLocalizerFactory;
+        _unitOfWorkManager = unitOfWorkManager;
         _localizationOptions = localizationOptions.Value;
         LocalizationResource = typeof(AbpRadzenUIResource);
     }
@@ -148,7 +152,7 @@ public class LocalizationTextAppService : ApplicationService, ILocalizationTextA
             await _repository.UpdateAsync(existing, autoSave: true);
         }
 
-        await _store.InvalidateAsync(CurrentTenant.Id, input.ResourceName, input.CultureName);
+        InvalidateCacheAfterCompleted(input.ResourceName, input.CultureName);
     }
 
     [Authorize(RadzenUIPermissions.Localization.Delete)]
@@ -165,7 +169,26 @@ public class LocalizationTextAppService : ApplicationService, ILocalizationTextA
         }
 
         await _repository.DeleteAsync(existing, autoSave: true);
-        await _store.InvalidateAsync(CurrentTenant.Id, input.ResourceName, input.CultureName);
+        InvalidateCacheAfterCompleted(input.ResourceName, input.CultureName);
+    }
+
+    /// <summary>
+    /// Refreshes the localization cache only after the current unit of work commits. Reloading
+    /// inside the UoW would open a separate transaction that cannot see the pending change, warming
+    /// the cache with stale data.
+    /// </summary>
+    private void InvalidateCacheAfterCompleted(string resourceName, string cultureName)
+    {
+        var tenantId = CurrentTenant.Id;
+
+        if (_unitOfWorkManager.Current != null)
+        {
+            _unitOfWorkManager.Current.OnCompleted(() => _store.InvalidateAsync(tenantId, resourceName, cultureName));
+        }
+        else
+        {
+            _ = _store.InvalidateAsync(tenantId, resourceName, cultureName);
+        }
     }
 
     private LocalizationResourceBase GetResourceOrThrow(string resourceName)
