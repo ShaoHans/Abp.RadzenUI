@@ -11,10 +11,17 @@ namespace Abp.RadzenUI.Infrastructure.Search;
 public interface ICommandPaletteContributor
 {
     /// <summary>
-    /// Localization key for the group heading (looked up against the theme resource).
-    /// Results from contributors sharing a key are merged into one group.
+    /// Stable identifier for the group. Results from contributors sharing a key are
+    /// merged into one group. Not shown to the user — see <see cref="GroupDisplayName"/>.
     /// </summary>
     string GroupKey { get; }
+
+    /// <summary>
+    /// Localized group heading shown to the user. The contributor localizes this itself
+    /// (against its own resource), so host groups don't depend on the theme resource.
+    /// When contributors share a <see cref="GroupKey"/>, the first one's name wins.
+    /// </summary>
+    string GroupDisplayName { get; }
 
     /// <summary>Display order of the group; lower comes first.</summary>
     int Order { get; }

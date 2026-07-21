@@ -14,6 +14,14 @@ public partial class List : IDisposable
 
     private SideDialogCoordinator<ProductDto> _sideDialogCoordinator = default!;
 
+    // Deep-link target used by the command palette (Ctrl+K) product search.
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "code")]
+    public string? CodeQuery { get; set; }
+
+    private bool _initialFilterApplied;
+    private string? _lastAppliedCode;
+
     public List()
     {
         ObjectMapperContext = typeof(AbpRadzenUIModule);
@@ -30,9 +38,38 @@ public partial class List : IDisposable
         _sideDialogCoordinator = SideDialogCoordinatorFactory.Create<ProductDto>();
     }
 
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        // Reload when navigated to a different ?code= while the page is already mounted.
+        if (_grid is not null && !string.Equals(CodeQuery, _lastAppliedCode, StringComparison.Ordinal))
+        {
+            _initialFilterApplied = false;
+            await _grid.Reload();
+        }
+    }
+
     protected override async Task UpdateGetListInputAsync(LoadDataArgs args)
     {
-        GetListInput.Filter = args.Filter;
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            // A grid column filter takes precedence and clears the deep-link filter.
+            GetListInput.Filter = args.Filter;
+            _initialFilterApplied = true;
+        }
+        else if (!_initialFilterApplied && !string.IsNullOrWhiteSpace(CodeQuery))
+        {
+            // Escape " as "" for the Dynamic LINQ string literal.
+            GetListInput.Filter = $"Code == \"{CodeQuery.Replace("\"", "\"\"")}\"";
+            _initialFilterApplied = true;
+            _lastAppliedCode = CodeQuery;
+        }
+        else
+        {
+            GetListInput.Filter = args.Filter;
+        }
+
         await base.UpdateGetListInputAsync(args);
     }
 

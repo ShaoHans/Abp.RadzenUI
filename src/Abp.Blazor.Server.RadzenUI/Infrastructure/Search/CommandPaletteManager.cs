@@ -1,6 +1,3 @@
-using Abp.RadzenUI.Localization;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Volo.Abp.DependencyInjection;
@@ -10,7 +7,6 @@ namespace Abp.RadzenUI.Infrastructure.Search;
 public class CommandPaletteManager(
     IServiceProvider serviceProvider,
     IOptions<CommandPaletteOptions> options,
-    IStringLocalizer<AbpRadzenUIResource> localizer,
     ILogger<CommandPaletteManager> logger)
     : ICommandPaletteManager, IScopedDependency
 {
@@ -38,7 +34,7 @@ public class CommandPaletteManager(
             CancellationToken = cancellationToken,
         };
 
-        var groups = new Dictionary<string, (int Order, List<CommandPaletteItem> Items)>();
+        var groups = new Dictionary<string, (string DisplayName, int Order, List<CommandPaletteItem> Items)>();
 
         foreach (var contributorType in _options.Contributors)
         {
@@ -62,7 +58,7 @@ public class CommandPaletteManager(
 
                 if (!groups.TryGetValue(contributor.GroupKey, out var bucket))
                 {
-                    bucket = (contributor.Order, []);
+                    bucket = (contributor.GroupDisplayName, contributor.Order, []);
                     groups[contributor.GroupKey] = bucket;
                 }
 
@@ -85,7 +81,7 @@ public class CommandPaletteManager(
             .Select(kvp => new CommandPaletteResultGroup
             {
                 GroupKey = kvp.Key,
-                DisplayName = localizer[kvp.Key],
+                DisplayName = kvp.Value.DisplayName,
                 Order = kvp.Value.Order,
                 Items = kvp.Value.Items
                     .OrderByDescending(static i => i.Score)

@@ -1,4 +1,6 @@
 using Abp.RadzenUI.Infrastructure.Navigation;
+using Abp.RadzenUI.Localization;
+using Microsoft.Extensions.Localization;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.UI.Navigation;
 
@@ -9,10 +11,14 @@ namespace Abp.RadzenUI.Infrastructure.Search;
 /// The menu returned by <see cref="IMenuManager"/> is already trimmed by ABP against the
 /// current user's <c>RequirePermissions</c>, so no extra authorization is needed here.
 /// </summary>
-public class MenuCommandPaletteContributor(IMenuManager menuManager)
+public class MenuCommandPaletteContributor(
+    IMenuManager menuManager,
+    IStringLocalizer<AbpRadzenUIResource> localizer)
     : ICommandPaletteContributor, ITransientDependency
 {
     public string GroupKey => "CommandPalette:Group.Pages";
+
+    public string GroupDisplayName => localizer["CommandPalette:Group.Pages"];
 
     public int Order => 0;
 

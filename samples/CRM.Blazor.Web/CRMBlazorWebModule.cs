@@ -1,8 +1,10 @@
 ﻿using Abp.RadzenUI;
+using Abp.RadzenUI.Infrastructure.Search;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.UIPlaceHolders;
 using CRM.Blazor.Web.Components.Pages;
 using CRM.Blazor.Web.Menus;
+using CRM.Blazor.Web.Search;
 using CRM.EntityFrameworkCore;
 using CRM.Localization;
 using CRM.MultiTenancy;
@@ -286,6 +288,13 @@ public class CRMBlazorWebModule : AbpModule
         Configure<AbpNavigationOptions>(options =>
         {
             options.MenuContributors.Add(new CRMMenuContributor());
+        });
+
+        // Extend the command palette (Ctrl+K) with product search on top of the
+        // built-in menu/page jump contributor.
+        Configure<CommandPaletteOptions>(options =>
+        {
+            options.AddContributor<ProductCommandPaletteContributor>();
         });
 
         context.Services.Replace(
