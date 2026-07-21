@@ -6,6 +6,7 @@ using Abp.RadzenUI.LinkAccounts;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Menus;
 using Abp.RadzenUI.Infrastructure.Navigation;
+using Abp.RadzenUI.Infrastructure.Search;
 using Abp.RadzenUI.Infrastructure.Services;
 using Localization.Resources.AbpUi;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -168,9 +169,15 @@ public class AbpRadzenUIModule : AbpModule
             options.Contributors.Add(new AccountPageContributor());
         });
 
+        Configure<CommandPaletteOptions>(options =>
+        {
+            options.AddContributor<MenuCommandPaletteContributor>();
+        });
+
         context.Services.AddSingleton(typeof(AbpBlazorMessageLocalizerHelper<>));
         context.Services.AddScoped<GridPageSizePreferenceService>();
         context.Services.AddScoped<MessageCenterState>();
+        context.Services.AddScoped<CommandPaletteState>();
         context.Services.AddScoped<MenuItemDecorationState>();
         context.Services.AddScoped(typeof(SideDialogState<>));
         context.Services.AddScoped<ISideDialogCoordinatorFactory, SideDialogCoordinatorFactory>();

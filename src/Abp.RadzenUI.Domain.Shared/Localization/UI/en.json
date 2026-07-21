@@ -304,7 +304,16 @@
     "Dashboard:Errors": "Errors",
     "Dashboard:StatusCodeDist": "HTTP Status Code Distribution",
     "Dashboard:StatusCode": "Status Code",
-    "Dashboard:NoData": "No data available."
+    "Dashboard:NoData": "No data available.",
+
+    "CommandPalette:Search": "Search",
+    "CommandPalette:Placeholder": "Search pages and commands...",
+    "CommandPalette:Hint": "Type to search pages",
+    "CommandPalette:NoResults": "No results found.",
+    "CommandPalette:Nav": "Navigate",
+    "CommandPalette:Open": "Open",
+    "CommandPalette:Close": "Close",
+    "CommandPalette:Group.Pages": "Pages"
   }
 }
 

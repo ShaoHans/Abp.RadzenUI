@@ -303,7 +303,16 @@
     "Dashboard:Errors": "错误数",
     "Dashboard:StatusCodeDist": "HTTP 状态码分布",
     "Dashboard:StatusCode": "状态码",
-    "Dashboard:NoData": "暂无数据。"
+    "Dashboard:NoData": "暂无数据。",
+
+    "CommandPalette:Search": "搜索",
+    "CommandPalette:Placeholder": "搜索页面和命令...",
+    "CommandPalette:Hint": "输入以搜索页面",
+    "CommandPalette:NoResults": "未找到结果。",
+    "CommandPalette:Nav": "导航",
+    "CommandPalette:Open": "打开",
+    "CommandPalette:Close": "关闭",
+    "CommandPalette:Group.Pages": "页面"
   }
 }
 

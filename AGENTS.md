@@ -187,6 +187,24 @@ app.UseRadzenUI();
 3. 在业务 `IMenuContributor` 中添加菜单项。
 4. 如有权限控制，菜单项调用 `RequirePermissions(...)`。
 
+## 全局搜索 / 命令面板(Ctrl+K)
+
+相关目录:`src/Abp.Blazor.Server.RadzenUI/Infrastructure/Search`
+
+命令面板提供 Ctrl/⌘+K 全局快速跳转,Phase 1 基于菜单数据做页面跳转,可扩展为实体搜索。
+
+核心构件:
+
+- `ICommandPaletteContributor`:扩展点。实现后通过 `CommandPaletteOptions.Contributors` 注册即可新增一组结果,无需改动面板 UI。契约为异步(`SearchAsync` 返回 `Task`),Phase 2 加实体查询(DB/HTTP)不改接口。
+- `MenuCommandPaletteContributor`:Phase 1 内置实现,从 `IMenuManager.GetMainMenuAsync()`(已按权限过滤)展平叶子菜单做内存匹配。
+- `ICommandPaletteManager` / `CommandPaletteManager`:聚合各贡献器结果,按 `GroupKey` 分组并本地化。
+- `CommandPaletteOptions`:`Enabled`、`MinKeywordLength`、`MaxResultsPerGroup`、`Contributors`。
+- `CommandPaletteState`(Scoped):协调 Header 搜索按钮、Ctrl+K 与面板组件之间的打开请求。
+- `Components/Shared/CommandPalette.razor`:Spotlight 居中浮层,挂载在 `MainLayout` 末尾,支持 ↑↓/↵/Esc 键盘导航与移动端全屏。
+- `wwwroot/js/command-palette.js`:全局 Ctrl/⌘+K 监听 + 输入框聚焦,沿用 `fullscreen.js` 的 `dotNetRef` 模块模式,脚本在 `App.razor` 中引入。
+
+贡献器需可从 DI 解析(实现 `ITransientDependency`/`IScopedDependency` 或手动注册)。本地化 key 前缀为 `CommandPalette:`。
+
 ## 页面开发模式
 
 通用 CRUD 页面基类：`src/Abp.Blazor.Server.RadzenUI/AbpCrudPageBase.cs`

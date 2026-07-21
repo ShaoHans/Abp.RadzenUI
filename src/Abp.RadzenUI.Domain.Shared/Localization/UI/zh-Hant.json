@@ -1,6 +1,14 @@
 {
   "culture": "zh-Hant",
   "texts": {
+    "CommandPalette:Search": "搜尋",
+    "CommandPalette:Placeholder": "搜尋頁面和命令...",
+    "CommandPalette:Hint": "輸入以搜尋頁面",
+    "CommandPalette:NoResults": "找不到結果。",
+    "CommandPalette:Nav": "導覽",
+    "CommandPalette:Open": "開啟",
+    "CommandPalette:Close": "關閉",
+    "CommandPalette:Group.Pages": "頁面",
     "GivenTenantIsNotExist": "指定的租戶不存在: {0}",
     "GivenTenantIsNotAvailable": "指定的租戶不可用: {0}",
     "Tenant": "租戶",

@@ -21,6 +21,7 @@
 @inject NavigationManager NavigationManager
 @inject IMessageAppService MessageAppService
 @inject MessageCenterState MessageCenterState
+@inject CommandPaletteState CommandPaletteState
 
 <style>
     /* GitHub-style icon buttons with rounded border box */
@@ -215,6 +216,13 @@
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="4">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" JustifyContent="JustifyContent.End" class="app-header__actions">
+                    <button type="button"
+                            class="app-header__action app-header__icon-action"
+                            title="@TL["CommandPalette:Search"] (Ctrl+K)"
+                            aria-label="@TL["CommandPalette:Search"]"
+                            @onclick="OpenCommandPaletteAsync">
+                        <RadzenIcon Icon="search" />
+                    </button>
                     @if (_titleBar.ShowGithubLink)
                     {
                         <a href="https://github.com/ShaoHans/Abp-RadzenUI"
@@ -358,6 +366,11 @@
     async Task ToggleMessagesAsync()
     {
         await MessageToggle.InvokeAsync(EventArgs.Empty);
+    }
+
+    async Task OpenCommandPaletteAsync()
+    {
+        await CommandPaletteState.OpenAsync();
     }
 
     string GetFullscreenButtonClass()
