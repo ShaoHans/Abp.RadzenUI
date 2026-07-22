@@ -65,17 +65,9 @@
         white-space: nowrap;
     }
     .cmdk-results {
-        flex: 1;
         overflow-y: auto;
+        max-height: 46vh;
         padding: 0.35rem 0;
-    }
-    .cmdk-group-label {
-        padding: 0.5rem 1rem 0.25rem;
-        font-size: 0.6875rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        opacity: 0.55;
     }
     .cmdk-item {
         display: flex;
@@ -120,6 +112,10 @@
         opacity: 0.6;
         font-size: 0.875rem;
     }
+    /* Trim RadzenTabs' default content padding so results align with the input. */
+    .cmdk-panel .rz-tabview-panel {
+        padding: 0;
+    }
     .cmdk-footer {
         display: flex;
         gap: 1rem;
@@ -143,6 +139,10 @@
             border-radius: 0;
             border: none;
         }
+        .cmdk-results {
+            max-height: none;
+            flex: 1;
+        }
     }
 </style>
 
@@ -162,39 +162,27 @@
                        @oninput="OnInputAsync" />
                 <span class="cmdk-kbd">Esc</span>
             </div>
-            <div class="cmdk-results">
-                @if (_flatItems.Count == 0)
-                {
-                    <div class="cmdk-empty">
-                        @(_keyword.Length == 0 ? TL["CommandPalette:Hint"] : TL["CommandPalette:NoResults"])
-                    </div>
-                }
-                else
-                {
-                    var flatIndex = 0;
-                    foreach (var group in _groups)
-                    {
-                        <div class="cmdk-group-label">@group.DisplayName</div>
-                        @foreach (var item in group.Items)
+
+            @if (_tabs.Count > 1)
+            {
+                <RadzenTabs @bind-SelectedIndex="_selectedTabIndex"
+                            Change="OnTabChangedAsync"
+                            RenderMode="TabRenderMode.Server">
+                    <Tabs>
+                        @foreach (var tab in _tabs)
                         {
-                            var currentIndex = flatIndex++;
-                            <button type="button"
-                                    class="@ItemCssClass(currentIndex)"
-                                    @onclick="() => ActivateAsync(item)"
-                                    @onmouseover="() => _activeIndex = currentIndex">
-                                <RadzenIcon Icon="@(item.Icon ?? "chevron_right")" IconColor="@item.IconColor" />
-                                <span class="cmdk-item-text">
-                                    <span class="cmdk-item-title">@item.Title</span>
-                                    @if (!string.IsNullOrEmpty(item.Description))
-                                    {
-                                        <span class="cmdk-item-desc">@item.Description</span>
-                                    }
-                                </span>
-                            </button>
+                            <RadzenTabsItem Text="@tab.DisplayName" Icon="@tab.Icon">
+                                @ResultsFragment
+                            </RadzenTabsItem>
                         }
-                    }
-                }
-            </div>
+                    </Tabs>
+                </RadzenTabs>
+            }
+            else
+            {
+                @ResultsFragment
+            }
+
             <div class="cmdk-footer">
                 <span><span class="cmdk-kbd">↑↓</span>@TL["CommandPalette:Nav"]</span>
                 <span><span class="cmdk-kbd">↵</span>@TL["CommandPalette:Open"]</span>
@@ -207,13 +195,45 @@
 @code {
     bool _open;
     string _keyword = string.Empty;
-    IReadOnlyList<CommandPaletteResultGroup> _groups = [];
-    List<CommandPaletteItem> _flatItems = [];
+    List<CommandPaletteTab> _tabs = [];
+    string _activeTabKey = string.Empty;
+    int _selectedTabIndex;
+    List<CommandPaletteItem> _items = [];
     int _activeIndex = -1;
     bool _shouldFocus;
 
     DotNetObjectReference<CommandPalette>? _dotNetRef;
-    CancellationTokenSource? _debounceCts;
+    CancellationTokenSource? _searchCts;
+
+    RenderFragment ResultsFragment =>@<div class="cmdk-results">
+        @if (_items.Count == 0)
+        {
+            <div class="cmdk-empty">
+                @(_keyword.Length == 0 ? TL["CommandPalette:Hint"] : TL["CommandPalette:NoResults"])
+            </div>
+        }
+        else
+        {
+            @for (var i = 0; i < _items.Count; i++)
+            {
+                var index = i;
+                var item = _items[index];
+                <button type="button"
+                        class="@ItemCssClass(index)"
+                        @onclick="() => ActivateAsync(item)"
+                        @onmouseover="() => _activeIndex = index">
+                    <RadzenIcon Icon="@(item.Icon ?? "chevron_right")" IconColor="@item.IconColor" />
+                    <span class="cmdk-item-text">
+                        <span class="cmdk-item-title">@item.Title</span>
+                        @if (!string.IsNullOrEmpty(item.Description))
+                        {
+                            <span class="cmdk-item-desc">@item.Description</span>
+                        }
+                    </span>
+                </button>
+            }
+        }
+    </div>;
 
     protected override void OnInitialized()
     {
@@ -251,10 +271,17 @@
             return;
         }
 
+        _tabs = Manager.GetTabs().ToList();
+        if (_tabs.Count == 0)
+        {
+            return;
+        }
+
         _open = true;
         _keyword = string.Empty;
-        _groups = [];
-        _flatItems = [];
+        _selectedTabIndex = 0;
+        _activeTabKey = _tabs[0].Key;
+        _items = [];
         _activeIndex = -1;
         _shouldFocus = true;
         await InvokeAsync(StateHasChanged);
@@ -262,11 +289,10 @@
 
     async Task CloseAsync()
     {
-        _debounceCts?.Cancel();
+        _searchCts?.Cancel();
         _open = false;
         _keyword = string.Empty;
-        _groups = [];
-        _flatItems = [];
+        _items = [];
         _activeIndex = -1;
         await InvokeAsync(StateHasChanged);
     }
@@ -274,36 +300,50 @@
     async Task OnInputAsync(ChangeEventArgs e)
     {
         _keyword = e.Value?.ToString() ?? string.Empty;
-        await SearchDebouncedAsync();
+        await SearchAsync(debounce: true);
     }
 
-    async Task SearchDebouncedAsync()
+    async Task OnTabChangedAsync(int index)
     {
-        _debounceCts?.Cancel();
-        _debounceCts?.Dispose();
-        var cts = new CancellationTokenSource();
-        _debounceCts = cts;
+        if (index < 0 || index >= _tabs.Count)
+        {
+            return;
+        }
 
-        // Capture the token before the source can be disposed by a newer keystroke.
-        // Reading IsCancellationRequested on the captured token stays safe after dispose;
-        // reading cts.Token (the source getter) would throw ObjectDisposedException.
+        _selectedTabIndex = index;
+        _activeTabKey = _tabs[index].Key;
+        _activeIndex = -1;
+        _shouldFocus = true;
+        await SearchAsync(debounce: false);
+    }
+
+    async Task SearchAsync(bool debounce)
+    {
+        _searchCts?.Cancel();
+        _searchCts?.Dispose();
+        var cts = new CancellationTokenSource();
+        _searchCts = cts;
+
+        // Capture the token before a newer keystroke/tab switch can dispose the source.
         var token = cts.Token;
 
         try
         {
-            await Task.Delay(150, token);
+            if (debounce)
+            {
+                await Task.Delay(150, token);
+            }
 
-            var groups = await Manager.SearchAsync(_keyword, token);
+            var items = await Manager.SearchAsync(_activeTabKey, _keyword, token);
 
             // Bail if a newer search superseded this one.
-            if (token.IsCancellationRequested || !ReferenceEquals(_debounceCts, cts))
+            if (token.IsCancellationRequested || !ReferenceEquals(_searchCts, cts))
             {
                 return;
             }
 
-            _groups = groups;
-            _flatItems = groups.SelectMany(static g => g.Items).ToList();
-            _activeIndex = _flatItems.Count > 0 ? 0 : -1;
+            _items = items.ToList();
+            _activeIndex = _items.Count > 0 ? 0 : -1;
             await InvokeAsync(StateHasChanged);
         }
         catch (OperationCanceledException)
@@ -322,9 +362,9 @@
                 Move(-1);
                 break;
             case "Enter":
-                if (_activeIndex >= 0 && _activeIndex < _flatItems.Count)
+                if (_activeIndex >= 0 && _activeIndex < _items.Count)
                 {
-                    await ActivateAsync(_flatItems[_activeIndex]);
+                    await ActivateAsync(_items[_activeIndex]);
                 }
                 break;
             case "Escape":
@@ -335,12 +375,12 @@
 
     void Move(int delta)
     {
-        if (_flatItems.Count == 0)
+        if (_items.Count == 0)
         {
             return;
         }
 
-        _activeIndex = (_activeIndex + delta + _flatItems.Count) % _flatItems.Count;
+        _activeIndex = (_activeIndex + delta + _items.Count) % _items.Count;
     }
 
     async Task ActivateAsync(CommandPaletteItem item)
@@ -355,8 +395,8 @@
     public async ValueTask DisposeAsync()
     {
         State.OpenRequested -= OpenAsync;
-        _debounceCts?.Cancel();
-        _debounceCts?.Dispose();
+        _searchCts?.Cancel();
+        _searchCts?.Dispose();
 
         if (_dotNetRef is not null)
         {

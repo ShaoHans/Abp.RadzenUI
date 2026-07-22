@@ -16,13 +16,41 @@ public class CommandPaletteManager(
 
     public int MinKeywordLength => _options.MinKeywordLength;
 
-    public async Task<IReadOnlyList<CommandPaletteResultGroup>> SearchAsync(
+    public IReadOnlyList<CommandPaletteTab> GetTabs()
+    {
+        if (!Enabled)
+        {
+            return [];
+        }
+
+        var tabs = new Dictionary<string, CommandPaletteTab>();
+
+        foreach (var contributor in ResolveContributors())
+        {
+            // First contributor for a given key defines the tab's label/order.
+            if (!tabs.ContainsKey(contributor.GroupKey))
+            {
+                tabs[contributor.GroupKey] = new CommandPaletteTab
+                {
+                    Key = contributor.GroupKey,
+                    DisplayName = contributor.GroupDisplayName,
+                    Icon = contributor.GroupIcon,
+                    Order = contributor.Order,
+                };
+            }
+        }
+
+        return tabs.Values.OrderBy(static t => t.Order).ToList();
+    }
+
+    public async Task<IReadOnlyList<CommandPaletteItem>> SearchAsync(
+        string tabKey,
         string keyword,
         CancellationToken cancellationToken = default)
     {
         keyword = keyword?.Trim() ?? string.Empty;
 
-        if (!Enabled || keyword.Length < _options.MinKeywordLength)
+        if (!Enabled || string.IsNullOrEmpty(tabKey) || keyword.Length < _options.MinKeywordLength)
         {
             return [];
         }
@@ -34,35 +62,22 @@ public class CommandPaletteManager(
             CancellationToken = cancellationToken,
         };
 
-        var groups = new Dictionary<string, (string DisplayName, int Order, List<CommandPaletteItem> Items)>();
+        var results = new List<CommandPaletteItem>();
 
-        foreach (var contributorType in _options.Contributors)
+        // Only the contributor(s) belonging to the active tab run — never all of them.
+        foreach (var contributor in ResolveContributors())
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (serviceProvider.GetService(contributorType) is not ICommandPaletteContributor contributor)
+            if (!string.Equals(contributor.GroupKey, tabKey, StringComparison.Ordinal))
             {
-                logger.LogWarning(
-                    "Command palette contributor {Type} is not registered in DI and was skipped.",
-                    contributorType.FullName);
                 continue;
             }
 
             try
             {
                 var items = await contributor.SearchAsync(context);
-                if (items.Count == 0)
-                {
-                    continue;
-                }
-
-                if (!groups.TryGetValue(contributor.GroupKey, out var bucket))
-                {
-                    bucket = (contributor.GroupDisplayName, contributor.Order, []);
-                    groups[contributor.GroupKey] = bucket;
-                }
-
-                bucket.Items.AddRange(items);
+                results.AddRange(items);
             }
             catch (OperationCanceledException)
             {
@@ -70,26 +85,33 @@ public class CommandPaletteManager(
             }
             catch (Exception ex)
             {
-                // A single failing contributor must not break the whole palette.
+                // A single failing contributor must not break the palette.
                 logger.LogError(ex,
                     "Command palette contributor {Type} threw and was skipped.",
-                    contributorType.FullName);
+                    contributor.GetType().FullName);
             }
         }
 
-        return groups
-            .Select(kvp => new CommandPaletteResultGroup
-            {
-                GroupKey = kvp.Key,
-                DisplayName = kvp.Value.DisplayName,
-                Order = kvp.Value.Order,
-                Items = kvp.Value.Items
-                    .OrderByDescending(static i => i.Score)
-                    .Take(_options.MaxResultsPerGroup)
-                    .ToList(),
-            })
-            .Where(static g => g.Items.Count > 0)
-            .OrderBy(static g => g.Order)
+        return results
+            .OrderByDescending(static i => i.Score)
+            .Take(_options.MaxResultsPerGroup)
             .ToList();
+    }
+
+    IEnumerable<ICommandPaletteContributor> ResolveContributors()
+    {
+        foreach (var contributorType in _options.Contributors)
+        {
+            if (serviceProvider.GetService(contributorType) is ICommandPaletteContributor contributor)
+            {
+                yield return contributor;
+            }
+            else
+            {
+                logger.LogWarning(
+                    "Command palette contributor {Type} is not registered in DI and was skipped.",
+                    contributorType.FullName);
+            }
+        }
     }
 }

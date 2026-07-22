@@ -308,7 +308,7 @@
 
     "CommandPalette:Search": "Search",
     "CommandPalette:Placeholder": "Search pages and commands...",
-    "CommandPalette:Hint": "Type to search pages",
+    "CommandPalette:Hint": "Type a keyword to search",
     "CommandPalette:NoResults": "No results found.",
     "CommandPalette:Nav": "Navigate",
     "CommandPalette:Open": "Open",

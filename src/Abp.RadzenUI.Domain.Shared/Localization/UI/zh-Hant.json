@@ -3,7 +3,7 @@
   "texts": {
     "CommandPalette:Search": "搜尋",
     "CommandPalette:Placeholder": "搜尋頁面和命令...",
-    "CommandPalette:Hint": "輸入以搜尋頁面",
+    "CommandPalette:Hint": "輸入關鍵字開始搜尋",
     "CommandPalette:NoResults": "找不到結果。",
     "CommandPalette:Nav": "導覽",
     "CommandPalette:Open": "開啟",

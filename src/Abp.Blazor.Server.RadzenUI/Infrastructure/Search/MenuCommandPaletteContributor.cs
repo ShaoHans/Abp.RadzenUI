@@ -20,6 +20,8 @@ public class MenuCommandPaletteContributor(
 
     public string GroupDisplayName => localizer["CommandPalette:Group.Pages"];
 
+    public string? GroupIcon => "list_alt";
+
     public int Order => 0;
 
     public async Task<IReadOnlyList<CommandPaletteItem>> SearchAsync(

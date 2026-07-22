@@ -27,6 +27,8 @@ public class ProductCommandPaletteContributor(
 
     public string GroupDisplayName => l["CommandPalette:Group.Products"];
 
+    public string? GroupIcon => "inventory_2";
+
     public int Order => 10;
 
     public async Task<IReadOnlyList<CommandPaletteItem>> SearchAsync(

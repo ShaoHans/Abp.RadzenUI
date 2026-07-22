@@ -23,6 +23,12 @@ public interface ICommandPaletteContributor
     /// </summary>
     string GroupDisplayName { get; }
 
+    /// <summary>
+    /// Optional Material Symbols icon for the tab (e.g. "inventory_2"). Null shows no icon.
+    /// Default is null so existing contributors need no change.
+    /// </summary>
+    string? GroupIcon => null;
+
     /// <summary>Display order of the group; lower comes first.</summary>
     int Order { get; }
 
