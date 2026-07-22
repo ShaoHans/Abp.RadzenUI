@@ -203,7 +203,8 @@ app.UseRadzenUI();
 - `CommandPaletteTab`:tab 元数据(Key / DisplayName / Order)。
 - `CommandPaletteOptions`:`Enabled`、`MinKeywordLength`、`MaxResultsPerGroup`、`Contributors`。
 - `CommandPaletteState`(Scoped):协调 Header 搜索按钮、Ctrl+K 与面板组件之间的打开请求。
-- `Components/Shared/CommandPalette.razor`:Spotlight 居中浮层,挂载在 `MainLayout` 末尾,输入框下方用官方 `RadzenTabs` 展示各 tab(仅鼠标点击切换,`GroupIcon` 作为 tab 图标),结果区只显示当前 tab 的结果;仅一个 tab 时不显示 tab 条;支持 ↑↓/↵/Esc 键盘导航与移动端全屏。
+- `Components/Shared/CommandPalette.razor`:**无外壳的宿主组件**,挂载在 `MainLayout` 末尾,只负责注册全局 Ctrl/⌘+K 的 `dotNetRef` 并通过 `DialogService.OpenAsync<CommandPaletteDialog>` 打开面板(`ShowTitle=false`、`Top="12vh"`、`CloseDialogOnOverlayClick/Esc`、`CssClass="cmdk-dialog"`)。遮罩、居中、backdrop、Esc、点击外部关闭都由 Radzen dialog 提供,无需自定义外壳 CSS。
+- `Components/Shared/CommandPaletteDialog.razor`:对话框内容,输入框 + 官方 `RadzenTabs`(仅鼠标点击切换,`GroupIcon` 作为 tab 图标)+ 结果列表 + 底部快捷键提示;仅一个 tab 时不显示 tab 条;支持 ↑↓/↵ 键盘导航(Esc 由 dialog 处理)。仅剩输入框/结果项/快捷键标签等命令面板固有样式。
 - `wwwroot/js/command-palette.js`:全局 Ctrl/⌘+K 监听 + 输入框聚焦,沿用 `fullscreen.js` 的 `dotNetRef` 模块模式,脚本在 `App.razor` 中引入。
 
 贡献器需可从 DI 解析(实现 `ITransientDependency`/`IScopedDependency` 或手动注册)。本地化 key 前缀为 `CommandPalette:`。`samples/CRM.Blazor.Web/Search/ProductCommandPaletteContributor.cs` 是 host 侧实体搜索 tab 的完整示例。
