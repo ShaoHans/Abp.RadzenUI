@@ -21,6 +21,7 @@ English | [简体中文](README_zh-CN.md)
 - [Use the Linked Accounts Module](#-use-the-linked-accounts-module)
 - [Use the Data Dictionary Module](#-use-the-data-dictionary-module)
 - [Use the Messages Module](#-use-the-messages-module)
+- [Use the Command Palette (Ctrl+K)](#-use-the-command-palette-ctrlk)
 - [Preview the Interface](#-preview-the-interface)
 
 ## ❤️ Try the Demo
@@ -389,6 +390,75 @@ The message module creates a `UserMessages` table and related indexes for tenant
 - Opening a message detail marks the message as read automatically.
 - `MessageType` is modeled as a string instead of an enum so consuming applications can extend it without changing the shared module.
 - The message type dropdown is provided through an overridable lookup service, so applications can replace the available options if needed.
+
+## 🔍 Use the Command Palette (Ctrl+K)
+
+The full UI package ships a global search / command palette. Press **Ctrl+K** (or **⌘+K** on macOS), or click the search icon in the header, to open a spotlight-style dialog for jumping around the app without touching the mouse.
+
+### Built-in behavior
+
+- Opens on Ctrl/⌘+K anywhere in the app; the header also has a search button as a discoverable entry point.
+- The palette is organized into **tabs** — each search source is one tab, and only the active tab's source runs for a query, so there is no wasted work and no concurrency contention.
+- The built-in **Pages** tab searches your navigation menu. It reuses the permission-filtered main menu, so results are automatically limited to pages the current user can access.
+- Keyboard first: `↑`/`↓` to move, `Enter` to open, `Esc` to close.
+
+### Add your own search source
+
+The palette is extensible through the `ICommandPaletteContributor` extension point. Each contributor becomes a new tab — the palette UI needs no changes. This is ideal for entity search (products, customers, orders, ...).
+
+##### (1) Implement a contributor
+
+`GroupKey` is a stable id (contributors sharing a key merge into one tab), `GroupDisplayName` is the localized tab label the contributor resolves itself, and `GroupIcon` is an optional tab icon. Return an empty list when there is no match or the user is not authorized.
+
+```csharp
+public class ProductCommandPaletteContributor(
+    IProductAppService productAppService,
+    IAuthorizationService authorizationService,
+    IStringLocalizer<CRMResource> l)
+    : ICommandPaletteContributor, ITransientDependency
+{
+    public string GroupKey => "CommandPalette:Group.Products";
+    public string GroupDisplayName => l["CommandPalette:Group.Products"];
+    public string? GroupIcon => "inventory_2";
+    public int Order => 10;
+
+    public async Task<IReadOnlyList<CommandPaletteItem>> SearchAsync(
+        CommandPaletteSearchContext context)
+    {
+        if (!await authorizationService.IsGrantedAsync(CRMPermissions.Products.Default))
+        {
+            return [];
+        }
+
+        var products = await productAppService.SearchAsync(
+            context.Keyword, context.MaxResultsPerGroup);
+
+        return products
+            .Select(p => new CommandPaletteItem
+            {
+                Title = p.Name,
+                Description = $"{l["DisplayName:Code"]}: {p.Code}",
+                Icon = "inventory_2",
+                Url = $"/products?code={Uri.EscapeDataString(p.Code)}",
+                Score = /* higher ranks first */ 50,
+            })
+            .ToList();
+    }
+}
+```
+
+##### (2) Register the contributor in your web module
+
+```csharp
+Configure<CommandPaletteOptions>(options =>
+{
+    options.AddContributor<ProductCommandPaletteContributor>();
+});
+```
+
+That is all — a "Products" tab now appears in the palette. See [ProductCommandPaletteContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/Search/ProductCommandPaletteContributor.cs) for the complete sample.
+
+`CommandPaletteOptions` also exposes `Enabled`, `MinKeywordLength`, and `MaxResultsPerGroup`.
 
 ## 🎨 Preview the Interface
 

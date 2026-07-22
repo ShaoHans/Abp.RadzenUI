@@ -21,6 +21,7 @@ Abp RadzenUI 是一个基于 [ABP](https://github.com/abpframework/abp) 框架�
 - [使用关联账户模块](#-使用关联账户模块)
 - [使用数据字典模块](#-使用数据字典模块)
 - [使用消息模块](#-使用消息模块)
+- [使用全局搜索 / 命令面板（Ctrl+K）](#-使用全局搜索--命令面板ctrlk)
 - [界面预览](#-界面预览)
 
 ## ❤️ 在线体验
@@ -383,6 +384,76 @@ public class MyProjectDbContext : AbpDbContext<MyProjectDbContext>
 - 打开消息详情时会自动将消息标记为已读。
 - `MessageType` 采用字符串而不是枚举建模，便于业务系统在不修改共享模块的前提下扩展消息类型。
 - 消息类型下拉由可 override 的查询服务提供，接入方可以按需替换可选项来源。
+
+## 🔍 使用全局搜索 / 命令面板（Ctrl+K）
+
+完整 UI 包内置了全局搜索 / 命令面板。在应用内任意位置按 **Ctrl+K**（macOS 为 **⌘+K**），或点击 Header 上的搜索图标，即可打开一个 Spotlight 风格的对话框，无需鼠标即可在应用内快速跳转。
+
+### 内置行为
+
+- 应用内任意位置按 Ctrl/⌘+K 打开；Header 上也有一个搜索按钮作为可发现入口。
+- 面板以 **tab** 组织——每个搜索来源是一个 tab，任一时刻只执行当前 tab 的来源查询，既没有多余查询，也没有并发争用。
+- 内置的 **页面** tab 搜索导航菜单。它复用了已按权限过滤的主菜单，因此结果会自动限定为当前用户有权访问的页面。
+- 键盘优先：`↑`/`↓` 移动，`Enter` 打开，`Esc` 关闭。
+
+### 扩展你自己的搜索来源
+
+面板通过 `ICommandPaletteContributor` 扩展点开放扩展。每个贡献器会成为一个新的 tab，面板 UI 无需任何改动，非常适合做实体搜索（产品、客户、订单……）。
+
+##### （1）实现一个贡献器
+
+`GroupKey` 是稳定标识（相同 key 的贡献器会归并到同一个 tab），`GroupDisplayName` 是贡献器自行本地化的 tab 标题，`GroupIcon` 是可选的 tab 图标。无匹配或用户无权限时返回空列表即可。
+
+```csharp
+public class ProductCommandPaletteContributor(
+    IProductAppService productAppService,
+    IAuthorizationService authorizationService,
+    IStringLocalizer<CRMResource> l)
+    : ICommandPaletteContributor, ITransientDependency
+{
+    public string GroupKey => "CommandPalette:Group.Products";
+    public string GroupDisplayName => l["CommandPalette:Group.Products"];
+    public string? GroupIcon => "inventory_2";
+    public int Order => 10;
+
+    public async Task<IReadOnlyList<CommandPaletteItem>> SearchAsync(
+        CommandPaletteSearchContext context)
+    {
+        // 用户无权查看产品时静默返回空，不产生噪声日志
+        if (!await authorizationService.IsGrantedAsync(CRMPermissions.Products.Default))
+        {
+            return [];
+        }
+
+        var products = await productAppService.SearchAsync(
+            context.Keyword, context.MaxResultsPerGroup);
+
+        return products
+            .Select(p => new CommandPaletteItem
+            {
+                Title = p.Name,
+                Description = $"{l["DisplayName:Code"]}: {p.Code}",
+                Icon = "inventory_2",
+                Url = $"/products?code={Uri.EscapeDataString(p.Code)}",
+                Score = /* 分值越高越靠前 */ 50,
+            })
+            .ToList();
+    }
+}
+```
+
+##### （2）在 Web 模块中注册贡献器
+
+```csharp
+Configure<CommandPaletteOptions>(options =>
+{
+    options.AddContributor<ProductCommandPaletteContributor>();
+});
+```
+
+这样面板里就会多出一个"产品"tab。完整示例见 [ProductCommandPaletteContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/Search/ProductCommandPaletteContributor.cs)。
+
+`CommandPaletteOptions` 还提供 `Enabled`、`MinKeywordLength`、`MaxResultsPerGroup` 等配置项。
 
 ## 🎨 界面预览
 
