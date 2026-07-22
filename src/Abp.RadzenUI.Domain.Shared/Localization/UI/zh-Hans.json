@@ -306,8 +306,8 @@
     "Dashboard:NoData": "暂无数据。",
 
     "CommandPalette:Search": "搜索",
-    "CommandPalette:Placeholder": "搜索页面和命令...",
-    "CommandPalette:Hint": "输入关键字开始搜索",
+    "CommandPalette:Placeholder": "搜索...",
+    "CommandPalette:Hint": "开始输入以搜索",
     "CommandPalette:NoResults": "未找到结果。",
     "CommandPalette:Nav": "导航",
     "CommandPalette:Open": "打开",

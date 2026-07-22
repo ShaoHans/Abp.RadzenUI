@@ -307,8 +307,8 @@
     "Dashboard:NoData": "No data available.",
 
     "CommandPalette:Search": "Search",
-    "CommandPalette:Placeholder": "Search pages and commands...",
-    "CommandPalette:Hint": "Type a keyword to search",
+    "CommandPalette:Placeholder": "Search...",
+    "CommandPalette:Hint": "Start typing to search",
     "CommandPalette:NoResults": "No results found.",
     "CommandPalette:Nav": "Navigate",
     "CommandPalette:Open": "Open",
