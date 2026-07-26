@@ -866,3 +866,79 @@ html, body {
     overflow: auto; /* ֻ�����ݳ���ʱ���� */
 }
 
+/*
+    Permission visualizer dialog: keep a single scroll region (the tree).
+
+    The dialog body has a fixed height (calc(100vh - 180px)). The summary cards,
+    search bar and tab headers must stay put; only the permission tree scrolls.
+    Radzen defaults fight this - RadzenTabs gives every `.rz-tabview-panels`
+    `flex:1; overflow:auto`, so each tab body scrolls on its own, producing a
+    second scrollbar. Here we build a flex-fill height chain, suppress the
+    panels' own scroll, and hand the single scrollbar to the tree (`.rz-tree`
+    already ships with overflow:auto, so it just needs a bounded height).
+
+    Scoped by the wrapper class so it never leaks to other RadzenTabs. Kept in
+    the global sheet (not a .razor.css) because ::deep must be anchored on a
+    scoped HTML element, which Radzen component roots never receive.
+*/
+.permission-visualizer .rz-tabview {
+    min-height: 0;
+}
+
+.permission-visualizer .rz-tabview-panels {
+    min-height: 0;
+    overflow: hidden;
+}
+
+.permission-visualizer .rz-tabview-panel {
+    height: 100%;
+    min-height: 0;
+}
+
+.permission-visualizer .rz-tabview-left {
+    height: 100%;
+}
+
+.permission-visualizer .rz-tree {
+    width: 100%;
+    height: 100%;
+}
+
+/*
+    Role permission editor dialog (Role/Permission.razor): same single-scroll
+    goal as the visualizer, but here the tree shares its tab panel with a
+    "select all in this tab" checkbox and a separator, and the whole thing lives
+    inside DialogFormLayout's scroll body. The body is switched to a flex column
+    (via BodyStyle) so the tabs fill the space; each tab wraps its content in
+    `.role-permission-panel` (a flex column we own) so the tree can be the sole
+    scroller. We deliberately do NOT put display:flex on `.rz-tabview-panel`
+    itself - Radzen toggles inactive panels with an inline style that would win
+    for the active panel and lose for hidden ones.
+*/
+.role-permission-dialog .rz-tabview {
+    min-height: 0;
+}
+
+.role-permission-dialog .rz-tabview-panels {
+    min-height: 0;
+    overflow: hidden;
+}
+
+.role-permission-dialog .rz-tabview-panel {
+    height: 100%;
+    min-height: 0;
+}
+
+.role-permission-dialog .role-permission-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+.role-permission-dialog .role-permission-panel .rz-tree {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+}
+

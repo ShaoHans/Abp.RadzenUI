@@ -8,6 +8,7 @@
 @inject IStringLocalizer<AbpRadzenUIResource> UI
 @inherits AbpRadzenUIComponentBase
 
+<div class="permission-visualizer">
 <RadzenStack Gap="1rem" Style="height:calc(100vh - 180px); min-height: 480px;">
     @if (_isLoading)
     {
@@ -49,7 +50,7 @@
                                 Style="width:220px;" />
             </RadzenStack>
 
-            <RadzenTabs RenderMode="TabRenderMode.Client" Style="height:100%; min-height:0;">
+            <RadzenTabs RenderMode="TabRenderMode.Client">
                 <Tabs>
                     <RadzenTabsItem Text="@UI["PermissionVisualizer:Groups"]">
                         <RadzenDataGrid Data="@_filteredGroups" TItem="PermissionGroupVm" AllowSorting="true" Style="height:100%;">
@@ -91,7 +92,7 @@
                         }
                         else
                         {
-                            <RadzenTabs TabPosition="TabPosition.Left" RenderMode="TabRenderMode.Client" Style="height:100%;">
+                            <RadzenTabs TabPosition="TabPosition.Left" RenderMode="TabRenderMode.Client">
                                 <Tabs>
                                     @foreach (var group in _filteredGroups)
                                     {
@@ -102,7 +103,7 @@
                                             }
                                             else
                                             {
-                                                <RadzenTree Style="width:100%;height:100%;max-height:calc(100vh - 360px);overflow:auto;" Data="@group.TreeItems">
+                                                <RadzenTree Data="@group.TreeItems">
                                                     <RadzenTreeLevel Text="(i => GetPermissionShownName(((PermissionTreeItemVm)i).Permission))"
                                                                      ChildrenProperty="Children"
                                                                      Expanded="(i => true)"
@@ -140,6 +141,7 @@
         </RadzenStack>
     }
 </RadzenStack>
+</div>
 
 @code {
     [Parameter]
