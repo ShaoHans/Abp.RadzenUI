@@ -1,3 +1,4 @@
+using Abp.RadzenUI.Application.Contracts.Users;
 using Abp.RadzenUI.Features.Avatar;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Infrastructure.Utils;
@@ -16,6 +17,10 @@ public partial class List
 {
     [Inject]
     public IStringLocalizer<AbpRadzenUIResource> IL { get; set; } = default!;
+
+    [Inject]
+    public IUserManagementAppService UserManagementAppService { get; set; } = default!;
+
     protected bool HasManagePermissionsPermission { get; set; }
     protected string ManagePermissionsPolicyName;
     private IReadOnlyList<ExtraPropertyColumnMeta> _extraColumns = default!;
@@ -43,6 +48,19 @@ public partial class List
     {
         var avatarUrl = user.GetProperty<string>(AvatarConsts.ExtraPropertyName);
         return string.IsNullOrWhiteSpace(avatarUrl) ? null : avatarUrl;
+    }
+
+    string GetLockoutTitle(IdentityUserDto user)
+    {
+        if (!user.LockoutEnd.HasValue)
+        {
+            return string.Empty;
+        }
+
+        // A far-future end date (see UserManagementAppService.LockForever) means "locked indefinitely".
+        return user.LockoutEnd.Value.UtcDateTime > DateTime.UtcNow.AddYears(100)
+            ? IL["User:LockedPermanently"]
+            : IL["User:LockedUntil", user.LockoutEnd.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")];
     }
 
     protected override async Task SetPermissionsAsync()
@@ -137,6 +155,47 @@ public partial class List
             user.Id,
             L["Delete"],
             L["UserDeletionConfirmationMessage", user.UserName]
+        );
+    }
+
+    async Task LockUserAsync(IdentityUserDto user)
+    {
+        var result = await DialogService.OpenAsync<LockUser>(
+            $"{IL["User:Lock"]} - {user.UserName}",
+            new Dictionary<string, object?>
+            {
+                { "UserId", user.Id },
+                { "UserName", user.UserName },
+            },
+            new DialogOptions { Draggable = true, Width = "460px" }
+        );
+
+        if (result is true)
+        {
+            await _grid.Reload();
+        }
+    }
+
+    async Task UnlockUserAsync(IdentityUserDto user)
+    {
+        try
+        {
+            await UserManagementAppService.UnlockAsync(user.Id);
+            await Notify.Success(IL["User:UnlockSuccess", user.UserName]);
+            await _grid.Reload();
+        }
+        catch (Exception ex)
+        {
+            await Notify.Error(ex.Message);
+        }
+    }
+
+    async Task OpenSetPasswordDialogAsync(IdentityUserDto user)
+    {
+        await DialogService.OpenAsync<SetPassword>(
+            $"{IL["User:SetPassword"]} - {user.UserName}",
+            new Dictionary<string, object?> { { "UserId", user.Id } },
+            SetDialogOptions()
         );
     }
 }

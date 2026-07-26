@@ -1,0 +1,123 @@
+@using Abp.RadzenUI.Application.Contracts.Users
+@using Abp.RadzenUI.Localization
+@using Microsoft.Extensions.Localization
+@using Volo.Abp.AspNetCore.Components
+@using Volo.Abp.Identity
+@using Volo.Abp.Identity.Localization
+@inject IUserManagementAppService UserManagementAppService
+@inject DialogService DialogService
+@inject IStringLocalizer<AbpRadzenUIResource> IL
+@inherits AbpRadzenUIComponentBase
+
+<RadzenTemplateForm TItem="LockModel" Data="@_model" Submit="@(_ => SaveAsync())">
+    <DialogFormLayout CancelClick="@(() => DialogService.Close(false))" IsSaving="@_isSaving"
+                      SaveText="@IL["User:Lock"]" SaveIcon="lock" SaveButtonStyle="ButtonStyle.Warning"
+                      BodyStyle="overflow:visible;">
+        <RadzenStack Gap="1.25rem" class="rz-py-2">
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                    <RadzenLabel Text="@IL["User:LockDuration"]" Component="Duration" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8">
+                    <RadzenDropDown Name="Duration" TValue="LockDurationOption" Data="@_durationOptions"
+                                    TextProperty="Text" ValueProperty="Value" @bind-Value="_model.Duration"
+                                    Style="display:block; width:100%;" />
+                </RadzenColumn>
+            </RadzenRow>
+            @if (_model.Duration == LockDurationOption.Custom)
+            {
+                <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                    <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                        <RequiredMark />
+                        <RadzenLabel Text="@IL["User:LockUntil"]" Component="Until" />
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8">
+                        <RadzenDatePicker Name="Until" @bind-Value="_model.CustomEnd" ShowTime="true"
+                                          Min="DateTime.Now" DateFormat="yyyy-MM-dd HH:mm" Style="display:block; width:100%;" />
+                    </RadzenColumn>
+                </RadzenRow>
+            }
+        </RadzenStack>
+    </DialogFormLayout>
+</RadzenTemplateForm>
+
+@code {
+    [Parameter] public Guid UserId { get; set; }
+    [Parameter] public string UserName { get; set; } = string.Empty;
+
+    // Far-future, provider-safe "locked indefinitely" marker (matches the list column's permanent check).
+    static readonly DateTimeOffset PermanentEnd = new(9999, 12, 31, 23, 59, 59, TimeSpan.Zero);
+
+    readonly LockModel _model = new();
+    List<DurationOption> _durationOptions = [];
+    bool _isSaving;
+
+    public LockUser()
+    {
+        LocalizationResource = typeof(IdentityResource);
+    }
+
+    protected override void OnInitialized()
+    {
+        _durationOptions =
+        [
+            new(LockDurationOption.Minutes30, IL["User:LockDuration.Minutes30"]),
+            new(LockDurationOption.Hours1, IL["User:LockDuration.Hours1"]),
+            new(LockDurationOption.Days1, IL["User:LockDuration.Days1"]),
+            new(LockDurationOption.Days7, IL["User:LockDuration.Days7"]),
+            new(LockDurationOption.Days30, IL["User:LockDuration.Days30"]),
+            new(LockDurationOption.Permanent, IL["User:LockDuration.Permanent"]),
+            new(LockDurationOption.Custom, IL["User:LockDuration.Custom"]),
+        ];
+    }
+
+    async Task SaveAsync()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var lockoutEnd = _model.Duration switch
+        {
+            LockDurationOption.Minutes30 => now.AddMinutes(30),
+            LockDurationOption.Hours1 => now.AddHours(1),
+            LockDurationOption.Days1 => now.AddDays(1),
+            LockDurationOption.Days7 => now.AddDays(7),
+            LockDurationOption.Days30 => now.AddDays(30),
+            LockDurationOption.Permanent => PermanentEnd,
+            LockDurationOption.Custom => _model.CustomEnd.HasValue
+                ? new DateTimeOffset(DateTime.SpecifyKind(_model.CustomEnd.Value, DateTimeKind.Local)).ToUniversalTime()
+                : now,
+            _ => now
+        };
+
+        if (_model.Duration == LockDurationOption.Custom && (!_model.CustomEnd.HasValue || lockoutEnd <= now))
+        {
+            await Notify.Error(IL["User:LockoutEndMustBeFuture"]);
+            return;
+        }
+
+        try
+        {
+            _isSaving = true;
+            await UserManagementAppService.LockAsync(UserId, new LockUserInput { LockoutEnd = lockoutEnd });
+            await Notify.Success(IL["User:LockSuccess", UserName]);
+            DialogService.Close(true);
+        }
+        catch (Exception ex)
+        {
+            await Notify.Error(ex.Message);
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    class LockModel
+    {
+        public LockDurationOption Duration { get; set; } = LockDurationOption.Hours1;
+        public DateTime? CustomEnd { get; set; }
+    }
+
+    enum LockDurationOption { Minutes30, Hours1, Days1, Days7, Days30, Permanent, Custom }
+
+    record DurationOption(LockDurationOption Value, string Text);
+}
