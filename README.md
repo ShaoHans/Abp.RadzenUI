@@ -22,6 +22,7 @@ English | [简体中文](README_zh-CN.md)
 - [Use the Data Dictionary Module](#-use-the-data-dictionary-module)
 - [Use the Messages Module](#-use-the-messages-module)
 - [Use the Command Palette (Ctrl+K)](#-use-the-command-palette-ctrlk)
+- [Use Data Export (Excel)](#-use-data-export-excel)
 - [Preview the Interface](#-preview-the-interface)
 
 ## ❤️ Try the Demo
@@ -459,6 +460,73 @@ Configure<CommandPaletteOptions>(options =>
 That is all — a "Products" tab now appears in the palette. See [ProductCommandPaletteContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/Search/ProductCommandPaletteContributor.cs) for the complete sample.
 
 `CommandPaletteOptions` also exposes `Enabled`, `MinKeywordLength`, and `MaxResultsPerGroup`.
+
+## 📤 Use Data Export (Excel)
+
+List pages can export their data to an `.xlsx` file. The pipeline is **streaming and memory-bounded**: rows are pulled page by page and written straight to a temporary file, then streamed back to the browser in chunks — peak server memory stays at roughly one page regardless of how many rows are exported. The Excel engine is [MiniExcel](https://github.com/mini-software/MiniExcel) (MIT-licensed, low memory) and lives behind an interface, so you can swap it without touching any page.
+
+### Built-in behavior
+
+- The whole feature lives under `Features/Export` and is **not tied to `AbpCrudPageBase`** — any list page (including custom / two-panel pages) can use it by injecting `IDataExportManager`.
+- Three layers, each replaceable via `Services.Replace(...)`:
+  - `IExcelExporter` (default `MiniExcelExporter`) — serializes rows to a file/bytes.
+  - `IFileDownloadService` — streams a file to the browser and cleans up the temp file.
+  - `IDataExportManager` + `ExcelExportOptions<T>` — orchestrates: permission → **before-export gate** → paged fetch → row shaping → stream to disk → download → notify.
+- The **before-export gate** (`BeforeExportAsync`) runs before any data is fetched; return `false` to abort silently. This is the hook for "verify before export" scenarios such as a captcha or confirmation dialog.
+
+### Use it on a CRUD page
+
+Pages that inherit `AbpCrudPageBase` get export for free — the base class wires its paged `GetListAsync` into the manager. Drop the shared `ExportButton` into your grid toolbar:
+
+```razor
+<ExportButton Visible="HasExportPermission" Busy="IsExporting" OnClick="ExportAsync" />
+```
+
+Override the hooks you need (all optional):
+
+```csharp
+// Localized headers + a curated column set (applied per page; keep the shape consistent)
+protected override object MapToExportRows(IReadOnlyList<ProductDto> data) =>
+    data.Select(p => new Dictionary<string, object?>
+    {
+        [L["DisplayName:Code"]] = p.Code,
+        [L["DisplayName:Name"]] = p.Name,
+        [L["DisplayName:Price"]] = p.Price,
+    }).ToList();
+
+// "Verify before export" gate: open a captcha/confirm dialog, return true only if it passes
+protected override async Task<bool> OnBeforeExportAsync()
+{
+    var ok = await DialogService.OpenAsync<CaptchaDialog>(L["Export:Verify"]);
+    return ok == true;
+}
+```
+
+Other overridable members: `GetExportPageAsync(skip, take)`, `GetExportFileName()`, `ExportPageSize`, `ExportMaxCount`, `ExportSheetName`, and `ExportPolicyName` (when unset, `HasExportPermission` defaults to `true` and relies on the page-level `[Authorize]`).
+
+### Use it on any page (no base class)
+
+Inject `IDataExportManager` and call it with your own paged query. Because data comes from a delegate, the mechanism is fully decoupled from how you fetch it:
+
+```csharp
+await ExportManager.ExportToExcelAsync(new ExcelExportOptions<ItemDto>
+{
+    // Called with an advancing skip until it returns an empty page
+    PageDataProvider = async (skip, take, ct) =>
+        (await ItemAppService.GetListAsync(
+            new() { SkipCount = skip, MaxResultCount = take })).Items,
+    RowSelector = page => page.Select(x => new Dictionary<string, object?>
+    {
+        [L["Code"]] = x.Code,
+        [L["Name"]] = x.Name,
+    }).ToList(),
+    FileName = "items.xlsx",
+    PageSize = 1000,
+    BeforeExportAsync = () => VerifyCaptchaAsync(), // optional gate
+});
+```
+
+See [Products/List.razor(.cs)](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/Components/Pages/Products/List.razor) for a complete CRUD-page example.
 
 ## 🎨 Preview the Interface
 

@@ -22,6 +22,7 @@ Abp RadzenUI 是一个基于 [ABP](https://github.com/abpframework/abp) 框架�
 - [使用数据字典模块](#-使用数据字典模块)
 - [使用消息模块](#-使用消息模块)
 - [使用全局搜索 / 命令面板（Ctrl+K）](#-使用全局搜索--命令面板ctrlk)
+- [使用数据导出（Excel）](#-使用数据导出excel)
 - [界面预览](#-界面预览)
 
 ## ❤️ 在线体验
@@ -454,6 +455,73 @@ Configure<CommandPaletteOptions>(options =>
 这样面板里就会多出一个"产品"tab。完整示例见 [ProductCommandPaletteContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/Search/ProductCommandPaletteContributor.cs)。
 
 `CommandPaletteOptions` 还提供 `Enabled`、`MinKeywordLength`、`MaxResultsPerGroup` 等配置项。
+
+## 📤 使用数据导出（Excel）
+
+列表页可以把数据导出为 `.xlsx` 文件。整条管线是**流式、内存有界**的：数据按页拉取，逐行直接写入临时文件，再分块回传浏览器——无论导出多少行，服务端峰值内存大约只有一页。Excel 引擎使用 [MiniExcel](https://github.com/mini-software/MiniExcel)（MIT 许可、低内存），且被接口封装，可随时替换而不改动任何页面。
+
+### 内置行为
+
+- 整个特性位于 `Features/Export`，**不绑定 `AbpCrudPageBase`**——任意列表页（包括自定义页、两栏式页面）只需注入 `IDataExportManager` 即可使用。
+- 三层结构，每层都可通过 `Services.Replace(...)` 替换：
+  - `IExcelExporter`（默认 `MiniExcelExporter`）——将行序列化为文件/字节。
+  - `IFileDownloadService`——把文件流式推送到浏览器并清理临时文件。
+  - `IDataExportManager` + `ExcelExportOptions<T>`——编排流程：权限 → **导出前门禁** → 分页取数 → 行整形 → 流式写盘 → 下载 → 通知。
+- **导出前门禁**（`BeforeExportAsync`）在取数之前执行，返回 `false` 即静默中止。这是"导出前需先验证"（验证码、二次确认对话框等）场景的钩子。
+
+### 在 CRUD 页面上使用
+
+继承 `AbpCrudPageBase` 的页面开箱即用——基类会把自己的分页 `GetListAsync` 接入编排器。把共享组件 `ExportButton` 放进表格工具栏即可：
+
+```razor
+<ExportButton Visible="HasExportPermission" Busy="IsExporting" OnClick="ExportAsync" />
+```
+
+按需重写钩子（都是可选的）：
+
+```csharp
+// 本地化列头 + 精选列（逐页调用，各页形状须一致）
+protected override object MapToExportRows(IReadOnlyList<ProductDto> data) =>
+    data.Select(p => new Dictionary<string, object?>
+    {
+        [L["DisplayName:Code"]] = p.Code,
+        [L["DisplayName:Name"]] = p.Name,
+        [L["DisplayName:Price"]] = p.Price,
+    }).ToList();
+
+// “导出前验证”门禁：弹出验证码/确认对话框，验证通过才返回 true
+protected override async Task<bool> OnBeforeExportAsync()
+{
+    var ok = await DialogService.OpenAsync<CaptchaDialog>(L["Export:Verify"]);
+    return ok == true;
+}
+```
+
+其他可重写成员：`GetExportPageAsync(skip, take)`、`GetExportFileName()`、`ExportPageSize`、`ExportMaxCount`、`ExportSheetName`、`ExportPolicyName`（未设置时 `HasExportPermission` 默认为 `true`，靠页面级 `[Authorize]` 兜底）。
+
+### 在任意页面上使用（无需基类）
+
+注入 `IDataExportManager`，用你自己的分页查询调用它。由于取数是委托传入的，机制与取数方式彻底解耦：
+
+```csharp
+await ExportManager.ExportToExcelAsync(new ExcelExportOptions<ItemDto>
+{
+    // 带着递增的 skip 反复调用，直到返回空页
+    PageDataProvider = async (skip, take, ct) =>
+        (await ItemAppService.GetListAsync(
+            new() { SkipCount = skip, MaxResultCount = take })).Items,
+    RowSelector = page => page.Select(x => new Dictionary<string, object?>
+    {
+        [L["Code"]] = x.Code,
+        [L["Name"]] = x.Name,
+    }).ToList(),
+    FileName = "items.xlsx",
+    PageSize = 1000,
+    BeforeExportAsync = () => VerifyCaptchaAsync(), // 可选门禁
+});
+```
+
+CRUD 页面完整示例见 [Products/List.razor(.cs)](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/Components/Pages/Products/List.razor)。
 
 ## 🎨 界面预览
 
