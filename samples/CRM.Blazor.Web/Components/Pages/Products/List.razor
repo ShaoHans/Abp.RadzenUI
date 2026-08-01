@@ -15,6 +15,7 @@
             {
                 <RadzenButton Icon="add" Text="@L["NewProduct"]" Click="@(async()=>{await OpenCreateDialogAsync<Create>(L["NewProduct"], SetDialogOptions);})" />
             }
+            <ExportButton Visible="HasExportPermission" Busy="IsExporting" OnClick="ExportAsync" />
             @* <RadzenStack Orientation="Orientation.Vertical" style="margin-left: auto;">
                 <DataGridPageJump TItem="ProductDto"
                                   Grid="_grid"

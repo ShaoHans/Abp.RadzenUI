@@ -25,6 +25,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Radzen.Blazor" />
+		<PackageReference Include="MiniExcel" />
 		<PackageReference Include="Volo.Abp.AspNetCore.Components.Server" />
 		<PackageReference Include="Volo.Abp.Autofac" />
 		<PackageReference Include="Volo.Abp.PermissionManagement.EntityFrameworkCore" />

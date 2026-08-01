@@ -8,8 +8,8 @@ Abp RadzenUI 是一个基于 ABP Framework 和 Radzen Blazor 的 Blazor Server U
 
 当前解决方案主要面向 `.NET 10`，集中包版本管理在 `Directory.Packages.props` 中。关键版本包括：
 
-- ABP：`10.4.0`
-- Radzen.Blazor：`10.4.6`
+- ABP：`10.5.0`
+- Radzen.Blazor：`11.2.0`
 - 目标框架：`net10.0`
 
 ## 解决方案结构
@@ -223,6 +223,36 @@ app.UseRadzenUI();
 - DTO 与 ViewModel 映射。
 
 页大小偏好通过 `GridPageSizePreferenceService` 和 Cookie 保存。支持的页大小为 `10、20、30、50、100`。
+
+### 数据导出（Excel）
+
+导出能力**分层解耦**在 `Features/Export`，刻意**不绑定** `AbpCrudPageBase`，也不绑定任何取数方式，且**分页流式、内存有界**(峰值内存约等于一页,而非全量):
+
+- `IExcelExporter`(默认 `MiniExcelExporter`)：序列化引擎，无 UI 依赖。两条路径——`ExportAsync(rows)` 全量入内存(小数据量便捷用)、`ExportToFileAsync(filePath, IAsyncEnumerable<object> 批次)` 逐批 `SaveAs`/`Insert` 追加落盘(大数据量,内存只驻留一批)。引擎可换(ClosedXML/NPOI…)，`context.Services.Replace(...)` 即可,不改任何页面。MiniExcel 选型理由：MIT 许可、依赖轻、流式低内存。
+- `IFileDownloadService`(默认 `FileDownloadService`)：浏览器下载原语。`DownloadFileAsync(fileName, filePath)` 用 `FileStream` + `DotNetStreamReference` **分块**回传(传输内存也有界),完成后删临时文件;另有 `DownloadAsync(byte[])` 供小数据量。经 `wwwroot/js/file-download.js` 的 `abpRadzenDownload.saveAsFile` 触发。任意交互式组件可复用,不限于导出。
+- `IDataExportManager` + `ExcelExportOptions<T>`：编排器。顺序为 权限(`PolicyName`) → `BeforeExportAsync` 门禁 → **`PageDataProvider` 分页委托取数**(循环 `skip/take` 直到短页/空页,受 `MaxCount` 上限约束) → `RowSelector` 逐页整形 → 逐批写临时文件 → 流式下载并删除临时文件 → 通知。**取数是调用方传入的分页委托**,因此与数据访问方式彻底解耦,同时天然内存有界。
+
+关键点:**任何列表页都能导出,无需继承 `AbpCrudPageBase`**。非 CRUD 页(如两栏式数据字典页)只需注入 `IDataExportManager` 直接调用:
+
+```csharp
+await ExportManager.ExportToExcelAsync(new ExcelExportOptions<ItemDto>
+{
+    // 分页取数：manager 会带着递增的 skip 反复调用，直到返回短页/空页
+    PageDataProvider = async (skip, take, ct) =>
+        (await ItemAppService.GetListAsync(new(){ SkipCount = skip, MaxResultCount = take })).Items,
+    RowSelector = page => page.Select(x => new Dictionary<string, object?>
+    {
+        [L["Code"]] = x.Code, [L["Name"]] = x.Name,   // 本地化列头(每页形状须一致)
+    }).ToList(),
+    FileName = "items.xlsx",
+    PageSize = 1000,
+    BeforeExportAsync = async () => await VerifyCaptchaAsync(), // 验证码/二次确认门禁
+});
+```
+
+`AbpCrudPageBase` 只是这套机制的**便捷封装**:`ExportAsync()` 负责 busy 态与错误呈现,把自己的分页 `GetListAsync`(默认沿用当前筛选/排序,只改分页窗口)包成 `PageDataProvider` 交给 manager。CRUD 页可 override 的点:`OnBeforeExportAsync()`(验证码门禁首选)、`MapToExportRows()`(本地化列头,逐页调用)、`GetExportPageAsync(skip, take)` / `GetExportFileName()` / `ExportPageSize` / `ExportMaxCount` / `ExportSheetName`;`HasExportPermission` 在 `ExportPolicyName` 未设时默认 `true`(靠页面级 `[Authorize]` 兜底)。
+
+工具栏放共享组件 `<ExportButton Visible="HasExportPermission" Busy="IsExporting" OnClick="ExportAsync" />` 即可。`samples/CRM.Blazor.Web/Components/Pages/Products/List.razor(.cs)` 是 CRUD 路径完整示例(含本地化列头与验证码钩子注释)。
 
 公共组件目录：
 

@@ -73,6 +73,30 @@ public partial class List : IDisposable
         await base.UpdateGetListInputAsync(args);
     }
 
+    // Shape the exported columns with localized headers instead of raw DTO property names.
+    // Returning IEnumerable<Dictionary<string, object?>> makes MiniExcel use the keys as headers.
+    protected override object MapToExportRows(IReadOnlyList<ProductDto> data)
+    {
+        return data.Select(p => new Dictionary<string, object?>
+        {
+            [L["DisplayName:Code"]] = p.Code,
+            [L["DisplayName:Name"]] = p.Name,
+            [L["DisplayName:Price"]] = p.Price,
+            [L["DisplayName:StockCount"]] = p.StockCount,
+            [L["DisplayName:Status"]] = p.Status.ToString(),
+            [L["CreationTime"]] = p.CreationTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"),
+        }).ToList();
+    }
+
+    // Example of the "verify before export" requirement: override this gate to open a captcha
+    // (or any confirmation) dialog and only return true once it passes. Returning false aborts
+    // the export silently. Uncomment and point it at your own dialog component to enable it.
+    //protected override async Task<bool> OnBeforeExportAsync()
+    //{
+    //    var verified = await DialogService.OpenAsync<CaptchaDialog>(L["Export:Verify"]);
+    //    return verified == true;
+    //}
+
     protected override Task<UpdateProductDto> SetEditDialogModelAsync(ProductDto dto)
     {
         return Task.FromResult(new UpdateProductDto

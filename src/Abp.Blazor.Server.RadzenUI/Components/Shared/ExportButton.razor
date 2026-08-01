@@ -1,0 +1,44 @@
+@using Abp.RadzenUI.Localization
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<AbpRadzenUIResource> UL
+
+@if (Visible)
+{
+    <RadzenButton Icon="@Icon"
+                  Text="@(Text ?? UL["Btn:Export"])"
+                  ButtonStyle="@ButtonStyle"
+                  Size="@Size"
+                  IsBusy="@Busy"
+                  BusyText="@(BusyText ?? UL["Export:Exporting"])"
+                  Disabled="@Busy"
+                  Click="@OnClick" />
+}
+
+@code {
+    /// <summary>Whether to render the button. Wire this to the page's HasExportPermission.</summary>
+    [Parameter]
+    public bool Visible { get; set; } = true;
+
+    /// <summary>Shows the busy/spinner state. Wire this to the page's IsExporting.</summary>
+    [Parameter]
+    public bool Busy { get; set; }
+
+    /// <summary>Export handler. Wire this to the page's ExportAsync.</summary>
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    [Parameter]
+    public string Icon { get; set; } = "download";
+
+    [Parameter]
+    public string? Text { get; set; }
+
+    [Parameter]
+    public string? BusyText { get; set; }
+
+    [Parameter]
+    public ButtonStyle ButtonStyle { get; set; } = ButtonStyle.Secondary;
+
+    [Parameter]
+    public ButtonSize Size { get; set; } = ButtonSize.Medium;
+}

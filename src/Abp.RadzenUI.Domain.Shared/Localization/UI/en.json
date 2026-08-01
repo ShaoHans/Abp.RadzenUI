@@ -335,7 +335,11 @@
     "CommandPalette:Nav": "Navigate",
     "CommandPalette:Open": "Open",
     "CommandPalette:Close": "Close",
-    "CommandPalette:Group.Pages": "Pages"
+    "CommandPalette:Group.Pages": "Pages",
+    "Btn:Export": "Export",
+    "Export:Exporting": "Exporting...",
+    "Export:Success": "Exported successfully",
+    "Export:NoData": "There is no data to export"
   }
 }
 

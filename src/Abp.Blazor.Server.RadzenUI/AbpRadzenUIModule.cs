@@ -1,6 +1,7 @@
 using Abp.RadzenUI.Features.Settings;
 using Abp.RadzenUI.Infrastructure.Bundling;
 using Abp.RadzenUI.Features.Avatar;
+using Abp.RadzenUI.Features.Export;
 using Abp.RadzenUI.EntityFrameworkCore;
 using Abp.RadzenUI.LinkAccounts;
 using Abp.RadzenUI.Localization;
@@ -182,6 +183,9 @@ public class AbpRadzenUIModule : AbpModule
         context.Services.AddScoped(typeof(SideDialogState<>));
         context.Services.AddScoped<ISideDialogCoordinatorFactory, SideDialogCoordinatorFactory>();
         context.Services.AddTransient<IUploadService, DefaultUploadService>();
+        context.Services.AddTransient<IExcelExporter, MiniExcelExporter>();
+        context.Services.AddScoped<IFileDownloadService, FileDownloadService>();
+        context.Services.AddScoped<IDataExportManager, DataExportManager>();
         context.Services.AddTransient<LinkedAccountSignInManager>();
     }
 }

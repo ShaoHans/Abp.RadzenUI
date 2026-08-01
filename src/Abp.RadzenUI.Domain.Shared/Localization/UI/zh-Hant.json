@@ -63,7 +63,11 @@
     "Permission:Ou.Default": "組織機構管理",
     "Permission:Ou.ManageTree": "管理組織機構樹",
     "Permission:Ou.ManageUsers": "管理使用者",
-    "Permission:Ou.ManageRoles": "管理角色"
+    "Permission:Ou.ManageRoles": "管理角色",
+    "Btn:Export": "匯出",
+    "Export:Exporting": "正在匯出...",
+    "Export:Success": "匯出成功",
+    "Export:NoData": "沒有可匯出的資料"
   }
 }
 
