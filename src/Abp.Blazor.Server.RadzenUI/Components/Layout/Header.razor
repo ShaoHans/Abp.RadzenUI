@@ -1,4 +1,7 @@
-﻿@using Abp.RadzenUI.Avatar
+@using Abp.RadzenUI.Features.Avatar
+@using Abp.RadzenUI.Application.Contracts.Messages
+@using Abp.RadzenUI.LinkAccounts
+@using Abp.RadzenUI.LinkAccounts.Dtos
 @using Abp.RadzenUI.UIPlaceHolders
 @using Microsoft.Extensions.Localization
 @using Microsoft.Extensions.Options
@@ -12,9 +15,13 @@
 @inherits AbpRadzenUIComponentBase
 @inject IStringLocalizer<AbpRadzenUIResource> TL
 @inject IIdentityUserRepository IdentityUserRepository
+@inject ILinkedAccountAppService LinkedAccountAppService
 @inject IJSRuntime JSRuntime
 @inject IMenuManager MenuManager
 @inject NavigationManager NavigationManager
+@inject IMessageAppService MessageAppService
+@inject MessageCenterState MessageCenterState
+@inject CommandPaletteState CommandPaletteState
 
 <style>
     /* GitHub-style icon buttons with rounded border box */
@@ -50,8 +57,28 @@
     .app-header__actions .app-header__icon-action .rz-button-icon-left {
         margin: 0 !important;
     }
-    .app-header__actions .app-header__icon-action .rzi {
+    .app-header__actions .app-header__icon-action :is(.rzi, .rz-icon) {
         font-size: 1.125rem !important;
+    }
+    .app-header__message-button {
+        position: relative;
+        overflow: visible;
+    }
+    .app-header__message-badge {
+        position: absolute;
+        top: -0.45rem;
+        right: -0.45rem;
+        min-width: 1.15rem;
+        height: 1.15rem;
+        padding: 0 0.3rem;
+        border-radius: 999px;
+        background: var(--rz-danger);
+        color: #fff;
+        font-size: 0.6875rem;
+        font-weight: 700;
+        line-height: 1.15rem;
+        text-align: center;
+        box-shadow: 0 0 0 2px var(--rz-header-background-color, var(--rz-base-000));
     }
     /* Active state (e.g. fullscreen active) */
     .app-header__actions .app-header__icon-action--active {
@@ -137,12 +164,33 @@
     .app-header__breadcrumb .rz-breadcrumb-item .rz-label {
         font-size: 0.875rem;
     }
+
+    @@media (max-width: 640.98px) {
+        .app-header__sidebar-area {
+            min-width: 0;
+            width: 100%;
+        }
+
+        .app-header__title {
+            width: 100%;
+        }
+
+        .app-header__breadcrumb {
+            display: none;
+        }
+
+        .app-header__actions {
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            row-gap: 0.35rem;
+        }
+    }
 </style>
 
 <RadzenHeader class="app-header">
     <ChildContent>
         <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px" class="app-header__row">
-            <RadzenColumn Size="8">
+            <RadzenColumn Size="12" SizeMD="8">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" class="app-header__title">
                     <div class="app-header__sidebar-area">
                         <RadzenSidebarToggle Click="@MenuToggle" />
@@ -166,8 +214,15 @@
                     }
                 </RadzenStack>
             </RadzenColumn>
-            <RadzenColumn Size="4">
+            <RadzenColumn Size="12" SizeMD="4">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" JustifyContent="JustifyContent.End" class="app-header__actions">
+                    <button type="button"
+                            class="app-header__action app-header__icon-action"
+                            title="@TL["CommandPalette:Search"] (Ctrl+K)"
+                            aria-label="@TL["CommandPalette:Search"]"
+                            @onclick="OpenCommandPaletteAsync">
+                        <RadzenIcon Icon="search" />
+                    </button>
                     @if (_titleBar.ShowGithubLink)
                     {
                         <a href="https://github.com/ShaoHans/Abp-RadzenUI"
@@ -182,6 +237,20 @@
                     }
                     <RadzenAppearanceToggle class="app-header__action app-header__icon-action" />
                     <RadzenSidebarToggle Icon="settings" Click="@ThemeToggle" class="app-header__action app-header__icon-action" />
+                    @if (CurrentUser != null && CurrentUser.IsAuthenticated)
+                    {
+                        <button type="button"
+                                class="@GetMessageButtonClass()"
+                                title="@TL["Message:MyMessages"]"
+                                aria-label="@TL["Message:MyMessages"]"
+                                @onclick="ToggleMessagesAsync">
+                            <RadzenIcon Icon="notifications" />
+                            @if (_unreadCount > 0)
+                            {
+                                <span class="app-header__message-badge">@FormatUnreadCount(_unreadCount)</span>
+                            }
+                        </button>
+                    }
                     <RadzenButton Icon="@(_isFullscreen ? "fullscreen_exit" : "fullscreen")"
                                   title="@(_isFullscreen ? "Exit full screen" : "Full screen")"
                                   Variant="Variant.Text"
@@ -191,7 +260,7 @@
                     @if (_titleBar.ShowLanguageMenu)
                     {
                         <div class="app-header__action">
-                            <LanguageSwitch />
+                            <LanguageSwitch MenuClass="app-header__menu app-header__menu--language" />
                         </div>
                     }
                     @if (CurrentUser != null && CurrentUser.IsAuthenticated)
@@ -214,6 +283,11 @@
                                 <ChildContent>
                                     <RadzenProfileMenuItem Text="@CurrentUser.UserName"></RadzenProfileMenuItem>
                                     <Devider />
+                                    <RadzenProfileMenuItem Text="@TL["LinkedAccounts:Title"]" Icon="link" Path="/account/linked-accounts"></RadzenProfileMenuItem>
+                                    @if (_linkedAccountSession?.CanGoBack == true)
+                                    {
+                                        <RadzenProfileMenuItem Text="@TL["LinkedAccounts:BackToPreviousAccount"]" Icon="undo" Path="@GetBackPath()"></RadzenProfileMenuItem>
+                                    }
                                     <RadzenProfileMenuItem Text="@L["MyAccount"]" Icon="person" Path="/account/manage"></RadzenProfileMenuItem>
                                     <RadzenProfileMenuItem Text="@L["LoggedOutTitle"]" Icon="logout" Path="/account/logout"></RadzenProfileMenuItem>
                                 </ChildContent>
@@ -235,6 +309,8 @@
 @code {
     [Parameter] public EventCallback<EventArgs> MenuToggle { get; set; }
     [Parameter] public EventCallback<EventArgs> ThemeToggle { get; set; }
+    [Parameter] public EventCallback<EventArgs> MessageToggle { get; set; }
+    [Parameter] public bool MessagePanelOpen { get; set; }
     [Inject] IUIPlaceHolderResolver UIPlaceHolderResolver { get; set; } = default!;
     TitleBarSettings _titleBar = new();
     string? _avatarUrl;
@@ -242,6 +318,8 @@
     DotNetObjectReference<Header>? _dotNetReference;
     List<ApplicationMenuItem> _breadcrumbItems = new();
     ApplicationMenu? _applicationMenu;
+    LinkedAccountSessionDto? _linkedAccountSession;
+    long _unreadCount;
 
     public Header()
     {
@@ -259,6 +337,9 @@
         {
             var user = await IdentityUserRepository.GetAsync(CurrentUser.Id.Value);
             _avatarUrl = user.GetProperty<string>(AvatarConsts.ExtraPropertyName);
+            _linkedAccountSession = await LinkedAccountAppService.GetCurrentSessionAsync();
+            _unreadCount = await MessageAppService.GetUnreadCountAsync();
+            MessageCenterState.Changed += HandleMessageCenterChangedAsync;
         }
     }
 
@@ -282,11 +363,28 @@
         _isFullscreen = await JSRuntime.InvokeAsync<bool>("abpRadzenFullscreen.toggle");
     }
 
+    async Task ToggleMessagesAsync()
+    {
+        await MessageToggle.InvokeAsync(EventArgs.Empty);
+    }
+
+    async Task OpenCommandPaletteAsync()
+    {
+        await CommandPaletteState.OpenAsync();
+    }
+
     string GetFullscreenButtonClass()
     {
         return _isFullscreen
             ? "app-header__action app-header__icon-action app-header__icon-action--active"
             : "app-header__action app-header__icon-action";
+    }
+
+    string GetMessageButtonClass()
+    {
+        return MessagePanelOpen
+            ? "app-header__action app-header__icon-action app-header__message-button app-header__icon-action--active"
+            : "app-header__action app-header__icon-action app-header__message-button";
     }
 
     [JSInvokable]
@@ -301,6 +399,11 @@
         NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
     }
 
+    string GetBackPath()
+    {
+        return $"/account/linked-accounts/back?returnUrl={Uri.EscapeDataString(NavigationManager.Uri)}";
+    }
+
     void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
     {
         UpdateBreadcrumb();
@@ -312,7 +415,7 @@
         _breadcrumbItems.Clear();
         if (_applicationMenu == null) return;
 
-        var currentPath = "/" + NavigationManager.ToBaseRelativePath(NavigationManager.Uri).TrimStart('/');
+        var currentPath = NormalizePath(NavigationManager.ToAbsoluteUri(NavigationManager.Uri).AbsolutePath);
 
         foreach (var menuItem in _applicationMenu.Items)
         {
@@ -329,8 +432,8 @@
     {
         trail.Add(item);
 
-        var itemUrl = item.Url?.TrimEnd('/') ?? "";
-        if (!string.IsNullOrEmpty(itemUrl) && string.Equals(itemUrl, currentPath.TrimEnd('/'), StringComparison.OrdinalIgnoreCase))
+        var itemUrl = NormalizePath(item.Url);
+        if (!string.IsNullOrEmpty(itemUrl) && string.Equals(itemUrl, currentPath, StringComparison.OrdinalIgnoreCase))
         {
             return true;
         }
@@ -347,9 +450,48 @@
         return false;
     }
 
+    static string NormalizePath(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return "/";
+        }
+
+        var queryIndex = path.IndexOfAny(['?', '#']);
+        var normalizedPath = queryIndex >= 0 ? path[..queryIndex] : path;
+
+        if (string.IsNullOrWhiteSpace(normalizedPath))
+        {
+            return "/";
+        }
+
+        normalizedPath = "/" + normalizedPath.TrimStart('/');
+
+        return normalizedPath.Length > 1
+            ? normalizedPath.TrimEnd('/')
+            : normalizedPath;
+    }
+
+    async Task HandleMessageCenterChangedAsync()
+    {
+        if (!CurrentUser.IsAuthenticated)
+        {
+            return;
+        }
+
+        _unreadCount = await MessageAppService.GetUnreadCountAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    static string FormatUnreadCount(long unreadCount)
+    {
+        return unreadCount > 99 ? "99+" : unreadCount.ToString();
+    }
+
     public async ValueTask DisposeAsync()
     {
         NavigationManager.LocationChanged -= OnLocationChanged;
+        MessageCenterState.Changed -= HandleMessageCenterChangedAsync;
 
         if (_dotNetReference is null)
         {

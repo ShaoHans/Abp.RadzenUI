@@ -27,9 +27,26 @@ public class TenantController : AbpControllerBase
     }
 
     [HttpGet("/tenant/switch")]
-    public IActionResult SwitchAsync(Guid? tenantId = null)
+    public IActionResult SwitchAsync(Guid? tenantId = null, string? returnUrl = null)
     {
         AbpMultiTenancyCookieHelper.SetTenantCookie(HttpContext, tenantId, Options.TenantKey);
+
+        if (!returnUrl.IsNullOrWhiteSpace())
+        {
+            if (Uri.TryCreate(returnUrl, UriKind.Absolute, out var absoluteUri))
+            {
+                returnUrl = absoluteUri.PathAndQuery + absoluteUri.Fragment;
+            }
+
+            if (returnUrl.StartsWith("~"))
+            {
+                return Redirect(returnUrl);
+            }
+
+            returnUrl = returnUrl.EnsureStartsWith('/');
+            return Redirect(returnUrl);
+        }
+
         return Redirect("~/account/login");
     }
 }

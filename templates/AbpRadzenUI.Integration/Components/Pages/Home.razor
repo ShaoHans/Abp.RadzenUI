@@ -1,0 +1,23 @@
+@page "/"
+@inherits AbpRadzenUIComponentBase
+
+<PageTitle>RadzenUiTemplateTitle</PageTitle>
+
+<RadzenStack Gap="1rem">
+    <RadzenText TextStyle="TextStyle.DisplayH5">RadzenUiTemplateTitle</RadzenText>
+
+    @if (CurrentUser.IsAuthenticated)
+    {
+        <RadzenText TextStyle="TextStyle.Body1">
+            Welcome, @CurrentUser.UserName.
+        </RadzenText>
+        <RadzenButton Icon="person" Text="My account" Path="/account/manage" ButtonStyle="ButtonStyle.Primary" />
+    }
+    else
+    {
+        <RadzenText TextStyle="TextStyle.Body1">
+            You are not logged in yet.
+        </RadzenText>
+        <RadzenButton Icon="login" Text="Log in" Path="/account/login" ButtonStyle="ButtonStyle.Primary" />
+    }
+</RadzenStack>

@@ -15,6 +15,7 @@ public partial class List
     {
         ObjectMapperContext = typeof(AbpRadzenUIModule);
         LocalizationResource = typeof(AbpRadzenUIResource);
+        _defaultPageSize = 20;
     }
 
     protected override Task UpdateGetListInputAsync(LoadDataArgs args)
@@ -22,7 +23,6 @@ public partial class List
         GetListInput.LoginTimeStart = _loginTimeStart;
         GetListInput.LoginTimeEnd = _loginTimeEnd;
         GetListInput.UserName = _userName;
-        _defaultPageSize = 20;
 
         return base.UpdateGetListInputAsync(args);
     }
@@ -45,7 +45,6 @@ public partial class List
         _loginTimeStart = null;
         _loginTimeEnd = null;
         _userName = null;
-        _defaultPageSize = 20;
         await SearchAsync();
     }
 }

@@ -2,12 +2,26 @@ using Abp.RadzenUI;
 using CRM.Localization;
 using CRM.Permissions;
 using CRM.Products;
+using Microsoft.AspNetCore.Components;
 using Radzen;
 
 namespace CRM.Blazor.Web.Components.Pages.Products;
 
-public partial class List
+public partial class List : IDisposable
 {
+    [Inject]
+    public ISideDialogCoordinatorFactory SideDialogCoordinatorFactory { get; set; } = default!;
+
+    private SideDialogCoordinator<ProductDto> _sideDialogCoordinator = default!;
+
+    // Deep-link target used by the command palette (Ctrl+K) product search.
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "code")]
+    public string? CodeQuery { get; set; }
+
+    private bool _initialFilterApplied;
+    private string? _lastAppliedCode;
+
     public List()
     {
         ObjectMapperContext = typeof(AbpRadzenUIModule);
@@ -18,11 +32,70 @@ public partial class List
         DeletePolicyName = CRMPermissions.Products.Delete;
     }
 
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _sideDialogCoordinator = SideDialogCoordinatorFactory.Create<ProductDto>();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        // Reload when navigated to a different ?code= while the page is already mounted.
+        if (_grid is not null && !string.Equals(CodeQuery, _lastAppliedCode, StringComparison.Ordinal))
+        {
+            _initialFilterApplied = false;
+            await _grid.Reload();
+        }
+    }
+
     protected override async Task UpdateGetListInputAsync(LoadDataArgs args)
     {
-        GetListInput.Filter = args.Filter;
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            // A grid column filter takes precedence and clears the deep-link filter.
+            GetListInput.Filter = args.Filter;
+            _initialFilterApplied = true;
+        }
+        else if (!_initialFilterApplied && !string.IsNullOrWhiteSpace(CodeQuery))
+        {
+            // Escape " as "" for the Dynamic LINQ string literal.
+            GetListInput.Filter = $"Code == \"{CodeQuery.Replace("\"", "\"\"")}\"";
+            _initialFilterApplied = true;
+            _lastAppliedCode = CodeQuery;
+        }
+        else
+        {
+            GetListInput.Filter = args.Filter;
+        }
+
         await base.UpdateGetListInputAsync(args);
     }
+
+    // Shape the exported columns with localized headers instead of raw DTO property names.
+    // Returning IEnumerable<Dictionary<string, object?>> makes MiniExcel use the keys as headers.
+    protected override object MapToExportRows(IReadOnlyList<ProductDto> data)
+    {
+        return data.Select(p => new Dictionary<string, object?>
+        {
+            [L["DisplayName:Code"]] = p.Code,
+            [L["DisplayName:Name"]] = p.Name,
+            [L["DisplayName:Price"]] = p.Price,
+            [L["DisplayName:StockCount"]] = p.StockCount,
+            [L["DisplayName:Status"]] = p.Status.ToString(),
+            [L["CreationTime"]] = p.CreationTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"),
+        }).ToList();
+    }
+
+    // Example of the "verify before export" requirement: override this gate to open a captcha
+    // (or any confirmation) dialog and only return true once it passes. Returning false aborts
+    // the export silently. Uncomment and point it at your own dialog component to enable it.
+    //protected override async Task<bool> OnBeforeExportAsync()
+    //{
+    //    var verified = await DialogService.OpenAsync<CaptchaDialog>(L["Export:Verify"]);
+    //    return verified == true;
+    //}
 
     protected override Task<UpdateProductDto> SetEditDialogModelAsync(ProductDto dto)
     {
@@ -44,5 +117,39 @@ public partial class List
             Draggable = true,
             Width = "600px",
         };
+    }
+
+    async Task OpenEditProductAsync(ProductDto product)
+    {
+        await OpenEditDialogAsync<Edit>(
+            L["Edit"],
+            product,
+            SetDialogOptions,
+            new Dictionary<string, object?> { { "Code", product.Code } }
+        );
+    }
+
+    async Task OpenDetailProductAsync(ProductDto product)
+    {
+        await _sideDialogCoordinator.OpenDetailAsync<ProductDto, Detail>(
+            product,
+            product.Name,
+            "Product",
+            "520px"
+        );
+    }
+
+    async Task DeleteProductAsync(ProductDto product)
+    {
+        await OpenDeleteConfirmDialogAsync(
+            product.Id,
+            L["Delete"],
+            L["ProductDeletionConfirmationMessage", product.Name]
+        );
+    }
+
+    public void Dispose()
+    {
+        _sideDialogCoordinator.Dispose();
     }
 }

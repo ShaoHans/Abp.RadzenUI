@@ -37,4 +37,14 @@ public class RadzenUI
     {
         public const string Default = "DataDictionary";
     }
+
+    public static class MessageMenuNames
+    {
+        public const string Default = "Messages";
+    }
+
+    public static class LocalizationMenuNames
+    {
+        public const string Default = "Localization";
+    }
 }

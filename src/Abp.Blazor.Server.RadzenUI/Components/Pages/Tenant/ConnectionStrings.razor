@@ -1,0 +1,202 @@
+@using Abp.RadzenUI.Application.Contracts.Tenants
+@inject ITenantConnectionStringAppService ConnectionStringAppService
+@inject DialogService DialogService
+@inherits AbpRadzenUIComponentBase
+
+<RadzenStack Style="max-height:calc(100vh - 200px); min-height: 300px;">
+    <DialogFormLayout ShowSave="false" CancelText="@L["Close"]" CancelIcon="close"
+                      CancelClick="() => DialogService.Close(false)">
+        <RadzenStack Gap="1rem" class="rz-p-4">
+            <RadzenDataGrid @ref="_grid" Data="@_connectionStrings" TItem="TenantConnectionStringDto"
+                            AllowSorting="false" Style="min-height: 200px;">
+                <HeaderTemplate>
+                    <RadzenButton Icon="add" Text="@L["ConnectionString:Add"]" Size="ButtonSize.Small"
+                                  Click="ShowAddForm" />
+                </HeaderTemplate>
+                <Columns>
+                    <RadzenDataGridColumn Property="@nameof(TenantConnectionStringDto.Name)"
+                                          Title="@L["ConnectionString:Name"]" Width="180px">
+                        <Template>
+                            <RadzenText>@context.Name</RadzenText>
+                            @if (context.Name == DefaultConnectionStringName)
+                            {
+                                <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="Default" Style="margin-left: 4px;" />
+                            }
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Property="@nameof(TenantConnectionStringDto.Value)"
+                                          Title="@L["ConnectionString:Value"]">
+                        <Template>
+                            <RadzenText title="@context.Value" Style="max-width: 350px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;">
+                                @MaskConnectionString(context.Value)
+                            </RadzenText>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Title="@L["Actions"]" Width="120px" Sortable="false">
+                        <Template>
+                            <RadzenButton Icon="edit" title="@L["Btn:Edit"]" ButtonStyle="ButtonStyle.Success"
+                                          Size="ButtonSize.Small" Click="@(() => EditConnectionString(context))" />
+                            <RadzenButton Icon="delete" title="@L["Btn:Delete"]" ButtonStyle="ButtonStyle.Danger"
+                                          Size="ButtonSize.Small" Click="@(() => DeleteConnectionStringAsync(context))" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+
+            @if (_showForm)
+            {
+                <RadzenCard>
+                    <RadzenText TextStyle="TextStyle.Subtitle2">
+                        @(_isEditing ? L["ConnectionString:Edit"] : L["ConnectionString:Add"])
+                    </RadzenText>
+                    <RadzenStack Gap="0.5rem" class="rz-mt-2">
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="3">
+                                <RequiredMark />
+                                <RadzenLabel Text="@L["ConnectionString:Name"]" Component="CsName" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="9">
+                                <RadzenTextBox Name="CsName" @bind-Value="_editingName"
+                                               Disabled="@_isEditing"
+                                               Style="width: 100%;" Placeholder="Default" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="3">
+                                <RequiredMark />
+                                <RadzenLabel Text="@L["ConnectionString:Value"]" Component="CsValue" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="9">
+                                <RadzenTextArea Name="CsValue" @bind-Value="_editingValue"
+                                                Style="width: 100%;" Rows="2"
+                                                Placeholder="Server=...;Database=...;" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="@L["Cancel"]"
+                                          Size="ButtonSize.Small" Click="CancelForm" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Primary" Text="@L["Save"]"
+                                          Size="ButtonSize.Small" Click="SaveConnectionStringAsync" />
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
+            }
+        </RadzenStack>
+    </DialogFormLayout>
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public Guid TenantId { get; set; }
+
+    const string DefaultConnectionStringName = "Default";
+
+    RadzenDataGrid<TenantConnectionStringDto> _grid = default!;
+    List<TenantConnectionStringDto> _connectionStrings = [];
+    bool _showForm;
+    bool _isEditing;
+    string _editingName = string.Empty;
+    string _editingValue = string.Empty;
+
+    public ConnectionStrings()
+    {
+        LocalizationResource = typeof(AbpRadzenUIResource);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadConnectionStringsAsync();
+    }
+
+    async Task LoadConnectionStringsAsync()
+    {
+        try
+        {
+            _connectionStrings = await ConnectionStringAppService.GetListAsync(TenantId);
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(ex);
+        }
+    }
+
+    void ShowAddForm()
+    {
+        _isEditing = false;
+        _editingName = string.Empty;
+        _editingValue = string.Empty;
+        _showForm = true;
+    }
+
+    void EditConnectionString(TenantConnectionStringDto cs)
+    {
+        _isEditing = true;
+        _editingName = cs.Name;
+        _editingValue = cs.Value;
+        _showForm = true;
+    }
+
+    void CancelForm()
+    {
+        _showForm = false;
+        _editingName = string.Empty;
+        _editingValue = string.Empty;
+    }
+
+    async Task SaveConnectionStringAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_editingName) || string.IsNullOrWhiteSpace(_editingValue))
+        {
+            await Notify.Warn(L["ConnectionString:NameAndValueRequired"]);
+            return;
+        }
+
+        try
+        {
+            await ConnectionStringAppService.AddOrUpdateAsync(TenantId, new TenantConnectionStringDto
+            {
+                Name = _editingName.Trim(),
+                Value = _editingValue.Trim()
+            });
+            await Notify.Success(L["SavedSuccessfully"]);
+            CancelForm();
+            await LoadConnectionStringsAsync();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(ex);
+        }
+    }
+
+    async Task DeleteConnectionStringAsync(TenantConnectionStringDto cs)
+    {
+        var result = await DialogService.Confirm(
+            L["ConnectionString:DeleteConfirm", cs.Name],
+            L["Btn:Delete"],
+            new ConfirmOptions { OkButtonText = L["Yes"], CancelButtonText = L["Cancel"] });
+
+        if (result == true)
+        {
+            try
+            {
+                await ConnectionStringAppService.DeleteAsync(TenantId, cs.Name);
+                await Notify.Success(L["DeletedSuccessfully"]);
+                await LoadConnectionStringsAsync();
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                await HandleErrorAsync(ex);
+            }
+        }
+    }
+
+    static string MaskConnectionString(string value)
+    {
+        if (string.IsNullOrEmpty(value) || value.Length <= 20)
+            return value;
+
+        return string.Concat(value.AsSpan(0, 20), "...");
+    }
+}

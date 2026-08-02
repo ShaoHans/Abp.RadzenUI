@@ -1,0 +1,31 @@
+@using Abp.RadzenUI.Application.Contracts.Messages
+@using Abp.RadzenUI.Components.Pages.Messages
+@implements IDisposable
+@inject SideDialogState<UserMessageDto> DialogState
+@inherits AbpRadzenUIComponentBase
+
+<DetailContent MessageId="@_messageId" />
+
+@code {
+    [Parameter]
+    public UserMessageDto SelectedMessage { get; set; } = new();
+
+    private Guid _messageId;
+
+    protected override void OnInitialized()
+    {
+        DialogState.OnChanged += OnDialogStateChangedAsync;
+        _messageId = DialogState.Selected?.Id ?? SelectedMessage.Id;
+    }
+
+    private Task OnDialogStateChangedAsync(UserMessageDto? message)
+    {
+        _messageId = message?.Id ?? Guid.Empty;
+        return InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        DialogState.OnChanged -= OnDialogStateChangedAsync;
+    }
+}

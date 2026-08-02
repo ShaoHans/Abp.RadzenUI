@@ -1,0 +1,318 @@
+@page "/sales/workspace"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(CRMPermissions.Sales.Workspace)]
+@inherits AbpRadzenUIComponentBase
+
+<PageTitle>@L["SalesWorkspace"]</PageTitle>
+
+<RadzenStack Gap="1rem" class="rz-p-4">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenStack Gap="0.25rem">
+            <RadzenText TextStyle="TextStyle.H5"><strong>@L["SalesWorkspace"]</strong></RadzenText>
+            <RadzenText TextStyle="TextStyle.Caption" class="rz-color-on-surface-variant">@L["SalesWorkspaceSubtitle"]</RadzenText>
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+            <RadzenDropDown TValue="string"
+                            Data="@_stageOptions"
+                            TextProperty="Text"
+                            ValueProperty="Value"
+                            @bind-Value="_selectedStage"
+                            Style="min-width:180px" />
+            <RadzenButton Icon="refresh" Text="@L["Sales:RefreshForecast"]" ButtonStyle="ButtonStyle.Light" Click="@RefreshForecast" />
+            <RadzenButton Icon="add" Text="@L["Sales:NewOpportunity"]" />
+        </RadzenStack>
+    </RadzenStack>
+
+    <RadzenRow Gap="1rem">
+        <RadzenColumn Size="12" SizeMD="6" SizeXL="3">
+            <RadzenCard class="rz-shadow-2" Style="border-left:4px solid #2563eb;">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                    <RadzenIcon Icon="payments" Style="font-size:2.2rem;color:#2563eb;" />
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.Caption">@L["Sales:QuarterForecast"]</RadzenText>
+                        <RadzenText TextStyle="TextStyle.H4">@FormatMoney(QuarterForecast)</RadzenText>
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6" SizeXL="3">
+            <RadzenCard class="rz-shadow-2" Style="border-left:4px solid #7c3aed;">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                    <RadzenIcon Icon="stacked_line_chart" Style="font-size:2.2rem;color:#7c3aed;" />
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.Caption">@L["Sales:WeightedPipeline"]</RadzenText>
+                        <RadzenText TextStyle="TextStyle.H4">@FormatMoney(WeightedPipeline)</RadzenText>
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6" SizeXL="3">
+            <RadzenCard class="rz-shadow-2" Style="border-left:4px solid #16a34a;">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                    <RadzenIcon Icon="verified" Style="font-size:2.2rem;color:#16a34a;" />
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.Caption">@L["Sales:WinRate"]</RadzenText>
+                        <RadzenText TextStyle="TextStyle.H4">@WinRate.ToString("0")%</RadzenText>
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6" SizeXL="3">
+            <RadzenCard class="rz-shadow-2" Style="border-left:4px solid #f59e0b;">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                    <RadzenIcon Icon="workspaces" Style="font-size:2.2rem;color:#f59e0b;" />
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.Caption">@L["Sales:OpenOpportunities"]</RadzenText>
+                        <RadzenText TextStyle="TextStyle.H4">@FilteredOpportunities.Count()</RadzenText>
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+
+    <RadzenRow Gap="1rem">
+        <RadzenColumn Size="12" SizeLG="7">
+            <RadzenCard class="rz-shadow-2">
+                <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-mb-3">@L["Sales:PipelineTrend"]</RadzenText>
+                <RadzenChart Style="height:320px;">
+                    <RadzenLineSeries Data="@_pipelineTrend" CategoryProperty="Month" ValueProperty="Pipeline" Title="@L["Sales:WeightedPipeline"]" Smooth="true" Stroke="#2563eb">
+                        <RadzenMarkers MarkerType="MarkerType.Circle" Size="5" />
+                    </RadzenLineSeries>
+                    <RadzenColumnSeries Data="@_pipelineTrend" CategoryProperty="Month" ValueProperty="Forecast" Title="@L["Sales:QuarterForecast"]" Fill="#7c3aed" />
+                    <RadzenCategoryAxis />
+                    <RadzenValueAxis>
+                        <RadzenGridLines Visible="true" />
+                    </RadzenValueAxis>
+                    <RadzenLegend Position="LegendPosition.Bottom" />
+                </RadzenChart>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeLG="5">
+            <RadzenCard class="rz-shadow-2">
+                <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-mb-3">@L["Sales:StageFunnel"]</RadzenText>
+                <RadzenChart Style="height:320px;">
+                    <RadzenPieSeries Data="@StageSummary" CategoryProperty="Stage" ValueProperty="Amount">
+                        <RadzenSeriesDataLabels Visible="true" />
+                    </RadzenPieSeries>
+                    <RadzenLegend Position="LegendPosition.Right" />
+                </RadzenChart>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+
+    <RadzenRow Gap="1rem">
+        <RadzenColumn Size="12" SizeXL="8">
+            <RadzenCard class="rz-shadow-2">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="1rem" Wrap="FlexWrap.Wrap" class="rz-mb-3">
+                    <RadzenText TextStyle="TextStyle.Subtitle1">@L["Sales:TopOpportunities"]</RadzenText>
+                    <RadzenBadge Text="@($"{FilteredOpportunities.Count()}")" BadgeStyle="BadgeStyle.Primary" />
+                </RadzenStack>
+                <RadzenDataGrid TItem="SalesOpportunity"
+                                Data="@FilteredOpportunities"
+                                AllowSorting="true"
+                                AllowPaging="true"
+                                PageSize="5"
+                                Density="Density.Compact"
+                                PagerHorizontalAlign="HorizontalAlign.Center">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="SalesOpportunity" Property="@nameof(SalesOpportunity.Name)" Title="@L["Sales:OpportunityName"]" Width="220px">
+                            <Template Context="opportunity">
+                                <RadzenStack Gap="0">
+                                    <RadzenText TextStyle="TextStyle.Body2"><strong>@opportunity.Name</strong></RadzenText>
+                                    <RadzenText TextStyle="TextStyle.Caption" class="rz-color-on-surface-variant">@opportunity.NextStep</RadzenText>
+                                </RadzenStack>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="SalesOpportunity" Property="@nameof(SalesOpportunity.Customer)" Title="@L["Sales:Customer"]" Width="160px" />
+                        <RadzenDataGridColumn TItem="SalesOpportunity" Property="@nameof(SalesOpportunity.Stage)" Title="@L["Sales:Stage"]" Width="130px">
+                            <Template Context="opportunity">
+                                <RadzenBadge Text="@opportunity.Stage" BadgeStyle="@GetStageBadgeStyle(opportunity.Stage)" />
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="SalesOpportunity" Property="@nameof(SalesOpportunity.Owner)" Title="@L["Sales:Owner"]" Width="120px" />
+                        <RadzenDataGridColumn TItem="SalesOpportunity" Property="@nameof(SalesOpportunity.Amount)" Title="@L["Sales:Amount"]" Width="120px">
+                            <Template Context="opportunity">@FormatMoney(opportunity.Amount)</Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="SalesOpportunity" Property="@nameof(SalesOpportunity.Probability)" Title="@L["Sales:Probability"]" Width="120px">
+                            <Template Context="opportunity">
+                                <RadzenProgressBar Value="@opportunity.Probability" ShowValue="true" Style="height:18px" />
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="SalesOpportunity" Property="@nameof(SalesOpportunity.ExpectedCloseDate)" Title="@L["Sales:ExpectedCloseDate"]" Width="140px">
+                            <Template Context="opportunity">@opportunity.ExpectedCloseDate.ToString("MMM dd")</Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="SalesOpportunity" Title="@L["Actions"]" Width="120px" Sortable="false" Filterable="false">
+                            <Template Context="opportunity">
+                                <RadzenButton Icon="visibility" Text="@L["Sales:ShowDetails"]" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small" Click="@(() => SelectOpportunity(opportunity))" />
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeXL="4">
+            <RadzenCard class="rz-shadow-2">
+                <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-mb-3">@L["Sales:CustomerSignals"]</RadzenText>
+                <RadzenTabs>
+                    <Tabs>
+                        <RadzenTabsItem Text="@L["Sales:CustomerSignals"]">
+                            <RadzenStack Gap="0.75rem">
+                                @foreach (var signal in _signals)
+                                {
+                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0.75rem">
+                                        <RadzenStack Gap="0">
+                                            <RadzenText TextStyle="TextStyle.Body2"><strong>@signal.Customer</strong></RadzenText>
+                                            <RadzenText TextStyle="TextStyle.Caption" class="rz-color-on-surface-variant">@signal.Description</RadzenText>
+                                        </RadzenStack>
+                                        <RadzenBadge Text="@signal.Tag" BadgeStyle="@signal.BadgeStyle" />
+                                    </RadzenStack>
+                                }
+                            </RadzenStack>
+                        </RadzenTabsItem>
+                        <RadzenTabsItem Text="@L["Sales:RecentActivity"]">
+                            <RadzenStack Gap="0.75rem">
+                                @foreach (var activity in _activities)
+                                {
+                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Gap="0.75rem">
+                                        <RadzenIcon Icon="@activity.Icon" Style="@($"color:{activity.Color};font-size:1.5rem;")" />
+                                        <RadzenStack Gap="0">
+                                            <RadzenText TextStyle="TextStyle.Body2"><strong>@activity.Title</strong></RadzenText>
+                                            <RadzenText TextStyle="TextStyle.Caption" class="rz-color-on-surface-variant">@activity.Description</RadzenText>
+                                        </RadzenStack>
+                                    </RadzenStack>
+                                }
+                            </RadzenStack>
+                        </RadzenTabsItem>
+                    </Tabs>
+                </RadzenTabs>
+            </RadzenCard>
+
+            @if (_selectedOpportunity is not null)
+            {
+                <RadzenCard class="rz-shadow-2 rz-mt-3" Style="border-left:4px solid #7c3aed;">
+                    <RadzenStack Gap="0.75rem">
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                            <RadzenText TextStyle="TextStyle.Subtitle1">@_selectedOpportunity.Name</RadzenText>
+                            <RadzenBadge Text="@_selectedOpportunity.Stage" BadgeStyle="@GetStageBadgeStyle(_selectedOpportunity.Stage)" />
+                        </RadzenStack>
+                        <RadzenText TextStyle="TextStyle.Body2">@_selectedOpportunity.Customer</RadzenText>
+                        <RadzenProgressBar Value="@_selectedOpportunity.Probability" ShowValue="true" />
+                        <RadzenText TextStyle="TextStyle.Caption" class="rz-color-on-surface-variant">@_selectedOpportunity.NextStep</RadzenText>
+                    </RadzenStack>
+                </RadzenCard>
+            }
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    private readonly List<StageOption> _stageOptions = [];
+    private readonly List<SalesOpportunity> _opportunities = [];
+    private readonly List<PipelinePoint> _pipelineTrend = [];
+    private readonly List<CustomerSignal> _signals = [];
+    private readonly List<SalesActivity> _activities = [];
+    private string _selectedStage = "";
+    private SalesOpportunity? _selectedOpportunity;
+
+    private IEnumerable<SalesOpportunity> FilteredOpportunities =>
+        string.IsNullOrWhiteSpace(_selectedStage)
+            ? _opportunities
+            : _opportunities.Where(x => x.Stage == _selectedStage);
+
+    private IEnumerable<StageAmount> StageSummary =>
+        _opportunities
+            .GroupBy(x => x.Stage)
+            .Select(x => new StageAmount(x.Key, x.Sum(o => o.Amount)));
+
+    private decimal QuarterForecast => _opportunities.Sum(x => x.Amount);
+    private decimal WeightedPipeline => _opportunities.Sum(x => x.Amount * (decimal)x.Probability / 100);
+    private double WinRate => _opportunities.Average(x => x.Probability);
+
+    public Workspace()
+    {
+        LocalizationResource = typeof(CRMResource);
+    }
+
+    protected override void OnInitialized()
+    {
+        _stageOptions.AddRange(
+        [
+            new StageOption(L["Sales:AllStages"], ""),
+            new StageOption(L["Sales:DemoBooked"], L["Sales:DemoBooked"]),
+            new StageOption(L["Sales:QuoteSent"], L["Sales:QuoteSent"]),
+            new StageOption(L["Sales:ContractReview"], L["Sales:ContractReview"])
+        ]);
+
+        _opportunities.AddRange(
+        [
+            new SalesOpportunity("Northwind ERP rollout", "Northwind Traders", L["Sales:ContractReview"], "Emma", 128000, 82, DateTime.Today.AddDays(12), "Legal review scheduled for Thursday"),
+            new SalesOpportunity("Contoso service expansion", "Contoso Ltd.", L["Sales:QuoteSent"], "Mason", 86000, 64, DateTime.Today.AddDays(19), "Confirm support tier and deployment window"),
+            new SalesOpportunity("Adventure Works renewal", "Adventure Works", L["Sales:ContractReview"], "Olivia", 72000, 76, DateTime.Today.AddDays(7), "Procurement needs final security note"),
+            new SalesOpportunity("Fabrikam analytics pilot", "Fabrikam", L["Sales:DemoBooked"], "Noah", 54000, 48, DateTime.Today.AddDays(28), "Run executive dashboard demo"),
+            new SalesOpportunity("Tailspin mobile rollout", "Tailspin Toys", L["Sales:QuoteSent"], "Ava", 43000, 58, DateTime.Today.AddDays(23), "Send phased rollout option")
+        ]);
+
+        _pipelineTrend.AddRange(
+        [
+            new PipelinePoint("Jan", 142000, 76000),
+            new PipelinePoint("Feb", 168000, 94000),
+            new PipelinePoint("Mar", 212000, 118000),
+            new PipelinePoint("Apr", 248000, 151000),
+            new PipelinePoint("May", 301000, 188000),
+            new PipelinePoint("Jun", 383000, 245000)
+        ]);
+
+        _signals.AddRange(
+        [
+            new CustomerSignal("Northwind Traders", "Security review passed; legal is the final blocker.", L["Sales:HotAccount"], BadgeStyle.Danger),
+            new CustomerSignal("Contoso Ltd.", "Usage grew 26% after service desk rollout.", L["Sales:Expansion"], BadgeStyle.Success),
+            new CustomerSignal("Adventure Works", "Renewal sponsor asked for a three-year option.", L["Sales:Renewal"], BadgeStyle.Info)
+        ]);
+
+        _activities.AddRange(
+        [
+            new SalesActivity("video_call", "#2563eb", "Demo completed", "Fabrikam finance team reviewed dashboard scenarios."),
+            new SalesActivity("request_quote", "#7c3aed", "Quote sent", "Contoso received revised enterprise pricing."),
+            new SalesActivity("task_alt", "#16a34a", "Mutual action plan", "Northwind confirmed rollout milestones.")
+        ]);
+
+        _selectedOpportunity = _opportunities[0];
+    }
+
+    private void SelectOpportunity(SalesOpportunity opportunity)
+    {
+        _selectedOpportunity = opportunity;
+    }
+
+    private void RefreshForecast()
+    {
+        _selectedOpportunity = FilteredOpportunities.FirstOrDefault() ?? _opportunities.FirstOrDefault();
+    }
+
+    private static string FormatMoney(decimal value)
+    {
+        return value >= 1000 ? $"${value / 1000:0}K" : $"${value:0}";
+    }
+
+    private static BadgeStyle GetStageBadgeStyle(string stage)
+    {
+        if (stage.Contains("Contract", StringComparison.OrdinalIgnoreCase) || stage.Contains("合同", StringComparison.OrdinalIgnoreCase))
+        {
+            return BadgeStyle.Success;
+        }
+
+        if (stage.Contains("Quote", StringComparison.OrdinalIgnoreCase) || stage.Contains("报价", StringComparison.OrdinalIgnoreCase))
+        {
+            return BadgeStyle.Warning;
+        }
+
+        return BadgeStyle.Info;
+    }
+
+    private sealed record StageOption(string Text, string Value);
+    private sealed record SalesOpportunity(string Name, string Customer, string Stage, string Owner, decimal Amount, double Probability, DateTime ExpectedCloseDate, string NextStep);
+    private sealed record PipelinePoint(string Month, decimal Pipeline, decimal Forecast);
+    private sealed record StageAmount(string Stage, decimal Amount);
+    private sealed record CustomerSignal(string Customer, string Description, string Tag, BadgeStyle BadgeStyle);
+    private sealed record SalesActivity(string Icon, string Color, string Title, string Description);
+}

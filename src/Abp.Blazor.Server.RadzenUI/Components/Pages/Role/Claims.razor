@@ -1,0 +1,125 @@
+@using Abp.RadzenUI.Application.Contracts.RoleClaims
+@using Abp.RadzenUI.Localization
+@using Microsoft.Extensions.Localization
+@using Volo.Abp.AspNetCore.Components
+@inject IRoleClaimAppService RoleClaimAppService
+@inject DialogService DialogService
+@inject IStringLocalizer<AbpRadzenUIResource> UL
+@inherits AbpRadzenUIComponentBase
+
+<RadzenStack Style="max-height:calc(100vh - 200px); min-height: 300px;">
+    <DialogFormLayout ShowSave="false" CancelText="@UL["Close"]" CancelIcon="close"
+                      CancelClick="() => DialogService.Close(false)">
+        <RadzenStack Gap="1rem" class="rz-p-4">
+            @* Add Claim Form *@
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-mb-2">@UL["RoleClaim:AddNew"]</RadzenText>
+                <RadzenTemplateForm TItem="CreateRoleClaimDto" Data="_newClaim" Submit="AddClaimAsync">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+                        <RadzenStack Gap="0.25rem" Style="flex:1; min-width: 150px;">
+                            <RadzenLabel Text="@UL["RoleClaim:ClaimType"]" Component="ClaimType" />
+                            <RadzenTextBox Name="ClaimType" @bind-Value="_newClaim.ClaimType"
+                                           MaxLength="256" Style="width:100%;" />
+                            <RadzenRequiredValidator Component="ClaimType" Text="@L.Required("RoleClaim:ClaimType")" />
+                        </RadzenStack>
+                        <RadzenStack Gap="0.25rem" Style="flex:1; min-width: 150px;">
+                            <RadzenLabel Text="@UL["RoleClaim:ClaimValue"]" Component="ClaimValue" />
+                            <RadzenTextBox Name="ClaimValue" @bind-Value="_newClaim.ClaimValue"
+                                           MaxLength="1024" Style="width:100%;" />
+                            <RadzenRequiredValidator Component="ClaimValue" Text="@L.Required("RoleClaim:ClaimValue")" />
+                        </RadzenStack>
+                        <RadzenButton ButtonType="ButtonType.Submit" Icon="add" Text="@UL["Btn:Add"]"
+                                      ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" />
+                    </RadzenStack>
+                </RadzenTemplateForm>
+            </RadzenCard>
+
+            @* Claims List *@
+            <RadzenDataGrid Data="@_claims" TItem="RoleClaimDto" AllowSorting="true"
+                            Style="height: 300px;" Density="Density.Compact">
+                <EmptyTemplate>
+                    <RadzenText TextStyle="TextStyle.Body2" class="rz-text-align-center rz-p-4">
+                        @UL["RoleClaim:NoClaims"]
+                    </RadzenText>
+                </EmptyTemplate>
+                <Columns>
+                    <RadzenDataGridColumn Property="@nameof(RoleClaimDto.ClaimType)"
+                                          Title="@UL["RoleClaim:ClaimType"]" Width="40%" />
+                    <RadzenDataGridColumn Property="@nameof(RoleClaimDto.ClaimValue)"
+                                          Title="@UL["RoleClaim:ClaimValue"]" />
+                    <RadzenDataGridColumn Title="@L["Actions"]" Width="80px" Sortable="false" TextAlign="TextAlign.Center">
+                        <Template Context="claim">
+                            <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.ExtraSmall"
+                                          title="@UL["Btn:Delete"]"
+                                          Click="@(async () => await DeleteClaimAsync(claim))" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenStack>
+    </DialogFormLayout>
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public Guid RoleId { get; set; }
+
+    private List<RoleClaimDto> _claims = [];
+    private CreateRoleClaimDto _newClaim = new();
+
+    public Claims()
+    {
+        LocalizationResource = typeof(AbpRadzenUIResource);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await LoadClaimsAsync();
+    }
+
+    private async Task LoadClaimsAsync()
+    {
+        _claims = await RoleClaimAppService.GetClaimsAsync(RoleId);
+    }
+
+    private async Task AddClaimAsync()
+    {
+        try
+        {
+            await RoleClaimAppService.AddClaimAsync(RoleId, _newClaim);
+            _newClaim = new();
+            await LoadClaimsAsync();
+            await Notify.Success(L["SuccessfullySaved"]);
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(ex);
+        }
+    }
+
+    private async Task DeleteClaimAsync(RoleClaimDto claim)
+    {
+        try
+        {
+            var confirmed = await DialogService.Confirm(
+                UL["RoleClaim:DeleteConfirm", claim.ClaimType],
+                UL["Btn:Delete"],
+                new ConfirmOptions
+                {
+                    OkButtonText = L["Yes"],
+                    CancelButtonText = L["Cancel"]
+                });
+
+            if (confirmed != true) return;
+
+            await RoleClaimAppService.DeleteClaimAsync(RoleId, claim);
+            await LoadClaimsAsync();
+            await Notify.Success(L["SuccessfullyDeleted"]);
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(ex);
+        }
+    }
+}

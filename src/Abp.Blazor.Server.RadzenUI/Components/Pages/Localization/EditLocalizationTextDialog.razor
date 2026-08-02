@@ -1,0 +1,62 @@
+@using Abp.RadzenUI.Application.Contracts.LocalizationTexts
+@using Abp.RadzenUI.Localization
+@using Microsoft.Extensions.Localization
+@inject DialogService DialogService
+@inject IStringLocalizer<AbpRadzenUIResource> L
+
+<RadzenStack Gap="1rem">
+    <RadzenFormField Text="@L["Localization:Key"]" Variant="Variant.Outlined" Style="width:100%">
+        <RadzenTextBox Value="@Item.Key" ReadOnly="true" />
+    </RadzenFormField>
+
+    <RadzenFormField Text="@L["Localization:BaseValue"]" Variant="Variant.Outlined" Style="width:100%">
+        <RadzenTextArea Value="@(Item.BaseValue ?? string.Empty)" ReadOnly="true" Rows="3" />
+    </RadzenFormField>
+
+    <RadzenFormField Text="@L["Localization:OverrideValue"]" Variant="Variant.Outlined" Style="width:100%">
+        <RadzenTextArea @bind-Value="_value" Rows="4" />
+    </RadzenFormField>
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween"
+                 AlignItems="AlignItems.Center">
+        <div>
+            @if (CanReset)
+            {
+                <RadzenButton Text="@L["Localization:Reset"]" Icon="restart_alt" ButtonStyle="ButtonStyle.Danger"
+                              Variant="Variant.Flat" Click="OnReset" />
+            }
+        </div>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="8px">
+            <RadzenButton Text="@L["Cancel"]" ButtonStyle="ButtonStyle.Light" Click="OnCancel" />
+            <RadzenButton Text="@L["Save"]" ButtonStyle="ButtonStyle.Primary" Click="OnSave" />
+        </RadzenStack>
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public LocalizationTextItemDto Item { get; set; } = default!;
+
+    [Parameter]
+    public bool CanReset { get; set; }
+
+    private string _value = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        _value = Item.OverrideValue ?? Item.BaseValue ?? string.Empty;
+    }
+
+    private void OnSave() => DialogService.Close(new EditResult { Value = _value });
+
+    private void OnReset() => DialogService.Close(new EditResult { Reset = true });
+
+    private void OnCancel() => DialogService.Close(null);
+
+    public class EditResult
+    {
+        public bool Reset { get; set; }
+
+        public string? Value { get; set; }
+    }
+}

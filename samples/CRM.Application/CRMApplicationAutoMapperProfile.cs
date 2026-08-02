@@ -1,4 +1,5 @@
 using CRM.Products;
+using CRM.Operations;
 using Riok.Mapperly.Abstractions;
 using Volo.Abp.Mapperly;
 
@@ -56,4 +57,44 @@ public partial class ProductDtoToUpdateProductDtoMapper : MapperBase<ProductDto,
     public override partial UpdateProductDto Map(ProductDto source);
 
     public override partial void Map(ProductDto source, UpdateProductDto destination);
+}
+
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+public partial class WorkOrderToWorkOrderDtoMapper : MapperBase<WorkOrder, WorkOrderDto>
+{
+    public override partial WorkOrderDto Map(WorkOrder source);
+
+    public override partial void Map(WorkOrder source, WorkOrderDto destination);
+}
+
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+public partial class WorkOrderEventToWorkOrderEventDtoMapper : MapperBase<WorkOrderEvent, WorkOrderEventDto>
+{
+    public override partial WorkOrderEventDto Map(WorkOrderEvent source);
+
+    public override partial void Map(WorkOrderEvent source, WorkOrderEventDto destination);
+}
+
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+public partial class OperationAssetToOperationAssetDtoMapper : MapperBase<OperationAsset, OperationAssetDto>
+{
+    public override partial OperationAssetDto Map(OperationAsset source);
+
+    public override partial void Map(OperationAsset source, OperationAssetDto destination);
+}
+
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+public partial class OperationShiftToOperationShiftDtoMapper : MapperBase<OperationShift, OperationShiftDto>
+{
+    [MapperIgnoreSource(nameof(OperationShift.CreationTime))]
+    [MapperIgnoreSource(nameof(OperationShift.CreatorId))]
+    [MapperIgnoreSource(nameof(OperationShift.LastModificationTime))]
+    [MapperIgnoreSource(nameof(OperationShift.LastModifierId))]
+    public override partial OperationShiftDto Map(OperationShift source);
+
+    [MapperIgnoreSource(nameof(OperationShift.CreationTime))]
+    [MapperIgnoreSource(nameof(OperationShift.CreatorId))]
+    [MapperIgnoreSource(nameof(OperationShift.LastModificationTime))]
+    [MapperIgnoreSource(nameof(OperationShift.LastModifierId))]
+    public override partial void Map(OperationShift source, OperationShiftDto destination);
 }

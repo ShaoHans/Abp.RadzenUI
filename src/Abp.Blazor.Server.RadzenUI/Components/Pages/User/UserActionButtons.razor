@@ -1,0 +1,137 @@
+@using Volo.Abp.Identity
+
+@if (CanEdit)
+{
+    <RadzenButton Icon="edit" title="@EditTitle" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small"
+                  Click="HandleEditClick" />
+}
+@if (CanManagePermissions)
+{
+    <RadzenButton Icon="visibility" title="@PermissionsVisualizerTitle" ButtonStyle="ButtonStyle.Info" Size="ButtonSize.Small"
+                  Click="HandleViewPermissionsClick" />
+    <RadzenButton Icon="productivity" title="@PermissionsTitle" ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small"
+                  Click="HandleManagePermissionsClick" />
+}
+@if (CanSetPassword)
+{
+    <RadzenButton Icon="password" title="@SetPasswordTitle" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
+                  Click="HandleSetPasswordClick" />
+}
+@if (CanManageLockout)
+{
+    @if (IsLocked)
+    {
+        <RadzenButton Icon="lock_open" title="@UnlockTitle" ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.Small"
+                      Click="HandleUnlockClick" />
+    }
+    else
+    {
+        <RadzenButton Icon="lock" title="@LockTitle" ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small"
+                      Click="HandleLockClick" />
+    }
+}
+@if (CanDelete)
+{
+    <RadzenButton Icon="delete" title="@DeleteTitle" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small"
+                  Click="HandleDeleteClick" />
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public IdentityUserDto User { get; set; } = default!;
+
+    [Parameter]
+    public bool CanEdit { get; set; }
+
+    [Parameter]
+    public bool CanManagePermissions { get; set; }
+
+    [Parameter]
+    public bool CanDelete { get; set; }
+
+    [Parameter]
+    public bool CanManageLockout { get; set; }
+
+    [Parameter]
+    public bool CanSetPassword { get; set; }
+
+    /// <summary>Whether the user is currently locked out (lockout end date is in the future).</summary>
+    bool IsLocked => User.LockoutEnd.HasValue && User.LockoutEnd.Value > DateTimeOffset.UtcNow;
+
+    [Parameter, EditorRequired]
+    public string EditTitle { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public string PermissionsTitle { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public string PermissionsVisualizerTitle { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public string DeleteTitle { get; set; } = default!;
+
+    [Parameter]
+    public string LockTitle { get; set; } = default!;
+
+    [Parameter]
+    public string UnlockTitle { get; set; } = default!;
+
+    [Parameter]
+    public string SetPasswordTitle { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public EventCallback<IdentityUserDto> OnEdit { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<IdentityUserDto> OnManagePermissions { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<IdentityUserDto> OnViewPermissions { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<IdentityUserDto> OnDelete { get; set; }
+
+    [Parameter]
+    public EventCallback<IdentityUserDto> OnLock { get; set; }
+
+    [Parameter]
+    public EventCallback<IdentityUserDto> OnUnlock { get; set; }
+
+    [Parameter]
+    public EventCallback<IdentityUserDto> OnSetPassword { get; set; }
+
+    Task HandleEditClick()
+    {
+        return OnEdit.InvokeAsync(User);
+    }
+
+    Task HandleManagePermissionsClick()
+    {
+        return OnManagePermissions.InvokeAsync(User);
+    }
+
+    Task HandleViewPermissionsClick()
+    {
+        return OnViewPermissions.InvokeAsync(User);
+    }
+
+    Task HandleDeleteClick()
+    {
+        return OnDelete.InvokeAsync(User);
+    }
+
+    Task HandleLockClick()
+    {
+        return OnLock.InvokeAsync(User);
+    }
+
+    Task HandleUnlockClick()
+    {
+        return OnUnlock.InvokeAsync(User);
+    }
+
+    Task HandleSetPasswordClick()
+    {
+        return OnSetPassword.InvokeAsync(User);
+    }
+}

@@ -1,5 +1,6 @@
 ﻿@page "/account/login"
 @using Abp.RadzenUI.Components.Layout
+@using Abp.RadzenUI.LinkAccounts
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.Extensions.Options
 @using Volo.Abp.Account.Localization
@@ -11,11 +12,18 @@
 
 <PageTitle>@L["Login"]</PageTitle>
 
+@if (!string.IsNullOrWhiteSpace(LinkToken))
+{
+    <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Icon="link" AllowClose="false" class="rz-mb-4">
+        @TL["LinkedAccounts:LoginHint"]
+    </RadzenAlert>
+}
+
 @if (!IsExternalLoginOnly)
 {
     @if (EnableLocalLogin)
     {
-        <RadzenTemplateForm Data=@("") Method="post" Action="/account/locallogin">
+        <RadzenTemplateForm Data=@("") Method="post" Action="@LoginAction">
             <RadzenLogin LoginText="@L["Login"]"
             UserText="@L["UserName"]" UserRequired="@L.Required("DisplayName:UserName")"
             PasswordText="@L["Password"]" PasswordRequired="@L.Required("DisplayName:Password")"
@@ -25,7 +33,7 @@
         </RadzenTemplateForm>
     }
 
-    <ExternalLoginProvider Text="@(EnableLocalLogin ? L["OrLoginWith"] : "")" ReturnUrl="@ReturnUrl" />
+    <ExternalLoginProvider Text="@(EnableLocalLogin ? L["OrLoginWith"] : "")" ReturnUrl="@ExternalLoginReturnUrl" />
 }
 
 @code {
@@ -41,6 +49,10 @@
     [Parameter]
     public string? ReturnUrl { get; set; }
 
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string? LinkToken { get; set; }
+
     [Inject]
     NavigationManager Navigation { get; set; } = default!;
 
@@ -53,11 +65,25 @@
     [Inject]
     IOptions<AbpRadzenUIOptions> RadzenUIOptions { get; set; } = default!;
 
+    [Inject]
+    Microsoft.Extensions.Localization.IStringLocalizer<AbpRadzenUIResource> TL { get; set; } = default!;
+
     public bool EnableLocalRegister { get; set; }
 
     public bool EnableLocalLogin { get; set; } = true;
 
+    string LoginAction => string.IsNullOrWhiteSpace(LinkToken)
+        ? "/account/locallogin"
+        : $"/account/locallogin?linkToken={Uri.EscapeDataString(LinkToken)}";
+
+    string ExternalLoginReturnUrl => string.IsNullOrWhiteSpace(LinkToken)
+        ? (ReturnUrl ?? "/")
+        : "/" + Navigation.ToBaseRelativePath(Navigation.Uri);
+
     List<ExternalProviderModel> ExternalProviders { get; set; } = [];
+
+    bool _shouldRedirectHome;
+    string? _redirectUrl;
 
     bool IsExternalLoginOnly => !EnableLocalLogin && ExternalProviders.Count == 1;
 
@@ -81,18 +107,38 @@
             await Notify.Error(Error);
         }
 
-        if (CurrentUser != null && CurrentUser.IsAuthenticated)
+        if ((CurrentUser != null && CurrentUser.IsAuthenticated) && !SkipAutoLogin && !IsLinkedFlowRequest())
         {
-            Navigation.NavigateTo("/");
+            _shouldRedirectHome = true;
             return;
         }
 
         if (IsExternalLoginOnly && !SkipAutoLogin)
         {
             var returnUrl = Uri.EscapeDataString(ReturnUrl ?? "/");
-            Navigation.NavigateTo($"/account/externallogin?provider={ExternalLoginScheme}&returnUrl={returnUrl}", forceLoad: true);
-            return;
+            _redirectUrl = $"/account/externallogin?provider={ExternalLoginScheme}&returnUrl={returnUrl}";
         }
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return Task.CompletedTask;
+        }
+
+        if (_shouldRedirectHome)
+        {
+            Navigation.NavigateTo("/");
+            return Task.CompletedTask;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_redirectUrl))
+        {
+            Navigation.NavigateTo(_redirectUrl, forceLoad: true);
+        }
+
+        return Task.CompletedTask;
     }
 
     async Task<List<ExternalProviderModel>> GetExternalProviders()
@@ -115,5 +161,12 @@
     public void OnRegister()
     {
         Navigation.NavigateTo("/account/register");
+    }
+
+    bool IsLinkedFlowRequest()
+    {
+        return !string.IsNullOrWhiteSpace(LinkToken)
+            || (!string.IsNullOrWhiteSpace(ReturnUrl)
+                && ReturnUrl.Contains("linkToken=", StringComparison.OrdinalIgnoreCase));
     }
 }

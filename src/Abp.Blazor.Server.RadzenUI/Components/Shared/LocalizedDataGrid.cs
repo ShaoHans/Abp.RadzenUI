@@ -20,6 +20,8 @@ public class LocalizedDataGrid<TItem>()
     {
         base.OnInitialized();
 
+        Responsive = true;
+
         this.EmptyText = L["DataGrid.EmptyText"];
         this.ApplyFilterText = L["DataGrid:Filter.Apply"];
         this.ClearFilterText = L["DataGrid:Filter.Clear"];

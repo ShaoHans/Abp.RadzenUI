@@ -10,7 +10,7 @@
             </RadzenColumn>
             <RadzenColumn Size="12" SizeMD="8">
                 <RadzenDropDown @bind-Value="@TimezoneSettings.Timezone" Placeholder="select timezone" AllowFiltering=true
-                                Data="@TimezoneSettings.TimeZoneItems" Style="width: 50%;" TextProperty="Name" ValueProperty="Value" Name="Timezone">
+                                Data="@TimezoneSettings.TimeZoneItems" Style="display:block;width:min(100%, 28rem);" TextProperty="Name" ValueProperty="Value" Name="Timezone">
                 </RadzenDropDown>
             </RadzenColumn>
         </RadzenRow>

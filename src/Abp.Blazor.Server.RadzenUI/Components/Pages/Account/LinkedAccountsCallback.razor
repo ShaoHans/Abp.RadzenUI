@@ -1,0 +1,68 @@
+@page "/account/linked-accounts/callback"
+@using Abp.RadzenUI.LinkAccounts
+@using Abp.RadzenUI.LinkAccounts.Dtos
+@inherits AbpRadzenUIComponentBase
+@inject ILinkedAccountAppService LinkedAccountAppService
+@inject NavigationManager NavigationManager
+
+<PageTitle>@L["LinkedAccounts:Title"]</PageTitle>
+
+<RadzenRow JustifyContent="JustifyContent.Center" class="rz-mt-12">
+    <RadzenColumn Size="12" SizeMD="8" SizeLG="6">
+        <RadzenCard>
+            <RadzenStack Gap="1rem">
+                <RadzenAlert AlertStyle="AlertStyle.Success" Variant="Variant.Flat" AllowClose="false">
+                    @L["LinkedAccounts:CallbackSuccess"]
+                </RadzenAlert>
+
+                @if (_session != null)
+                {
+                    <RadzenText TextStyle="TextStyle.Body1">
+                        @L["LinkedAccounts:CurrentAccountLabel"]: @SessionDisplay.CurrentAccountDisplay
+                    </RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2">
+                        @L["LinkedAccounts:PreviousAccountLabel"]: @SessionDisplay.OriginAccountDisplay
+                    </RadzenText>
+                }
+
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.75rem">
+                    <RadzenButton Text="@L["LinkedAccounts:StayWithCurrentAccount"]" Icon="check" Click="StayAsync" />
+                    <RadzenButton Text="@L["LinkedAccounts:BackToPreviousAccount"]" Icon="undo" Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Secondary" Click="BackAsync" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string? ReturnUrl { get; set; }
+
+    LinkedAccountSessionDto? _session;
+
+    private LinkedAccountSessionDisplayModel SessionDisplay => LinkedAccountSessionDisplayModel.Create(_session, L["LinkedAccounts:Host"]);
+
+    public LinkedAccountsCallback()
+    {
+        LocalizationResource = typeof(AbpRadzenUIResource);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _session = await LinkedAccountAppService.GetCurrentSessionAsync();
+    }
+
+    private Task StayAsync()
+    {
+        NavigationManager.NavigateTo(string.IsNullOrWhiteSpace(ReturnUrl) ? "/" : ReturnUrl, true);
+        return Task.CompletedTask;
+    }
+
+    private Task BackAsync()
+    {
+        var encoded = Uri.EscapeDataString(string.IsNullOrWhiteSpace(ReturnUrl) ? "/" : ReturnUrl);
+        NavigationManager.NavigateTo($"/account/linked-accounts/back?returnUrl={encoded}", true);
+        return Task.CompletedTask;
+    }
+}

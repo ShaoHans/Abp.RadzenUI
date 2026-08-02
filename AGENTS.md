@@ -1,0 +1,468 @@
+# AGENTS.md
+
+## 项目概览
+
+Abp RadzenUI 是一个基于 ABP Framework 和 Radzen Blazor 的 Blazor Server UI 主题与管理后台基础包。它的核心类库项目是 `src/Abp.Blazor.Server.RadzenUI`，NuGet 包名为 `AbpRadzen.Blazor.Server.UI`。
+
+这个仓库不只是外观主题，还封装了 Blazor Server 运行入口、Radzen 服务注册、布局、菜单、本地化、认证跳转、通知/消息适配、设置页承载、头像上传、关联账户、数据字典、用户消息、审计日志、身份安全日志、租户和身份管理页面等能力。
+
+当前解决方案主要面向 `.NET 10`，集中包版本管理在 `Directory.Packages.props` 中。关键版本包括：
+
+- ABP：`10.5.0`
+- Radzen.Blazor：`11.2.0`
+- 目标框架：`net10.0`
+
+## 解决方案结构
+
+根目录重要文件：
+
+- `Abp.RadzenUI.sln` / `Abp.RadzenUI.slnx`：解决方案文件。
+- `Directory.Packages.props`：集中管理 NuGet 包版本。
+- `Directory.Build.props`：统一构建属性。
+- `README.md` / `README_zh-CN.md`：英文和中文使用说明。
+- `docker-compose.yml`：示例运行相关的编排文件。
+- `tasks/lessons.md`：维护过程中的经验记录，改 UI 或公共组件前建议先看。
+
+源码目录：
+
+- `src/Abp.Blazor.Server.RadzenUI`：核心 Blazor Server UI 主题包。
+- `src/Abp.RadzenUI.Application.Contracts`：应用服务接口、DTO、权限定义。
+- `src/Abp.RadzenUI.Application`：内置应用服务实现。
+- `src/Abp.RadzenUI.Domain.Shared`：本地化、常量、错误码等共享定义。
+- `src/Abp.RadzenUI.Domain`：领域实体，例如数据字典、用户消息。
+- `src/Abp.RadzenUI.EntityFrameworkCore`：内置实体的 EF Core DbContext 与模型映射。
+- `src/Abp.RadzenUI.LinkAccounts`：关联账户独立模块。
+
+示例目录：
+
+- `samples/CRM.*`：完整 CRM 示例应用，演示主题集成、菜单、产品 CRUD、数据库迁移、OpenIddict、Swagger、Redis、Aspire 等。
+
+测试目录：
+
+- `tests/Abp.RadzenUI.LinkAccounts.Tests`：关联账户会话栈、账号显示等回归测试。
+
+## 核心 UI 包
+
+核心项目：`src/Abp.Blazor.Server.RadzenUI/Abp.Blazor.Server.RadzenUI.csproj`
+
+包信息：
+
+- `PackageId`：`AbpRadzen.Blazor.Server.UI`
+- `RootNamespace`：`Abp.RadzenUI`
+- SDK：`Microsoft.NET.Sdk.Razor`
+
+核心依赖：
+
+- `Radzen.Blazor`
+- `Volo.Abp.AspNetCore.Components.Server`
+- `Volo.Abp.Autofac`
+- `Volo.Abp.Identity.EntityFrameworkCore`
+- `Volo.Abp.Account.Web.OpenIddict`
+- `Volo.Abp.TenantManagement.*`
+- `Volo.Abp.SettingManagement.*`
+- `Volo.Abp.PermissionManagement.*`
+- `Volo.Abp.AuditLogging.EntityFrameworkCore`
+- 项目引用：Application、Application.Contracts、EntityFrameworkCore、LinkAccounts
+
+## 模块注册
+
+核心模块：`src/Abp.Blazor.Server.RadzenUI/AbpRadzenUIModule.cs`
+
+它通过 `[DependsOn]` 接入：
+
+- `AbpAutofacModule`
+- `AbpRadzenUIApplicationModule`
+- `AbpRadzenUIEntityFrameworkCoreModule`
+- `AbpRadzenUILinkAccountsModule`
+- ABP 审计、权限、设置、租户、身份、Blazor Components Web 模块
+
+`ConfigureServices` 中的关键动作：
+
+- 配置头像扩展属性。
+- 为 `AbpRadzenUIResource` 增加 ABP UI、审计、设置管理等本地化基类。
+- 重写 Cookie 认证跳转：未登录跳 `/account/login`，无权限跳 `/forbidden`。
+- 注册 Razor Components 和 Interactive Server Components。
+- 注册 Radzen 组件服务、查询字符串主题服务、级联认证状态。
+- 替换 ABP 默认 `IUiMessageService` 和 `IUiNotificationService` 为 Radzen 实现。
+- 注册全局样式和脚本 Bundle。
+- 清空默认菜单贡献器，改用 RadzenUI 自己的菜单贡献器。
+- 注册设置页 Contributor：Email、TimeZone、Account。
+- 注册页面大小偏好、消息中心状态、菜单装饰状态、侧边弹窗、上传服务、关联账户登录管理等服务。
+
+## 运行入口与路由
+
+宿主项目需要在应用初始化管线末尾调用：
+
+```csharp
+app.UseRadzenUI();
+```
+
+实现位置：
+
+- `src/Abp.Blazor.Server.RadzenUI/Extensions/ApplicationBuilderExtensions.cs`
+- `src/Abp.Blazor.Server.RadzenUI/Extensions/EndpointRouteBuilderExtensions.cs`
+
+`UseRadzenUI()` 会：
+
+- 配置状态码跳转到 `/404`。
+- 调用 `UseConfiguredEndpoints`。
+- 映射 `MapRazorComponents<App>()`。
+- 启用 `AddInteractiveServerRenderMode()`。
+- 添加 `AbpRadzenUIOptions.RouterAdditionalAssemblies` 中的页面程序集。
+
+路由组件：`src/Abp.Blazor.Server.RadzenUI/Components/Routes.razor`
+
+- 使用 `AuthorizeRouteView`。
+- 默认布局为 `MainLayout`。
+- 未登录时导航到 `/account/login`。
+- 页面程序集来自主题自身和 `RouterAdditionalAssemblies`。
+
+## 主题配置
+
+配置类：`src/Abp.Blazor.Server.RadzenUI/AbpRadzenUIOptions.cs`
+
+主要配置项：
+
+- `RouterAdditionalAssemblies`：宿主应用 Razor 页面程序集。接入业务页面时必须设置。
+- `TitleBar`：标题栏设置，包括标题、GitHub 链接、语言菜单、侧边菜单多展开、面包屑。
+- `LoginPage`：登录页标题和 Logo。
+- `Theme`：默认主题和高级主题开关，默认主题为 `material-dark`。
+- `ExternalLogin`：第三方登录图标配置。
+
+示例项目在 `samples/CRM.Blazor.Web/CRMBlazorWebModule.cs` 中演示了完整配置方式。
+
+## UI 外壳
+
+主布局：`src/Abp.Blazor.Server.RadzenUI/Components/Layout/MainLayout.razor`
+
+布局包含：
+
+- `RadzenComponents`
+- 顶部 `Header`
+- 左侧 `MenuSiderbar`
+- 右侧 `ThemeSiderbar`
+- 右侧 `MessageSidebar`
+- 移动端遮罩
+- `CustomErrorBoundary`
+- `SideDialogClickAway`
+
+标题栏：`src/Abp.Blazor.Server.RadzenUI/Components/Layout/Header.razor`
+
+标题栏能力：
+
+- 菜单开关。
+- 标题和面包屑。
+- 刷新按钮。
+- GitHub 链接。
+- Radzen 外观切换。
+- 主题侧栏开关。
+- 消息中心按钮和未读数量。
+- 全屏切换。
+- 语言切换。
+- 登录入口。
+- 用户头像和个人菜单。
+- 关联账户入口及返回上一个账号入口。
+
+## 菜单系统
+
+内置菜单贡献器在 `src/Abp.Blazor.Server.RadzenUI/Menus`：
+
+- `DefaultRadzenMenuContributor`：创建 Administration 根菜单。
+- `AbpIdentityMenuContributor`：身份管理菜单。
+- `AbpTenantMenuContributor`：租户管理菜单。
+- `AuditLoggingMenuContributor`：审计日志菜单。
+- `IdentitySecurityLogMenuContributor`：身份安全日志菜单。
+- `DataDictionaryMenuContributor`：数据字典菜单。
+- `MessageMenuContributor`：消息菜单。
+- `SettingManagementMenuContributor`：设置管理菜单。
+
+菜单图标使用 Radzen/Material Symbols 风格的字符串图标名。菜单颜色扩展在 `Infrastructure/Navigation/ApplicationMenuItemIconColorExtensions.cs`。
+
+示例业务菜单：`samples/CRM.Blazor.Web/Menus/CRMMenuContributor.cs`
+
+要新增业务页面，通常需要：
+
+1. 在宿主 Web 项目新增 Razor 页面。
+2. 将页面程序集加入 `AbpRadzenUIOptions.RouterAdditionalAssemblies`。
+3. 在业务 `IMenuContributor` 中添加菜单项。
+4. 如有权限控制，菜单项调用 `RequirePermissions(...)`。
+
+## 全局搜索 / 命令面板(Ctrl+K)
+
+相关目录:`src/Abp.Blazor.Server.RadzenUI/Infrastructure/Search`
+
+命令面板提供 Ctrl/⌘+K 全局快速跳转,Phase 1 基于菜单数据做页面跳转,可扩展为实体搜索。
+
+**每个贡献器 = 面板里的一个 tab**。用户点选某个 tab 才会执行对应贡献器的搜索,任一时刻只跑一个 tab 的贡献器 —— 因此不存在多贡献器并发共用 scoped `DbContext` 的问题,也不会有多余查询。默认选中第一个 tab。
+
+核心构件:
+
+- `ICommandPaletteContributor`:扩展点。实现后通过 `CommandPaletteOptions.Contributors` 注册即多出一个 tab,无需改动面板 UI。契约为异步(`SearchAsync` 返回 `Task`),Phase 2 加实体查询(DB/HTTP)不改接口。`GroupKey` 是 tab 稳定标识(相同 key 归并到同一 tab),`GroupDisplayName` 是贡献器自行本地化的 tab 标题(所以 host 侧 tab 名可用自己的 resource,不依赖主题 resource),`Order` 决定 tab 顺序。
+- `MenuCommandPaletteContributor`:Phase 1 内置实现,从 `IMenuManager.GetMainMenuAsync()`(已按权限过滤)展平叶子菜单做内存匹配。
+- `ICommandPaletteManager` / `CommandPaletteManager`:`GetTabs()` 给出 tab 列表;`SearchAsync(tabKey, keyword, ct)` 只执行该 tab 对应的贡献器,单贡献器异常隔离。
+- `CommandPaletteTab`:tab 元数据(Key / DisplayName / Order)。
+- `CommandPaletteOptions`:`Enabled`、`MinKeywordLength`、`MaxResultsPerGroup`、`Contributors`。
+- `CommandPaletteState`(Scoped):协调 Header 搜索按钮、Ctrl+K 与面板组件之间的打开请求。
+- `Components/Shared/CommandPalette.razor`:**无外壳的宿主组件**,挂载在 `MainLayout` 末尾,只负责注册全局 Ctrl/⌘+K 的 `dotNetRef` 并通过 `DialogService.OpenAsync<CommandPaletteDialog>` 打开面板(`ShowTitle=false`、`Top="12vh"`、`CloseDialogOnOverlayClick/Esc`、`CssClass="cmdk-dialog"`)。遮罩、居中、backdrop、Esc、点击外部关闭都由 Radzen dialog 提供,无需自定义外壳 CSS。
+- `Components/Shared/CommandPaletteDialog.razor`:对话框内容,输入框 + 官方 `RadzenTabs`(仅鼠标点击切换,`GroupIcon` 作为 tab 图标)+ 结果列表 + 底部快捷键提示;仅一个 tab 时不显示 tab 条;支持 ↑↓/↵ 键盘导航(Esc 由 dialog 处理)。仅剩输入框/结果项/快捷键标签等命令面板固有样式。
+- `wwwroot/js/command-palette.js`:全局 Ctrl/⌘+K 监听 + 输入框聚焦,沿用 `fullscreen.js` 的 `dotNetRef` 模块模式,脚本在 `App.razor` 中引入。
+
+贡献器需可从 DI 解析(实现 `ITransientDependency`/`IScopedDependency` 或手动注册)。本地化 key 前缀为 `CommandPalette:`。`samples/CRM.Blazor.Web/Search/ProductCommandPaletteContributor.cs` 是 host 侧实体搜索 tab 的完整示例。
+
+## 页面开发模式
+
+通用 CRUD 页面基类：`src/Abp.Blazor.Server.RadzenUI/AbpCrudPageBase.cs`
+
+它面向 ABP 的 `ICrudAppService`，提供：
+
+- Radzen DataGrid 数据加载。
+- 分页、排序、页大小偏好。
+- 创建、编辑、删除弹窗流程。
+- 权限检查：`CreatePolicyName`、`UpdatePolicyName`、`DeletePolicyName`。
+- 成功通知和统一错误处理。
+- DTO 与 ViewModel 映射。
+
+页大小偏好通过 `GridPageSizePreferenceService` 和 Cookie 保存。支持的页大小为 `10、20、30、50、100`。
+
+### 数据导出（Excel）
+
+导出能力**分层解耦**在 `Features/Export`，刻意**不绑定** `AbpCrudPageBase`，也不绑定任何取数方式，且**分页流式、内存有界**(峰值内存约等于一页,而非全量):
+
+- `IExcelExporter`(默认 `MiniExcelExporter`)：序列化引擎，无 UI 依赖。两条路径——`ExportAsync(rows)` 全量入内存(小数据量便捷用)、`ExportToFileAsync(filePath, IAsyncEnumerable<object> 批次)` 逐批 `SaveAs`/`Insert` 追加落盘(大数据量,内存只驻留一批)。引擎可换(ClosedXML/NPOI…)，`context.Services.Replace(...)` 即可,不改任何页面。MiniExcel 选型理由：MIT 许可、依赖轻、流式低内存。
+- `IFileDownloadService`(默认 `FileDownloadService`)：浏览器下载原语。`DownloadFileAsync(fileName, filePath)` 用 `FileStream` + `DotNetStreamReference` **分块**回传(传输内存也有界),完成后删临时文件;另有 `DownloadAsync(byte[])` 供小数据量。经 `wwwroot/js/file-download.js` 的 `abpRadzenDownload.saveAsFile` 触发。任意交互式组件可复用,不限于导出。
+- `IDataExportManager` + `ExcelExportOptions<T>`：编排器。顺序为 权限(`PolicyName`) → `BeforeExportAsync` 门禁 → **`PageDataProvider` 分页委托取数**(循环 `skip/take` 直到短页/空页,受 `MaxCount` 上限约束) → `RowSelector` 逐页整形 → 逐批写临时文件 → 流式下载并删除临时文件 → 通知。**取数是调用方传入的分页委托**,因此与数据访问方式彻底解耦,同时天然内存有界。
+
+关键点:**任何列表页都能导出,无需继承 `AbpCrudPageBase`**。非 CRUD 页(如两栏式数据字典页)只需注入 `IDataExportManager` 直接调用:
+
+```csharp
+await ExportManager.ExportToExcelAsync(new ExcelExportOptions<ItemDto>
+{
+    // 分页取数：manager 会带着递增的 skip 反复调用，直到返回短页/空页
+    PageDataProvider = async (skip, take, ct) =>
+        (await ItemAppService.GetListAsync(new(){ SkipCount = skip, MaxResultCount = take })).Items,
+    RowSelector = page => page.Select(x => new Dictionary<string, object?>
+    {
+        [L["Code"]] = x.Code, [L["Name"]] = x.Name,   // 本地化列头(每页形状须一致)
+    }).ToList(),
+    FileName = "items.xlsx",
+    PageSize = 1000,
+    BeforeExportAsync = async () => await VerifyCaptchaAsync(), // 验证码/二次确认门禁
+});
+```
+
+`AbpCrudPageBase` 只是这套机制的**便捷封装**:`ExportAsync()` 负责 busy 态与错误呈现,把自己的分页 `GetListAsync`(默认沿用当前筛选/排序,只改分页窗口)包成 `PageDataProvider` 交给 manager。CRUD 页可 override 的点:`OnBeforeExportAsync()`(验证码门禁首选)、`MapToExportRows()`(本地化列头,逐页调用)、`GetExportPageAsync(skip, take)` / `GetExportFileName()` / `ExportPageSize` / `ExportMaxCount` / `ExportSheetName`;`HasExportPermission` 在 `ExportPolicyName` 未设时默认 `true`(靠页面级 `[Authorize]` 兜底)。
+
+工具栏放共享组件 `<ExportButton Visible="HasExportPermission" Busy="IsExporting" OnClick="ExportAsync" />` 即可。`samples/CRM.Blazor.Web/Components/Pages/Products/List.razor(.cs)` 是 CRUD 路径完整示例(含本地化列头与验证码钩子注释)。
+
+公共组件目录：
+
+- `Components/Shared`：搜索框、分页跳转、布尔图标、错误边界、语言切换、表单布局等。
+- `Components/ObjectExtending`：ABP 对象扩展属性的 Radzen 表单组件。
+- `Features/SideDialogs`：侧边弹窗协调器。
+- `Features/Settings`：设置页贡献器机制。
+
+## 内置业务模块
+
+### 数据字典
+
+相关目录：
+
+- `src/Abp.RadzenUI.Domain/DataDictionaries`
+- `src/Abp.RadzenUI.Application/DataDictionaries`
+- `src/Abp.RadzenUI.Application.Contracts/DataDictionaries`
+- `src/Abp.Blazor.Server.RadzenUI/Components/Pages/DataDictionary`
+
+提供数据字典类型和字典项管理能力。
+
+### 用户消息
+
+相关目录：
+
+- `src/Abp.RadzenUI.Domain/Messages`
+- `src/Abp.RadzenUI.Application/Messages`
+- `src/Abp.RadzenUI.Application.Contracts/Messages`
+- `src/Abp.Blazor.Server.RadzenUI/Components/Pages/Messages`
+- `src/Abp.Blazor.Server.RadzenUI/Components/Layout/MessageSidebar.razor`
+
+标题栏和消息侧栏会读取未读数量。维护时注意 `tasks/lessons.md` 中关于菜单 badge 和消息状态刷新的经验记录。
+
+### 关联账户
+
+独立模块：`src/Abp.RadzenUI.LinkAccounts`
+
+模块类：`AbpRadzenUILinkAccountsModule`
+
+提供：
+
+- `ILinkedAccountAppService`
+- `ILinkedAccountFlowStateStore`
+- `LinkedAccountSessionStackManager`
+- flow token 和会话栈管理
+
+UI 包已经内置关联账户页面，主要页面在：
+
+- `Components/Pages/Account/LinkedAccountsDialog.razor`
+- `Components/Pages/Account/LinkedAccountsCallback.razor`
+
+测试重点在 `tests/Abp.RadzenUI.LinkAccounts.Tests/LinkedAccountSessionRegressionTests.cs`。
+
+### 设置管理
+
+设置页通过 Contributor 扩展：
+
+- `ISettingComponentContributor`
+- `SettingManagementComponentOptions`
+- `EmailingPageContributor`
+- `TimeZonePageContributor`
+- `AccountPageContributor`
+
+新增设置页的一般步骤：
+
+1. 创建应用服务和 DTO。
+2. 创建 Blazor 设置组件。
+3. 实现 `ISettingComponentContributor`。
+4. 在模块中加入 `SettingManagementComponentOptions.Contributors`。
+
+### 头像上传
+
+相关目录：`src/Abp.Blazor.Server.RadzenUI/Features/Avatar`
+
+默认服务：
+
+- `IUploadService`
+- `DefaultUploadService`
+
+头像地址存放在身份用户扩展属性中，扩展配置在 `AvatarModuleExtensionConfigurator`。
+
+## EF Core 集成
+
+项目：`src/Abp.RadzenUI.EntityFrameworkCore`
+
+模块：`AbpRadzenUIEntityFrameworkCoreModule`
+
+DbContext：`AbpRadzenUIDbContext`
+
+内置 `DbSet`：
+
+- `DataDictionaryTypes`
+- `DataDictionaryItems`
+- `UserMessages`
+
+模型配置入口：
+
+```csharp
+builder.ConfigureAbpRadzenUI();
+```
+
+如果宿主只单独引用 EF Core 包，需要在业务 DbContext 中补充相关实体并调用该配置入口。完整 UI 包已经依赖 EF Core 包。
+
+## 示例 CRM 应用
+
+示例 Web 模块：`samples/CRM.Blazor.Web/CRMBlazorWebModule.cs`
+
+它演示了：
+
+- 依赖 `AbpRadzenUIModule`。
+- 配置 `RouterAdditionalAssemblies = [typeof(Home).Assembly]`。
+- 配置主题、标题栏、第三方登录图标。
+- 将业务本地化资源继承 `AbpRadzenUIResource`。
+- 清理并重建语言列表。
+- 添加业务菜单贡献器。
+- 替换 `IUIPlaceHolderResolver`。
+- 配置认证、OpenIddict、Swagger、多租户、审计、动态 Claims。
+- 在应用管线末尾调用 `app.UseRadzenUI()`。
+
+示例启动入口：`samples/CRM.Blazor.Web/Program.cs`
+
+- 使用 Autofac。
+- 使用 Serilog。
+- 调用 `builder.AddApplicationAsync<CRMBlazorWebModule>()`。
+- 调用 `app.InitializeApplicationAsync()` 后运行。
+
+## 本地化
+
+主题本地化资源：
+
+- `src/Abp.RadzenUI.Domain.Shared/Localization/AbpRadzenUIResource.cs`
+- `src/Abp.RadzenUI.Domain.Shared/Localization/UI/*.json`
+
+已包含多语言文件，例如 `en.json`、`zh-Hans.json`、`zh-Hant.json`、`fr.json` 等。
+
+宿主应用需要让自己的本地化资源继承 `AbpRadzenUIResource`，这样才能复用主题内置文本。
+
+## 静态资源
+
+核心 UI 静态资源位于：
+
+- `src/Abp.Blazor.Server.RadzenUI/wwwroot/app.css`
+- `src/Abp.Blazor.Server.RadzenUI/wwwroot/css/site.css`
+- `src/Abp.Blazor.Server.RadzenUI/wwwroot/js/*.js`
+- `src/Abp.Blazor.Server.RadzenUI/wwwroot/fonts/*`
+- `src/Abp.Blazor.Server.RadzenUI/wwwroot/images/*`
+
+重要 JS：
+
+- `blazor.server.js`
+- `fullscreen.js`
+- `page-size-preference.js`
+- `side-dialog-clickaway.js`
+- `avatar-uploader.js`
+
+全局 Bundle 定义：
+
+- `Infrastructure/Bundling/BlazorRadzenThemeBundles.cs`
+- `Infrastructure/Bundling/BlazorGlobalStyleContributor.cs`
+- `Infrastructure/Bundling/BlazorGlobalScriptContributor.cs`
+
+## 开发和维护约定
+
+- 优先复用 Radzen 官方组件，组件无法承载时再补最小 CSS/JS。
+- 公共库中不要硬编码业务项目名称、Logo、布局 class 或具体业务状态。
+- 登录页、loading、标题栏这类品牌入口优先走 `LoginPageSettings`、`TitleBarSettings` 或 `IUIPlaceHolderResolver`。
+- 新增宿主页必须配置 `RouterAdditionalAssemblies`，否则路由找不到业务页面。
+- 新增菜单项要走 ABP `IMenuContributor`，不要在布局里硬编码业务菜单。
+- 菜单 badge 或动态装饰应使用独立状态，例如 `MenuItemDecorationState`，避免和消息中心等业务状态强耦合。
+- 如果 Razor 组件同时需要 `Template` 和子内容，优先使用显式 `Template=@...`、`ChildContent=@...` 参数，避免 Razor `RZ9996`。
+- 消息正文如果可能是 HTML，要同时考虑渲染效果和安全边界，暗黑主题下还要处理正文内部内联颜色导致的不可见问题。
+- 公共 CRUD 页面优先继承 `AbpCrudPageBase`，保持分页、权限、通知和错误处理一致。
+- 修改 UI 后建议同时检查移动端布局，主布局中 `768px` 以下会进入移动端侧栏行为。
+
+## 常用命令
+
+构建整个解决方案：
+
+```powershell
+dotnet build Abp.RadzenUI.slnx -v minimal
+```
+
+构建传统解决方案文件：
+
+```powershell
+dotnet build Abp.RadzenUI.sln -v minimal
+```
+
+构建核心应用层：
+
+```powershell
+dotnet build src/Abp.RadzenUI.Application/Abp.RadzenUI.Application.csproj -v minimal
+```
+
+运行测试：
+
+```powershell
+dotnet test tests/Abp.RadzenUI.LinkAccounts.Tests/Abp.RadzenUI.LinkAccounts.Tests.csproj -v minimal
+```
+
+运行示例 Web 项目前，通常需要先处理数据库迁移和配置文件中的连接串、Redis、OpenIddict 等配置。
+
+## 接入新 ABP Blazor Server 项目的最小路径
+
+1. 在宿主 Blazor Server 项目安装 `AbpRadzen.Blazor.Server.UI`。
+2. 移除默认主题相关依赖和页面。
+3. 模块依赖中加入 `AbpRadzenUIModule`。
+4. 配置 `AbpRadzenUIOptions.RouterAdditionalAssemblies`。
+5. 宿主本地化资源继承 `AbpRadzenUIResource`。
+6. 配置业务菜单贡献器。
+7. 在 `OnApplicationInitialization` 管线末尾调用 `app.UseRadzenUI()`。
+8. 如果使用数据字典或消息模块，确认 EF Core 映射和迁移已经包含 `ConfigureAbpRadzenUI()`。
+

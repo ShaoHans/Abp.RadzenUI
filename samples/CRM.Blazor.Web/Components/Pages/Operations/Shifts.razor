@@ -1,0 +1,106 @@
+@page "/operations/shifts"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(CRMPermissions.Operations.Shifts)]
+@inject IOperationAppService OperationAppService
+@inherits AbpRadzenUIComponentBase
+
+<PageTitle>@L["OperationShifts"]</PageTitle>
+
+<RadzenStack Gap="1rem" class="rz-p-4">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenStack Gap="0.2rem">
+            <RadzenText TextStyle="TextStyle.H5"><strong>@L["OperationShifts"]</strong></RadzenText>
+            <RadzenText TextStyle="TextStyle.Caption" class="rz-color-on-surface-variant">@L["OperationShiftsSubtitle"]</RadzenText>
+        </RadzenStack>
+        <RadzenButton Icon="refresh" Text="@L["Refresh"]" ButtonStyle="ButtonStyle.Light" Click="LoadAsync" />
+    </RadzenStack>
+
+    <RadzenScheduler @ref="_scheduler"
+                     Data="@_appointments"
+                     TItem="ShiftAppointment"
+                     StartProperty="@nameof(ShiftAppointment.Start)"
+                     EndProperty="@nameof(ShiftAppointment.End)"
+                     TextProperty="@nameof(ShiftAppointment.Text)"
+                     SelectedIndex="2"
+                     Style="height:calc(100vh - 180px);min-height:560px;">
+        <Template Context="item">
+            <RadzenStack Gap="0.15rem">
+                <RadzenText TextStyle="TextStyle.Caption"><strong>@item.Text</strong></RadzenText>
+                <RadzenText TextStyle="TextStyle.Caption">@item.OwnerName · @item.WorkOrderCount @L["Operation:OrdersUnit"]</RadzenText>
+            </RadzenStack>
+        </Template>
+        <ChildContent>
+            <RadzenDayView />
+            <RadzenWeekView />
+            <RadzenMonthView />
+        </ChildContent>
+    </RadzenScheduler>
+</RadzenStack>
+
+@code {
+    private RadzenScheduler<ShiftAppointment> _scheduler = default!;
+    private List<ShiftAppointment> _appointments = [];
+
+    public Shifts()
+    {
+        LocalizationResource = typeof(CRMResource);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        try
+        {
+            var start = DateTime.Now.Date.AddDays(-14);
+            var end = DateTime.Now.Date.AddDays(45);
+            var shifts = await OperationAppService.GetShiftsAsync(start, end);
+            _appointments = shifts.Select(ToAppointment).ToList();
+            if (_scheduler is not null)
+            {
+                await _scheduler.Reload();
+            }
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(ex);
+        }
+    }
+
+    private static ShiftAppointment ToAppointment(OperationShiftDto shift)
+    {
+        var hour = shift.ShiftType switch
+        {
+            OperationShiftType.Morning => 8,
+            OperationShiftType.Afternoon => 14,
+            OperationShiftType.Night => 20,
+            _ => 10
+        };
+
+        return new ShiftAppointment
+        {
+            Start = shift.ShiftDate.Date.AddHours(hour),
+            End = shift.ShiftDate.Date.AddHours(hour + 4),
+            Text = $"{shift.ShiftType} - {shift.Responsibility}",
+            OwnerName = shift.OwnerName,
+            WorkOrderCount = shift.WorkOrderCount
+        };
+    }
+
+    private class ShiftAppointment
+    {
+        public DateTime Start { get; set; }
+
+        public DateTime End { get; set; }
+
+        public string Text { get; set; } = string.Empty;
+
+        public string OwnerName { get; set; } = string.Empty;
+
+        public int WorkOrderCount { get; set; }
+    }
+}

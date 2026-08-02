@@ -24,18 +24,7 @@
             }
             <RadzenRow Gap="2rem" RowGap="2rem" class="rz-p-0 rz-p-md-12">
                 <RadzenColumn Size="12" SizeMD="12">
-                    <RadzenRadialGauge Style="width: 100%; height: 500px;">
-                        <RadzenRadialGaugeScale Step="1" Min="0" Max="12" StartAngle="0" EndAngle="360" ShowFirstTick="false"
-                                                MinorStep=@minorStep
-                                                TickLength="20"
-                                                MinorTickLength="10"
-                                                TickLabelOffset="40"
-                                                TickPosition="GaugeTickPosition.Inside">
-                            <RadzenRadialGaugeScalePointer Value=@hours Length="0.6" ShowValue="false" />
-                            <RadzenRadialGaugeScalePointer Value=@seconds Length="0.9" Fill="red" Width="2" ShowValue="false" />
-                            <RadzenRadialGaugeScalePointer Value=@minutes Length="0.8" ShowValue="false" />
-                        </RadzenRadialGaugeScale>
-                    </RadzenRadialGauge>
+                    <HomeClock />
                 </RadzenColumn>
             </RadzenRow>
         </RadzenTabsItem>
@@ -102,23 +91,14 @@
     {
         await base.OnInitializedAsync();
 
-        _ = Task.Run(async () =>
-        {
-            repository = await GitHubClient.GetRepositoryAsync();
-            commitCount = await GitHubClient.GetRepositoryCommitCountAsync();
-        });
+        var repositoryTask = GitHubClient.GetRepositoryAsync();
+        var commitCountTask = GitHubClient.GetRepositoryCommitCountAsync();
 
-        timer = new Timer(state =>
-        {
-            var now = DateTime.Now;
+        await Task.WhenAll(repositoryTask, commitCountTask);
 
-            hours = now.Hour % 12 + now.Minute / 60.0;
-
-            minutes = now.Minute * minorStep + now.Second * 12 / 3600.0;
-            seconds = now.Second * minorStep;
-
-            InvokeAsync(StateHasChanged);
-        }, null, 0, 1000);
+        repository = await repositoryTask;
+        commitCount = await commitCountTask;
+        isLoading = false;
     }
 
     async Task PageChanged(PagerEventArgs args)
@@ -129,8 +109,14 @@
     async Task GetStargazersAsync(int skip, int take)
     {
         isLoading = true;
-        stargazers = await GitHubClient.GetRepositoryStargazersAsync(take, (skip / take) + 1);
-        isLoading = false;
+        try
+        {
+            stargazers = await GitHubClient.GetRepositoryStargazersAsync(take, (skip / take) + 1);
+        }
+        finally
+        {
+            isLoading = false;
+        }
     }
 
     async Task LoadCommits(LoadDataArgs args)
@@ -138,8 +124,14 @@
         isLoading = true;
         var skip = args.Skip ?? 0;
         var take = args.Top ?? 20;
-        commits = await GitHubClient.GetRepositoryCommitsAsync(take, (skip / take) + 1);
-        isLoading = false;
+        try
+        {
+            commits = await GitHubClient.GetRepositoryCommitsAsync(take, (skip / take) + 1);
+        }
+        finally
+        {
+            isLoading = false;
+        }
     }
 
     async Task TabChanged(int index)
@@ -161,17 +153,5 @@
                 }
                 break;
         }
-    }
-
-    Timer timer = default!;
-    double hours;
-    double minutes;
-    double seconds;
-
-    double minorStep = 12 / 60.0;
-
-    public void Dispose()
-    {
-        timer?.Dispose();
     }
 }

@@ -25,6 +25,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Radzen.Blazor" />
+		<PackageReference Include="MiniExcel" />
 		<PackageReference Include="Volo.Abp.AspNetCore.Components.Server" />
 		<PackageReference Include="Volo.Abp.Autofac" />
 		<PackageReference Include="Volo.Abp.PermissionManagement.EntityFrameworkCore" />
@@ -33,6 +34,7 @@
 		<PackageReference Include="Volo.Abp.AuditLogging.EntityFrameworkCore" />
 		<PackageReference Include="Volo.Abp.TenantManagement.EntityFrameworkCore" />
 		<PackageReference Include="Volo.Abp.TenantManagement.Application" />
+		<PackageReference Include="Volo.Abp.FeatureManagement.Application" />
 		<PackageReference Include="Volo.Abp.Identity.EntityFrameworkCore" />
 		<PackageReference Include="Volo.Abp.Account.Web.OpenIddict" />
 	</ItemGroup>
@@ -42,11 +44,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Abp.RadzenUI.DataDictionary.EntityFrameworkCore\Abp.RadzenUI.DataDictionary.EntityFrameworkCore.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<EmbeddedResource Include="Localization\UI\*.json" />
-		<Content Remove="Localization\UI\*.json" />
+		<ProjectReference Include="..\Abp.RadzenUI.Application.Contracts\Abp.RadzenUI.Application.Contracts.csproj" />
+		<ProjectReference Include="..\Abp.RadzenUI.Application\Abp.RadzenUI.Application.csproj" />
+		<ProjectReference Include="..\Abp.RadzenUI.EntityFrameworkCore\Abp.RadzenUI.EntityFrameworkCore.csproj" />
+		<ProjectReference Include="..\Abp.RadzenUI.LinkAccounts\Abp.RadzenUI.LinkAccounts.csproj" />
 	</ItemGroup>
 </Project>

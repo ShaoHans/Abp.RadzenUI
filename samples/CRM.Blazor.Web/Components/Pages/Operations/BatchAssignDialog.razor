@@ -1,0 +1,53 @@
+@using CRM.Localization
+@inject DialogService DialogService
+@inherits AbpRadzenUIComponentBase
+
+<RadzenTemplateForm TItem="BatchAssignModel" Data="@_model" Submit="SubmitAsync">
+    <DialogFormLayout CancelClick="() => DialogService.Close(null)">
+        <RadzenStack Gap="1rem">
+            <RadzenText TextStyle="TextStyle.Body2" class="rz-color-on-surface-variant">
+                @L["SelectedItems"]: @SelectedCount
+            </RadzenText>
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                    <RequiredMark />
+                    <RadzenLabel Text="@L["OwnerName"]" Component="OwnerName" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8">
+                    <RadzenTextBox Name="OwnerName"
+                                   @bind-Value="_model.OwnerName"
+                                   Style="width: 100%;"
+                                   MaxLength="64"
+                                   Placeholder="@L["OwnerName"]" />
+                    <RadzenRequiredValidator Component="OwnerName" Text="@L["ThisFieldIsRequired"]" />
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenStack>
+    </DialogFormLayout>
+</RadzenTemplateForm>
+
+@code {
+    [Parameter]
+    public int SelectedCount { get; set; }
+
+    private readonly BatchAssignModel _model = new()
+    {
+        OwnerName = "Operations Specialist"
+    };
+
+    public BatchAssignDialog()
+    {
+        LocalizationResource = typeof(CRMResource);
+    }
+
+    private Task SubmitAsync(BatchAssignModel model)
+    {
+        DialogService.Close(model.OwnerName);
+        return Task.CompletedTask;
+    }
+
+    private sealed class BatchAssignModel
+    {
+        public string? OwnerName { get; set; }
+    }
+}

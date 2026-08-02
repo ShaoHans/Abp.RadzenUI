@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "ShaoHans",
+  "classifications": [
+    "ABP",
+    "Radzen",
+    "Blazor",
+    "Server"
+  ],
+  "identity": "ShaoHans.AbpRadzenUI.Integration",
+  "name": "ABP RadzenUI integration files",
+  "shortName": "abp-radzenui-integration",
+  "sourceName": "RadzenUiTemplate",
+  "defaultName": "MyProject",
+  "description": "Adds the common integration files for using AbpRadzen.Blazor.Server.UI in an existing ABP Blazor Server web project.",
+  "tags": {
+    "language": "C#",
+    "type": "item"
+  },
+  "symbols": {
+    "title": {
+      "type": "parameter",
+      "datatype": "text",
+      "defaultValue": "My Project",
+      "description": "The title shown in the RadzenUI title bar and login page.",
+      "replaces": "RadzenUiTemplateTitle"
+    },
+    "rootNamespace": {
+      "type": "parameter",
+      "datatype": "text",
+      "defaultValue": "MyProject.Blazor.Web",
+      "description": "The root namespace of the target Blazor Server web project.",
+      "replaces": "RadzenUiTemplateNamespace"
+    },
+    "premiumTheme": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false",
+      "description": "Enable Radzen premium themes in the generated integration helper.",
+      "replaces": "RadzenUiTemplateEnablePremiumTheme"
+    }
+  },
+  "primaryOutputs": [
+    {
+      "path": "RadzenUI/RadzenUiTemplateRadzenUIIntegrationExtensions.cs"
+    },
+    {
+      "path": "Menus/RadzenUiTemplateMenus.cs"
+    },
+    {
+      "path": "Menus/RadzenUiTemplateMenuContributor.cs"
+    },
+    {
+      "path": "Components/Pages/Home.razor"
+    },
+    {
+      "path": "RadzenUI/RADZENUI-INTEGRATION.md"
+    }
+  ]
+}

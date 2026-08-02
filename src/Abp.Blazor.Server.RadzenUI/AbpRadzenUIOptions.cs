@@ -13,6 +13,14 @@ public class AbpRadzenUIOptions
     public ThemeSettings Theme { get; set; } = new();
 
     public ExternalLoginSettings ExternalLogin { get; set; } = new();
+
+    /// <summary>
+    /// Enables the online localization text management feature: a dynamic localization contributor
+    /// overlays database overrides on top of the static JSON texts, and the management page/menu
+    /// become available. Default is <c>true</c>. Set to <c>false</c> to keep localization fully
+    /// static (no dynamic contributor is attached, and the menu is hidden).
+    /// </summary>
+    public bool EnableLocalizationManagement { get; set; } = true;
 }
 
 public class LoginPageSettings

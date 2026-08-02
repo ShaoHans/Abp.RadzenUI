@@ -1,14 +1,21 @@
 ﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.Extensions.Localization
+@inject IJSRuntime JSRuntime
+@inject IStringLocalizer<Abp.RadzenUI.Localization.AbpRadzenUIResource> TL
+@inject Abp.RadzenUI.UIPlaceHolders.IUIPlaceHolderResolver UIPlaceHolderResolver
 @using Radzen.Blazor
 @inherits LayoutComponentBase
 
 @if (rendered)
 {
     <RadzenComponents />
+    <RadzenMediaQuery Query="(max-width: 768px)" Change="HandleMobileLayoutChange" />
 
-    <RadzenLayout class="app-layout-shell" Style="grid-template-columns: auto 1fr auto; grid-template-areas: 'rz-header rz-header rz-header' 'rz-sidebar rz-body rz-config-sidebar'">
+    <RadzenLayout class="app-layout-shell" Style="grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'rz-header rz-header rz-header' 'rz-sidebar rz-body rz-config-sidebar'">
         <Header MenuToggle="ToggleMenu"
-                ThemeToggle="ToggleTheme" />
+            ThemeToggle="ToggleTheme"
+            MessageToggle="ToggleMessages"
+            MessagePanelOpen="messageSidebarExpanded" />
         <RadzenBody>
             <ChildContent>
                 <RadzenContentContainer Name="main" class="app-layout-main">
@@ -26,23 +33,57 @@
                 </RadzenContentContainer>
             </ChildContent>
         </RadzenBody>
-        <MenuSiderbar @bind-SidebarExpanded="menuSidebarExpanded" />
-        <CascadingValue Value="@themeSidebarExpanded" Name="SidebarExpanded">
-            <ThemeSiderbar />
-        </CascadingValue>
+        <MenuSiderbar @bind-SidebarExpanded="menuSidebarExpanded" Collapsed="menuCollapsed" />
+        <ThemeSiderbar @bind-SidebarExpanded="themeSidebarExpanded" />
+        <MessageSidebar @bind-SidebarExpanded="messageSidebarExpanded" />
+        @if (isMobile && (menuSidebarExpanded || themeSidebarExpanded || messageSidebarExpanded))
+        {
+            <div class="app-layout-overlay" @onclick="CloseMobileSidebars"></div>
+        }
     </RadzenLayout>
+    <SideDialogClickAway />
+    <CommandPalette />
 }
 else
 {
-    <div class="rz-app-loading">
-        <div class="logo-loading"></div>
+    <div class="rz-app-loading" role="status" aria-live="polite" aria-label="Loading application shell">
+        <div class="app-loading-panel">
+            <div class="app-loading-brand-mark">
+                <div class="app-loading-halo"></div>
+                <div class="logo-loading">
+                    <img src="@_loginPage.LogoPath" alt="@_titleBar.Title" class="app-loading-logo" />
+                </div>
+            </div>
+
+            <div class="app-loading-copy">
+                <div class="app-loading-kicker">@_titleBar.Title</div>
+                <div class="app-loading-title">@TL["Loading:PreparingWorkspace"]</div>
+                <div class="app-loading-subtitle">@TL["Loading:PreparingWorkspaceDescription"]</div>
+            </div>
+
+            <div class="app-loading-meter" aria-hidden="true">
+                <span></span>
+            </div>
+
+            <div class="app-loading-dots" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
     </div>
 }
 
 @code {
     bool menuSidebarExpanded = true;
+    bool menuCollapsed = false;
     bool themeSidebarExpanded = false;
+    bool messageSidebarExpanded = false;
+    bool isMobile;
+    bool hasViewportState;
     bool rendered;
+    Abp.RadzenUI.LoginPageSettings _loginPage = new();
+    Abp.RadzenUI.TitleBarSettings _titleBar = new();
     ErrorBoundary? errorBoundary;
 
     protected override void OnInitialized()
@@ -50,10 +91,32 @@ else
         System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnInitializedAsync()
+    {
+        _loginPage = await UIPlaceHolderResolver.GetLoginPageSettingsAsync();
+        _titleBar = await UIPlaceHolderResolver.GetTitleBarSettingsAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            if (!hasViewportState)
+            {
+                try
+                {
+                    isMobile = await JSRuntime.InvokeAsync<bool>("abpRadzenViewport.isMobile", 768);
+                }
+                catch (JSException)
+                {
+                    isMobile = false;
+                }
+
+                hasViewportState = true;
+                menuSidebarExpanded = !isMobile;
+                themeSidebarExpanded = false;
+            }
+
             rendered = true;
             StateHasChanged();
         }
@@ -66,11 +129,80 @@ else
 
     private void ToggleMenu()
     {
-        menuSidebarExpanded = !menuSidebarExpanded;
+        if (isMobile)
+        {
+            // On mobile the sidebar is a full overlay: toggle show/hide.
+            menuSidebarExpanded = !menuSidebarExpanded;
+        }
+        else
+        {
+            // On desktop keep the sidebar visible but collapse it to an icon-only rail.
+            menuCollapsed = !menuCollapsed;
+        }
     }
 
     private void ToggleTheme()
     {
         themeSidebarExpanded = !themeSidebarExpanded;
+
+        if (themeSidebarExpanded)
+        {
+            messageSidebarExpanded = false;
+        }
+    }
+
+    private void ToggleMessages()
+    {
+        messageSidebarExpanded = !messageSidebarExpanded;
+
+        if (messageSidebarExpanded)
+        {
+            themeSidebarExpanded = false;
+        }
+    }
+
+    private void HandleMobileLayoutChange(bool matches)
+    {
+        if (!hasViewportState)
+        {
+            hasViewportState = true;
+            isMobile = matches;
+
+            if (matches)
+            {
+                menuSidebarExpanded = false;
+                menuCollapsed = false;
+                themeSidebarExpanded = false;
+                messageSidebarExpanded = false;
+            }
+
+            return;
+        }
+
+        if (isMobile == matches)
+        {
+            return;
+        }
+
+        isMobile = matches;
+
+        if (matches)
+        {
+            menuSidebarExpanded = false;
+            menuCollapsed = false;
+            themeSidebarExpanded = false;
+            messageSidebarExpanded = false;
+        }
+        else
+        {
+            menuSidebarExpanded = true;
+        }
+    }
+
+    private void CloseMobileSidebars()
+    {
+        menuSidebarExpanded = false;
+        themeSidebarExpanded = false;
+        messageSidebarExpanded = false;
     }
 }

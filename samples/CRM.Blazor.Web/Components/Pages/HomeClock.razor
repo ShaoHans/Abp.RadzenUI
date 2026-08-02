@@ -1,0 +1,46 @@
+@implements IDisposable
+
+<RadzenRadialGauge Style="width: 100%; height: 500px;">
+    <RadzenRadialGaugeScale Step="1" Min="0" Max="12" StartAngle="0" EndAngle="360" ShowFirstTick="false"
+                            MinorStep="@_minorStep"
+                            TickLength="20"
+                            MinorTickLength="10"
+                            TickLabelOffset="40"
+                            TickPosition="GaugeTickPosition.Inside">
+        <RadzenRadialGaugeScalePointer Value="@_hours" Length="0.6" ShowValue="false" />
+        <RadzenRadialGaugeScalePointer Value="@_seconds" Length="0.9" Fill="red" Width="2" ShowValue="false" />
+        <RadzenRadialGaugeScalePointer Value="@_minutes" Length="0.8" ShowValue="false" />
+    </RadzenRadialGaugeScale>
+</RadzenRadialGauge>
+
+@code {
+    readonly double _minorStep = 12 / 60.0;
+    Timer? _timer;
+    double _hours;
+    double _minutes;
+    double _seconds;
+
+    protected override void OnInitialized()
+    {
+        UpdateClockHands();
+
+        _timer = new Timer(_ =>
+        {
+            UpdateClockHands();
+            _ = InvokeAsync(StateHasChanged);
+        }, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+    }
+
+    void UpdateClockHands()
+    {
+        var now = DateTime.Now;
+        _hours = now.Hour % 12 + now.Minute / 60.0;
+        _minutes = now.Minute * _minorStep + now.Second * 12 / 3600.0;
+        _seconds = now.Second * _minorStep;
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
+    }
+}

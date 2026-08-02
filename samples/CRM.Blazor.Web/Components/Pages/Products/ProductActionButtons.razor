@@ -1,0 +1,45 @@
+@using CRM.Products
+
+@if (CanEdit)
+{
+    <RadzenButton Icon="edit" title="@EditTitle" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small"
+                  Click="HandleEditClick" />
+}
+@if (CanDelete)
+{
+    <RadzenButton Icon="delete" title="@DeleteTitle" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small"
+                  Click="HandleDeleteClick" />
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public ProductDto Product { get; set; } = default!;
+
+    [Parameter]
+    public bool CanEdit { get; set; }
+
+    [Parameter]
+    public bool CanDelete { get; set; }
+
+    [Parameter, EditorRequired]
+    public string EditTitle { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public string DeleteTitle { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public EventCallback<ProductDto> OnEdit { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<ProductDto> OnDelete { get; set; }
+
+    Task HandleEditClick()
+    {
+        return OnEdit.InvokeAsync(Product);
+    }
+
+    Task HandleDeleteClick()
+    {
+        return OnDelete.InvokeAsync(Product);
+    }
+}

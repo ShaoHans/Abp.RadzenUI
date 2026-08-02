@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
@@ -41,6 +42,28 @@ public class ProductAppService
         }
 
         return await base.CreateAsync(input);
+    }
+
+    public async Task<List<ProductDto>> SearchAsync(string keyword, int maxResultCount = 8)
+    {
+        await CheckGetListPolicyAsync();
+
+        keyword = keyword?.Trim() ?? string.Empty;
+        if (keyword.Length == 0)
+        {
+            return [];
+        }
+
+        var queryable = await Repository.GetQueryableAsync();
+
+        var query = queryable
+            .Where(p => p.Code.Contains(keyword) || p.Name.Contains(keyword))
+            .OrderBy(p => p.Code)
+            .Take(maxResultCount);
+
+        var products = await AsyncExecuter.ToListAsync(query);
+
+        return ObjectMapper.Map<List<Product>, List<ProductDto>>(products);
     }
 
     protected override async Task<IQueryable<Product>> CreateFilteredQueryAsync(

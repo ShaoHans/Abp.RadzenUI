@@ -1,0 +1,16 @@
+<RadzenRow>
+    <RadzenColumn Size="4">
+        <RadzenText TextStyle="TextStyle.Subtitle2">@Label</RadzenText>
+    </RadzenColumn>
+    <RadzenColumn Size="8">
+        <RadzenText>@Value</RadzenText>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Value { get; set; } = string.Empty;
+}

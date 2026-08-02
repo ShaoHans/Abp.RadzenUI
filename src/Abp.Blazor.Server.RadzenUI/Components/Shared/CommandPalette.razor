@@ -1,0 +1,86 @@
+@using Abp.RadzenUI.Infrastructure.Search
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+@inject ICommandPaletteManager Manager
+@inject CommandPaletteState State
+@inject DialogService DialogService
+@inject IJSRuntime JSRuntime
+
+@* Headless host: owns the global Ctrl/⌘+K listener and opens the palette as a
+   Radzen dialog. The dialog (CommandPaletteDialog) provides the overlay, backdrop,
+   centering, Esc and click-away — so no custom shell CSS is needed here. *@
+
+@code {
+    bool _open;
+    DotNetObjectReference<CommandPalette>? _dotNetRef;
+
+    protected override void OnInitialized()
+    {
+        State.OpenRequested += OpenAsync;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JSRuntime.InvokeVoidAsync("abpRadzenCommandPalette.initialize", _dotNetRef);
+        }
+    }
+
+    [JSInvokable]
+    public Task OpenFromShortcut() => OpenAsync();
+
+    public async Task OpenAsync()
+    {
+        if (_open || !Manager.Enabled)
+        {
+            return;
+        }
+
+        _open = true;
+        try
+        {
+            await DialogService.OpenAsync<CommandPaletteDialog>(
+                string.Empty,
+                parameters: null,
+                options: new DialogOptions
+                {
+                    ShowTitle = false,
+                    ShowClose = false,
+                    CloseDialogOnOverlayClick = true,
+                    CloseDialogOnEsc = true,
+                    AutoFocusFirstElement = true,
+                    Width = "640px",
+                    Top = "12vh",
+                    CssClass = "cmdk-dialog",
+                });
+        }
+        finally
+        {
+            _open = false;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        State.OpenRequested -= OpenAsync;
+
+        if (_dotNetRef is not null)
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("abpRadzenCommandPalette.dispose");
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+            catch (JSException)
+            {
+            }
+
+            _dotNetRef.Dispose();
+            _dotNetRef = null;
+        }
+    }
+}

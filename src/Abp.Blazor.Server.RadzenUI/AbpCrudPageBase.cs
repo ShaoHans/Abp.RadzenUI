@@ -1,8 +1,9 @@
-﻿using Abp.RadzenUI.Components.Shared;
+using Abp.RadzenUI.Components.Shared;
+using Abp.RadzenUI.Features.Export;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Models;
-using Abp.RadzenUI.Services;
-using Abp.RadzenUI.Utils;
+using Abp.RadzenUI.Infrastructure.Services;
+using Abp.RadzenUI.Infrastructure.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Http;
@@ -148,6 +149,9 @@ public abstract class AbpCrudPageBase<
     protected GridPageSizePreferenceService GridPageSizePreferenceService { get; set; } =
         default!;
 
+    [Inject]
+    protected IDataExportManager ExportManager { get; set; } = default!;
+
     protected RadzenDataGrid<TListViewModel> _grid = default!;
     protected IReadOnlyList<TListViewModel> _entities = [];
     protected int _totalCount;
@@ -166,10 +170,21 @@ public abstract class AbpCrudPageBase<
     protected string? CreatePolicyName { get; set; }
     protected string? UpdatePolicyName { get; set; }
     protected string? DeletePolicyName { get; set; }
+    protected string? ExportPolicyName { get; set; }
 
     public bool HasCreatePermission { get; set; }
     public bool HasUpdatePermission { get; set; }
     public bool HasDeletePermission { get; set; }
+
+    /// <summary>
+    /// Whether the current user may export. Resolved in <see cref="SetPermissionsAsync"/>:
+    /// <c>true</c> when <see cref="ExportPolicyName"/> is not set (the page-level authorization
+    /// already gates access), otherwise the result of the policy check.
+    /// </summary>
+    public bool HasExportPermission { get; set; } = true;
+
+    /// <summary>Set while an export is running so the toolbar button can show a busy state.</summary>
+    protected bool IsExporting { get; private set; }
 
     protected AbpCrudPageBase()
     {
@@ -307,6 +322,10 @@ public abstract class AbpCrudPageBase<
         {
             HasDeletePermission = await AuthorizationService.IsGrantedAsync(DeletePolicyName);
         }
+
+        HasExportPermission =
+            ExportPolicyName == null
+            || await AuthorizationService.IsGrantedAsync(ExportPolicyName);
     }
 
     protected virtual async Task OpenCreateDialogAsync<TDialog>(
@@ -532,4 +551,122 @@ public abstract class AbpCrudPageBase<
 
         await AuthorizationService.CheckAsync(policyName);
     }
+
+    #region Export
+
+    /// <summary>Overall safety cap on the number of rows exported. Override to change.</summary>
+    protected virtual int ExportMaxCount => 100000;
+
+    /// <summary>Rows fetched per page while streaming the export. Bounds peak memory. Override to change.</summary>
+    protected virtual int ExportPageSize => 1000;
+
+    /// <summary>Worksheet name used in the generated file. Override to localize/customize.</summary>
+    protected virtual string ExportSheetName => typeof(TGetListOutputDto).Name;
+
+    /// <summary>
+    /// Convenience entry point wired to the toolbar export button. It is only a thin adapter: it
+    /// manages the busy state / error surface and hands a <see cref="ExcelExportOptions{T}"/> built
+    /// from the overridable members below to the reusable <see cref="IDataExportManager"/>, which
+    /// owns the actual flow (permission → gate → fetch → shape → serialize → download → notify).
+    /// <para>
+    /// A page that does <b>not</b> derive from this base does not need any of this — it can inject
+    /// <see cref="IDataExportManager"/> and call it directly with its own <c>DataProvider</c>.
+    /// </para>
+    /// Override this whole method only for fully custom flows; for the common "verify before export"
+    /// case override <see cref="OnBeforeExportAsync"/> instead.
+    /// </summary>
+    public virtual async Task ExportAsync()
+    {
+        if (IsExporting)
+        {
+            return;
+        }
+
+        IsExporting = true;
+        StateHasChanged();
+        try
+        {
+            await ExportManager.ExportToExcelAsync(
+                new ExcelExportOptions<TGetListOutputDto>
+                {
+                    PolicyName = ExportPolicyName,
+                    BeforeExportAsync = OnBeforeExportAsync,
+                    PageDataProvider = (skipCount, maxResultCount, _) =>
+                        GetExportPageAsync(skipCount, maxResultCount),
+                    RowSelector = MapToExportRows,
+                    FileName = GetExportFileName(),
+                    SheetName = ExportSheetName,
+                    PageSize = ExportPageSize,
+                    MaxCount = ExportMaxCount,
+                }
+            );
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(ex);
+        }
+        finally
+        {
+            IsExporting = false;
+            StateHasChanged();
+        }
+    }
+
+    /// <summary>
+    /// Runs before any data is fetched. Return <c>false</c> to abort the export.
+    /// This is the primary extension point for scenarios that must be authorized interactively —
+    /// e.g. open a verification-code dialog and only return <c>true</c> once it is verified:
+    /// <code>
+    /// protected override async Task&lt;bool&gt; OnBeforeExportAsync()
+    /// {
+    ///     var ok = await DialogService.OpenAsync&lt;CaptchaDialog&gt;("Verify");
+    ///     return ok == true;
+    /// }
+    /// </code>
+    /// Default returns <c>true</c> (no extra gate).
+    /// </summary>
+    protected virtual Task<bool> OnBeforeExportAsync() => Task.FromResult(true);
+
+    /// <summary>
+    /// Fetches a single page of rows for the export. Called repeatedly with an advancing
+    /// <paramref name="skipCount"/> until a short/empty page is returned, so the whole result set is
+    /// never held in memory at once. By default reuses the current <see cref="GetListInput"/> (the
+    /// active filter/sort are preserved) and only adjusts the paging window. Override to customize
+    /// the query.
+    /// </summary>
+    protected virtual async Task<IReadOnlyList<TGetListOutputDto>> GetExportPageAsync(
+        int skipCount,
+        int maxResultCount
+    )
+    {
+        if (GetListInput is IPagedResultRequest pagedResultRequestInput)
+        {
+            pagedResultRequestInput.SkipCount = skipCount;
+        }
+
+        if (GetListInput is ILimitedResultRequest limitedResultRequestInput)
+        {
+            limitedResultRequestInput.MaxResultCount = maxResultCount;
+        }
+
+        var result = await AppService.GetListAsync(GetListInput);
+        return result.Items;
+    }
+
+    /// <summary>
+    /// Shapes the fetched rows into the object passed to <see cref="IExcelExporter"/>.
+    /// Default returns the DTOs as-is, so the exported column headers are the DTO property names.
+    /// Override and return a list of <c>Dictionary&lt;string, object?&gt;</c> to emit localized
+    /// headers and a curated column set.
+    /// </summary>
+    protected virtual object MapToExportRows(IReadOnlyList<TGetListOutputDto> data) => data;
+
+    /// <summary>Builds the download file name. Default: <c>{Entity}-{yyyyMMddHHmmss}.xlsx</c>.</summary>
+    protected virtual string GetExportFileName()
+    {
+        var timestamp = DateTime.Now.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture);
+        return $"{typeof(TGetListOutputDto).Name}-{timestamp}.xlsx";
+    }
+
+    #endregion
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.Mvc;
@@ -14,12 +15,12 @@ public class AbpRadzenControllerBase : AbpControllerBase
 
     protected virtual IActionResult RedirectWithError(string url, string error)
     {
-        return Redirect($"{url}{(url.Contains('?') ? "&" : "?")}error={error}");
+        return Redirect(QueryHelpers.AddQueryString(url, "error", SanitizeForHeader(error)));
     }
 
     protected virtual IActionResult RedirectWithError(string url, Exception ex)
     {
-        return Redirect($"{url}{(url.Contains('?') ? "&" : "?")}error={GetErrorMessage(ex)}");
+        return RedirectWithError(url, GetErrorMessage(ex));
     }
 
     protected virtual string GetErrorMessage(Exception ex)
@@ -37,6 +38,16 @@ public class AbpRadzenControllerBase : AbpControllerBase
         }
 
         return error;
+    }
+
+    protected virtual string SanitizeForHeader(string? value)
+    {
+        if (value.IsNullOrEmpty())
+        {
+            return string.Empty;
+        }
+
+        return new string(value.Where(ch => !char.IsControl(ch)).ToArray());
     }
 
     protected virtual async Task<RedirectResult> RedirectSafelyAsync(

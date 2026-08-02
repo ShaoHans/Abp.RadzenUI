@@ -1,0 +1,103 @@
+@implements IDisposable
+@inherits AbpRadzenUIComponentBase
+
+<RadzenStack Gap="1rem" Style="height:calc(100vh - 7rem); min-height:460px;">
+    <RadzenCard Variant="Variant.Flat" Style="border:1px solid var(--rz-base-300);">
+        <RadzenStack Gap="0.75rem">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
+                <RadzenStack Gap="0.25rem">
+                    <RadzenText TextStyle="TextStyle.H5"><strong>@Detail.WorkOrder.Code</strong></RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1">@Detail.WorkOrder.Title</RadzenText>
+                </RadzenStack>
+                <RadzenBadge BadgeStyle="@OperationUi.GetStatusStyle(Detail.WorkOrder.Status)" Text="@Detail.WorkOrder.Status.ToString()" />
+            </RadzenStack>
+            <RadzenProgressBar Value="@GetProgressValue(Detail.WorkOrder.Status)" ShowValue="false" Style="height:8px;" />
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenTabs>
+        <Tabs>
+            <RadzenTabsItem Text="@L["BasicInfo"]" Icon="info">
+                <RadzenStack Gap="0.8rem" class="rz-p-2">
+                    <InfoRow Label="@L["WorkOrderType"]" Value="@Detail.WorkOrder.Type.ToString()" />
+                    <InfoRow Label="@L["Priority"]" Value="@Detail.WorkOrder.Priority.ToString()" />
+                    <InfoRow Label="@L["OwnerName"]" Value="@Detail.WorkOrder.OwnerName" />
+                    <InfoRow Label="@L["Location"]" Value="@Detail.WorkOrder.Location" />
+                    <InfoRow Label="@L["PlannedAt"]" Value="@Detail.WorkOrder.PlannedAt.ToString("yyyy-MM-dd HH:mm")" />
+                    <InfoRow Label="@L["CompletedAt"]" Value="@(Detail.WorkOrder.CompletedAt?.ToString("yyyy-MM-dd HH:mm") ?? "-")" />
+                    <RadzenText TextStyle="TextStyle.Subtitle2">@L["DisplayName:Description"]</RadzenText>
+                    <RadzenText Style="white-space:pre-wrap;word-break:break-word;">@(Detail.WorkOrder.Description ?? "-")</RadzenText>
+                </RadzenStack>
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="@L["Timeline"]" Icon="timeline">
+                <RadzenStack Gap="0.75rem" class="rz-p-2">
+                    @foreach (var item in Detail.Events)
+                    {
+                        <RadzenCard Variant="Variant.Flat" Style="border:1px solid var(--rz-base-300);">
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Gap="0.75rem">
+                                <RadzenIcon Icon="radio_button_checked" Style="color:var(--rz-primary);margin-top:0.2rem;" />
+                                <RadzenStack Gap="0.2rem">
+                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+                                        <RadzenBadge BadgeStyle="@OperationUi.GetStatusStyle(item.Status)" Text="@item.Status.ToString()" />
+                                        <RadzenText TextStyle="TextStyle.Caption">@item.EventTime.ToString("yyyy-MM-dd HH:mm")</RadzenText>
+                                    </RadzenStack>
+                                    <RadzenText><strong>@item.OperatorName</strong> @item.Summary</RadzenText>
+                                </RadzenStack>
+                            </RadzenStack>
+                        </RadzenCard>
+                    }
+                </RadzenStack>
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public WorkOrderDetailDto Detail { get; set; } = new() { WorkOrder = new WorkOrderDto() };
+
+    [Inject]
+    public SideDialogState<WorkOrderDetailDto> DialogState { get; set; } = default!;
+
+    public WorkOrderDetail()
+    {
+        LocalizationResource = typeof(CRMResource);
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        DialogState.OnChanged += OnStateChangedAsync;
+
+        if (DialogState.Selected != null)
+        {
+            Detail = DialogState.Selected;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task OnStateChangedAsync(WorkOrderDetailDto? detail)
+    {
+        Detail = detail ?? new WorkOrderDetailDto { WorkOrder = new WorkOrderDto() };
+        return InvokeAsync(StateHasChanged);
+    }
+
+    private static double GetProgressValue(WorkOrderStatus status)
+    {
+        return status switch
+        {
+            WorkOrderStatus.New => 12,
+            WorkOrderStatus.Assigned => 28,
+            WorkOrderStatus.InProgress => 55,
+            WorkOrderStatus.Paused => 45,
+            WorkOrderStatus.Resolved => 85,
+            WorkOrderStatus.Closed => 100,
+            _ => 0
+        };
+    }
+
+    public void Dispose()
+    {
+        DialogState.OnChanged -= OnStateChangedAsync;
+    }
+}

@@ -1,5 +1,5 @@
-﻿@using Abp.RadzenUI.Components.ObjectExtending
-@using Abp.RadzenUI.Avatar
+@using Abp.RadzenUI.Components.ObjectExtending
+@using Abp.RadzenUI.Features.Avatar
 @using Microsoft.AspNetCore.Authorization
 @using System.Collections.Immutable
 @using Microsoft.Extensions.Localization
@@ -13,8 +13,8 @@
 @inject AbpBlazorMessageLocalizerHelper<IdentityResource> LH
 @inherits AbpRadzenUIComponentBase
 
-<RadzenTemplateForm TItem="IdentityUserCreateDto" Data=@DialogFromOption.Model Submit=@DialogFromOption.OnSubmit Style="max-height:calc(100vh - 200px); display: flex;flex-direction:column">
-    <DialogFormLayout CancelClick="DialogFromOption.OnCancel">
+<RadzenTemplateForm TItem="IdentityUserCreateDto" Data=@DialogFromOption.Model Submit="@(model => DialogFromOption.SubmitAsync(model, () => InvokeAsync(StateHasChanged)))" Style="max-height:calc(100vh - 200px); display: flex;flex-direction:column">
+    <DialogFormLayout CancelClick="DialogFromOption.OnCancel" IsSaving="@DialogFromOption.IsSaving">
         <RadzenTabs>
             <Tabs>
                 <RadzenTabsItem Text="@IL["DisplayName:UserInfo"]">

@@ -1,0 +1,352 @@
+@using Abp.RadzenUI.Infrastructure.Search
+@using Microsoft.Extensions.Localization
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+@inject ICommandPaletteManager Manager
+@inject DialogService DialogService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject IStringLocalizer<Abp.RadzenUI.Localization.AbpRadzenUIResource> TL
+
+<style>
+    /* Strip the Radzen dialog's default chrome so the palette sits flush. */
+    .cmdk-dialog .rz-dialog-content {
+        padding: 0;
+    }
+    .cmdk-dialog .rz-tabview-panel {
+        padding: 0;
+    }
+
+    .cmdk-input-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--rz-border-color, color-mix(in srgb, currentColor 12%, transparent));
+    }
+    .cmdk-input-row .rzi, .cmdk-input-row .rz-icon {
+        font-size: 1.25rem;
+        opacity: 0.7;
+    }
+    .cmdk-input {
+        flex: 1;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: inherit;
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+    .cmdk-input::placeholder {
+        color: color-mix(in srgb, currentColor 50%, transparent);
+    }
+    .cmdk-kbd {
+        font-size: 0.6875rem;
+        font-weight: 600;
+        padding: 0.1rem 0.4rem;
+        border-radius: 0.3rem;
+        border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+        opacity: 0.7;
+        white-space: nowrap;
+    }
+    .cmdk-results {
+        overflow-y: auto;
+        max-height: 46vh;
+        padding: 0.35rem 0;
+    }
+    .cmdk-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        color: inherit;
+        width: 100%;
+        text-align: start;
+    }
+    .cmdk-item:hover,
+    .cmdk-item--active {
+        background: color-mix(in srgb, var(--rz-primary, #2563eb) 14%, transparent);
+    }
+    .cmdk-item .rzi, .cmdk-item .rz-icon {
+        font-size: 1.25rem;
+    }
+    .cmdk-item-text {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .cmdk-item-title {
+        font-size: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .cmdk-item-desc {
+        font-size: 0.75rem;
+        opacity: 0.6;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .cmdk-empty {
+        padding: 2rem 1rem;
+        text-align: center;
+        opacity: 0.6;
+        font-size: 0.875rem;
+    }
+    .cmdk-footer {
+        display: flex;
+        gap: 1rem;
+        padding: 0.5rem 1rem;
+        border-top: 1px solid var(--rz-border-color, color-mix(in srgb, currentColor 12%, transparent));
+        font-size: 0.75rem;
+        opacity: 0.65;
+    }
+    .cmdk-footer .cmdk-kbd {
+        margin-inline-end: 0.25rem;
+    }
+</style>
+
+<div>
+    <div class="cmdk-input-row">
+        <RadzenIcon Icon="search" />
+        <input id="cmdk-input"
+               class="cmdk-input"
+               type="text"
+               autocomplete="off"
+               spellcheck="false"
+               placeholder="@TL["CommandPalette:Placeholder"]"
+               value="@_keyword"
+               @oninput="OnInputAsync" />
+        <span class="cmdk-kbd">Esc</span>
+    </div>
+
+    @if (_tabs.Count > 1)
+    {
+        <RadzenTabs @bind-SelectedIndex="_selectedTabIndex"
+                    Change="OnTabChangedAsync"
+                    RenderMode="TabRenderMode.Server">
+            <Tabs>
+                @foreach (var tab in _tabs)
+                {
+                    <RadzenTabsItem Text="@tab.DisplayName" Icon="@tab.Icon">
+                        @ResultsFragment
+                    </RadzenTabsItem>
+                }
+            </Tabs>
+        </RadzenTabs>
+    }
+    else
+    {
+        @ResultsFragment
+    }
+
+    <div class="cmdk-footer">
+        <span><span class="cmdk-kbd">↑↓</span>@TL["CommandPalette:Nav"]</span>
+        <span><span class="cmdk-kbd">↵</span>@TL["CommandPalette:Open"]</span>
+        <span><span class="cmdk-kbd">Esc</span>@TL["CommandPalette:Close"]</span>
+    </div>
+</div>
+
+@code {
+    string _keyword = string.Empty;
+    List<CommandPaletteTab> _tabs = [];
+    string _activeTabKey = string.Empty;
+    int _selectedTabIndex;
+    List<CommandPaletteItem> _items = [];
+    int _activeIndex = -1;
+    bool _shouldFocus;
+
+    CancellationTokenSource? _searchCts;
+    DotNetObjectReference<CommandPaletteDialog>? _dotNetRef;
+
+    RenderFragment ResultsFragment =>@<div class="cmdk-results">
+        @if (_items.Count == 0)
+        {
+            <div class="cmdk-empty">
+                @(_keyword.Length == 0 ? TL["CommandPalette:Hint"] : TL["CommandPalette:NoResults"])
+            </div>
+        }
+        else
+        {
+            @for (var i = 0; i < _items.Count; i++)
+            {
+                var index = i;
+                var item = _items[index];
+                <button type="button"
+                        class="@ItemCssClass(index)"
+                        @onclick="() => ActivateAsync(item)"
+                        @onmouseover="() => _activeIndex = index">
+                    <RadzenIcon Icon="@(item.Icon ?? "chevron_right")" IconColor="@item.IconColor" />
+                    <span class="cmdk-item-text">
+                        <span class="cmdk-item-title">@item.Title</span>
+                        @if (!string.IsNullOrEmpty(item.Description))
+                        {
+                            <span class="cmdk-item-desc">@item.Description</span>
+                        }
+                    </span>
+                </button>
+            }
+        }
+    </div>;
+
+    protected override void OnInitialized()
+    {
+        _tabs = Manager.GetTabs().ToList();
+        if (_tabs.Count == 0)
+        {
+            DialogService.Close();
+            return;
+        }
+
+        _selectedTabIndex = 0;
+        _activeTabKey = _tabs[0].Key;
+        _shouldFocus = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JSRuntime.InvokeVoidAsync("abpRadzenCommandPalette.setDialog", _dotNetRef);
+        }
+
+        if (_shouldFocus)
+        {
+            _shouldFocus = false;
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("abpRadzenCommandPalette.focus", "#cmdk-input");
+            }
+            catch (JSException)
+            {
+            }
+        }
+    }
+
+    async Task OnInputAsync(ChangeEventArgs e)
+    {
+        _keyword = e.Value?.ToString() ?? string.Empty;
+        await SearchAsync(debounce: true);
+    }
+
+    async Task OnTabChangedAsync(int index)
+    {
+        if (index < 0 || index >= _tabs.Count)
+        {
+            return;
+        }
+
+        _selectedTabIndex = index;
+        _activeTabKey = _tabs[index].Key;
+        _activeIndex = -1;
+        _shouldFocus = true;
+        await SearchAsync(debounce: false);
+    }
+
+    async Task SearchAsync(bool debounce)
+    {
+        _searchCts?.Cancel();
+        _searchCts?.Dispose();
+        var cts = new CancellationTokenSource();
+        _searchCts = cts;
+
+        // Capture the token before a newer keystroke/tab switch can dispose the source.
+        var token = cts.Token;
+
+        try
+        {
+            if (debounce)
+            {
+                await Task.Delay(150, token);
+            }
+
+            var items = await Manager.SearchAsync(_activeTabKey, _keyword, token);
+
+            // Bail if a newer search superseded this one.
+            if (token.IsCancellationRequested || !ReferenceEquals(_searchCts, cts))
+            {
+                return;
+            }
+
+            _items = items.ToList();
+            _activeIndex = _items.Count > 0 ? 0 : -1;
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    // Invoked from the JS capture-phase keydown listener while this dialog is open, so
+    // navigation works regardless of which element (input, RadzenTabs header) has focus.
+    // Esc is handled by the dialog itself (CloseDialogOnEsc).
+    [JSInvokable]
+    public async Task HandleKey(string key)
+    {
+        switch (key)
+        {
+            case "ArrowDown":
+                Move(1);
+                await InvokeAsync(StateHasChanged);
+                break;
+            case "ArrowUp":
+                Move(-1);
+                await InvokeAsync(StateHasChanged);
+                break;
+            case "Enter":
+                if (_activeIndex >= 0 && _activeIndex < _items.Count)
+                {
+                    await ActivateAsync(_items[_activeIndex]);
+                }
+                break;
+        }
+    }
+
+    void Move(int delta)
+    {
+        if (_items.Count == 0)
+        {
+            return;
+        }
+
+        _activeIndex = (_activeIndex + delta + _items.Count) % _items.Count;
+    }
+
+    async Task ActivateAsync(CommandPaletteItem item)
+    {
+        DialogService.Close();
+        NavigationManager.NavigateTo(item.Url, forceLoad: item.ForceLoad);
+        await Task.CompletedTask;
+    }
+
+    string ItemCssClass(int index) =>
+        index == _activeIndex ? "cmdk-item cmdk-item--active" : "cmdk-item";
+
+    public async ValueTask DisposeAsync()
+    {
+        _searchCts?.Cancel();
+        _searchCts?.Dispose();
+
+        if (_dotNetRef is not null)
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("abpRadzenCommandPalette.clearDialog");
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+            catch (JSException)
+            {
+            }
+
+            _dotNetRef.Dispose();
+            _dotNetRef = null;
+        }
+    }
+}

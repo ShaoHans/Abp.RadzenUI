@@ -1,7 +1,6 @@
 ﻿@page "/identity/users"
 @using Microsoft.AspNetCore.Authorization
 @using Volo.Abp.Identity
-@using Volo.Abp.Users
 @attribute [Authorize(IdentityPermissions.Users.Default)]
 @inherits AbpCrudPageBase<IIdentityUserAppService, IdentityUserDto, Guid, GetIdentityUsersInput, IdentityUserCreateDto, IdentityUserUpdateDto>
 
@@ -65,29 +64,52 @@
                 <BooleanIcon Value="@context.LockoutEnabled" />
             </Template>
         </RadzenDataGridColumn>
+        <RadzenDataGridColumn Title="@IL["DisplayName:LockoutStatus"]" Width="200px" Filterable="false" Sortable="false">
+            <Template>
+                @{
+                    var locked = context.LockoutEnd.HasValue && context.LockoutEnd.Value > DateTimeOffset.UtcNow;
+                }
+                @if (locked)
+                {
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="4px" Wrap="FlexWrap.NoWrap">
+                        <RadzenIcon Icon="lock" IconColor="@Colors.Danger" />
+                        <RadzenText TextStyle="TextStyle.Caption" class="rz-m-0">@GetLockoutTitle(context)</RadzenText>
+                    </RadzenStack>
+                }
+                else
+                {
+                    <RadzenIcon Icon="lock_open" Style="color:var(--rz-text-disabled-color);" />
+                }
+            </Template>
+        </RadzenDataGridColumn>
         @(RadzenColumnHelper.ExtraPropertiesColumns<IdentityUserDto>(_extraColumns, StringLocalizerFactory))
         <RadzenDataGridColumn Property="@nameof(IdentityUserDto.CreationTime)" Filterable="false" Title="@L["CreationTime"]" Width="130px">
             <Template>
                 @context.CreationTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Title="@L["Actions"]" Width="120px" Frozen="true" Filterable="false" Sortable="false">
+        <RadzenDataGridColumn Title="@L["Actions"]" Width="150px" Frozen="true" Filterable="false" Sortable="false">
             <Template>
-                @if ((context.UserName != "admin" || CurrentUser.UserName == "admin") && HasUpdatePermission)
-                {
-                    <RadzenButton Icon="edit" title="@L["Edit"]" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small"
-                                  Click="@(async () => await OpenEditDialogAsync<Edit>(@L["Edit"], context, SetDialogOptions, new Dictionary<string, object?>{{"UserId", context.Id}}))" />
-                }
-                @if ((context.UserName != "admin" || CurrentUser.UserName == "admin") && HasManagePermissionsPermission)
-                {
-                    <RadzenButton Icon="productivity" title="@L["Permissions"]" ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small"
-                                  Click="@(async () => await OpenAssignPermissionDialog(context))" />
-                }
-                @if (context.UserName != "admin" && HasDeletePermission)
-                {
-                    <RadzenButton Icon="delete" title="@L["Delete"]" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small"
-                                  Click=@(async () => await OpenDeleteConfirmDialogAsync(context.Id, L["Delete"], L["UserDeletionConfirmationMessage",context.UserName])) />
-                }
+                <UserActionButtons User="context"
+                                   CanEdit="@((context.UserName != "admin" || CurrentUser.UserName == "admin") && HasUpdatePermission)"
+                                   CanManagePermissions="@((context.UserName != "admin" || CurrentUser.UserName == "admin") && HasManagePermissionsPermission)"
+                                   CanDelete="@(context.UserName != "admin" && HasDeletePermission)"
+                                   CanManageLockout="@(context.UserName != "admin" && HasUpdatePermission)"
+                                   CanSetPassword="@((context.UserName != "admin" || CurrentUser.UserName == "admin") && HasUpdatePermission)"
+                                   EditTitle="@L["Edit"]"
+                                   PermissionsTitle="@L["Permissions"]"
+                                   PermissionsVisualizerTitle="@IL["PermissionVisualizer:Title"]"
+                                   DeleteTitle="@L["Delete"]"
+                                   LockTitle="@IL["User:Lock"]"
+                                   UnlockTitle="@IL["User:Unlock"]"
+                                   SetPasswordTitle="@IL["User:SetPassword"]"
+                                   OnEdit="OpenEditUserAsync"
+                                   OnManagePermissions="OpenAssignPermissionDialog"
+                                   OnViewPermissions="OpenPermissionVisualizerDialog"
+                                   OnDelete="DeleteUserAsync"
+                                   OnLock="LockUserAsync"
+                                   OnUnlock="UnlockUserAsync"
+                                   OnSetPassword="OpenSetPasswordDialogAsync" />
             </Template>
         </RadzenDataGridColumn>
     </Columns>

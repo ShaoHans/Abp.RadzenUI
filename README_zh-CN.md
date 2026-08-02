@@ -17,7 +17,12 @@ Abp RadzenUI 是一个基于 [ABP](https://github.com/abpframework/abp) 框架�
 
 - [在线体验](#-在线体验)
 - [快速开始](#-快速开始)
+- [使用 dotnet new 模板快速接入](#使用-dotnet-new-模板快速接入)
+- [使用关联账户模块](#-使用关联账户模块)
 - [使用数据字典模块](#-使用数据字典模块)
+- [使用消息模块](#-使用消息模块)
+- [使用全局搜索 / 命令面板（Ctrl+K）](#-使用全局搜索--命令面板ctrlk)
+- [使用数据导出（Excel）](#-使用数据导出excel)
 - [界面预览](#-界面预览)
 
 ## ❤️ 在线体验
@@ -28,6 +33,76 @@ Abp RadzenUI 是一个基于 [ABP](https://github.com/abpframework/abp) 框架�
 密码:  **1q2w#E***
 
 ## 🌱 快速开始
+
+### 已发布的 NuGet 包
+
+- `AbpRadzen.Blazor.Server.UI`：完整的 Blazor Server UI 主题包，包含内置页面、菜单、本地化和宿主集成能力。
+- `AbpRadzen.LinkAccounts`：独立的关联账户应用层包。
+- `AbpRadzen.EntityFrameworkCore`：统一的 EF Core 包，内置数据字典和消息模块的实体映射。
+- `AbpRadzen.Application.Contracts`、`AbpRadzen.Application`、`AbpRadzen.Domain`、`AbpRadzen.Domain.Shared`：用于自定义组合的分层基础包。
+
+### 使用 dotnet new 模板快速接入
+
+仓库内置了一个 `dotnet new` item template，可以为已有 ABP Blazor Server Web 项目生成常用接入文件，包括 RadzenUI 配置扩展、菜单贡献器、最小首页和接入清单。
+
+在本仓库根目录安装模板：
+
+```shell
+dotnet new install .\templates\AbpRadzenUI.Integration
+```
+
+进入你的 Blazor Server Web 项目目录，例如 `src\MyCompany.MyProject.Blazor`，执行：
+
+```shell
+dotnet new abp-radzenui-integration -n MyProject --rootNamespace MyCompany.MyProject.Blazor --title "My Project"
+```
+
+如果要启用 Radzen 高级主题：
+
+```shell
+dotnet new abp-radzenui-integration -n MyProject --rootNamespace MyCompany.MyProject.Blazor --title "My Project" --premiumTheme true
+```
+
+参数说明：
+
+- `-n`：用于生成 C# 类型名的项目短名，建议不要包含点号。
+- `--rootNamespace`：目标 Blazor Server Web 项目的真实根命名空间。
+- `--title`：标题栏和登录页显示的系统名称。
+- `--premiumTheme`：是否启用 Radzen 高级主题。
+
+模板会生成：
+
+- `RadzenUI/<ProjectName>RadzenUIIntegrationExtensions.cs`
+- `Menus/<ProjectName>Menus.cs`
+- `Menus/<ProjectName>MenuContributor.cs`
+- `Components/Pages/Home.razor`
+- `RadzenUI/RADZENUI-INTEGRATION.md`
+
+生成文件后，还需要按清单完成几处手工接入：
+
+```shell
+dotnet add package AbpRadzen.Blazor.Server.UI
+```
+
+在 Web Module 的 `[DependsOn]` 中加入：
+
+```csharp
+typeof(AbpRadzenUIModule)
+```
+
+在 `ConfigureServices` 中调用生成的扩展方法：
+
+```csharp
+context.Services.AddRadzenUIIntegration<Home, MyProjectResource, MyProjectMenuContributor>();
+```
+
+最后在 `OnApplicationInitialization` 管线末尾调用：
+
+```csharp
+app.UseRadzenUI();
+```
+
+更完整的说明见 [docs/getting-started-template.md](docs/getting-started-template.md)。
 
 ### 集成步骤
 
@@ -164,9 +239,9 @@ private void ConfigureOidcAuthentication(
 #### 7. 配置参数设置页面
 在系统开发过程中，我们经常需要维护一些系统级或业务级参数，例如邮件服务、短信服务等。ABP 框架提供了 [Settings](https://abp.io/docs/latest/framework/infrastructure/settings?_redirected=B8ABF606AA1BDF5C629883DF1061649A) 机制，用于便捷地保存和读取这些配置。在此基础上，本 UI 组件进一步提供了统一的设置页承载能力。按照下面的步骤操作后，你自定义的配置组件会自动以 Tab 的形式出现在设置页面中：
 
-##### （1）创建参数配置服务，例如：[AccountSettingsAppService](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Application/AccountSettingsAppService.cs)
+##### （1）创建参数配置服务，例如：[AccountSettingsAppService](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.RadzenUI.Application/AccountSettingsAppService.cs)
 ##### （2）创建参数配置 Blazor 组件，例如：[AccountSettingComponent](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Components/Pages/Setting/AccountSettingComponent.razor)
-##### （3）定义参数配置 Contributor，实现接口 `ISettingComponentContributor`。该 Contributor 负责注册你的配置组件，例如：[AccountPageContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Blazor/SettingManagement/AccountPageContributor.cs)
+##### （3）定义参数配置 Contributor，实现接口 `ISettingComponentContributor`。该 Contributor 负责注册你的配置组件，例如：[AccountPageContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Features/Settings/AccountPageContributor.cs)
 ##### （4）最后将 Contributor 添加到 Module 配置中
 ```chsarp
 Configure<SettingManagementComponentOptions>(options =>
@@ -179,24 +254,72 @@ Configure<SettingManagementComponentOptions>(options =>
 
 #### 8. 第一次运行示例程序前，请不要忘记执行数据库迁移
 
-## 📚 使用数据字典模块
+## 🔗 使用关联账户模块
 
-数据字典模块已集成在 UI 包中，提供开箱即用的字典类型与字典项管理页面。
+Linked Accounts 功能现在已经内置在完整 UI 包中，同时也可以作为独立的应用层类库单独集成。
 
-### 模块说明
+### 功能说明
 
-#### 1. 安装包
+- 在当前已登录会话下发起关联另一个本地或跨租户账号。
+- 在直接关联和间接可达的关联账号之间切换，无需手动退出登录。
+- 维护可回退的会话栈，允许用户返回上一个账号。
+- 复用 ABP 内置的 `IdentityLinkUser` 和 `IdentityLinkUserManager`，不额外引入自定义关联表。
+
+### 通过完整 UI 包使用
+
+如果你安装的是 `AbpRadzen.Blazor.Server.UI`，那么关联账户页面、本地化文案、控制器和菜单入口都已经集成在主题模块中，不需要额外安装其他包。
+
+内置管理页路由为 `/account/linked-accounts`。
+
+### 作为独立包单独集成
+
+如果你只希望在自己的模块中复用关联和切换服务，可以安装下面这个独立包：
+
+```shell
+dotnet add package AbpRadzen.LinkAccounts
+```
+
+然后在你的应用模块中添加模块依赖：
+
+```csharp
+[DependsOn(typeof(AbpRadzenUILinkAccountsModule))]
+public class MyApplicationModule : AbpModule
+{
+}
+```
+
+独立包会自动注册以下服务：
+
+- `ILinkedAccountAppService`
+- `ILinkedAccountFlowStateStore`
+
+### 认证流程说明
+
+- 第一次建立关联时，目标账号仍然需要完成一次真实登录。
+- 建链成功后，后续切换依赖已建立的关联关系和短时有效的 flow token 来重新签发认证票据。
+- Flow token 和关联会话状态会存放在分布式缓存中，并统一使用 host 作用域共享，以保证跨租户切换可以正常完成。
+
+## 🧱 数据字典与消息模块共用的 EF Core 集成说明
+
+数据字典模块和消息模块现在共用同一个独立 EF Core 包，也共用同一个 DbContext 配置入口。
+
+### 安装包
+
+如果你使用的是完整 UI 包，则不需要额外安装：
+
 ```shell
 dotnet add package AbpRadzen.Blazor.Server.UI
 ```
 
-如果你只需要数据字典实体与 EF Core 映射能力，也可以单独安装以下包：
+如果你只需要这两个内置模块的实体定义和 EF Core 映射能力，请安装统一的包：
+
 ```shell
-dotnet add package AbpRadzen.DataDictionary.EntityFrameworkCore
+dotnet add package AbpRadzen.EntityFrameworkCore
 ```
 
-#### 2. 注册 DbContext
-完整 UI 包已经在 `AbpRadzenUIModule` 中注册了 `DataDictionaryDbContext`。如果你仅在自己的项目中集成 EF Core 包，则需要在业务 DbContext 中补充 `DbSet`，并调用 `ConfigureDataDictionary()`。
+### 注册 DbContext
+
+完整 UI 包已经依赖 `AbpRadzen.EntityFrameworkCore`，并自动接入统一的 EF 模块。如果你仅在自己的项目中集成 EF Core 包，则需要在业务 DbContext 中补充所需的 `DbSet`，并调用 `ConfigureAbpRadzenUI()`。
 
 ```csharp
 public class MyProjectDbContext : AbpDbContext<MyProjectDbContext>
@@ -205,19 +328,27 @@ public class MyProjectDbContext : AbpDbContext<MyProjectDbContext>
 
     public DbSet<DataDictionaryItem> DataDictionaryItems { get; set; }
 
+    public DbSet<UserMessage> UserMessages { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
 
-        builder.ConfigureDataDictionary();
+        builder.ConfigureAbpRadzenUI();
     }
 }
 ```
 
-#### 3. 菜单和多语言
+## 📚 使用数据字典模块
+
+数据字典模块已集成在 UI 包中，提供开箱即用的字典类型与字典项管理页面。
+
+### 模块说明
+
+#### 1. 菜单和多语言
 数据字典页面的路由为 `/data-dictionary`。使用完整 UI 包时，菜单贡献者与多语言资源均已配置完成；如果你是在自己的应用模块中按需组合使用，请确保本地化资源继承自 `AbpRadzenUIResource`。
 
-#### 4. 执行数据库变更
+#### 2. 执行数据库变更
 数据字典模块会创建以下两张表：
 
 - `DataDictionaryTypes`
@@ -225,11 +356,172 @@ public class MyProjectDbContext : AbpDbContext<MyProjectDbContext>
 
 接入模块后，按照常规流程创建并执行 EF Core Migration 即可。
 
-#### 5. 使用说明
+#### 3. 使用说明
 
 - 字典项通过 `DataDictionaryTypeId` 与字典类型关联，但 EF Core 映射不会创建数据库级外键。
 - 删除字典类型时，应用服务会同步删除其下的字典项。
 - 内置页面采用主从 DataGrid 布局，选中字典类型后，右侧字典项列表会自动刷新。
+
+## ✉️ 使用消息模块
+
+消息模块已经集成在完整 UI 包中，提供开箱即用的站内消息能力，包括 Header 未读角标、右侧消息侧栏、消息中心列表页，以及富文本消息详情展示。
+
+### 模块说明
+
+#### 1. 内置界面能力
+
+- 内置消息中心页面路由为 `/messages`。
+- Header 内置未读角标和右侧消息侧栏，便于快速查看最新消息。
+- 用户可以将单条消息标记为已读，也可以将当前消息全部标记为已读，并可从侧栏或列表页进入详情。
+- 消息中心页面支持按标题、已读状态和消息类型筛选。
+- 消息详情支持按 HTML 富文本渲染内容。
+
+#### 2. 执行数据库变更
+消息模块会创建 `UserMessages` 表以及围绕租户、用户、已读状态、消息类型和创建时间的相关索引。接入模块后，按照常规流程创建并执行 EF Core Migration 即可。
+
+#### 3. 使用说明
+
+- 消息按当前租户和当前登录用户隔离。
+- 打开消息详情时会自动将消息标记为已读。
+- `MessageType` 采用字符串而不是枚举建模，便于业务系统在不修改共享模块的前提下扩展消息类型。
+- 消息类型下拉由可 override 的查询服务提供，接入方可以按需替换可选项来源。
+
+## 🔍 使用全局搜索 / 命令面板（Ctrl+K）
+
+完整 UI 包内置了全局搜索 / 命令面板。在应用内任意位置按 **Ctrl+K**（macOS 为 **⌘+K**），或点击 Header 上的搜索图标，即可打开一个 Spotlight 风格的对话框，无需鼠标即可在应用内快速跳转。
+
+### 内置行为
+
+- 应用内任意位置按 Ctrl/⌘+K 打开；Header 上也有一个搜索按钮作为可发现入口。
+- 面板以 **tab** 组织——每个搜索来源是一个 tab，任一时刻只执行当前 tab 的来源查询，既没有多余查询，也没有并发争用。
+- 内置的 **页面** tab 搜索导航菜单。它复用了已按权限过滤的主菜单，因此结果会自动限定为当前用户有权访问的页面。
+- 键盘优先：`↑`/`↓` 移动，`Enter` 打开，`Esc` 关闭。
+
+### 扩展你自己的搜索来源
+
+面板通过 `ICommandPaletteContributor` 扩展点开放扩展。每个贡献器会成为一个新的 tab，面板 UI 无需任何改动，非常适合做实体搜索（产品、客户、订单……）。
+
+##### （1）实现一个贡献器
+
+`GroupKey` 是稳定标识（相同 key 的贡献器会归并到同一个 tab），`GroupDisplayName` 是贡献器自行本地化的 tab 标题，`GroupIcon` 是可选的 tab 图标。无匹配或用户无权限时返回空列表即可。
+
+```csharp
+public class ProductCommandPaletteContributor(
+    IProductAppService productAppService,
+    IAuthorizationService authorizationService,
+    IStringLocalizer<CRMResource> l)
+    : ICommandPaletteContributor, ITransientDependency
+{
+    public string GroupKey => "CommandPalette:Group.Products";
+    public string GroupDisplayName => l["CommandPalette:Group.Products"];
+    public string? GroupIcon => "inventory_2";
+    public int Order => 10;
+
+    public async Task<IReadOnlyList<CommandPaletteItem>> SearchAsync(
+        CommandPaletteSearchContext context)
+    {
+        // 用户无权查看产品时静默返回空，不产生噪声日志
+        if (!await authorizationService.IsGrantedAsync(CRMPermissions.Products.Default))
+        {
+            return [];
+        }
+
+        var products = await productAppService.SearchAsync(
+            context.Keyword, context.MaxResultsPerGroup);
+
+        return products
+            .Select(p => new CommandPaletteItem
+            {
+                Title = p.Name,
+                Description = $"{l["DisplayName:Code"]}: {p.Code}",
+                Icon = "inventory_2",
+                Url = $"/products?code={Uri.EscapeDataString(p.Code)}",
+                Score = /* 分值越高越靠前 */ 50,
+            })
+            .ToList();
+    }
+}
+```
+
+##### （2）在 Web 模块中注册贡献器
+
+```csharp
+Configure<CommandPaletteOptions>(options =>
+{
+    options.AddContributor<ProductCommandPaletteContributor>();
+});
+```
+
+这样面板里就会多出一个"产品"tab。完整示例见 [ProductCommandPaletteContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/Search/ProductCommandPaletteContributor.cs)。
+
+`CommandPaletteOptions` 还提供 `Enabled`、`MinKeywordLength`、`MaxResultsPerGroup` 等配置项。
+
+## 📤 使用数据导出（Excel）
+
+列表页可以把数据导出为 `.xlsx` 文件。整条管线是**流式、内存有界**的：数据按页拉取，逐行直接写入临时文件，再分块回传浏览器——无论导出多少行，服务端峰值内存大约只有一页。Excel 引擎使用 [MiniExcel](https://github.com/mini-software/MiniExcel)（MIT 许可、低内存），且被接口封装，可随时替换而不改动任何页面。
+
+### 内置行为
+
+- 整个特性位于 `Features/Export`，**不绑定 `AbpCrudPageBase`**——任意列表页（包括自定义页、两栏式页面）只需注入 `IDataExportManager` 即可使用。
+- 三层结构，每层都可通过 `Services.Replace(...)` 替换：
+  - `IExcelExporter`（默认 `MiniExcelExporter`）——将行序列化为文件/字节。
+  - `IFileDownloadService`——把文件流式推送到浏览器并清理临时文件。
+  - `IDataExportManager` + `ExcelExportOptions<T>`——编排流程：权限 → **导出前门禁** → 分页取数 → 行整形 → 流式写盘 → 下载 → 通知。
+- **导出前门禁**（`BeforeExportAsync`）在取数之前执行，返回 `false` 即静默中止。这是"导出前需先验证"（验证码、二次确认对话框等）场景的钩子。
+
+### 在 CRUD 页面上使用
+
+继承 `AbpCrudPageBase` 的页面开箱即用——基类会把自己的分页 `GetListAsync` 接入编排器。把共享组件 `ExportButton` 放进表格工具栏即可：
+
+```razor
+<ExportButton Visible="HasExportPermission" Busy="IsExporting" OnClick="ExportAsync" />
+```
+
+按需重写钩子（都是可选的）：
+
+```csharp
+// 本地化列头 + 精选列（逐页调用，各页形状须一致）
+protected override object MapToExportRows(IReadOnlyList<ProductDto> data) =>
+    data.Select(p => new Dictionary<string, object?>
+    {
+        [L["DisplayName:Code"]] = p.Code,
+        [L["DisplayName:Name"]] = p.Name,
+        [L["DisplayName:Price"]] = p.Price,
+    }).ToList();
+
+// “导出前验证”门禁：弹出验证码/确认对话框，验证通过才返回 true
+protected override async Task<bool> OnBeforeExportAsync()
+{
+    var ok = await DialogService.OpenAsync<CaptchaDialog>(L["Export:Verify"]);
+    return ok == true;
+}
+```
+
+其他可重写成员：`GetExportPageAsync(skip, take)`、`GetExportFileName()`、`ExportPageSize`、`ExportMaxCount`、`ExportSheetName`、`ExportPolicyName`（未设置时 `HasExportPermission` 默认为 `true`，靠页面级 `[Authorize]` 兜底）。
+
+### 在任意页面上使用（无需基类）
+
+注入 `IDataExportManager`，用你自己的分页查询调用它。由于取数是委托传入的，机制与取数方式彻底解耦：
+
+```csharp
+await ExportManager.ExportToExcelAsync(new ExcelExportOptions<ItemDto>
+{
+    // 带着递增的 skip 反复调用，直到返回空页
+    PageDataProvider = async (skip, take, ct) =>
+        (await ItemAppService.GetListAsync(
+            new() { SkipCount = skip, MaxResultCount = take })).Items,
+    RowSelector = page => page.Select(x => new Dictionary<string, object?>
+    {
+        [L["Code"]] = x.Code,
+        [L["Name"]] = x.Name,
+    }).ToList(),
+    FileName = "items.xlsx",
+    PageSize = 1000,
+    BeforeExportAsync = () => VerifyCaptchaAsync(), // 可选门禁
+});
+```
+
+CRUD 页面完整示例见 [Products/List.razor(.cs)](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/Components/Pages/Products/List.razor)。
 
 ## 🎨 界面预览
 

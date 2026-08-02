@@ -1,4 +1,6 @@
-﻿using CRM.Localization;
+using Abp.RadzenUI.Localization;
+using Abp.RadzenUI.Infrastructure.Navigation;
+using CRM.Localization;
 using CRM.MultiTenancy;
 using CRM.Permissions;
 using Microsoft.Extensions.Localization;
@@ -25,8 +27,18 @@ public class CRMMenuContributor : IMenuContributor
         context.Menu.Items.Insert(
             0,
             new ApplicationMenuItem(CRMMenus.Home, l["Menu:Home"], "/", icon: "home", order: 1)
+                .WithIconColor("#2563eb")
         );
 
+        var rl = context.GetLocalizer<AbpRadzenUIResource>();
+        context.Menu.Items.Insert(
+            1,
+            new ApplicationMenuItem(CRMMenus.Dashboard, rl["Menu:Dashboard"], "/dashboard", icon: "dashboard", order: 2)
+                .WithIconColor("#0f766e")
+        );
+
+        ConfigSalesMenu(context, l);
+        ConfigOperationMenu(context, l);
         ConfigProductMenu(context, l);
 
         //Administration
@@ -55,8 +67,8 @@ public class CRMMenuContributor : IMenuContributor
             CRMMenus.Product,
             l["Menu:Product"],
             icon: "inventory_2",
-            order: 2
-        );
+            order: 4
+        ).WithIconColor("#ea580c");
 
         productMenu.AddItem(
             new ApplicationMenuItem(
@@ -68,5 +80,89 @@ public class CRMMenuContributor : IMenuContributor
         );
 
         context.Menu.Items.Add(productMenu);
+    }
+
+    private static void ConfigSalesMenu(MenuConfigurationContext context, IStringLocalizer l)
+    {
+        var salesMenu = new ApplicationMenuItem(
+            CRMMenus.Sales,
+            l["Menu:Sales"],
+            icon: "trending_up",
+            order: 2
+        ).WithIconColor("#7c3aed");
+
+        salesMenu.AddItem(
+            new ApplicationMenuItem(
+                CRMMenus.SalesWorkspace,
+                l["Menu:Sales.Workspace"],
+                "/sales/workspace",
+                icon: "space_dashboard",
+                order: 1
+            ).RequirePermissions(CRMPermissions.Sales.Workspace)
+        );
+
+        context.Menu.Items.Add(salesMenu);
+    }
+
+    private static void ConfigOperationMenu(MenuConfigurationContext context, IStringLocalizer l)
+    {
+        var operationsMenu = new ApplicationMenuItem(
+            CRMMenus.Operations,
+            l["Menu:Operations"],
+            icon: "support_agent",
+            order: 3
+        ).WithIconColor("#0f766e");
+
+        operationsMenu.AddItem(
+            new ApplicationMenuItem(
+                CRMMenus.OperationsDashboard,
+                l["Menu:Operations.Dashboard"],
+                "/operations/dashboard",
+                icon: "monitoring",
+                order: 1
+            ).RequirePermissions(CRMPermissions.Operations.Dashboard)
+        );
+
+        operationsMenu.AddItem(
+            new ApplicationMenuItem(
+                CRMMenus.WorkOrders,
+                l["Menu:Operations.WorkOrders"],
+                "/operations/work-orders",
+                icon: "fact_check",
+                order: 2
+            ).RequirePermissions(CRMPermissions.Operations.WorkOrders)
+        );
+
+        operationsMenu.AddItem(
+            new ApplicationMenuItem(
+                CRMMenus.WorkOrderBoard,
+                l["Menu:Operations.Board"],
+                "/operations/board",
+                icon: "view_kanban",
+                order: 3
+            ).RequirePermissions(CRMPermissions.Operations.WorkOrders)
+        );
+
+        operationsMenu.AddItem(
+            new ApplicationMenuItem(
+                CRMMenus.OperationShifts,
+                l["Menu:Operations.Shifts"],
+                "/operations/shifts",
+                icon: "calendar_month",
+                order: 4
+            ).RequirePermissions(CRMPermissions.Operations.Shifts)
+        );
+
+        operationsMenu.AddItem(
+            new ApplicationMenuItem(
+                CRMMenus.OperationAssets,
+                l["Menu:Operations.Assets"],
+                "/operations/assets",
+                icon: "precision_manufacturing",
+                order: 5
+            ).RequirePermissions(CRMPermissions.Operations.Assets)
+        );
+
+        context.Menu.Items.Add(operationsMenu);
     }
 }

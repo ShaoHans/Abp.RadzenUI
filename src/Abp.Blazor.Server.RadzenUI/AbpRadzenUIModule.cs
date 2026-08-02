@@ -1,16 +1,21 @@
-﻿using Abp.RadzenUI.Blazor.SettingManagement;
-using Abp.RadzenUI.Bundling;
-using Abp.RadzenUI.Avatar;
-using Abp.RadzenUI.DataDictionaries;
+using Abp.RadzenUI.Features.Settings;
+using Abp.RadzenUI.Infrastructure.Bundling;
+using Abp.RadzenUI.Features.Avatar;
+using Abp.RadzenUI.Features.Export;
+using Abp.RadzenUI.EntityFrameworkCore;
+using Abp.RadzenUI.LinkAccounts;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Menus;
-using Abp.RadzenUI.Services;
+using Abp.RadzenUI.Infrastructure.Navigation;
+using Abp.RadzenUI.Infrastructure.Search;
+using Abp.RadzenUI.Infrastructure.Services;
 using Localization.Resources.AbpUi;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Radzen;
 using Volo.Abp.AspNetCore.Components.Messages;
 using Volo.Abp.AspNetCore.Components.Notifications;
@@ -18,28 +23,27 @@ using Volo.Abp.AspNetCore.Components.Server.Configuration;
 using Volo.Abp.AspNetCore.Components.Web;
 using Volo.Abp.AspNetCore.Components.Web.Configuration;
 using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
+using Volo.Abp.AspNetCore.Auditing;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.Localization;
 using Volo.Abp.Autofac;
-using Volo.Abp.ExceptionHandling.Localization;
 using Volo.Abp.Identity.AspNetCore;
 using Volo.Abp.Identity.EntityFrameworkCore;
 using Volo.Abp.Localization;
-using Volo.Abp.Localization.ExceptionHandling;
 using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.Localization;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
 using Volo.Abp.UI.Navigation;
-using Volo.Abp.Validation.Localization;
-using Volo.Abp.VirtualFileSystem;
-using Volo.Abp.EntityFrameworkCore;
 
 namespace Abp.RadzenUI;
 
 [DependsOn(
     typeof(AbpAutofacModule),
+    typeof(AbpRadzenUIApplicationModule),
+    typeof(AbpRadzenUIEntityFrameworkCoreModule),
+    typeof(AbpRadzenUILinkAccountsModule),
     typeof(AbpAuditLoggingEntityFrameworkCoreModule),
     typeof(AbpPermissionManagementEntityFrameworkCoreModule),
     typeof(AbpSettingManagementEntityFrameworkCoreModule),
@@ -54,30 +58,23 @@ public class AbpRadzenUIModule : AbpModule
     {
         AvatarModuleExtensionConfigurator.Configure();
 
-        var configuration = context.Services.GetConfiguration();
+        //Configure<AbpAspNetCoreAuditingOptions>(options =>
+        //{
+        //    options.IgnoredUrls.AddIfNotContains("/_blazor");
+        //});
 
-        Configure<AbpVirtualFileSystemOptions>(options =>
-        {
-            options.FileSets.AddEmbedded<AbpRadzenUIModule>("Abp.RadzenUI");
-        });
+        var configuration = context.Services.GetConfiguration();
 
         Configure<AbpLocalizationOptions>(options =>
         {
             options
-                .Resources.Add<AbpRadzenUIResource>("en")
+                .Resources.Get<AbpRadzenUIResource>()
                 .AddBaseTypes(
-                    typeof(AbpValidationResource),
                     typeof(AbpUiResource),
-                    typeof(AbpExceptionHandlingResource),
                     typeof(AuditLoggingResource),
                     typeof(AbpSettingManagementResource)
                 )
-                .AddVirtualJson("/Localization/UI");
-        });
-
-        Configure<AbpExceptionLocalizationOptions>(options =>
-        {
-            options.MapCodeNamespace("AbpRadzenUI", typeof(AbpRadzenUIResource));
+                ;
         });
 
         Configure<CookieAuthenticationOptions>(
@@ -155,8 +152,16 @@ public class AbpRadzenUIModule : AbpModule
             options.MenuContributors.Add(new AuditLoggingMenuContributor());
             options.MenuContributors.Add(new IdentitySecurityLogMenuContributor());
             options.MenuContributors.Add(new DataDictionaryMenuContributor());
+            options.MenuContributors.Add(new LocalizationMenuContributor());
+            options.MenuContributors.Add(new MessageMenuContributor());
             options.MenuContributors.Add(new SettingManagementMenuContributor());
         });
+
+        // Overlay database localization overrides on top of the static JSON texts.
+        context.Services.AddSingleton<
+            IPostConfigureOptions<AbpLocalizationOptions>,
+            AbpRadzenUILocalizationPostConfigureOptions
+        >();
 
         Configure<SettingManagementComponentOptions>(options =>
         {
@@ -165,13 +170,22 @@ public class AbpRadzenUIModule : AbpModule
             options.Contributors.Add(new AccountPageContributor());
         });
 
+        Configure<CommandPaletteOptions>(options =>
+        {
+            options.AddContributor<MenuCommandPaletteContributor>();
+        });
+
         context.Services.AddSingleton(typeof(AbpBlazorMessageLocalizerHelper<>));
         context.Services.AddScoped<GridPageSizePreferenceService>();
+        context.Services.AddScoped<MessageCenterState>();
+        context.Services.AddScoped<CommandPaletteState>();
+        context.Services.AddScoped<MenuItemDecorationState>();
+        context.Services.AddScoped(typeof(SideDialogState<>));
+        context.Services.AddScoped<ISideDialogCoordinatorFactory, SideDialogCoordinatorFactory>();
         context.Services.AddTransient<IUploadService, DefaultUploadService>();
-
-        context.Services.AddAbpDbContext<DataDictionaryDbContext>(options =>
-        {
-            options.AddDefaultRepositories();
-        });
+        context.Services.AddTransient<IExcelExporter, MiniExcelExporter>();
+        context.Services.AddScoped<IFileDownloadService, FileDownloadService>();
+        context.Services.AddScoped<IDataExportManager, DataExportManager>();
+        context.Services.AddTransient<LinkedAccountSignInManager>();
     }
 }

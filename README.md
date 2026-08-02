@@ -17,7 +17,12 @@ English | [简体中文](README_zh-CN.md)
 
 - [Try the Demo](#-try-the-demo)
 - [Get Started](#-get-started)
+- [Use the dotnet new Template](#use-the-dotnet-new-template)
+- [Use the Linked Accounts Module](#-use-the-linked-accounts-module)
 - [Use the Data Dictionary Module](#-use-the-data-dictionary-module)
+- [Use the Messages Module](#-use-the-messages-module)
+- [Use the Command Palette (Ctrl+K)](#-use-the-command-palette-ctrlk)
+- [Use Data Export (Excel)](#-use-data-export-excel)
 - [Preview the Interface](#-preview-the-interface)
 
 ## ❤️ Try the Demo
@@ -28,6 +33,76 @@ UserName:  **test**
 Password:  **1q2w#E***
 
 ## 🌱 Get Started
+
+### Published Packages
+
+- `AbpRadzen.Blazor.Server.UI`: the full Blazor Server UI theme package with built-in pages, menus, localization, and host-side integration.
+- `AbpRadzen.LinkAccounts`: the standalone linked-accounts application package.
+- `AbpRadzen.EntityFrameworkCore`: the unified EF Core package for the built-in Data Dictionary and Messages modules.
+- `AbpRadzen.Application.Contracts`, `AbpRadzen.Application`, `AbpRadzen.Domain`, `AbpRadzen.Domain.Shared`: layered building blocks for custom composition outside the full UI package.
+
+### Use the dotnet new Template
+
+This repository includes a `dotnet new` item template that generates the common integration files for an existing ABP Blazor Server web project, including the RadzenUI integration helper, menu contributor, minimal home page, and an integration checklist.
+
+Install the template from the repository root:
+
+```shell
+dotnet new install .\templates\AbpRadzenUI.Integration
+```
+
+Go to your Blazor Server web project directory, for example `src\MyCompany.MyProject.Blazor`, and run:
+
+```shell
+dotnet new abp-radzenui-integration -n MyProject --rootNamespace MyCompany.MyProject.Blazor --title "My Project"
+```
+
+To enable Radzen premium themes:
+
+```shell
+dotnet new abp-radzenui-integration -n MyProject --rootNamespace MyCompany.MyProject.Blazor --title "My Project" --premiumTheme true
+```
+
+Parameters:
+
+- `-n`: the short project name used for generated C# type names. Avoid dots.
+- `--rootNamespace`: the real root namespace of the target Blazor Server web project.
+- `--title`: the system title shown in the title bar and login page.
+- `--premiumTheme`: enables Radzen premium themes.
+
+The template generates:
+
+- `RadzenUI/<ProjectName>RadzenUIIntegrationExtensions.cs`
+- `Menus/<ProjectName>Menus.cs`
+- `Menus/<ProjectName>MenuContributor.cs`
+- `Components/Pages/Home.razor`
+- `RadzenUI/RADZENUI-INTEGRATION.md`
+
+After generation, complete the manual integration checklist:
+
+```shell
+dotnet add package AbpRadzen.Blazor.Server.UI
+```
+
+Add the module dependency to your web module:
+
+```csharp
+typeof(AbpRadzenUIModule)
+```
+
+Call the generated extension method in `ConfigureServices`:
+
+```csharp
+context.Services.AddRadzenUIIntegration<Home, MyProjectResource, MyProjectMenuContributor>();
+```
+
+Finally, call RadzenUI at the end of `OnApplicationInitialization`:
+
+```csharp
+app.UseRadzenUI();
+```
+
+See [docs/getting-started-template.md](docs/getting-started-template.md) for the full guide.
 
 ### Integration Steps
 
@@ -166,11 +241,11 @@ In real-world projects, it is common to manage system-level or business-level se
 
 Follow the steps below to add your own settings component:
 
-##### (1) Create an application service for your settings, for example: [AccountSettingsAppService](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Application/AccountSettingsAppService.cs)
+##### (1) Create an application service for your settings, for example: [AccountSettingsAppService](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.RadzenUI.Application/AccountSettingsAppService.cs)
 
 ##### (2) Create a Blazor component for the settings UI, for example: [AccountSettingComponent](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Components/Pages/Setting/AccountSettingComponent.razor)
 
-##### (3) Create a contributor by implementing `ISettingComponentContributor`. The contributor is responsible for registering your settings component, for example: [AccountPageContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Blazor/SettingManagement/AccountPageContributor.cs)
+##### (3) Create a contributor by implementing `ISettingComponentContributor`. The contributor is responsible for registering your settings component, for example: [AccountPageContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/src/Abp.Blazor.Server.RadzenUI/Features/Settings/AccountPageContributor.cs)
 
 ##### (4) Finally, register the contributor in your module configuration
 
@@ -185,24 +260,72 @@ Configure<SettingManagementComponentOptions>(options =>
 
 #### 8. Apply database migrations before the first run
 
-## 📚 Use the Data Dictionary Module
+## 🔗 Use the Linked Accounts Module
 
-The data dictionary module is included in the UI package and provides an out-of-the-box page for managing dictionary types and dictionary items.
+The Linked Accounts capability is now built into the full UI package and can also be consumed as a standalone application-layer package.
 
-### Module Guide
+### What it provides
 
-#### 1. Install the package
+- Link another local or cross-tenant account from the current signed-in session.
+- Switch between directly linked and indirectly reachable accounts without logging out manually.
+- Keep a reversible session stack so the user can return to the previous account.
+- Reuse ABP's built-in `IdentityLinkUser` and `IdentityLinkUserManager` instead of introducing a custom link table.
+
+### Use it through the full UI package
+
+If you install `AbpRadzen.Blazor.Server.UI`, the Linked Accounts pages, localization texts, controllers, and menu entry are already wired into the theme module. No extra package installation is required.
+
+The built-in management page route is `/account/linked-accounts`.
+
+### Use it as a standalone package
+
+If you only need the linking and switching services in your own module, install the standalone package below:
+
+```shell
+dotnet add package AbpRadzen.LinkAccounts
+```
+
+Then depend on the module in your application module:
+
+```csharp
+[DependsOn(typeof(AbpRadzenUILinkAccountsModule))]
+public class MyApplicationModule : AbpModule
+{
+}
+```
+
+The standalone package registers the following services for you:
+
+- `ILinkedAccountAppService`
+- `ILinkedAccountFlowStateStore`
+
+### Notes about the authentication flow
+
+- The first link operation still requires a real login for the target account.
+- After the relationship is established, account switching relies on the existing link relationship plus a short-lived flow token to re-issue the authentication ticket.
+- Flow tokens and linked-account sessions are stored in distributed cache and are shared in the host tenant scope so cross-tenant switching can complete correctly.
+
+## 🧱 Shared EF Core Integration
+
+The Data Dictionary and Messages modules now share the same standalone EF Core package and the same DbContext configuration entry.
+
+### Install the package
+
+If you use the full UI package, no extra installation is required:
+
 ```shell
 dotnet add package AbpRadzen.Blazor.Server.UI
 ```
 
-If you only need the entity definitions and EF Core mappings, you can install the standalone package below:
+If you only need the entity definitions and EF Core mappings for these built-in modules, install the unified package below:
+
 ```shell
-dotnet add package AbpRadzen.DataDictionary.EntityFrameworkCore
+dotnet add package AbpRadzen.EntityFrameworkCore
 ```
 
-#### 2. Register the DbContext
-The full UI module already registers `DataDictionaryDbContext` inside `AbpRadzenUIModule`. If you integrate only the EF Core package into your own solution, add the DbSets and call `ConfigureDataDictionary()` inside your application's DbContext.
+### Register the DbContext
+
+The full UI package already depends on `AbpRadzen.EntityFrameworkCore` and wires the unified EF module for you. If you integrate only the EF Core package into your own solution, add the required DbSets and call `ConfigureAbpRadzenUI()` inside your application's DbContext.
 
 ```csharp
 public class MyProjectDbContext : AbpDbContext<MyProjectDbContext>
@@ -211,19 +334,27 @@ public class MyProjectDbContext : AbpDbContext<MyProjectDbContext>
 
     public DbSet<DataDictionaryItem> DataDictionaryItems { get; set; }
 
+    public DbSet<UserMessage> UserMessages { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
 
-        builder.ConfigureDataDictionary();
+        builder.ConfigureAbpRadzenUI();
     }
 }
 ```
 
-#### 3. Add localization and menu support
+## 📚 Use the Data Dictionary Module
+
+The data dictionary module is included in the UI package and provides an out-of-the-box page for managing dictionary types and dictionary items.
+
+### Module Guide
+
+#### 1. Add localization and menu support
 The built-in page route is `/data-dictionary`. When you use the full UI package, menu contributions and localization resources are already wired up. If you are composing your own application module, make sure your localization resource inherits from `AbpRadzenUIResource`.
 
-#### 4. Apply database changes
+#### 2. Apply database changes
 The data dictionary module creates the following two tables:
 
 - `DataDictionaryTypes`
@@ -231,11 +362,171 @@ The data dictionary module creates the following two tables:
 
 After integrating the module, create and apply your EF Core migrations in the usual way.
 
-#### 5. Usage notes
+#### 3. Usage notes
 
 - Dictionary items are associated with dictionary types through `DataDictionaryTypeId`, but the EF Core mapping does not create a database-level foreign key.
 - Deleting a dictionary type will also remove its child dictionary items at the application-service level.
 - The built-in page uses a master-detail DataGrid layout. Selecting a dictionary type automatically refreshes the item grid on the right.
+
+## ✉️ Use the Messages Module
+
+The messages module is included in the full UI package and provides a built-in in-app messaging experience with a header unread badge, a right-side inbox panel, a message center list page, and rich-text message details.
+
+### Module Guide
+
+#### 1. Built-in UI capabilities
+
+- The built-in message center page route is `/messages`.
+- The header includes an unread badge and a right-side inbox sidebar for quick access.
+- Users can mark a single message or all current messages as read, and open full message details from the sidebar or the list page.
+- The message center page supports filtering by title, read status, and message type.
+- Message content supports HTML rendering in the detail view.
+
+#### 2. Apply database changes
+The message module creates a `UserMessages` table and related indexes for tenant, user, read status, message type, and creation time. After integrating the module, create and apply your EF Core migrations in the usual way.
+
+#### 3. Usage notes
+
+- Messages are isolated by current tenant and current user.
+- Opening a message detail marks the message as read automatically.
+- `MessageType` is modeled as a string instead of an enum so consuming applications can extend it without changing the shared module.
+- The message type dropdown is provided through an overridable lookup service, so applications can replace the available options if needed.
+
+## 🔍 Use the Command Palette (Ctrl+K)
+
+The full UI package ships a global search / command palette. Press **Ctrl+K** (or **⌘+K** on macOS), or click the search icon in the header, to open a spotlight-style dialog for jumping around the app without touching the mouse.
+
+### Built-in behavior
+
+- Opens on Ctrl/⌘+K anywhere in the app; the header also has a search button as a discoverable entry point.
+- The palette is organized into **tabs** — each search source is one tab, and only the active tab's source runs for a query, so there is no wasted work and no concurrency contention.
+- The built-in **Pages** tab searches your navigation menu. It reuses the permission-filtered main menu, so results are automatically limited to pages the current user can access.
+- Keyboard first: `↑`/`↓` to move, `Enter` to open, `Esc` to close.
+
+### Add your own search source
+
+The palette is extensible through the `ICommandPaletteContributor` extension point. Each contributor becomes a new tab — the palette UI needs no changes. This is ideal for entity search (products, customers, orders, ...).
+
+##### (1) Implement a contributor
+
+`GroupKey` is a stable id (contributors sharing a key merge into one tab), `GroupDisplayName` is the localized tab label the contributor resolves itself, and `GroupIcon` is an optional tab icon. Return an empty list when there is no match or the user is not authorized.
+
+```csharp
+public class ProductCommandPaletteContributor(
+    IProductAppService productAppService,
+    IAuthorizationService authorizationService,
+    IStringLocalizer<CRMResource> l)
+    : ICommandPaletteContributor, ITransientDependency
+{
+    public string GroupKey => "CommandPalette:Group.Products";
+    public string GroupDisplayName => l["CommandPalette:Group.Products"];
+    public string? GroupIcon => "inventory_2";
+    public int Order => 10;
+
+    public async Task<IReadOnlyList<CommandPaletteItem>> SearchAsync(
+        CommandPaletteSearchContext context)
+    {
+        if (!await authorizationService.IsGrantedAsync(CRMPermissions.Products.Default))
+        {
+            return [];
+        }
+
+        var products = await productAppService.SearchAsync(
+            context.Keyword, context.MaxResultsPerGroup);
+
+        return products
+            .Select(p => new CommandPaletteItem
+            {
+                Title = p.Name,
+                Description = $"{l["DisplayName:Code"]}: {p.Code}",
+                Icon = "inventory_2",
+                Url = $"/products?code={Uri.EscapeDataString(p.Code)}",
+                Score = /* higher ranks first */ 50,
+            })
+            .ToList();
+    }
+}
+```
+
+##### (2) Register the contributor in your web module
+
+```csharp
+Configure<CommandPaletteOptions>(options =>
+{
+    options.AddContributor<ProductCommandPaletteContributor>();
+});
+```
+
+That is all — a "Products" tab now appears in the palette. See [ProductCommandPaletteContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/Search/ProductCommandPaletteContributor.cs) for the complete sample.
+
+`CommandPaletteOptions` also exposes `Enabled`, `MinKeywordLength`, and `MaxResultsPerGroup`.
+
+## 📤 Use Data Export (Excel)
+
+List pages can export their data to an `.xlsx` file. The pipeline is **streaming and memory-bounded**: rows are pulled page by page and written straight to a temporary file, then streamed back to the browser in chunks — peak server memory stays at roughly one page regardless of how many rows are exported. The Excel engine is [MiniExcel](https://github.com/mini-software/MiniExcel) (MIT-licensed, low memory) and lives behind an interface, so you can swap it without touching any page.
+
+### Built-in behavior
+
+- The whole feature lives under `Features/Export` and is **not tied to `AbpCrudPageBase`** — any list page (including custom / two-panel pages) can use it by injecting `IDataExportManager`.
+- Three layers, each replaceable via `Services.Replace(...)`:
+  - `IExcelExporter` (default `MiniExcelExporter`) — serializes rows to a file/bytes.
+  - `IFileDownloadService` — streams a file to the browser and cleans up the temp file.
+  - `IDataExportManager` + `ExcelExportOptions<T>` — orchestrates: permission → **before-export gate** → paged fetch → row shaping → stream to disk → download → notify.
+- The **before-export gate** (`BeforeExportAsync`) runs before any data is fetched; return `false` to abort silently. This is the hook for "verify before export" scenarios such as a captcha or confirmation dialog.
+
+### Use it on a CRUD page
+
+Pages that inherit `AbpCrudPageBase` get export for free — the base class wires its paged `GetListAsync` into the manager. Drop the shared `ExportButton` into your grid toolbar:
+
+```razor
+<ExportButton Visible="HasExportPermission" Busy="IsExporting" OnClick="ExportAsync" />
+```
+
+Override the hooks you need (all optional):
+
+```csharp
+// Localized headers + a curated column set (applied per page; keep the shape consistent)
+protected override object MapToExportRows(IReadOnlyList<ProductDto> data) =>
+    data.Select(p => new Dictionary<string, object?>
+    {
+        [L["DisplayName:Code"]] = p.Code,
+        [L["DisplayName:Name"]] = p.Name,
+        [L["DisplayName:Price"]] = p.Price,
+    }).ToList();
+
+// "Verify before export" gate: open a captcha/confirm dialog, return true only if it passes
+protected override async Task<bool> OnBeforeExportAsync()
+{
+    var ok = await DialogService.OpenAsync<CaptchaDialog>(L["Export:Verify"]);
+    return ok == true;
+}
+```
+
+Other overridable members: `GetExportPageAsync(skip, take)`, `GetExportFileName()`, `ExportPageSize`, `ExportMaxCount`, `ExportSheetName`, and `ExportPolicyName` (when unset, `HasExportPermission` defaults to `true` and relies on the page-level `[Authorize]`).
+
+### Use it on any page (no base class)
+
+Inject `IDataExportManager` and call it with your own paged query. Because data comes from a delegate, the mechanism is fully decoupled from how you fetch it:
+
+```csharp
+await ExportManager.ExportToExcelAsync(new ExcelExportOptions<ItemDto>
+{
+    // Called with an advancing skip until it returns an empty page
+    PageDataProvider = async (skip, take, ct) =>
+        (await ItemAppService.GetListAsync(
+            new() { SkipCount = skip, MaxResultCount = take })).Items,
+    RowSelector = page => page.Select(x => new Dictionary<string, object?>
+    {
+        [L["Code"]] = x.Code,
+        [L["Name"]] = x.Name,
+    }).ToList(),
+    FileName = "items.xlsx",
+    PageSize = 1000,
+    BeforeExportAsync = () => VerifyCaptchaAsync(), // optional gate
+});
+```
+
+See [Products/List.razor(.cs)](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/Components/Pages/Products/List.razor) for a complete CRUD-page example.
 
 ## 🎨 Preview the Interface
 

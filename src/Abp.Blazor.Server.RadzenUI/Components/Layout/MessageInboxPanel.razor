@@ -1,0 +1,264 @@
+@using System.Net
+@using System.Text.RegularExpressions
+@using Abp.RadzenUI.Application.Contracts.Messages
+@using Abp.RadzenUI.Components.Pages.Messages
+@using Abp.RadzenUI.Localization
+@using Abp.RadzenUI.Infrastructure.Navigation
+@implements IDisposable
+@inject IMessageAppService MessageAppService
+@inject MessageCenterState MessageCenterState
+@inject MenuItemDecorationState MenuItemDecorationState
+@inject NavigationManager NavigationManager
+@inject Volo.Abp.AspNetCore.Components.Notifications.IUiNotificationService UiNotify
+@inherits AbpRadzenUIComponentBase
+<div style="height:calc(100vh - 7rem); min-height:420px; display:flex; flex-direction:column;">
+    @if (_selectedMessageId == Guid.Empty)
+    {
+        <RadzenStack Gap="1rem" Style="height:100%;">
+            <RadzenStack Gap="0.75rem">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="0.5rem">
+                    <RadzenButton Icon="mark_email_read"
+                                  Text="@L["Message:MarkAllAsRead"]"
+                                  ButtonStyle="ButtonStyle.Success"
+                                  Size="ButtonSize.Small"
+                                  Click="MarkAllAsReadAsync" />
+                    <RadzenButton Icon="open_in_new"
+                                  Text="@L["Message:ViewMore"]"
+                                  ButtonStyle="ButtonStyle.Light"
+                                  Size="ButtonSize.Small"
+                                  Click="GoToListAsync" />
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="0.5rem">
+                    <RadzenButton Text="@L["Message:All"]"
+                                  ButtonStyle="@(_readStatus is null ? ButtonStyle.Primary : ButtonStyle.Light)"
+                                  Size="ButtonSize.Small"
+                                  Click="@(() => ChangeStatusAsync(null))" />
+                    <RadzenButton Text="@L["Message:Unread"]"
+                                  ButtonStyle="@(_readStatus == MessageReadStatus.Unread ? ButtonStyle.Primary : ButtonStyle.Light)"
+                                  Size="ButtonSize.Small"
+                                  Click="@(() => ChangeStatusAsync(MessageReadStatus.Unread))" />
+                    <RadzenButton Text="@L["Message:Read"]"
+                                  ButtonStyle="@(_readStatus == MessageReadStatus.Read ? ButtonStyle.Primary : ButtonStyle.Light)"
+                                  Size="ButtonSize.Small"
+                                  Click="@(() => ChangeStatusAsync(MessageReadStatus.Read))" />
+                </RadzenStack>
+            </RadzenStack>
+
+            @if (_isLoading)
+            {
+                <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="flex:1;">
+                    <RadzenProgressBarCircular ShowValue="true" Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Medium" />
+                </RadzenStack>
+            }
+            else if (_messages.Count == 0)
+            {
+                <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="flex:1;">
+                    <RadzenText TextStyle="TextStyle.Body1">@L["Message:NoMessages"]</RadzenText>
+                </RadzenStack>
+            }
+            else
+            {
+                <RadzenStack Gap="0.75rem" Style="flex:1; min-height:0; overflow:auto; padding-right:0.25rem;">
+                    @foreach (var message in _messages)
+                    {
+                        <RadzenCard Variant="Variant.Flat" Style="padding: 1rem; border: 1px solid var(--rz-base-300); background: var(--rz-base-background-color);">
+                            <RadzenStack Gap="0.35rem" Style="width:100%;">
+                                <RadzenStack Orientation="Orientation.Horizontal"
+                                             AlignItems="AlignItems.Start"
+                                             JustifyContent="JustifyContent.SpaceBetween"
+                                             Wrap="FlexWrap.Wrap"
+                                             Gap="0.75rem">
+                                    <RadzenStack Gap="0.35rem">
+                                        <SideDialogLink Text="@message.Title" OnClick="@(() => OpenDetail(message.Id))" />
+                                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="0.5rem">
+                                            <RadzenBadge Text="@message.MessageType" BadgeStyle="BadgeStyle.Info" />
+                                            <RadzenBadge Text="@(message.IsRead ? L["Message:ReadBadge"] : L["Message:UnreadBadge"] )"
+                                                         BadgeStyle="@(message.IsRead ? BadgeStyle.Light : BadgeStyle.Warning)" />
+                                        </RadzenStack>
+                                    </RadzenStack>
+                                    <RadzenText TextStyle="TextStyle.Caption" class="rz-text-secondary-color">@message.CreationTime.ToLocalTime().ToString("MM-dd HH:mm")</RadzenText>
+                                </RadzenStack>
+                                <RadzenText TextStyle="TextStyle.Body2" class="rz-text-secondary-color">@GetPreview(message.Content)</RadzenText>
+                            </RadzenStack>
+                        </RadzenCard>
+                    }
+                </RadzenStack>
+            }
+        </RadzenStack>
+    }
+    else
+    {
+        <RadzenStack Gap="1rem" Style="height:100%;">
+            <RadzenButton Icon="arrow_back" Variant="Variant.Text" Text="@L["Back"]" Click="BackToList" Style="width: fit-content;" />
+            <div style="flex:1; min-height:0; overflow:hidden;">
+                <DetailContent MessageId="@_selectedMessageId" />
+            </div>
+        </RadzenStack>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public bool IsOpen { get; set; }
+
+    [Parameter]
+    public EventCallback NavigateToListRequested { get; set; }
+
+    private const int MaxMessages = 10;
+
+    private IReadOnlyList<UserMessageDto> _messages = [];
+    private bool _disposed;
+    private bool _isLoading;
+    private MessageReadStatus? _readStatus = MessageReadStatus.Unread;
+    private Guid _selectedMessageId;
+
+    public MessageInboxPanel()
+    {
+        LocalizationResource = typeof(AbpRadzenUIResource);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        MessageCenterState.Changed += HandleMessageCenterChangedAsync;
+
+        if (IsOpen && CurrentUser.IsAuthenticated)
+        {
+            await LoadMessagesAsync();
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!IsOpen)
+        {
+            _selectedMessageId = Guid.Empty;
+            return;
+        }
+
+        if (_messages.Count == 0 && !_isLoading && CurrentUser.IsAuthenticated)
+        {
+            await LoadMessagesAsync();
+        }
+    }
+
+    private async Task ChangeStatusAsync(MessageReadStatus? status)
+    {
+        _readStatus = status;
+        await LoadMessagesAsync();
+    }
+
+    private void OpenDetail(Guid id)
+    {
+        _selectedMessageId = id;
+    }
+
+    private void BackToList()
+    {
+        _selectedMessageId = Guid.Empty;
+    }
+
+    private async Task MarkAllAsReadAsync()
+    {
+        try
+        {
+            await MessageAppService.MarkAllAsReadAsync();
+            await MessageCenterState.NotifyChangedAsync();
+            await MenuItemDecorationState.NotifyChangedAsync(MenuItemDecorationRefreshKeys.UnreadMessages);
+            await UiNotify.Success(L["SavedSuccessfully"]);
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(ex);
+        }
+    }
+
+    private async Task GoToListAsync()
+    {
+        if (NavigateToListRequested.HasDelegate)
+        {
+            await NavigateToListRequested.InvokeAsync();
+        }
+
+        await InvokeAsync(() => NavigationManager.NavigateTo("/messages"));
+    }
+
+    private async Task LoadMessagesAsync()
+    {
+        if (_disposed || !CurrentUser.IsAuthenticated)
+        {
+            _messages = [];
+            _isLoading = false;
+            return;
+        }
+
+        _isLoading = true;
+
+        try
+        {
+            var result = await MessageAppService.GetListAsync(
+                new GetUserMessagesInput
+                {
+                    ReadStatus = _readStatus,
+                    MaxResultCount = MaxMessages,
+                    SkipCount = 0,
+                }
+            );
+
+            _messages = result.Items.ToList();
+        }
+        catch (Exception ex) when (ex is not ObjectDisposedException)
+        {
+            await HandleErrorAsync(ex);
+        }
+        finally
+        {
+            if (!_disposed)
+            {
+                _isLoading = false;
+            }
+        }
+    }
+
+    private async Task HandleMessageCenterChangedAsync()
+    {
+        if (_disposed || !CurrentUser.IsAuthenticated)
+        {
+            return;
+        }
+
+        await InvokeAsync(async () =>
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            await LoadMessagesAsync();
+
+            if (!_disposed)
+            {
+                StateHasChanged();
+            }
+        });
+    }
+
+    private static string GetPreview(string content)
+    {
+        var plainText = Regex.Replace(content, "<.*?>", string.Empty);
+        plainText = WebUtility.HtmlDecode(plainText).Trim();
+
+        if (plainText.Length <= 120)
+        {
+            return plainText;
+        }
+
+        return plainText[..120] + "...";
+    }
+
+    public void Dispose()
+    {
+        _disposed = true;
+        MessageCenterState.Changed -= HandleMessageCenterChangedAsync;
+    }
+}
