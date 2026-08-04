@@ -917,6 +917,20 @@ html, body {
 */
 .role-permission-dialog .rz-tabview {
     min-height: 0;
+    /* Fill the dialog body's remaining height so the left nav is height-bounded
+       (it grows with the group count otherwise, pushing groups off-screen). */
+    flex: 1;
+}
+
+/*
+    With TabPosition.Left the nav is the left column. When there are many
+    permission groups it overflows the dialog; constrain it to the tabview
+    height and let it scroll on its own.
+*/
+.role-permission-dialog .rz-tabview-nav {
+    min-height: 0;
+    max-height: 100%;
+    overflow-y: auto;
 }
 
 .role-permission-dialog .rz-tabview-panels {
