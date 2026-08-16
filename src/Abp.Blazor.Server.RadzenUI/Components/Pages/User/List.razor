@@ -88,7 +88,7 @@
                 @context.CreationTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Title="@L["Actions"]" Width="150px" Frozen="true" Filterable="false" Sortable="false">
+        <RadzenDataGridColumn Title="@L["Actions"]" Width="90px" Frozen="true" FrozenPosition="FrozenColumnPosition.Right" Filterable="false" Sortable="false">
             <Template>
                 <UserActionButtons User="context"
                                    CanEdit="@((context.UserName != "admin" || CurrentUser.UserName == "admin") && HasUpdatePermission)"
@@ -103,6 +103,7 @@
                                    LockTitle="@IL["User:Lock"]"
                                    UnlockTitle="@IL["User:Unlock"]"
                                    SetPasswordTitle="@IL["User:SetPassword"]"
+                                   MoreTitle="@L["Actions"]"
                                    OnEdit="OpenEditUserAsync"
                                    OnManagePermissions="OpenAssignPermissionDialog"
                                    OnViewPermissions="OpenPermissionVisualizerDialog"

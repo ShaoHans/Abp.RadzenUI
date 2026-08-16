@@ -1,42 +1,51 @@
 @using Volo.Abp.Identity
 
-@if (CanEdit)
-{
-    <RadzenButton Icon="edit" title="@EditTitle" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small"
-                  Click="HandleEditClick" />
+@{
+    RenderFragment menuItems =
+    @<text>
+        @foreach (var action in _menu)
+        {
+            <RadzenSplitButtonItem Text="@action.Text" Icon="@action.Icon" IconColor="@action.IconColor" Value="@action.Key" />
+        }
+    </text>;
 }
-@if (CanManagePermissions)
+
+@if (_primary is not null && _menu.Count == 0)
 {
-    <RadzenButton Icon="visibility" title="@PermissionsVisualizerTitle" ButtonStyle="ButtonStyle.Info" Size="ButtonSize.Small"
-                  Click="HandleViewPermissionsClick" />
-    <RadzenButton Icon="productivity" title="@PermissionsTitle" ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small"
-                  Click="HandleManagePermissionsClick" />
+    @* Only one action is permitted: a split button would show an empty popup. *@
+    <RadzenButton Icon="@_primary.Icon" Text="@_primary.Text" title="@_primary.Text"
+                  ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small"
+                  Click="@(() => RunActionAsync(_primary))" />
 }
-@if (CanSetPassword)
+else if (_primary is not null)
 {
-    <RadzenButton Icon="password" title="@SetPasswordTitle" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
-                  Click="HandleSetPasswordClick" />
+    <RadzenSplitButton Icon="@_primary.Icon" Text="@_primary.Text" title="@_primary.Text"
+                       ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small"
+                       Click="HandleActionClickAsync" ChildContent="@menuItems" />
 }
-@if (CanManageLockout)
+else if (_menu.Count == 1)
 {
-    @if (IsLocked)
-    {
-        <RadzenButton Icon="lock_open" title="@UnlockTitle" ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.Small"
-                      Click="HandleUnlockClick" />
-    }
-    else
-    {
-        <RadzenButton Icon="lock" title="@LockTitle" ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small"
-                      Click="HandleLockClick" />
-    }
+    <RadzenButton Icon="@_menu[0].Icon" title="@_menu[0].Text" IconColor="@_menu[0].IconColor"
+                  ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
+                  Click="@(() => RunActionAsync(_menu[0]))" />
 }
-@if (CanDelete)
+else if (_menu.Count > 1)
 {
-    <RadzenButton Icon="delete" title="@DeleteTitle" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small"
-                  Click="HandleDeleteClick" />
+    @* No primary action is permitted (e.g. the admin row seen by a non-admin): plain overflow menu. *@
+    <RadzenSplitButton Icon="more_horiz" title="@MoreTitle" AlwaysOpenPopup="true"
+                       ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
+                       Click="HandleActionClickAsync" ChildContent="@menuItems" />
 }
 
 @code {
+    const string EditKey = "edit";
+    const string ViewPermissionsKey = "view-permissions";
+    const string ManagePermissionsKey = "manage-permissions";
+    const string SetPasswordKey = "set-password";
+    const string LockKey = "lock";
+    const string UnlockKey = "unlock";
+    const string DeleteKey = "delete";
+
     [Parameter, EditorRequired]
     public IdentityUserDto User { get; set; } = default!;
 
@@ -79,6 +88,10 @@
     [Parameter]
     public string SetPasswordTitle { get; set; } = default!;
 
+    /// <summary>Tooltip of the overflow menu shown when no primary action is permitted.</summary>
+    [Parameter]
+    public string MoreTitle { get; set; } = string.Empty;
+
     [Parameter, EditorRequired]
     public EventCallback<IdentityUserDto> OnEdit { get; set; }
 
@@ -100,38 +113,73 @@
     [Parameter]
     public EventCallback<IdentityUserDto> OnSetPassword { get; set; }
 
-    Task HandleEditClick()
+    /// <summary>Action rendered as the split button's main button, or <c>null</c> when editing is not permitted.</summary>
+    UserAction? _primary;
+
+    /// <summary>Actions rendered inside the popup.</summary>
+    List<UserAction> _menu = [];
+
+    protected override void OnParametersSet()
     {
-        return OnEdit.InvokeAsync(User);
+        base.OnParametersSet();
+
+        _primary = CanEdit
+            ? new UserAction(EditKey, EditTitle, "edit", null, OnEdit)
+            : null;
+
+        _menu = [];
+
+        // Menu icons stay uncoloured so they inherit the theme-aware menu text
+        // colour. Radzen's semantic tokens are shared between the light and dark
+        // themes (--rz-warning is #ff9800 in both), so a fixed IconColor is
+        // illegible in one of them. Delete keeps Danger as a destructive-action cue.
+        if (CanManagePermissions)
+        {
+            _menu.Add(new UserAction(ViewPermissionsKey, PermissionsVisualizerTitle, "visibility", null, OnViewPermissions));
+            _menu.Add(new UserAction(ManagePermissionsKey, PermissionsTitle, "productivity", null, OnManagePermissions));
+        }
+
+        if (CanSetPassword)
+        {
+            _menu.Add(new UserAction(SetPasswordKey, SetPasswordTitle, "password", null, OnSetPassword));
+        }
+
+        if (CanManageLockout)
+        {
+            _menu.Add(IsLocked
+                ? new UserAction(UnlockKey, UnlockTitle, "lock_open", null, OnUnlock)
+                : new UserAction(LockKey, LockTitle, "lock", null, OnLock));
+        }
+
+        if (CanDelete)
+        {
+            _menu.Add(new UserAction(DeleteKey, DeleteTitle, "delete", Colors.Danger, OnDelete));
+        }
     }
 
-    Task HandleManagePermissionsClick()
+    Task HandleActionClickAsync(RadzenSplitButtonItem? item)
     {
-        return OnManagePermissions.InvokeAsync(User);
+        // Radzen passes null when the main button itself was clicked.
+        if (item is null)
+        {
+            return _primary is null ? Task.CompletedTask : RunActionAsync(_primary);
+        }
+
+        var key = item.Value?.ToString();
+        var action = _menu.FirstOrDefault(a => a.Key == key);
+
+        return action is null ? Task.CompletedTask : RunActionAsync(action);
     }
 
-    Task HandleViewPermissionsClick()
+    Task RunActionAsync(UserAction action)
     {
-        return OnViewPermissions.InvokeAsync(User);
+        return action.Callback.InvokeAsync(User);
     }
 
-    Task HandleDeleteClick()
-    {
-        return OnDelete.InvokeAsync(User);
-    }
-
-    Task HandleLockClick()
-    {
-        return OnLock.InvokeAsync(User);
-    }
-
-    Task HandleUnlockClick()
-    {
-        return OnUnlock.InvokeAsync(User);
-    }
-
-    Task HandleSetPasswordClick()
-    {
-        return OnSetPassword.InvokeAsync(User);
-    }
+    sealed record UserAction(
+        string Key,
+        string Text,
+        string Icon,
+        string? IconColor,
+        EventCallback<IdentityUserDto> Callback);
 }

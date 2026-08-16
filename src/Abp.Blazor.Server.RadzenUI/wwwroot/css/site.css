@@ -956,3 +956,27 @@ html, body {
     width: 100%;
 }
 
+/*
+    RadzenSplitButton: keep the popup at default (md) metrics even when the
+    trigger button is Small.
+
+    Radzen derives the popup's size class from the button's Size
+    (PopupMenuClass: ButtonSize.Small => "rz-input-sm"), and the themes then
+    shrink the popup's item padding, font size and icon size to the sm scale.
+    Inside a DataGrid action column we want a Small trigger (a md button is
+    2.5rem vs 1.75rem and visibly inflates every row) but a normally readable
+    menu, and the component exposes no separate parameter for the popup - hence
+    the override. Values mirror the themes' own md tokens rather than hard-coded
+    sizes, so this follows whichever Radzen theme is active.
+
+    The popup is portalled to <body>, so this cannot live in a scoped .razor.css.
+*/
+.rz-splitbutton-menu.rz-input-sm {
+    --rz-dropdown-item-padding: var(--rz-input-padding-block-md) var(--rz-input-padding-inline-md);
+    --rz-dropdown-item-font-size: var(--rz-input-font-size-md);
+}
+
+.rz-splitbutton-menu.rz-input-sm .rz-menuitem-icon {
+    font-size: var(--rz-icon-size);
+}
+
