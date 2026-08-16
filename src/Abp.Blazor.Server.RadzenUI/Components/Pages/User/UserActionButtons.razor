@@ -1,41 +1,6 @@
 @using Volo.Abp.Identity
 
-@{
-    RenderFragment menuItems =
-    @<text>
-        @foreach (var action in _menu)
-        {
-            <RadzenSplitButtonItem Text="@action.Text" Icon="@action.Icon" IconColor="@action.IconColor" Value="@action.Key" />
-        }
-    </text>;
-}
-
-@if (_primary is not null && _menu.Count == 0)
-{
-    @* Only one action is permitted: a split button would show an empty popup. *@
-    <RadzenButton Icon="@_primary.Icon" Text="@_primary.Text" title="@_primary.Text"
-                  ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small"
-                  Click="@(() => RunActionAsync(_primary))" />
-}
-else if (_primary is not null)
-{
-    <RadzenSplitButton Icon="@_primary.Icon" Text="@_primary.Text" title="@_primary.Text"
-                       ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small"
-                       Click="HandleActionClickAsync" ChildContent="@menuItems" />
-}
-else if (_menu.Count == 1)
-{
-    <RadzenButton Icon="@_menu[0].Icon" title="@_menu[0].Text" IconColor="@_menu[0].IconColor"
-                  ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
-                  Click="@(() => RunActionAsync(_menu[0]))" />
-}
-else if (_menu.Count > 1)
-{
-    @* No primary action is permitted (e.g. the admin row seen by a non-admin): plain overflow menu. *@
-    <RadzenSplitButton Icon="more_horiz" title="@MoreTitle" AlwaysOpenPopup="true"
-                       ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
-                       Click="HandleActionClickAsync" ChildContent="@menuItems" />
-}
+<RowActionMenu Actions="@_actions" OnAction="HandleActionAsync" MoreTitle="@MoreTitle" />
 
 @code {
     const string EditKey = "edit";
@@ -113,73 +78,55 @@ else if (_menu.Count > 1)
     [Parameter]
     public EventCallback<IdentityUserDto> OnSetPassword { get; set; }
 
-    /// <summary>Action rendered as the split button's main button, or <c>null</c> when editing is not permitted.</summary>
-    UserAction? _primary;
-
-    /// <summary>Actions rendered inside the popup.</summary>
-    List<UserAction> _menu = [];
+    List<RowAction> _actions = [];
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
 
-        _primary = CanEdit
-            ? new UserAction(EditKey, EditTitle, "edit", null, OnEdit)
-            : null;
+        _actions = [];
 
-        _menu = [];
+        if (CanEdit)
+        {
+            _actions.Add(new RowAction(EditKey, EditTitle, "edit", IsPrimary: true));
+        }
 
-        // Menu icons stay uncoloured so they inherit the theme-aware menu text
-        // colour. Radzen's semantic tokens are shared between the light and dark
-        // themes (--rz-warning is #ff9800 in both), so a fixed IconColor is
-        // illegible in one of them. Delete keeps Danger as a destructive-action cue.
         if (CanManagePermissions)
         {
-            _menu.Add(new UserAction(ViewPermissionsKey, PermissionsVisualizerTitle, "visibility", null, OnViewPermissions));
-            _menu.Add(new UserAction(ManagePermissionsKey, PermissionsTitle, "productivity", null, OnManagePermissions));
+            _actions.Add(new RowAction(ViewPermissionsKey, PermissionsVisualizerTitle, "visibility"));
+            _actions.Add(new RowAction(ManagePermissionsKey, PermissionsTitle, "productivity"));
         }
 
         if (CanSetPassword)
         {
-            _menu.Add(new UserAction(SetPasswordKey, SetPasswordTitle, "password", null, OnSetPassword));
+            _actions.Add(new RowAction(SetPasswordKey, SetPasswordTitle, "password"));
         }
 
         if (CanManageLockout)
         {
-            _menu.Add(IsLocked
-                ? new UserAction(UnlockKey, UnlockTitle, "lock_open", null, OnUnlock)
-                : new UserAction(LockKey, LockTitle, "lock", null, OnLock));
+            _actions.Add(IsLocked
+                ? new RowAction(UnlockKey, UnlockTitle, "lock_open")
+                : new RowAction(LockKey, LockTitle, "lock"));
         }
 
         if (CanDelete)
         {
-            _menu.Add(new UserAction(DeleteKey, DeleteTitle, "delete", Colors.Danger, OnDelete));
+            _actions.Add(new RowAction(DeleteKey, DeleteTitle, "delete", Colors.Danger));
         }
     }
 
-    Task HandleActionClickAsync(RadzenSplitButtonItem? item)
+    Task HandleActionAsync(string key)
     {
-        // Radzen passes null when the main button itself was clicked.
-        if (item is null)
+        return key switch
         {
-            return _primary is null ? Task.CompletedTask : RunActionAsync(_primary);
-        }
-
-        var key = item.Value?.ToString();
-        var action = _menu.FirstOrDefault(a => a.Key == key);
-
-        return action is null ? Task.CompletedTask : RunActionAsync(action);
+            EditKey => OnEdit.InvokeAsync(User),
+            ViewPermissionsKey => OnViewPermissions.InvokeAsync(User),
+            ManagePermissionsKey => OnManagePermissions.InvokeAsync(User),
+            SetPasswordKey => OnSetPassword.InvokeAsync(User),
+            LockKey => OnLock.InvokeAsync(User),
+            UnlockKey => OnUnlock.InvokeAsync(User),
+            DeleteKey => OnDelete.InvokeAsync(User),
+            _ => Task.CompletedTask,
+        };
     }
-
-    Task RunActionAsync(UserAction action)
-    {
-        return action.Callback.InvokeAsync(User);
-    }
-
-    sealed record UserAction(
-        string Key,
-        string Text,
-        string Icon,
-        string? IconColor,
-        EventCallback<IdentityUserDto> Callback);
 }

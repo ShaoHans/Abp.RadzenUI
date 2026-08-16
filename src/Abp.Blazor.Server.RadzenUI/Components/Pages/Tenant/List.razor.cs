@@ -1,3 +1,4 @@
+using Abp.RadzenUI.Components.Shared;
 using Abp.RadzenUI.Infrastructure.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
@@ -10,6 +11,11 @@ namespace Abp.RadzenUI.Components.Pages.Tenant;
 
 public partial class List
 {
+    private const string EditKey = "edit";
+    private const string FeaturesKey = "features";
+    private const string ConnectionStringsKey = "connection-strings";
+    private const string DeleteKey = "delete";
+
     [Inject]
     protected DialogService TenantDialogService { get; set; } = default!;
 
@@ -55,6 +61,59 @@ public partial class List
         HasManageConnectionStringsPermission = await AuthorizationService.IsGrantedAsync(
             ManageConnectionStringsPolicyName
         );
+    }
+
+    /// <summary>
+    /// Actions offered for a tenant row, in display order. Availability depends only
+    /// on the current user's permissions, not on the row itself.
+    /// </summary>
+    private IReadOnlyList<RowAction> BuildRowActions()
+    {
+        var actions = new List<RowAction>();
+
+        if (HasUpdatePermission)
+        {
+            actions.Add(new RowAction(EditKey, L["Edit"], "edit", IsPrimary: true));
+        }
+
+        if (HasManageFeaturesPermission)
+        {
+            actions.Add(
+                new RowAction(FeaturesKey, UL["Permission:ManageFeatures"], "toggle_on")
+            );
+        }
+
+        if (HasManageConnectionStringsPermission)
+        {
+            actions.Add(
+                new RowAction(ConnectionStringsKey, UL["ConnectionString:Manage"], "link")
+            );
+        }
+
+        if (HasDeletePermission)
+        {
+            actions.Add(new RowAction(DeleteKey, L["Delete"], "delete", Colors.Danger));
+        }
+
+        return actions;
+    }
+
+    private Task HandleRowActionAsync(string key, TenantDto tenant)
+    {
+        return key switch
+        {
+            // Not a method group: SetDialogOptions has optional parameters and so
+            // does not convert to Func<DialogOptions>.
+            EditKey => OpenEditDialogAsync<Edit>(L["Edit"], tenant, () => SetDialogOptions()),
+            FeaturesKey => OpenFeaturesDialogAsync(tenant),
+            ConnectionStringsKey => OpenConnectionStringsDialogAsync(tenant),
+            DeleteKey => OpenDeleteConfirmDialogAsync(
+                tenant.Id,
+                L["Delete"],
+                L["TenantDeletionConfirmationMessage", tenant.Name]
+            ),
+            _ => Task.CompletedTask,
+        };
     }
 
     private async Task OpenFeaturesDialogAsync(TenantDto tenant)

@@ -1,0 +1,88 @@
+@*
+    Renders a DataGrid row's actions as a compact split button instead of a row of
+    icon buttons, which overflow (and get clipped by the cell) once a grid is
+    narrow enough to scroll horizontally.
+
+    Callers pass an ordered, already permission-filtered list of actions and
+    handle OnAction by key. The four branches below cover every combination,
+    including the ones a bare RadzenSplitButton handles badly: a single action
+    would leave the popup empty, and no primary action would leave the main
+    button inert.
+*@
+
+@{
+    RenderFragment menuItems =
+    @<text>
+        @foreach (var action in _menu)
+        {
+            <RadzenSplitButtonItem Text="@action.Text" Icon="@action.Icon" IconColor="@action.IconColor" Value="@action.Key" />
+        }
+    </text>;
+}
+
+@if (_primary is not null && _menu.Count == 0)
+{
+    <RadzenButton Icon="@_primary.Icon" Text="@_primary.Text" title="@_primary.Text"
+                  ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small"
+                  Click="@(() => OnAction.InvokeAsync(_primary.Key))" />
+}
+else if (_primary is not null)
+{
+    <RadzenSplitButton Icon="@_primary.Icon" Text="@_primary.Text" title="@_primary.Text"
+                       ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small"
+                       Click="HandleClickAsync" ChildContent="@menuItems" />
+}
+else if (_menu.Count == 1)
+{
+    <RadzenButton Icon="@_menu[0].Icon" title="@_menu[0].Text" IconColor="@_menu[0].IconColor"
+                  ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
+                  Click="@(() => OnAction.InvokeAsync(_menu[0].Key))" />
+}
+else if (_menu.Count > 1)
+{
+    <RadzenSplitButton Icon="more_horiz" title="@MoreTitle" AlwaysOpenPopup="true"
+                       ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
+                       Click="HandleClickAsync" ChildContent="@menuItems" />
+}
+
+@code {
+    /// <summary>
+    /// Actions in display order, already filtered by permission - anything present
+    /// here is rendered. Nothing is rendered for an empty list.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public IReadOnlyList<RowAction> Actions { get; set; } = [];
+
+    /// <summary>Invoked with the <see cref="RowAction.Key"/> of the picked action.</summary>
+    [Parameter, EditorRequired]
+    public EventCallback<string> OnAction { get; set; }
+
+    /// <summary>Tooltip of the overflow menu shown when no primary action is available.</summary>
+    [Parameter]
+    public string MoreTitle { get; set; } = string.Empty;
+
+    /// <summary>Action promoted to the split button's main button, if any.</summary>
+    RowAction? _primary;
+
+    /// <summary>Actions rendered inside the popup.</summary>
+    List<RowAction> _menu = [];
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        _primary = Actions.FirstOrDefault(a => a.IsPrimary);
+
+        // Reference equality, not the record's value equality: two actions could
+        // compare equal by value and both would drop out of the menu.
+        _menu = Actions.Where(a => !ReferenceEquals(a, _primary)).ToList();
+    }
+
+    Task HandleClickAsync(RadzenSplitButtonItem? item)
+    {
+        // Radzen passes null when the main button itself was clicked.
+        var key = item is null ? _primary?.Key : item.Value?.ToString();
+
+        return string.IsNullOrEmpty(key) ? Task.CompletedTask : OnAction.InvokeAsync(key);
+    }
+}
