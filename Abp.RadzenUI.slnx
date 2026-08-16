@@ -18,6 +18,8 @@
     <Project Path="samples/CRM.HttpApi/CRM.HttpApi.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
     <File Path="docker-compose.yml" />
   </Folder>
   <Folder Name="/src/">
