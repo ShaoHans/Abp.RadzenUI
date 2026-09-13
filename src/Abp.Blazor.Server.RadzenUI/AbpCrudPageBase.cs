@@ -564,6 +564,19 @@ public abstract class AbpCrudPageBase<
     protected virtual string ExportSheetName => typeof(TGetListOutputDto).Name;
 
     /// <summary>
+    /// How the generated sheet is written — frozen panes, column widths, header style. Null
+    /// (default) keeps the exporter's defaults: header row frozen, fixed column widths.
+    /// Override on a wide sheet so the columns identifying a row stay visible while scrolling
+    /// sideways:
+    /// <code>
+    /// protected override ExcelWriteOptions ExportWriteOptions =>
+    ///     new() { FreezeColumnCount = 3, AutoFitColumns = true };
+    /// </code>
+    /// The sheet name keeps coming from <see cref="ExportSheetName"/> unless this also sets one.
+    /// </summary>
+    protected virtual ExcelWriteOptions? ExportWriteOptions => null;
+
+    /// <summary>
     /// Convenience entry point wired to the toolbar export button. It is only a thin adapter: it
     /// manages the busy state / error surface and hands a <see cref="ExcelExportOptions{T}"/> built
     /// from the overridable members below to the reusable <see cref="IDataExportManager"/>, which
@@ -596,6 +609,7 @@ public abstract class AbpCrudPageBase<
                     RowSelector = MapToExportRows,
                     FileName = GetExportFileName(),
                     SheetName = ExportSheetName,
+                    WriteOptions = ExportWriteOptions,
                     PageSize = ExportPageSize,
                     MaxCount = ExportMaxCount,
                 }

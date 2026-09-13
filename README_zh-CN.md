@@ -495,9 +495,33 @@ protected override async Task<bool> OnBeforeExportAsync()
     var ok = await DialogService.OpenAsync<CaptchaDialog>(L["Export:Verify"]);
     return ok == true;
 }
+
+// 生成文件的呈现方式：宽表冻结住标识列，列宽按内容自适应
+protected override ExcelWriteOptions ExportWriteOptions =>
+    new() { FreezeColumnCount = 3, AutoFitColumns = true };
 ```
 
 其他可重写成员：`GetExportPageAsync(skip, take)`、`GetExportFileName()`、`ExportPageSize`、`ExportMaxCount`、`ExportSheetName`、`ExportPolicyName`（未设置时 `HasExportPermission` 默认为 `true`，靠页面级 `[Authorize]` 兜底）。
+
+### 工作表呈现（`ExcelWriteOptions`）
+
+`ExcelWriteOptions` 描述工作表**怎么写**，且不暴露任何引擎类型——所以替换 `IExcelExporter` 时页面不用改。它既可以作为 `ExcelExportOptions<T>.WriteOptions` 传入，也可以在 CRUD 页面上重写 `ExportWriteOptions`。每一项默认值都等于加入该类型之前的行为，因此只有显式设置才会改变产物：
+
+| 成员 | 默认值 | 作用 |
+|---|---|---|
+| `SheetName` | null | 工作表名；为空时回落到 `ExcelExportOptions<T>.SheetName` |
+| `SheetStyle` | `Plain` | `Plain` = 无单元格边框、无表头底色；`Tabular` = 表头带底色 + 所有单元格细边框 |
+| `FreezeRowCount` | 1 | 顶部冻结行数（表头始终可见） |
+| `FreezeColumnCount` | 0 | 左侧冻结列数——设为开头那几列标识列的数量 |
+| `AutoFitColumns` | false | 列宽按内容自适应，受 `MinColumnWidth` / `MaxColumnWidth` 约束 |
+| `HeaderBackgroundColor` | null | 表头底色，`#RRGGBB`。设置它等于同时选了 `Tabular` |
+| `HeaderWrapText` | false | 表头文字换行。同样等于选了 `Tabular` |
+
+> **2.10.0 行为变更**——导出默认改为 `Plain`。此前每个单元格都会带细边框、表头带蓝色底纹；要保留旧观感请传 `SheetStyle = ExcelSheetStyle.Tabular`。
+
+边框和表头底色在 MiniExcel 里由同一个开关控制，只能同时开或同时关——做不到「无边框但表头有底色」；而且 `Plain` 下表头样式会被引擎直接忽略，所以设置表头样式等于选了 `Tabular`。
+
+无论传什么，MiniExcel 引擎都**做不到**：逐行样式（斑马线）、表头加粗、合并单元格。需要这些的工作表得换一个 `IExcelExporter` 实现。
 
 ### 在任意页面上使用（无需基类）
 

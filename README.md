@@ -500,9 +500,33 @@ protected override async Task<bool> OnBeforeExportAsync()
     var ok = await DialogService.OpenAsync<CaptchaDialog>(L["Export:Verify"]);
     return ok == true;
 }
+
+// Presentation of the produced sheet: pin the identity columns on a wide export, size columns to content
+protected override ExcelWriteOptions ExportWriteOptions =>
+    new() { FreezeColumnCount = 3, AutoFitColumns = true };
 ```
 
 Other overridable members: `GetExportPageAsync(skip, take)`, `GetExportFileName()`, `ExportPageSize`, `ExportMaxCount`, `ExportSheetName`, and `ExportPolicyName` (when unset, `HasExportPermission` defaults to `true` and relies on the page-level `[Authorize]`).
+
+### Sheet presentation (`ExcelWriteOptions`)
+
+`ExcelWriteOptions` describes **how** the sheet is written, without naming an engine — so replacing `IExcelExporter` leaves pages untouched. Pass it as `ExcelExportOptions<T>.WriteOptions`, or override `ExportWriteOptions` on a CRUD page. Every default reproduces the previous behaviour, so adding it changes nothing until you set something:
+
+| Member | Default | Effect |
+|---|---|---|
+| `SheetName` | null | Worksheet name; falls back to `ExcelExportOptions<T>.SheetName` |
+| `SheetStyle` | `Plain` | `Plain` = no cell borders, no header fill; `Tabular` = tinted header + thin borders everywhere |
+| `FreezeRowCount` | 1 | Rows frozen at the top (header stays visible) |
+| `FreezeColumnCount` | 0 | Columns frozen at the left — set it to the number of leading identity columns |
+| `AutoFitColumns` | false | Size columns to content, clamped by `MinColumnWidth` / `MaxColumnWidth` |
+| `HeaderBackgroundColor` | null | Header fill as `#RRGGBB`. Implies `Tabular` |
+| `HeaderWrapText` | false | Wrap long header captions. Implies `Tabular` |
+
+> **Behaviour change in 2.10.0** — exports are now `Plain`. Previously every cell got a thin border and the header a blue fill; pass `SheetStyle = ExcelSheetStyle.Tabular` to keep that look.
+
+Borders and the header fill come from one switch in MiniExcel, so they are on or off together — "borderless with a coloured header" is not reachable, and header styling is ignored outright on a plain sheet (which is why setting it implies `Tabular`).
+
+What the MiniExcel engine **cannot** do, whatever you pass: per-row styling (zebra striping), bold headers, and merged cells. A sheet that needs those needs a different `IExcelExporter` implementation.
 
 ### Use it on any page (no base class)
 

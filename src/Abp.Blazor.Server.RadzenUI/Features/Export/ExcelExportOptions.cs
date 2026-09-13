@@ -41,6 +41,17 @@ public class ExcelExportOptions<T>
     /// <summary>Worksheet name.</summary>
     public string? SheetName { get; init; }
 
+    /// <summary>
+    /// How the sheet is written: frozen panes, column widths and header style. Null applies the
+    /// exporter's defaults.
+    /// <para>
+    /// Its own <see cref="ExcelWriteOptions.SheetName"/> may stay null — <see cref="SheetName"/> is
+    /// then used — so a page that already sets <see cref="SheetName"/> only has to add presentation
+    /// here.
+    /// </para>
+    /// </summary>
+    public ExcelWriteOptions? WriteOptions { get; init; }
+
     /// <summary>Optional ABP policy checked (throwing) before exporting. Null skips the check.</summary>
     public string? PolicyName { get; init; }
 

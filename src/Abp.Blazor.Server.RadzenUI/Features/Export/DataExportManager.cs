@@ -77,7 +77,7 @@ public class DataExportManager : IDataExportManager
             await _exporter.ExportToFileAsync(
                 tempFilePath,
                 StreamRowsAsync(options, firstPage, cancellationToken),
-                options.SheetName,
+                ResolveWriteOptions(options),
                 cancellationToken
             );
 
@@ -105,6 +105,23 @@ public class DataExportManager : IDataExportManager
             // Safety net if the temp file was created but never downloaded (e.g. an error in between).
             TryDeleteTempFile(tempFilePath);
         }
+    }
+
+    /// <summary>
+    /// Merges the two ways a caller can name the sheet: <see cref="ExcelExportOptions{T}.SheetName"/>
+    /// (the original one) and <see cref="ExcelWriteOptions.SheetName"/>. The write options win when
+    /// they carry a name, so a page can set presentation only and keep naming the sheet as before.
+    /// </summary>
+    private static ExcelWriteOptions ResolveWriteOptions<T>(ExcelExportOptions<T> options)
+    {
+        if (options.WriteOptions is null)
+        {
+            return new ExcelWriteOptions { SheetName = options.SheetName };
+        }
+
+        return string.IsNullOrWhiteSpace(options.WriteOptions.SheetName)
+            ? options.WriteOptions with { SheetName = options.SheetName }
+            : options.WriteOptions;
     }
 
     /// <summary>
