@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <AbpVersion>10.5.0</AbpVersion>
+    <AbpVersion>10.6.1</AbpVersion>
     <Net10PackageVersion>10.0.3</Net10PackageVersion>
     <ContainersToolsVersion>1.23.0</ContainersToolsVersion>
     <AspireHostingVersion>13.3.5</AspireHostingVersion>
