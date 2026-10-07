@@ -67,12 +67,10 @@
         {
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.75rem">
                 <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
-                    <RequiredMark />
                     <RadzenLabel Text="@L["SmtpDomain"]" Component="@nameof(UpdateEmailSettingsVm.SmtpDomain)" />
                 </RadzenColumn>
                 <RadzenColumn Size="12" SizeMD="8">
                     <RadzenTextBox Name="@nameof(UpdateEmailSettingsVm.SmtpDomain)" @bind-Value="@EmailSettings.SmtpDomain" Style="display:block;width:min(100%, 28rem)" />
-                    <RadzenRequiredValidator Component="@nameof(UpdateEmailSettingsVm.SmtpDomain)" Text="@L.Required("SmtpDomain")" Style="position: absolute" />
                 </RadzenColumn>
             </RadzenRow>
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.75rem">
