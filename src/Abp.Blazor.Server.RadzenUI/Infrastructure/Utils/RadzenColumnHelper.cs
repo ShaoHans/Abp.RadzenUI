@@ -1,4 +1,5 @@
-using System.Globalization;
+﻿using System.Globalization;
+using Abp.RadzenUI.ObjectExtending;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 using Radzen.Blazor;
@@ -21,10 +22,31 @@ public static class RadzenColumnHelper
 {
     public static List<ExtraPropertyColumnMeta> GetExtraPropertyMetas<TItem>()
     {
+        return GetExtraPropertyMetas<TItem>(null, null, null);
+    }
+
+    /// <summary>
+    /// Builds column metadata for the extension properties of <typeparamref name="TItem"/>.
+    /// When <paramref name="moduleName"/> / <paramref name="entityName"/> are given, properties
+    /// configured with <c>UI.OnTable.IsVisible = false</c> at module level are skipped
+    /// (ABP does not copy that flag onto the DTO-level property info). The column title falls back to
+    /// the property's <c>DisplayName</c> when no <c>Title</c> / <c>LocalizationKey</c> configuration exists.
+    /// </summary>
+    public static List<ExtraPropertyColumnMeta> GetExtraPropertyMetas<TItem>(
+        string? moduleName,
+        string? entityName,
+        IStringLocalizerFactory? stringLocalizerFactory
+    )
+    {
         return
         [
             .. ObjectExtensionManager
                 .Instance.GetProperties<TItem>()
+                .Where(prop =>
+                    moduleName == null
+                    || entityName == null
+                    || ModuleExtensionPropertyHelper.IsVisibleOnTable(moduleName, entityName, prop.Name)
+                )
                 .Select(prop =>
                 {
                     var key =
@@ -32,14 +54,26 @@ public static class RadzenColumnHelper
                             ? lk.ToString()!
                             : $"DisplayName:{typeof(TItem).Name}.{prop.Name}";
 
+                    var title =
+                        prop.Configuration?.TryGetValue("Title", out var t) == true
+                            ? t.ToString()
+                            : null;
+
+                    if (
+                        title == null
+                        && prop.DisplayName != null
+                        && stringLocalizerFactory != null
+                        && prop.Configuration?.ContainsKey("LocalizationKey") != true
+                    )
+                    {
+                        title = prop.DisplayName.Localize(stringLocalizerFactory);
+                    }
+
                     return new ExtraPropertyColumnMeta
                     {
                         Name = prop.Name,
                         LocalizationKey = key,
-                        Title =
-                            prop.Configuration?.TryGetValue("Title", out var t) == true
-                                ? t.ToString()
-                                : null,
+                        Title = title,
                         Width =
                             prop.Configuration?.TryGetValue("Width", out var w) == true
                                 ? w.ToString()

@@ -1,5 +1,6 @@
 ﻿@typeparam TEntity
 @typeparam TResourceType
+@using Abp.RadzenUI.Components.Shared
 @using Volo.Abp.AspNetCore.Components
 @using Volo.Abp.Localization
 @inherits ExtensionPropertyComponentBase<TEntity, TResourceType>
@@ -7,11 +8,18 @@
 @if (PropertyInfo != null && Entity != null)
 {
     <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-        <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+        <RadzenColumn Size="12" SizeMD="@LabelSizeMD" class="rz-text-align-start rz-text-align-md-end">
             <RadzenLabel Text="@PropertyInfo.GetLocalizedDisplayName(StringLocalizerFactory)" Component="@PropertyInfo.Name" />
         </RadzenColumn>
-        <RadzenColumn Size="12" SizeMD="8">
-            <RadzenCheckBox TValue="bool" @bind-Value="@Value" Name="@PropertyInfo.Name" />
+        <RadzenColumn Size="12" SizeMD="@InputSizeMD">
+            @if (ReadOnly)
+            {
+                <BooleanIcon Value="@Value" />
+            }
+            else
+            {
+                <RadzenCheckBox TValue="bool" @bind-Value="@Value" Name="@PropertyInfo.Name" />
+            }
         </RadzenColumn>
     </RadzenRow>
 }

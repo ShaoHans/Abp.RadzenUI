@@ -1,3 +1,4 @@
+﻿using Abp.RadzenUI.ObjectExtending;
 using Abp.RadzenUI.Application.Contracts.Users;
 using Abp.RadzenUI.Features.Avatar;
 using Abp.RadzenUI.Localization;
@@ -39,7 +40,11 @@ public partial class List
     protected override void OnInitialized()
     {
         _extraColumns = RadzenColumnHelper
-            .GetExtraPropertyMetas<IdentityUserDto>()
+            .GetExtraPropertyMetas<IdentityUserDto>(
+                IdentityModuleExtensionConsts.ModuleName,
+                IdentityModuleExtensionConsts.EntityNames.User,
+                StringLocalizerFactory
+            )
             .Where(x => !x.Name.Equals(AvatarConsts.ExtraPropertyName, StringComparison.Ordinal))
             .ToList();
     }
@@ -99,7 +104,9 @@ public partial class List
             RoleNames = userRoles,
         };
 
-        dto.MapExtraPropertiesTo(updateDto);
+        // Not MapExtraPropertiesTo: that validates while copying and would throw for a
+        // [Required] extension property that is still empty on an existing record.
+        ExtraPropertyMappingHelper.CopyExtraPropertiesForEditing(dto, updateDto);
 
         return updateDto;
     }

@@ -9,7 +9,7 @@
 
     foreach (var propertyInfo in Properties)
     {
-        if (!propertyInfo.Name.EndsWith("_Text") && !ExcludedPropertyNames.Contains(propertyInfo.Name))
+        if (!IsHidden(propertyInfo))
         {
             if (propertyInfo.Type.IsEnum)
             {

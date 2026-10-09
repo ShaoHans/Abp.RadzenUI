@@ -1,13 +1,21 @@
+using Abp.RadzenUI.Features.Avatar;
 using Abp.RadzenUI.Models;
 using Riok.Mapperly.Abstractions;
 using Volo.Abp.Account;
 using Volo.Abp.Mapperly;
+using Volo.Abp.ObjectExtending;
 using Volo.Abp.SettingManagement;
 
 namespace Abp.RadzenUI;
 
+// PersonalInfoModel has no extension property definitions of its own; it mirrors
+// ProfileDto / UpdateProfileDto. ABP's default pair check would therefore drop every
+// extension property, so definition checks are disabled on both directions.
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
-[MapExtraProperties]
+[MapExtraProperties(
+    DefinitionChecks = MappingPropertyDefinitionChecks.None,
+    IgnoredProperties = [AvatarConsts.ExtraPropertyName]
+)]
 public partial class ProfileDtoToPersonalInfoModelMapper : MapperBase<ProfileDto, PersonalInfoModel>
 {
     [MapperIgnoreTarget(nameof(PersonalInfoModel.PhoneNumberConfirmed))]
@@ -20,7 +28,10 @@ public partial class ProfileDtoToPersonalInfoModelMapper : MapperBase<ProfileDto
 }
 
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
-[MapExtraProperties]
+[MapExtraProperties(
+    DefinitionChecks = MappingPropertyDefinitionChecks.None,
+    IgnoredProperties = [AvatarConsts.ExtraPropertyName]
+)]
 public partial class PersonalInfoModelToUpdateProfileDtoMapper
     : MapperBase<PersonalInfoModel, UpdateProfileDto>
 {

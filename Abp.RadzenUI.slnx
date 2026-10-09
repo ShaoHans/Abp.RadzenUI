@@ -22,6 +22,10 @@
     <File Path="Directory.Packages.props" />
     <File Path="docker-compose.yml" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Abp.RadzenUI.Domain.Shared.Tests/Abp.RadzenUI.Domain.Shared.Tests.csproj" />
+    <Project Path="tests/Abp.RadzenUI.LinkAccounts.Tests/Abp.RadzenUI.LinkAccounts.Tests.csproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/Abp.Blazor.Server.RadzenUI/Abp.Blazor.Server.RadzenUI.csproj" />
     <Project Path="src/Abp.RadzenUI.Application.Contracts/Abp.RadzenUI.Application.Contracts.csproj" />

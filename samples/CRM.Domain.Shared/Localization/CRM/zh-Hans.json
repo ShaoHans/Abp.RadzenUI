@@ -1,4 +1,4 @@
-{
+﻿{
   "culture": "zh-Hans",
   "texts": {
     "AppName": "CRM",
@@ -139,6 +139,8 @@
     "DisplayName:Title": "标题",
     "DisplayName:ImagePath": "图片名称",
     "DisplayName:Price": "价格",
+    "DisplayName:Department": "部门",
+    "DisplayName:Nickname": "昵称",
     "DisplayName:StockCount": "库存数量",
     "DisplayName:Status": "状态",
     "DisplayName:Description": "描述",

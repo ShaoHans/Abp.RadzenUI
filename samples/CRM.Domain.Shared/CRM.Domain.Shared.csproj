@@ -28,6 +28,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Abp.RadzenUI.Domain.Shared\Abp.RadzenUI.Domain.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Localization\CRM\*.json" />
     <Content Remove="Localization\CRM\*.json" />
   </ItemGroup>

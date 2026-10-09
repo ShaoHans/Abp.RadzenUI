@@ -6,17 +6,24 @@
 
 @if (PropertyInfo != null && Entity != null)
 {
-    var isRequired = PropertyInfo.IsRequired();
+    var isRequired = IsRequiredAndEditable;
     <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-        <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+        <RadzenColumn Size="12" SizeMD="@LabelSizeMD" class="rz-text-align-start rz-text-align-md-end">
             @if (isRequired)
             {
                 <RequiredMark />
             }
             <RadzenLabel Text="@PropertyInfo.GetLocalizedDisplayName(StringLocalizerFactory)" Component="@PropertyInfo.Name" />
         </RadzenColumn>
-        <RadzenColumn Size="12" SizeMD="8">
-            <RadzenTextBox Name="@PropertyInfo.Name" @bind-Value="@Value" Style="display: block; width: 100%;" />
+        <RadzenColumn Size="12" SizeMD="@InputSizeMD">
+            @if (ReadOnly)
+            {
+                <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-0">@Value</RadzenText>
+            }
+            else
+            {
+                <RadzenTextBox Name="@PropertyInfo.Name" @bind-Value="@Value" Style="@InputStyle" />
+            }
             @if (isRequired)
             {
                 <RadzenRequiredValidator Component="@PropertyInfo.Name" Text="@L.Required(PropertyInfo.GetLocalizedDisplayName(StringLocalizerFactory))" />

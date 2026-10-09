@@ -1,3 +1,4 @@
+﻿using Abp.RadzenUI.ObjectExtending;
 using Abp.RadzenUI.Application.Contracts.Organizations;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Models;
@@ -68,7 +69,9 @@ public partial class Index
     )
     {
         var updateDto = new OrganizationUnitUpdateDto { DisplayName = dto.DisplayName };
-        dto.MapExtraPropertiesTo(updateDto);
+        // Not MapExtraPropertiesTo: that validates while copying and would throw for a
+        // [Required] extension property that is still empty on an existing record.
+        ExtraPropertyMappingHelper.CopyExtraPropertiesForEditing(dto, updateDto);
         return Task.FromResult(updateDto);
     }
 

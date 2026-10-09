@@ -257,7 +257,7 @@ await ExportManager.ExportToExcelAsync(new ExcelExportOptions<ItemDto>
 公共组件目录：
 
 - `Components/Shared`：搜索框、分页跳转、布尔图标、错误边界、语言切换、表单布局等。
-- `Components/ObjectExtending`：ABP 对象扩展属性的 Radzen 表单组件。
+- `Components/ObjectExtending`：ABP 对象扩展属性的 Radzen 表单组件。`ExtensionProperties` 支持 `DefinitionType`（定义来源类型与绑定对象分离）、`HiddenWhen` / `ReadOnlyWhen`（按属性隐藏或只读）、`LabelSizeMD` / `InputSizeMD`（与宿主表单列宽对齐）和 `InputStyle`（输入框内联样式，默认撑满列，传空串则用 Radzen 默认宽度）。
 - `Features/SideDialogs`：侧边弹窗协调器。
 - `Features/Settings`：设置页贡献器机制。
 
@@ -334,6 +334,27 @@ UI 包已经内置关联账户页面，主要页面在：
 
 头像地址存放在身份用户扩展属性中，扩展配置在 `AvatarModuleExtensionConfigurator`。
 
+### 个人中心扩展属性
+
+相关目录：
+
+- `src/Abp.RadzenUI.Domain.Shared/ObjectExtending`：`ProfileExtensionPropertyMode`、`AbpRadzenUIProfileOptions`、`ConfigureProfile(...)` 扩展方法与 `ProfileExtensionPropertyHelper`。
+- `src/Abp.RadzenUI.Application/Account/AbpRadzenUIProfileAppService.cs`：替换 ABP `ProfileAppService` 的服务端兜底。
+- `src/Abp.Blazor.Server.RadzenUI/Components/Pages/Account/Manage.razor`：PersonalInfo tab 渲染。
+
+管理员在用户创建/编辑弹窗填写的身份用户扩展属性，会在 `/account/manage` 的 PersonalInfo tab 中展示。每个属性在个人中心的行为由 `ProfileExtensionPropertyMode` 决定：`Hidden`（不展示、不接受）、`ReadOnly`（展示但禁止修改）、`Editable`（可改并保存）。
+
+- **全局默认**：`Configure<AbpRadzenUIProfileOptions>(o => o.DefaultExtensionPropertyMode = ...)`，未显式配置的属性走该默认值，出厂默认 `ReadOnly`。
+- **按属性配置**：在定义属性时调用 `ConfigureProfile`，既支持模块级 `ExtensionPropertyConfiguration`（`ConfigureIdentity(i => i.ConfigureUser(u => u.AddOrUpdateProperty<string>("Department", p => p.ConfigureProfile(c => c.Mode = ProfileExtensionPropertyMode.Editable))))`），也支持直接定义在 `ProfileDto` / `UpdateProfileDto` 上的 `ObjectExtensionPropertyInfo`。配置存放在 ABP 自带的 `Configuration` 字典里，键为 `ProfileExtensionPropertyInfoExtensions.ConfigurationKey`。
+- **只读展示**：`ReadOnly` 的属性不渲染输入框，而是用 `RadzenText` 显示文本（日期/时间按固定格式、密码打码、布尔用 `BooleanIcon`），也不挂必填标记和校验器。
+- **校验放宽**：模块级定义会把 `Required` 等校验属性一起复制到 `UpdateProfileDto`，但用户填不了只读字段，所以 `AbpRadzenUIApplicationModule.OnApplicationInitialization` 调用 `ProfileExtensionPropertyHelper.RelaxValidationForNonEditableProperties` 把 ReadOnly / Hidden 属性在 `UpdateProfileDto` 上的 `ValidationAttribute`（保留 `DataTypeAttribute`）和 `Validators` 去掉，老用户字段为空也能保存个人资料。
+- **作用范围**：只影响个人中心页面和 `IProfileAppService.UpdateAsync`；管理员的用户创建/编辑弹窗继续遵循 ABP 自带的 `UI.CreateModal` / `UI.EditModal`，`IIdentityUserAppService` 不受影响。
+- **服务端兜底**：`AbpRadzenUIProfileAppService.UpdateAsync` 会把非 `Editable` 的扩展属性从入参中移除后再交给 ABP 原逻辑，因此直接调用 `/api/account/my-profile` 也改不了只读字段。
+- **编辑弹窗加载**：用户 / 租户 / 组织机构列表打开编辑弹窗时，用 `ExtraPropertyMappingHelper.CopyExtraPropertiesForEditing` 把 Get DTO 的扩展属性拷到 Update DTO，而不是 ABP 的 `MapExtraPropertiesTo`：后者每次 `SetProperty` 都会校验，老记录上为空的 `[Required]` 扩展属性会在打开弹窗时直接抛 `AbpValidationException`。
+- **列表列**：用户 / 租户列表的扩展列由 `RadzenColumnHelper.GetExtraPropertyMetas<TItem>(moduleName, entityName, localizerFactory)` 生成，会按模块级 `UI.OnTable.IsVisible` 过滤（ABP 不会把该标记复制到 DTO 级属性信息上，所以要通过 `ModuleExtensionPropertyHelper.IsVisibleOnTable` 回查模块配置），列标题在没有 `Title` / `LocalizationKey` 配置时回退到属性的 `DisplayName`。
+
+`PersonalInfoModel` 本身没有注册扩展属性定义，ABP 默认的成对定义检查会把扩展属性全部丢弃，所以 `ProfileDto ↔ PersonalInfoModel ↔ UpdateProfileDto` 的 Mapperly 映射显式使用 `MappingPropertyDefinitionChecks.None` 并忽略头像属性；页面上的 `ExtensionProperties` 以 `DefinitionType="typeof(UpdateProfileDto)"` 取定义、绑定到 `PersonalInfoModel`。
+
 ## EF Core 集成
 
 项目：`src/Abp.RadzenUI.EntityFrameworkCore`
@@ -371,6 +392,8 @@ builder.ConfigureAbpRadzenUI();
 - 替换 `IUIPlaceHolderResolver`。
 - 配置认证、OpenIddict、Swagger、多租户、审计、动态 Claims。
 - 在应用管线末尾调用 `app.UseRadzenUI()`。
+
+扩展属性示例：`samples/CRM.Domain.Shared/CRMModuleExtensionConfigurator.cs` 用模块级扩展 `ConfigureIdentity(i => i.ConfigureUser(...))` 一次定义 `Department`（必填、个人中心只读）和 `Nickname`（选填、个人中心可编辑、`UI.OnTable.IsVisible = false` 不在用户列表占列），ABP 自动复制到 IdentityUser 实体和全部相关 DTO；显示名走 `CRMResource` 的 `DisplayName:*` 键。`CRM.Domain.Shared` 为此引用了 `Abp.RadzenUI.Domain.Shared`。租户显示名仍按 DTO 逐个定义在 `samples/CRM.Application.Contracts/CRMDtoExtensions.cs`。
 
 示例启动入口：`samples/CRM.Blazor.Web/Program.cs`
 

@@ -1,4 +1,4 @@
-{
+﻿{
   "Culture": "en",
   "Texts": {
     "AppName": "CRM",
@@ -106,6 +106,8 @@
     "DisplayName:Title": "Title",
     "DisplayName:ImagePath": "Image Path",
     "DisplayName:Price": "Price",
+    "DisplayName:Department": "Department",
+    "DisplayName:Nickname": "Nickname",
     "DisplayName:StockCount": "StockCount",
     "DisplayName:Status": "Status",
     "DisplayName:Description": "Description",

@@ -1,3 +1,4 @@
+﻿using Abp.RadzenUI.ObjectExtending;
 using Abp.RadzenUI.Components.Shared;
 using Abp.RadzenUI.Infrastructure.Utils;
 using Microsoft.AspNetCore.Authorization;
@@ -41,13 +42,19 @@ public partial class List
 
     protected override void OnInitialized()
     {
-        _extraColumns = RadzenColumnHelper.GetExtraPropertyMetas<TenantDto>();
+        _extraColumns = RadzenColumnHelper.GetExtraPropertyMetas<TenantDto>(
+            TenantManagementModuleExtensionConsts.ModuleName,
+            TenantManagementModuleExtensionConsts.EntityNames.Tenant,
+            StringLocalizerFactory
+        );
     }
 
     protected override Task<TenantUpdateDto> SetEditDialogModelAsync(TenantDto dto)
     {
         var updateDto = new TenantUpdateDto { Name = dto.Name };
-        dto.MapExtraPropertiesTo(updateDto);
+        // Not MapExtraPropertiesTo: that validates while copying and would throw for a
+        // [Required] extension property that is still empty on an existing record.
+        ExtraPropertyMappingHelper.CopyExtraPropertiesForEditing(dto, updateDto);
         return Task.FromResult(updateDto);
     }
 

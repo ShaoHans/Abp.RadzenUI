@@ -28,6 +28,36 @@ public abstract class ExtensionPropertyComponentBase<TEntity, TResourceType> : A
     [Parameter]
     public AbpBlazorMessageLocalizerHelper<TResourceType> LH { get; set; } = default!;
 
+    /// <summary>
+    /// Renders the input as read-only and skips required validation.
+    /// </summary>
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    /// <summary>
+    /// Bootstrap-style column size (1-12) of the label on medium+ screens.
+    /// </summary>
+    [Parameter]
+    public int LabelSizeMD { get; set; } = 4;
+
+    /// <summary>
+    /// Bootstrap-style column size (1-12) of the input on medium+ screens.
+    /// </summary>
+    [Parameter]
+    public int InputSizeMD { get; set; } = 8;
+
+    /// <summary>
+    /// Inline style applied to the input control. Defaults to filling the column,
+    /// which suits dialogs; pass an empty string to keep Radzen's default width.
+    /// </summary>
+    [Parameter]
+    public string InputStyle { get; set; } = "display: block; width: 100%;";
+
+    /// <summary>
+    /// Required mark and validator are only rendered when the field is editable.
+    /// </summary>
+    protected bool IsRequiredAndEditable => !ReadOnly && PropertyInfo.IsRequired();
+
     //[Parameter]
     //public ExtensionPropertyModalType? ModalType { get; set; }
 
