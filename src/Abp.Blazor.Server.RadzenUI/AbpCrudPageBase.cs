@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using Radzen;
 using Radzen.Blazor;
@@ -210,17 +211,64 @@ public abstract class AbpCrudPageBase<
         await PersistPageSizeCookieAsync(_defaultPageSize);
     }
 
+    /// <summary>Whether the last <see cref="LoadDataAsync"/> failed. The grid keeps its previous rows; derived pages can skip follow-ups such as restoring state from the URL.</summary>
+    protected bool LastLoadFailed { get; private set; }
+
     protected virtual async Task LoadDataAsync(LoadDataArgs args)
     {
         _isLoading = true;
-        await UpdatePageSizePreferenceAsync(args);
-        await UpdateGetListInputAsync(args);
-        var result = await AppService.GetListAsync(GetListInput);
-        _entities = MapToListViewModel(result.Items);
-        _totalCount = (int)result.TotalCount;
-        _isLoading = false;
+        Exception? error = null;
+        try
+        {
+            await UpdatePageSizePreferenceAsync(args);
+            await UpdateGetListInputAsync(args);
+            var result = await AppService.GetListAsync(GetListInput);
+            _entities = MapToListViewModel(result.Items);
+            _totalCount = (int)result.TotalCount;
+            LastLoadFailed = false;
+        }
+        catch (Exception ex)
+        {
+            LastLoadFailed = true;
+            error = ex;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+
+        // Render first: HandleErrorAsync only returns after the user closes the dialog
         StateHasChanged();
+
+        if (error is null)
+        {
+            return;
+        }
+
+        if (IsIgnorableLoadError(error))
+        {
+            Logger.LogDebug(error, "List load interrupted");
+            return;
+        }
+
+        await OnLoadDataErrorAsync(error);
     }
+
+    /// <summary>Reports a load failure. During prerendering nobody can close a dialog and the SSR request would hang, so it only logs; the interactive reload reports it.</summary>
+    protected virtual Task OnLoadDataErrorAsync(Exception exception)
+    {
+        if (RendererInfo.IsInteractive)
+        {
+            return HandleErrorAsync(exception);
+        }
+
+        Logger.LogWarning(exception, "List load failed during prerendering");
+        return Task.CompletedTask;
+    }
+
+    /// <summary>Circuit gone, request canceled or component disposed: there is no one to inform.</summary>
+    protected static bool IsIgnorableLoadError(Exception exception) =>
+        exception is JSDisconnectedException or OperationCanceledException or ObjectDisposedException;
 
     protected virtual Task UpdateGetListInputAsync(LoadDataArgs args)
     {
@@ -286,12 +334,19 @@ public abstract class AbpCrudPageBase<
             return;
         }
 
-        await JSRuntime.InvokeVoidAsync(
-            "abpRadzenCookie.set",
-            AbpRadzenUICookieHelper.PageSizeKey,
-            pageSize.ToString(CultureInfo.InvariantCulture),
-            3650
-        );
+        try
+        {
+            await JSRuntime.InvokeVoidAsync(
+                "abpRadzenCookie.set",
+                AbpRadzenUICookieHelper.PageSizeKey,
+                pageSize.ToString(CultureInfo.InvariantCulture),
+                3650
+            );
+        }
+        catch (JSDisconnectedException)
+        {
+            return;
+        }
 
         _lastPersistedPageSize = pageSize;
     }
