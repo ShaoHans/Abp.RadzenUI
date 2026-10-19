@@ -3,6 +3,7 @@
 @using Microsoft.Extensions.Localization
 @using Microsoft.Extensions.Logging
 @using Volo.Abp
+@using Volo.Abp.AspNetCore.ExceptionHandling
 @using Volo.Abp.Identity
 @using Volo.Abp.Localization
 @inherits ErrorBoundary
@@ -10,6 +11,7 @@
 @inject NotificationService NotificationService
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<AbpRadzenUIResource> L
+@inject IExceptionToErrorInfoConverter ErrorInfoConverter
 @inject IServiceProvider ScopedServices
 
 @if (CurrentException is null)
@@ -49,7 +51,7 @@ else if (ErrorContent is not null)
                         }
                         break;
                     case BusinessException businessException:
-                        NotificationService.Error(L[businessException.Code!]);
+                        NotificationService.Error(ErrorInfoConverter.Convert(businessException).Message ?? L["500Message"]);
                         break;
                     default:
                         NotificationService.Error(L["500Message"]);
