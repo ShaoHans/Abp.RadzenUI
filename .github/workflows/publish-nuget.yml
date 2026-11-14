@@ -23,6 +23,10 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read   # actions/checkout
+      id-token: write  # nuget.org Trusted Publishing：签发 GitHub OIDC 令牌
+
     steps:
     - uses: actions/checkout@v4
       name: Checkout code
@@ -60,5 +64,11 @@ jobs:
       run: dotnet nuget add source --username ShaoHans --password ${{ secrets.NUGET_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/ShaoHans/index.json"
     - name: Publish the package to Github Packages
       run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_TOKEN }} --source github --skip-duplicate
+    # Trusted Publishing：用 OIDC 换取 1 小时有效的临时 API key，紧挨推送步骤以免过期
+    - name: NuGet login (OIDC → temp API key)
+      uses: NuGet/login@v1
+      id: nuget-login
+      with:
+        user: ${{ secrets.NUGET_USER }}  # nuget.org 用户名（profile name），不是邮箱
     - name: Publish the package to Nuget Gallery
-      run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_GALLERY_TOKEN }}  --source nuget.org --skip-duplicate
+      run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
