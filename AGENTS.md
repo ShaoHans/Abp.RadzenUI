@@ -425,7 +425,6 @@ builder.ConfigureAbpRadzenUI();
 
 重要 JS：
 
-- `blazor.server.js`
 - `fullscreen.js`
 - `page-size-preference.js`
 - `side-dialog-clickaway.js`
