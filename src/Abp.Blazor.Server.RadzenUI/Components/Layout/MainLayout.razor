@@ -11,7 +11,7 @@
     <RadzenComponents />
     <RadzenMediaQuery Query="(max-width: 768px)" Change="HandleMobileLayoutChange" />
 
-    <RadzenLayout class="app-layout-shell" Style="grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'rz-header rz-header rz-header' 'rz-sidebar rz-body rz-config-sidebar'">
+    <RadzenLayout class="@(menuCollapsed ? "app-layout-shell app-layout-shell--rail" : "app-layout-shell")" Style="grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'rz-header rz-header rz-header' 'rz-sidebar rz-body rz-config-sidebar'">
         <Header MenuToggle="ToggleMenu"
             ThemeToggle="ToggleTheme"
             MessageToggle="ToggleMessages"

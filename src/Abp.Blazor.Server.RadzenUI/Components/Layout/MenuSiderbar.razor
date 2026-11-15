@@ -15,17 +15,53 @@
     @* <div style="padding: 1rem">
         <RadzenTextBox id="find" Placeholder="Find menu ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" class="rz-search-input" aria-label="find" />
     </div> *@
-    <div style="flex: 1; overflow: auto">
-        <RadzenPanelMenu Match="NavLinkMatch.Prefix" Multiple="@_titleBarSettings.AllowSideMenuMultipleExpand"
-                         DisplayStyle="@(Collapsed ? MenuItemDisplayStyle.Icon : MenuItemDisplayStyle.IconAndText)"
-                         ShowArrow="@(!Collapsed)"
-                         Style="@PanelMenuStyle">
+    @if (Collapsed)
+    {
+        @* 折叠态：只显示一级图标，悬停浮出该项的子菜单（浮层定位见 js/menu-rail.js） *@
+        <ul class="app-rail">
             @foreach (var menu in _applicationMenu?.Items ?? [])
             {
-                @BuildMenuTree(menu);
+                var displayName = GetDisplayName(menu);
+                var hasChildren = !menu.Items.IsNullOrEmpty();
+                <li class="@(IsActive(menu) ? "app-rail__item app-rail__item--active" : "app-rail__item")">
+                    @if (hasChildren)
+                    {
+                        <div class="app-rail__link" tabindex="0" aria-label="@displayName" aria-haspopup="true">
+                            @RailIcon(menu, displayName)
+                        </div>
+                    }
+                    else
+                    {
+                        <a class="app-rail__link" href="@menu.Url" aria-label="@displayName">
+                            @RailIcon(menu, displayName)
+                        </a>
+                    }
+                    <div class="app-rail__flyout">
+                        <div class="app-rail__flyout-panel">
+                            <div class="app-rail__flyout-title">@displayName</div>
+                            @if (hasChildren)
+                            {
+                                <RadzenPanelMenu Match="NavLinkMatch.Prefix" Multiple="@_titleBarSettings.AllowSideMenuMultipleExpand">
+                                    @BuildMenuChildren(menu.Items)
+                                </RadzenPanelMenu>
+                            }
+                        </div>
+                    </div>
+                </li>
             }
-        </RadzenPanelMenu>
-    </div>
+        </ul>
+    }
+    else
+    {
+        <div style="flex: 1; overflow: auto">
+            <RadzenPanelMenu Match="NavLinkMatch.Prefix" Multiple="@_titleBarSettings.AllowSideMenuMultipleExpand">
+                @foreach (var menu in _applicationMenu?.Items ?? [])
+                {
+                    @BuildMenuTree(menu);
+                }
+            </RadzenPanelMenu>
+        </div>
+    }
 </RadzenSidebar>
 
 @code {
@@ -38,13 +74,9 @@
 
     string SidebarCssClass => Collapsed ? "demos-sidebar demos-sidebar--collapsed" : "demos-sidebar";
 
-    string SidebarWidth => Collapsed ? "4rem" : "clamp(14rem, 13.5rem + 0.6vw, 15rem)";
+    string SidebarWidth => Collapsed ? "3.5rem" : "13rem";
 
     string SidebarStyle => $"display: flex; flex-direction: column; --rz-sidebar-width: {SidebarWidth};";
-
-    string PanelMenuStyle => Collapsed
-        ? "--rz-panel-menu-icon-margin-inline: 0; --rz-panel-menu-item-padding: 0.75rem 0; --rz-panel-menu-item-2nd-level-padding: 0.75rem 0; --rz-panel-menu-item-3rd-level-padding: 0.75rem 0;"
-        : "--rz-panel-menu-icon-margin-inline: 0 0.75rem; --rz-panel-menu-item-padding: 0.75rem 0.875rem; --rz-panel-menu-item-2nd-level-padding: 0.625rem 0.875rem 0.625rem 2.5rem; --rz-panel-menu-item-3rd-level-padding: 0.5rem 0.875rem 0.5rem 3rem;";
 
 
     ApplicationMenu _applicationMenu = default!;
@@ -73,9 +105,44 @@
                              IconColor="@GetIconColor(menuItem)"
                              Text="@displayName"
                              Path="@menuItem.Url"
-                             Template="@(!Collapsed && UseTemplate(menuItem) ? BuildMenuTemplate(menuItem) : null)"
+                             Template="@(UseTemplate(menuItem) ? BuildMenuTemplate(menuItem) : null)"
                              ChildContent="@(menuItem.Items.IsNullOrEmpty() ? null : BuildMenuChildren(menuItem.Items))" />
     };
+
+    RenderFragment RailIcon(ApplicationMenuItem menuItem, string displayName) => __builder =>
+    {
+        if (string.IsNullOrEmpty(menuItem.Icon))
+        {
+            <span class="app-rail__initial">@(displayName.Length > 0 ? displayName[..1] : "?")</span>
+        }
+        else
+        {
+            <RadzenIcon Icon="@menuItem.Icon" IconColor="@GetIconColor(menuItem)" />
+        }
+
+        if (UseTemplate(menuItem))
+        {
+            <span class="app-rail__dot"></span>
+        }
+    };
+
+    bool IsActive(ApplicationMenuItem menuItem)
+    {
+        var path = "/" + NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Split('?', '#')[0].Trim('/');
+
+        return EnumerateMenuItems([menuItem]).Any(item =>
+        {
+            if (string.IsNullOrEmpty(item.Url))
+            {
+                return false;
+            }
+
+            var url = "/" + item.Url.TrimStart('~').Split('?', '#')[0].Trim('/');
+            return url == "/"
+                ? path == "/"
+                : path.Equals(url, StringComparison.OrdinalIgnoreCase) || path.StartsWith(url + "/", StringComparison.OrdinalIgnoreCase);
+        });
+    }
 
     RenderFragment BuildMenuChildren(IReadOnlyList<ApplicationMenuItem> menuItems) => __builder =>
     {
