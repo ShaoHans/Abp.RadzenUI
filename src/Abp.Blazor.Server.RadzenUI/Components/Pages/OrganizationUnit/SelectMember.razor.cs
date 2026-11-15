@@ -66,7 +66,6 @@ public partial class SelectMember
         _entities = result.Items;
         _totalCount = (int)result.TotalCount;
         _isLoading = false;
-        StateHasChanged();
     }
 
     protected virtual Task UpdateGetListInputAsync(LoadDataArgs args)
