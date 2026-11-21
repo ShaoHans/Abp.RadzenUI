@@ -1,0 +1,47 @@
+@typeparam TDto where TDto : IdentityRoleCreateOrUpdateDtoBase
+@using Microsoft.Extensions.Localization
+@using Volo.Abp.AspNetCore.Components
+@using Volo.Abp.Identity
+@using Volo.Abp.Identity.Localization
+@inherits AbpRadzenUIComponentBase
+
+@* Shared role fields for the create/edit dialogs: label on top for the name,
+   switches with a one-line explanation for the flags. *@
+
+<RadzenStack Gap="1.5rem" class="rz-p-1 rz-mb-4">
+    <RadzenStack Gap="0.25rem">
+        <div>
+            <RequiredMark />
+            <RadzenLabel Text="@L["DisplayName:RoleName"]" Component="Name" />
+        </div>
+        <RadzenTextBox Name="Name" @bind-Value="@Model.Name" MaxLength="IdentityRoleConsts.MaxNameLength" Style="width: 100%;" />
+        <RadzenRequiredValidator Component="Name" Text="@L.Required("DisplayName:RoleName")" />
+    </RadzenStack>
+    <RadzenStack Gap="0.75rem">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Gap="0.75rem">
+            <RadzenSwitch Name="IsDefault" @bind-Value="@Model.IsDefault" />
+            <RadzenStack Gap="0.125rem">
+                <RadzenLabel Text="@L["DisplayName:IsDefault"]" Component="IsDefault" />
+                <RadzenText TextStyle="TextStyle.Caption" class="rz-m-0 rz-text-secondary-color">@IL["RoleForm:IsDefaultHint"]</RadzenText>
+            </RadzenStack>
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Gap="0.75rem">
+            <RadzenSwitch Name="IsPublic" @bind-Value="@Model.IsPublic" />
+            <RadzenStack Gap="0.125rem">
+                <RadzenLabel Text="@L["DisplayName:IsPublic"]" Component="IsPublic" />
+                <RadzenText TextStyle="TextStyle.Caption" class="rz-m-0 rz-text-secondary-color">@IL["RoleForm:IsPublicHint"]</RadzenText>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    [Parameter, EditorRequired] public TDto Model { get; set; } = default!;
+
+    [Inject] public IStringLocalizer<AbpRadzenUIResource> IL { get; set; } = default!;
+
+    public RoleInfoFields()
+    {
+        LocalizationResource = typeof(IdentityResource);
+    }
+}

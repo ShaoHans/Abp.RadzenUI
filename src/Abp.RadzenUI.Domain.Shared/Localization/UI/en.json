@@ -350,7 +350,9 @@
     "UserForm:RolesSelected": "{0} selected",
     "UserForm:NoAssignableRoles": "No roles available to assign.",
     "UserForm:SearchRoles": "Search roles",
-    "UserForm:RoleFromOrganizationUnit": "From organization unit"
+    "UserForm:RoleFromOrganizationUnit": "From organization unit",
+    "RoleForm:IsDefaultHint": "New users are assigned this role automatically.",
+    "RoleForm:IsPublicHint": "Other users can see this role."
   }
 }
 

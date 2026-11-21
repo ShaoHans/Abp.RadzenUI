@@ -348,7 +348,9 @@
     "UserForm:RolesSelected": "已选 {0} 个",
     "UserForm:NoAssignableRoles": "暂无可分配的角色。",
     "UserForm:SearchRoles": "搜索角色",
-    "UserForm:RoleFromOrganizationUnit": "来自组织机构"
+    "UserForm:RoleFromOrganizationUnit": "来自组织机构",
+    "RoleForm:IsDefaultHint": "新用户会自动分配此角色。",
+    "RoleForm:IsPublicHint": "其他用户可以看到此角色。"
   }
 }
 
