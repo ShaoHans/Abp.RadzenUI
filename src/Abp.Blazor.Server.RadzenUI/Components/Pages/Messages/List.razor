@@ -7,7 +7,7 @@
 
 <PageTitle>@L["PageTitle:Messages"]</PageTitle>
 
-<RadzenCard Variant="Variant.Flat" Style="margin-bottom: 0.75rem; padding: 0.75rem 0.875rem; border: 1px solid var(--rz-base-300); background: var(--rz-panel-background-color, var(--rz-base-background-color)); box-shadow: var(--rz-shadow-1);">
+<RadzenCard Variant="Variant.Outlined" class="rz-mb-3 rz-p-3">
     <RadzenRow Gap="1rem" RowGap="0.75rem">
         <RadzenColumn Size="12" SizeMD="4" SizeLG="2">
             <RadzenTextBox Placeholder="@L["Message:TitlePlaceholder"]"
@@ -40,7 +40,7 @@
         <RadzenColumn Size="12" SizeMD="4" SizeLG="2">
             <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" Wrap="FlexWrap.Wrap">
                 <RadzenButton Text="@L["Btn:Search"]" ButtonStyle="ButtonStyle.Primary" Icon="search" Click="SearchAsync" Size="ButtonSize.Small" />
-                <RadzenButton Text="@L["Btn:Reset"]" ButtonStyle="ButtonStyle.Secondary" Icon="refresh" Click="ResetFiltersAsync" Size="ButtonSize.Small" />
+                <RadzenButton Text="@L["Btn:Reset"]" ButtonStyle="ButtonStyle.Base" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="refresh" Click="ResetFiltersAsync" Size="ButtonSize.Small" />
             </RadzenStack>
         </RadzenColumn>
     </RadzenRow>
@@ -51,6 +51,7 @@
                    TItem="UserMessageDto"
                    AllowPaging="true"
                    AllowSorting="true"
+                   Density="Density.Compact"
                    AllowColumnResize="true"
                    AllowRowSelectOnRowClick="false"
                    PagerHorizontalAlign="HorizontalAlign.Center"
@@ -65,18 +66,19 @@
                    @bind-Value="_selectedMessages">
     <HeaderTemplate>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="0.5rem">
-                <RadzenButton Icon="done_all"
-                              Text="@L["Message:BatchMarkAsRead"]"
-                              Disabled="@(_selectedMessages.Count == 0)"
-                              Click="BatchMarkAsReadAsync" />
-                <RadzenButton Icon="mark_email_read"
-                              Text="@L["Message:MarkAllAsRead"]"
-                          ButtonStyle="ButtonStyle.Success"
-                              Click="MarkAllAsReadAsync" />
+            <RadzenButton Icon="done_all"
+                          Text="@L["Message:BatchMarkAsRead"]"
+                          Size="ButtonSize.Small"
+                          Disabled="@(_selectedMessages.Count == 0)"
+                          Click="BatchMarkAsReadAsync" />
+            <RadzenButton Icon="mark_email_read"
+                          Text="@L["Message:MarkAllAsRead"]"
+                          Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter"
+                          Click="MarkAllAsReadAsync" />
         </RadzenStack>
     </HeaderTemplate>
     <Columns>
-        <RadzenDataGridColumn Width="60px" Sortable="false" Filterable="false">
+        <RadzenDataGridColumn Width="50px" Sortable="false" Filterable="false">
             <HeaderTemplate>
                 <RadzenCheckBox TabIndex="-1"
                                 TriState="false"
@@ -96,18 +98,20 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(UserMessageDto.Title)" Title="@L["DisplayName:UserMessage.Title"]" Sortable="false" MinWidth="360px">
             <Template Context="message">
-                <SideDialogLink Text="@message.Title" OnClick="@(async () => await OpenDetailAsync(message))" />
-                <RadzenBadge Text="@(message.IsRead ? L["Message:ReadBadge"] : L["Message:UnreadBadge"] )"
-                                    BadgeStyle="@(message.IsRead ? BadgeStyle.Light : BadgeStyle.Warning)" />
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.375rem" Wrap="FlexWrap.NoWrap">
+                    <RadzenBadge Text="@(message.IsRead ? L["Message:ReadBadge"] : L["Message:UnreadBadge"])"
+                                 BadgeStyle="@(message.IsRead ? BadgeStyle.Base : BadgeStyle.Warning)" Variant="Variant.Flat" Shade="Shade.Lighter" IsPill="true" Style="text-transform:none" />
+                    <SideDialogLink Text="@message.Title" OnClick="@(async () => await OpenDetailAsync(message))" />
+                </RadzenStack>
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(UserMessageDto.MessageType)" Title="@L["DisplayName:UserMessage.MessageType"]" Width="180px" />
-        <RadzenDataGridColumn Property="@nameof(UserMessageDto.ReadTime)" Title="@L["DisplayName:UserMessage.ReadTime"]" Width="180px">
+        <RadzenDataGridColumn Property="@nameof(UserMessageDto.ReadTime)" Title="@L["DisplayName:UserMessage.ReadTime"]" Width="150px">
             <Template Context="message">
-                @(message.ReadTime?.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss") ?? "-")
+                <TextOrDash Text="@(message.ReadTime?.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"))" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(UserMessageDto.CreationTime)" Title="@L["DisplayName:UserMessage.ReceivedTime"]" Width="180px">
+        <RadzenDataGridColumn Property="@nameof(UserMessageDto.CreationTime)" Title="@L["DisplayName:UserMessage.ReceivedTime"]" Width="150px">
             <Template Context="message">
                 @message.CreationTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")
             </Template>

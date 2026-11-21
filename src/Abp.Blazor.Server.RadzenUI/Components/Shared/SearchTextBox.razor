@@ -1,9 +1,22 @@
-﻿<RadzenFormField Style="@Style" Text="@PlaceHoder" Variant="Variant.Outlined">
+﻿@*
+    List-toolbar search box built from official Radzen parts: a RadzenFormField
+    without a floating label (the label truncated long hints such as
+    "user name/email/phone"), the hint as placeholder/tooltip, Enter to search,
+    and a clear button that resets the keyword and searches again.
+*@
+@* AllowFloatingLabel=false: with the floating label on, RadzenFormField overwrites the
+   child input's placeholder with " " to make room for the label, so the hint vanishes. *@
+<RadzenFormField Style="@Style" Variant="Variant.Outlined" AllowFloatingLabel="false">
+    <Start>
+        <RadzenIcon Icon="search" IconStyle="IconStyle.Secondary" />
+    </Start>
     <ChildContent>
-        <RadzenTextBox @bind-Value="@Keyword" @oninput="HandleInput" @onkeydown="HandleKeyDown" />
+        <RadzenTextBox Value="@Keyword" Placeholder="@PlaceHoder" title="@PlaceHoder" aria-label="@PlaceHoder"
+                       @oninput="HandleInput" @onkeydown="HandleKeyDown" />
     </ChildContent>
     <End>
-        <RadzenIcon Icon="search" IconStyle="IconStyle.Secondary" />
+        <RadzenButton Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.ExtraSmall"
+                      Visible="@(!string.IsNullOrEmpty(Keyword))" Click="ClearAsync" />
     </End>
 </RadzenFormField>
 
@@ -32,6 +45,17 @@
     async Task HandleKeyDown(KeyboardEventArgs args)
     {
         if (args.Key == "Enter" && SearchAsync is not null)
+        {
+            await SearchAsync.Invoke();
+        }
+    }
+
+    async Task ClearAsync()
+    {
+        Keyword = null;
+        await KeywordChanged.InvokeAsync(Keyword);
+
+        if (SearchAsync is not null)
         {
             await SearchAsync.Invoke();
         }

@@ -6,32 +6,32 @@
 
 <PageTitle>@L["Roles"]</PageTitle>
 
-<LocalizedDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true"
+<LocalizedDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true" Density="Density.Compact"
                 PagerHorizontalAlign="HorizontalAlign.Center" PageSize="@_defaultPageSize" Style="height:calc(100vh - 110px)"
                 PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary"
                 LoadData="LoadDataAsync" Count="@_totalCount" IsLoading="@_isLoading">
     <HeaderTemplate>
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="0.5rem">
             @if (HasCreatePermission)
             {
-                <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-                    <RadzenButton Icon="add" Text="@L["NewRole"]" Click="@(async () => await OpenCreateDialogAsync<Create>(@L["NewRole"]))" />
-                </RadzenStack>
+                <RadzenButton Icon="add" Text="@L["NewRole"]" Size="ButtonSize.Small" Click="@(async () => await OpenCreateDialogAsync<Create>(@L["NewRole"]))" />
             }
-            <RadzenStack Orientation="Orientation.Vertical" style="margin-left: auto;" Gap="4px">
-                <SearchTextBox PlaceHoder="@L["DisplayName:RoleName"]" @bind-Keyword="@GetListInput.Filter" SearchAsync="@_grid.Reload" />
-            </RadzenStack>
+            <SearchTextBox Style="width:280px;max-width:100%;margin-inline-start:auto" PlaceHoder="@L["DisplayName:RoleName"]" @bind-Keyword="@GetListInput.Filter" SearchAsync="@_grid.Reload" />
         </RadzenStack>
     </HeaderTemplate>
     <Columns>
-        <RadzenDataGridColumn Title="@L["DisplayName:RoleName"]" Property="@nameof(IdentityRoleDto.Name)">
+        <RadzenDataGridColumn Title="@L["DisplayName:RoleName"]" Property="@nameof(IdentityRoleDto.Name)" MinWidth="200px">
             <Template>
-                <RadzenLabel Text="@context.Name" />
-                <RadzenBadge Text="@L["DisplayName:IsDefault"]" Visible="context.IsDefault" BadgeStyle="BadgeStyle.Success" />
-                <RadzenBadge Text="@L["DisplayName:IsPublic"]" Visible="context.IsPublic" BadgeStyle="BadgeStyle.Info" />
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.375rem" Wrap="FlexWrap.NoWrap">
+                    <span title="@context.Name">@context.Name</span>
+                    <RadzenBadge Text="@L["DisplayName:IsDefault"]" Visible="context.IsDefault" BadgeStyle="BadgeStyle.Success"
+                                 Variant="Variant.Flat" Shade="Shade.Lighter" IsPill="true" Style="text-transform:none" />
+                    <RadzenBadge Text="@L["DisplayName:IsPublic"]" Visible="context.IsPublic" BadgeStyle="BadgeStyle.Info"
+                                 Variant="Variant.Flat" Shade="Shade.Lighter" IsPill="true" Style="text-transform:none" />
+                </RadzenStack>
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Title="@L["Actions"]" Width="150px" Sortable="false">
+        <RadzenDataGridColumn Title="@L["Actions"]" Width="100px" Sortable="false" TextAlign="TextAlign.Center">
             <Template>
                 <RowActionMenu Actions="@BuildRowActions(context)"
                                OnAction="@(key => HandleRowActionAsync(key, context))"

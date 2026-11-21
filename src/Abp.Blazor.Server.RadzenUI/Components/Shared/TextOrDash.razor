@@ -1,0 +1,14 @@
+﻿@* Empty grid cells show a dash, so "not filled in" reads differently from "not loaded"; a value gets a hover tooltip with the full text. *@
+@if (string.IsNullOrWhiteSpace(Text))
+{
+    <span style="color:var(--rz-text-disabled-color)">—</span>
+}
+else
+{
+    <span title="@Text">@Text</span>
+}
+
+@code {
+    [Parameter]
+    public string? Text { get; set; }
+}

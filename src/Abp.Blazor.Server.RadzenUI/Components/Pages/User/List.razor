@@ -7,88 +7,88 @@
 <PageTitle>@L["Users"]</PageTitle>
 
 @* Freeze Header： Style="height:calc(100vh - 160px)" *@
-<LocalizedDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true"
+<LocalizedDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true" Density="Density.Compact"
                 PagerHorizontalAlign="HorizontalAlign.Center" PageSize="@_defaultPageSize" Style="height:calc(100vh - 110px)"
                 PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
                 Count="@_totalCount" IsLoading="@_isLoading">
     <HeaderTemplate>
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="0.5rem">
             @if (HasCreatePermission)
             {
-                <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-                    <RadzenButton Icon="add" Text="@L["NewUser"]" Click="@(async () => { await OpenCreateDialogAsync<Create>(L["NewUser"], SetDialogOptions); })" />
-                </RadzenStack>
+                <RadzenButton Icon="add" Text="@L["NewUser"]" Size="ButtonSize.Small"
+                              Click="@(async () => { await OpenCreateDialogAsync<Create>(L["NewUser"], SetDialogOptions); })" />
             }
-            <RadzenStack Orientation="Orientation.Vertical" style="margin-left: auto;width:20%" Gap="4px">
-                <SearchTextBox PlaceHoder="@($"{L["DisplayName:UserName"]}/{L["DisplayName:Email"]}/{L["DisplayName:PhoneNumber"]}")"
-                               @bind-Keyword="@GetListInput.Filter" SearchAsync="@_grid.Reload" />
-            </RadzenStack>
+            <SearchTextBox Style="width:320px;max-width:100%;margin-inline-start:auto"
+                           PlaceHoder="@($"{L["DisplayName:UserName"]}/{L["DisplayName:Email"]}/{L["DisplayName:PhoneNumber"]}")"
+                           @bind-Keyword="@GetListInput.Filter" SearchAsync="@_grid.Reload" />
         </RadzenStack>
     </HeaderTemplate>
     <Columns>
-        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.UserName)" Frozen="true" Title="@L["DisplayName:UserName"]" Width="140px">
+        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.UserName)" Frozen="true" Title="@L["DisplayName:UserName"]" Width="200px">
             <Template>
                 @{
                     var avatarUrl = GetAvatarUrl(context);
+                    var fullName = string.Format(IL["User:FullNameFormat"], context.Name, context.Surname).Trim();
                 }
-                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="8px" Wrap="FlexWrap.NoWrap">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.NoWrap" Style="min-width:0">
                     @if (!string.IsNullOrWhiteSpace(avatarUrl))
                     {
                         <img src="@avatarUrl" alt="@context.UserName" class="avatar-header-image" />
                     }
-                    <RadzenLabel Text="@context.UserName" />
+                    <RadzenStack Gap="0" Style="min-width:0">
+                        <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.Span" title="@context.UserName"
+                                    Style="font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">@context.UserName</RadzenText>
+                        @if (!string.IsNullOrEmpty(fullName) && fullName != context.UserName)
+                        {
+                            <RadzenText TextStyle="TextStyle.Caption" TagName="TagName.Span" title="@fullName"
+                                        Style="color:var(--rz-text-secondary-color);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">@fullName</RadzenText>
+                        }
+                    </RadzenStack>
                 </RadzenStack>
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.UserName)" Title="@IL["Display:User.FullName"]" Width="100px">
+        @* Flexible column: takes the remaining width, never narrower than MinWidth. *@
+        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.Email)" Title="@L["DisplayName:Email"]" MinWidth="220px">
             <Template>
-                @{
-                    var fullName = string.Format(
-                    IL["User:FullNameFormat"],
-                    context.Name,
-                    context.Surname
-                    );
-                    <RadzenLabel Text="@fullName" />
+                <TextOrDash Text="@context.Email" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.PhoneNumber)" Title="@L["DisplayName:PhoneNumber"]" Width="140px">
+            <Template>
+                <TextOrDash Text="@context.PhoneNumber" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Title="@IL["DisplayName:UserStatus"]" Width="110px" Filterable="false" Sortable="false">
+            <Template>
+                @if (!context.IsActive)
+                {
+                    <RadzenBadge BadgeStyle="BadgeStyle.Base" Variant="Variant.Flat" Shade="Shade.Lighter" IsPill="true"
+                                 Text="@IL["User:Status.Inactive"]" Style="text-transform:none" />
+                }
+                else if (context.LockoutEnd.HasValue && context.LockoutEnd.Value > DateTimeOffset.UtcNow)
+                {
+                    <RadzenBadge BadgeStyle="BadgeStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter" IsPill="true"
+                                 Text="@IL["User:Status.Locked"]" title="@GetLockoutTitle(context)" Style="text-transform:none" />
+                }
+                else
+                {
+                    <RadzenBadge BadgeStyle="BadgeStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter" IsPill="true"
+                                 Text="@IL["User:Status.Active"]" Style="text-transform:none" />
                 }
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.Email)" Title="@L["DisplayName:Email"]" Width="180px" />
-        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.PhoneNumber)" Title="@L["DisplayName:PhoneNumber"]" Width="140px" />
-        <RadzenDataGridColumn Title="@L["DisplayName:IsActive"]" Width="60px" Filterable="false" Sortable="false">
-            <Template>
-                <BooleanIcon Value="@context.IsActive" />
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn Title="@L["DisplayName:LockoutEnabled"]" Width="80px" Filterable="false" Sortable="false">
+        <RadzenDataGridColumn Title="@L["DisplayName:LockoutEnabled"]" Width="100px" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
             <Template>
                 <BooleanIcon Value="@context.LockoutEnabled" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Title="@IL["DisplayName:LockoutStatus"]" Width="200px" Filterable="false" Sortable="false">
-            <Template>
-                @{
-                    var locked = context.LockoutEnd.HasValue && context.LockoutEnd.Value > DateTimeOffset.UtcNow;
-                }
-                @if (locked)
-                {
-                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="4px" Wrap="FlexWrap.NoWrap">
-                        <RadzenIcon Icon="lock" IconColor="@Colors.Danger" />
-                        <RadzenText TextStyle="TextStyle.Caption" class="rz-m-0">@GetLockoutTitle(context)</RadzenText>
-                    </RadzenStack>
-                }
-                else
-                {
-                    <RadzenIcon Icon="lock_open" Style="color:var(--rz-text-disabled-color);" />
-                }
-            </Template>
-        </RadzenDataGridColumn>
         @(RadzenColumnHelper.ExtraPropertiesColumns<IdentityUserDto>(_extraColumns, StringLocalizerFactory))
-        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.CreationTime)" Filterable="false" Title="@L["CreationTime"]" Width="130px">
+        <RadzenDataGridColumn Property="@nameof(IdentityUserDto.CreationTime)" Filterable="false" Title="@L["CreationTime"]" Width="150px">
             <Template>
                 @context.CreationTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Title="@L["Actions"]" Width="150px" Frozen="true" FrozenPosition="FrozenColumnPosition.Right" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+        <RadzenDataGridColumn Title="@L["Actions"]" Width="100px" Frozen="true" FrozenPosition="FrozenColumnPosition.Right" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
             <Template>
                 <UserActionButtons User="context"
                                    CanEdit="@((context.UserName != "admin" || CurrentUser.UserName == "admin") && HasUpdatePermission)"

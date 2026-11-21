@@ -61,7 +61,7 @@ public partial class List
 
         if (!isProtectedAdmin && HasUpdatePermission)
         {
-            actions.Add(new RowAction(EditKey, L["Edit"], "edit", IsPrimary: true));
+            actions.Add(new RowAction(EditKey, L["Edit"], string.Empty, IsPrimary: true));
         }
 
         if (!isProtectedAdmin && HasManagePermissionsPermission)

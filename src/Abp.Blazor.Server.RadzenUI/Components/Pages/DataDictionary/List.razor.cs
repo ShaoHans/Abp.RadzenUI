@@ -1,4 +1,5 @@
 using Abp.RadzenUI.Application.Contracts.DataDictionaries;
+using Abp.RadzenUI.Components.Shared;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Permissions;
 using Microsoft.AspNetCore.Authorization;
@@ -194,6 +195,55 @@ public partial class List
     }
 
     #region Type CRUD
+
+    private const string EditKey = "edit";
+    private const string DeleteKey = "delete";
+
+    private IReadOnlyList<RowAction> BuildTypeRowActions(DataDictionaryTypeDto type)
+    {
+        return CanManageType(type) ? BuildEditDeleteActions() : [];
+    }
+
+    /// <summary>Items share their type's permissions, so one list serves every row.</summary>
+    private IReadOnlyList<RowAction> ItemRowActions =>
+        CanManageSelectedType ? BuildEditDeleteActions() : [];
+
+    private List<RowAction> BuildEditDeleteActions()
+    {
+        var actions = new List<RowAction>();
+
+        if (HasUpdatePermission)
+        {
+            actions.Add(new RowAction(EditKey, UL["Edit"], string.Empty, IsPrimary: true));
+        }
+
+        if (HasDeletePermission)
+        {
+            actions.Add(new RowAction(DeleteKey, UL["Delete"], "delete", Colors.Danger));
+        }
+
+        return actions;
+    }
+
+    private Task HandleTypeRowActionAsync(string key, DataDictionaryTypeDto type)
+    {
+        return key switch
+        {
+            EditKey => OpenEditTypeDialogAsync(type),
+            DeleteKey => DeleteTypeAsync(type),
+            _ => Task.CompletedTask,
+        };
+    }
+
+    private Task HandleItemRowActionAsync(string key, DataDictionaryItemDto item)
+    {
+        return key switch
+        {
+            EditKey => OpenEditItemDialogAsync(item),
+            DeleteKey => DeleteItemAsync(item),
+            _ => Task.CompletedTask,
+        };
+    }
 
     private async Task OpenCreateTypeDialogAsync()
     {

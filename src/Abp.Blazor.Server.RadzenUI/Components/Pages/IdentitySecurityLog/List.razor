@@ -8,35 +8,48 @@
 
 <PageTitle>@L["PageTitle:SecurityLogs"]</PageTitle>
 
-<LocalizedDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true"
+<LocalizedDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true" Density="Density.Compact"
                 PagerHorizontalAlign="HorizontalAlign.Center"
                 Style="height:calc(100vh - 110px)" PageSize="@_defaultPageSize"
                 PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
                 Count="@_totalCount" IsLoading="@_isLoading">
     <HeaderTemplate>
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap" Gap="8px">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="0.5rem">
             <RadzenDatePicker TValue="DateTime?" @bind-Value="_loginTimeStart" ShowTime="true" DateFormat="yyyy-MM-dd HH:mm:ss"
                               Placeholder="@L["DisplayName:SecurityLog.LoginTimeStart"]" Style="width:220px" />
             <RadzenDatePicker TValue="DateTime?" @bind-Value="_loginTimeEnd" ShowTime="true" DateFormat="yyyy-MM-dd HH:mm:ss"
                               Placeholder="@L["DisplayName:SecurityLog.LoginTimeEnd"]" Style="width:220px" />
             <RadzenTextBox @bind-Value="_userName" Placeholder="@L["DisplayName:SecurityLog.UserName"]" Style="width:220px;" />
             <RadzenButton Icon="search" Text="@L["Btn:Search"]" Click="@(async () => await SearchAsync())" Size="ButtonSize.Small" />
-            <RadzenButton Icon="refresh" Text="@L["Btn:Reset"]" ButtonStyle="ButtonStyle.Secondary" Click="@(async () => await ResetAsync())" Size="ButtonSize.Small" />
+            <RadzenButton Icon="refresh" Text="@L["Btn:Reset"]" ButtonStyle="ButtonStyle.Base" Variant="Variant.Flat" Shade="Shade.Lighter" Click="@(async () => await ResetAsync())" Size="ButtonSize.Small" />
         </RadzenStack>
     </HeaderTemplate>
     <Columns>
-        <RadzenDataGridColumn Property="@nameof(IdentitySecurityLogDto.ApplicationName)" Title="@L["DisplayName:SecurityLog.ApplicationName"]" Sortable="false" />
-        <RadzenDataGridColumn Property="@nameof(IdentitySecurityLogDto.UserName)" Title="@L["DisplayName:SecurityLog.UserName"]" />
-        <RadzenDataGridColumn Property="@nameof(IdentitySecurityLogDto.TenantName)" Title="@L["DisplayName:SecurityLog.TenantName"]" Sortable="false" />
-        <RadzenDataGridColumn Property="@nameof(IdentitySecurityLogDto.Action)" Title="@L["DisplayName:SecurityLog.LoginStatus"]" Sortable="false" />
-        <RadzenDataGridColumn Property="@nameof(IdentitySecurityLogDto.ClientIpAddress)" Title="@L["DisplayName:SecurityLog.ClientIpAddress"]" Sortable="false">
+        <RadzenDataGridColumn Property="@nameof(IdentitySecurityLogDto.ApplicationName)" Title="@L["DisplayName:SecurityLog.ApplicationName"]" Sortable="false" MinWidth="180px" />
+        <RadzenDataGridColumn Property="@nameof(IdentitySecurityLogDto.UserName)" Title="@L["DisplayName:SecurityLog.UserName"]" Width="140px">
             <Template>
-                <RadzenLabel>@context.ClientIpAddress?.Replace("::ffff:", "")</RadzenLabel>
+                <TextOrDash Text="@context.UserName" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(IdentitySecurityLogDto.CreationTime)" Title="@L["DisplayName:SecurityLog.LoginTime"]" Width="200px">
+        <RadzenDataGridColumn Property="@nameof(IdentitySecurityLogDto.TenantName)" Title="@L["DisplayName:SecurityLog.TenantName"]" Sortable="false" Width="140px">
             <Template>
-                <RadzenLabel>@context.CreationTime.ToLocalTime()</RadzenLabel>
+                <TextOrDash Text="@context.TenantName" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(IdentitySecurityLogDto.Action)" Title="@L["DisplayName:SecurityLog.LoginStatus"]" Sortable="false" Width="200px">
+            <Template>
+                <RadzenBadge Text="@context.Action" BadgeStyle="@GetActionBadgeStyle(context.Action)"
+                             Variant="Variant.Flat" Shade="Shade.Lighter" IsPill="true" Style="text-transform:none" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(IdentitySecurityLogDto.ClientIpAddress)" Title="@L["DisplayName:SecurityLog.ClientIpAddress"]" Sortable="false" Width="150px">
+            <Template>
+                <TextOrDash Text="@context.ClientIpAddress?.Replace("::ffff:", "")" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(IdentitySecurityLogDto.CreationTime)" Title="@L["DisplayName:SecurityLog.LoginTime"]" Width="150px">
+            <Template>
+                @context.CreationTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")
             </Template>
         </RadzenDataGridColumn>
     </Columns>

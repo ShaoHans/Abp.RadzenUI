@@ -40,6 +40,31 @@ public partial class List
         }
     }
 
+    /// <summary>
+    /// Colours an ABP security-log action (IdentitySecurityLogActionConsts):
+    /// successful logins green, rejected attempts red, everything else
+    /// (logout, password change, ...) neutral info.
+    /// </summary>
+    private static BadgeStyle GetActionBadgeStyle(string? action)
+    {
+        if (string.IsNullOrEmpty(action))
+        {
+            return BadgeStyle.Base;
+        }
+
+        if (action.Contains("Succeeded", StringComparison.OrdinalIgnoreCase))
+        {
+            return BadgeStyle.Success;
+        }
+
+        return action.Contains("Failed", StringComparison.OrdinalIgnoreCase)
+               || action.Contains("Invalid", StringComparison.OrdinalIgnoreCase)
+               || action.Contains("Locked", StringComparison.OrdinalIgnoreCase)
+               || action.Contains("NotAllowed", StringComparison.OrdinalIgnoreCase)
+            ? BadgeStyle.Danger
+            : BadgeStyle.Info;
+    }
+
     private async Task ResetAsync()
     {
         _loginTimeStart = null;

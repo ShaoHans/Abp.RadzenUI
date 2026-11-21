@@ -9,7 +9,7 @@
 
 <PageTitle>@L["AuditLogs"]</PageTitle>
 
-<LocalizedDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true" AllowFiltering="true"
+<LocalizedDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true" AllowFiltering="true" Density="Density.Compact"
                 PagerHorizontalAlign="HorizontalAlign.Center" PageSize="@_defaultPageSize"
                 Style="height:calc(100vh - 110px)"
                 PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
@@ -21,47 +21,63 @@
                                 OnClick="@(() => OpenDetailDialogAsync(context))" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(AuditLogDto.UserName)" Title="@L["UserName"]" Sortable="false" />
-        <RadzenDataGridColumn Property="@nameof(AuditLogDto.ClientIpAddress)" Title="@L["ClientIpAddress"]" Sortable="false">
+        <RadzenDataGridColumn Property="@nameof(AuditLogDto.UserName)" Title="@L["UserName"]" Sortable="false" Width="140px">
             <Template>
-                <RadzenLabel>@context.ClientIpAddress?.Replace("::ffff:","")</RadzenLabel>
+                <TextOrDash Text="@context.UserName" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(AuditLogDto.HttpMethod)" Title="@L["HttpMethod"]" Sortable="false" />
-        <RadzenDataGridColumn Property="@nameof(AuditLogDto.HttpStatusCode)" Title="@L["HttpStatusCode"]" Sortable="false" >
+        <RadzenDataGridColumn Property="@nameof(AuditLogDto.ClientIpAddress)" Title="@L["ClientIpAddress"]" Sortable="false" Width="150px">
             <Template>
-                @{
-                    var color = "rz-color-info";
-                }
-                @if (context.HttpStatusCode >= 200 && context.HttpStatusCode < 400)
-                {
-                    color = "rz-color-success";
-                }
-                else if (context.HttpStatusCode >= 400 && context.HttpStatusCode <= 503)
-                {
-                    color = "rz-color-danger";
-                }
-                <RadzenLabel class="@color">@context.HttpStatusCode</RadzenLabel>
-                @if (!string.IsNullOrEmpty(context.Exceptions))
-                {
-                    <RadzenButton Icon="info" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.ExtraSmall" MouseEnter="@(args => ShowTooltip(args,context.Exceptions, new TooltipOptions(){ Position = TooltipPosition.Bottom, Duration = null}))" />
-                }
+                <TextOrDash Text="@context.ClientIpAddress?.Replace("::ffff:", "")" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(AuditLogDto.ExecutionTime)" Title="@L["ExecutionTime"]" Width="200px" >
+        <RadzenDataGridColumn Property="@nameof(AuditLogDto.HttpMethod)" Title="@L["HttpMethod"]" Sortable="false" Width="140px" />
+        <RadzenDataGridColumn Property="@nameof(AuditLogDto.HttpStatusCode)" Title="@L["HttpStatusCode"]" Sortable="false" Width="150px">
             <Template>
-                <RadzenLabel>@context.ExecutionTime.ToLocalTime()</RadzenLabel>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Wrap="FlexWrap.NoWrap">
+                    @if (context.HttpStatusCode.HasValue)
+                    {
+                        <RadzenBadge Text="@context.HttpStatusCode.ToString()" BadgeStyle="@GetStatusCodeBadgeStyle(context.HttpStatusCode)"
+                                     Variant="Variant.Flat" Shade="Shade.Lighter" IsPill="true" />
+                    }
+                    else
+                    {
+                        <TextOrDash Text="@null" />
+                    }
+                    @if (!string.IsNullOrEmpty(context.Exceptions))
+                    {
+                        <RadzenButton Icon="info" Variant="Variant.Text" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.ExtraSmall" MouseEnter="@(args => ShowTooltip(args,context.Exceptions, new TooltipOptions(){ Position = TooltipPosition.Bottom, Duration = null}))" />
+                    }
+                </RadzenStack>
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(AuditLogDto.ExecutionDuration)" Filterable="false" Sortable="false" Title="@L["ExecutionDuration"]" />
-        <RadzenDataGridColumn Property="@nameof(AuditLogDto.BrowserInfo)" Filterable="false" Sortable="false" Title="@L["BrowserInfo"]">
+        <RadzenDataGridColumn Property="@nameof(AuditLogDto.ExecutionTime)" Title="@L["ExecutionTime"]" Width="150px">
             <Template>
-                <RadzenLabel title="@context.BrowserInfo">@context.BrowserInfo</RadzenLabel>
+                @context.ExecutionTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(AuditLogDto.ExecutionDuration)" Filterable="false" Sortable="false" Title="@L["ExecutionDuration"]" Width="110px" TextAlign="TextAlign.Right">
+            <Template>
+                @($"{context.ExecutionDuration} ms")
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(AuditLogDto.BrowserInfo)" Filterable="false" Sortable="false" Title="@L["BrowserInfo"]" MinWidth="240px">
+            <Template>
+                <TextOrDash Text="@context.BrowserInfo" />
             </Template>
         </RadzenDataGridColumn>
     </Columns>
 </LocalizedDataGrid>
 
 @code {
+    /// <summary>2xx/3xx success, 4xx warning (client side), 5xx danger, anything else neutral.</summary>
+    static BadgeStyle GetStatusCodeBadgeStyle(int? code) => code switch
+    {
+        >= 200 and < 400 => BadgeStyle.Success,
+        >= 400 and < 500 => BadgeStyle.Warning,
+        >= 500 => BadgeStyle.Danger,
+        _ => BadgeStyle.Base,
+    };
+
     void ShowTooltip(ElementReference elementReference, string? text, TooltipOptions? options = null) => TooltipService.Open(elementReference, text ?? "Nothing", options);
 }

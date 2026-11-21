@@ -23,25 +23,25 @@
 @if (_primary is not null && _menu.Count == 0)
 {
     <RadzenButton Icon="@_primary.Icon" Text="@_primary.Text" title="@_primary.Text"
-                  ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small"
+                  ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.ExtraSmall"
                   Click="@(() => OnAction.InvokeAsync(_primary.Key))" />
 }
 else if (_primary is not null)
 {
     <RadzenSplitButton Icon="@_primary.Icon" Text="@_primary.Text" title="@_primary.Text"
-                       ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small"
+                       ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.ExtraSmall"
                        Click="HandleClickAsync" ChildContent="@menuItems" />
 }
 else if (_menu.Count == 1)
 {
     <RadzenButton Icon="@_menu[0].Icon" title="@_menu[0].Text" IconColor="@_menu[0].IconColor"
-                  ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
+                  ButtonStyle="ButtonStyle.Base" Variant="Variant.Text" Size="ButtonSize.ExtraSmall"
                   Click="@(() => OnAction.InvokeAsync(_menu[0].Key))" />
 }
 else if (_menu.Count > 1)
 {
     <RadzenSplitButton Icon="more_horiz" title="@MoreTitle" AlwaysOpenPopup="true"
-                       ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
+                       ButtonStyle="ButtonStyle.Base" Variant="Variant.Text" Size="ButtonSize.ExtraSmall"
                        Click="HandleClickAsync" ChildContent="@menuItems" />
 }
 
