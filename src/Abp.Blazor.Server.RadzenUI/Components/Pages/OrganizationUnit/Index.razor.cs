@@ -52,6 +52,21 @@ public partial class Index
         );
     }
 
+    /// <summary>Parent of the unit being created; null for a root unit.</summary>
+    private OrganizationUnitTreeItemVm? _createParentOu;
+
+    // "Add root unit" must not fall back to the selected tree node, otherwise it
+    // silently creates a child of whatever happens to be selected.
+    private async Task OpenCreateOuDialogAsync(bool asRoot)
+    {
+        _createParentOu = asRoot ? null : GetSelectedOu();
+        await OpenCreateDialogAsync<CreateOu>(
+            L["Ou:NewOu.Title"],
+            parameters: new Dictionary<string, object?> { { "ParentDisplayName", _createParentOu?.DisplayName } },
+            callback: LoadOuAsync
+        );
+    }
+
     private async Task LoadOuAsync()
     {
         var ous = (await AppService.GetAllAsync()).Items ?? [];
@@ -60,7 +75,7 @@ public partial class Index
 
     protected override Task<OrganizationUnitCreateDto> SetCreateDialogModelAsync()
     {
-        var createDto = new OrganizationUnitCreateDto { ParentId = GetSelectedOu()?.Id, };
+        var createDto = new OrganizationUnitCreateDto { ParentId = _createParentOu?.Id };
         return Task.FromResult(createDto);
     }
 
@@ -126,7 +141,7 @@ public partial class Index
                 );
                 break;
             case OuTreeItemAction.AddSubOu:
-                await OpenCreateDialogAsync<CreateOu>(L["Ou:NewOu.Title"], callback: LoadOuAsync);
+                await OpenCreateOuDialogAsync(asRoot: false);
                 break;
             case OuTreeItemAction.Delete:
                 var selectedOu = GetSelectedOu()!;

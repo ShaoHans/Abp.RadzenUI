@@ -352,7 +352,9 @@
     "RoleForm:IsDefaultHint": "新用户会自动分配此角色。",
     "RoleForm:IsPublicHint": "其他用户可以看到此角色。",
     "DataDictionaryForm:IsSharedHint": "共享后所有租户都能使用此字典类型。",
-    "DataDictionaryForm:IsActiveHint": "停用后该项不再出现在下拉选项中。"
+    "DataDictionaryForm:IsActiveHint": "停用后该项不再出现在下拉选项中。",
+    "Ou:Parent": "上级机构",
+    "Ou:Parent.None": "无（根机构）"
   }
 }
 
