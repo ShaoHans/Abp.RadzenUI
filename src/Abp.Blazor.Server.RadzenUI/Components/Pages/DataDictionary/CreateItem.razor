@@ -6,61 +6,52 @@
 <RadzenTemplateForm TItem="CreateDataDictionaryItemDto" Data=@DialogFromOption.Model Submit="@(model => DialogFromOption.SubmitAsync(model, () => InvokeAsync(StateHasChanged)))"
                     Style="max-height:calc(100vh - 200px); display: flex; flex-direction:column">
     <DialogFormLayout CancelClick="DialogFromOption.OnCancel" IsSaving="@DialogFromOption.IsSaving">
-        <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
-            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                    <RadzenLabel Text="@L["DataDictionary:Types"]" />
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="8">
-                    <RadzenText TextStyle="TextStyle.Body1" Style="font-weight:700; display:block; width:100%; padding-top:0.5rem;">
-                        @TypeDisplayText
-                    </RadzenText>
-                </RadzenColumn>
-            </RadzenRow>
-            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                    <RequiredMark />
-                    <RadzenLabel Text="@L["DisplayName:DataDictionaryItem.Code"]" Component="Code" />
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="8">
-                    <RadzenTextBox Name="Code" @bind-Value=@DialogFromOption.Model.Code
-                                   Style="display: block; width: 100%;"
-                                   MaxLength="DataDictionaryItemConsts.MaxCodeLength" />
+        <RadzenRow Gap="1rem" RowGap="1rem" class="rz-p-1 rz-mb-4">
+            <RadzenColumn Size="12">
+                <RadzenStack Gap="0.25rem">
+                    <div>
+                        <RadzenLabel Text="@L["DataDictionary:Types"]" />
+                    </div>
+                    <RadzenTextBox Value="@TypeDisplayText" Disabled="true" Style="width: 100%;" />
+                </RadzenStack>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenStack Gap="0.25rem">
+                    <div>
+                        <RequiredMark />
+                        <RadzenLabel Text="@L["DisplayName:DataDictionaryItem.Code"]" Component="Code" />
+                    </div>
+                    <RadzenTextBox Name="Code" @bind-Value=@DialogFromOption.Model.Code Style="width: 100%;" MaxLength="DataDictionaryItemConsts.MaxCodeLength" />
                     <RadzenRequiredValidator Component="Code" Text="@L.Required("DisplayName:DataDictionaryItem.Code")" />
-                </RadzenColumn>
-            </RadzenRow>
-            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                    <RequiredMark />
-                    <RadzenLabel Text="@L["DisplayName:DataDictionaryItem.Name"]" Component="Name" />
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="8">
-                    <RadzenTextBox Name="Name" @bind-Value=@DialogFromOption.Model.Name
-                                   Style="display: block; width: 100%;"
-                                   MaxLength="DataDictionaryItemConsts.MaxNameLength" />
+                </RadzenStack>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenStack Gap="0.25rem">
+                    <div>
+                        <RequiredMark />
+                        <RadzenLabel Text="@L["DisplayName:DataDictionaryItem.Name"]" Component="Name" />
+                    </div>
+                    <RadzenTextBox Name="Name" @bind-Value=@DialogFromOption.Model.Name Style="width: 100%;" MaxLength="DataDictionaryItemConsts.MaxNameLength" />
                     <RadzenRequiredValidator Component="Name" Text="@L.Required("DisplayName:DataDictionaryItem.Name")" />
-                </RadzenColumn>
-            </RadzenRow>
-            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                    <RadzenLabel Text="@L["DisplayName:DataDictionaryItem.Sort"]" Component="Sort" />
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="8">
-                    <RadzenNumeric Name="Sort" TValue="int" @bind-Value=@DialogFromOption.Model.Sort
-                                   Style="display: block; width: 100%;" />
-                </RadzenColumn>
-            </RadzenRow>
-            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                    <RadzenLabel Text="@L["DisplayName:DataDictionaryItem.Description"]" Component="Description" />
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="8">
-                    <RadzenTextArea Name="Description" @bind-Value=@DialogFromOption.Model.Description
-                                    Style="display: block; width: 100%;" Rows="3"
-                                    MaxLength="DataDictionaryItemConsts.MaxDescriptionLength" />
-                </RadzenColumn>
-            </RadzenRow>
-        </RadzenStack>
+                </RadzenStack>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenStack Gap="0.25rem">
+                    <div>
+                        <RadzenLabel Text="@L["DisplayName:DataDictionaryItem.Sort"]" Component="Sort" />
+                    </div>
+                    <RadzenNumeric Name="Sort" TValue="int" @bind-Value=@DialogFromOption.Model.Sort Style="width: 100%;" />
+                </RadzenStack>
+            </RadzenColumn>
+            <RadzenColumn Size="12">
+                <RadzenStack Gap="0.25rem">
+                    <div>
+                        <RadzenLabel Text="@L["DisplayName:DataDictionaryItem.Description"]" Component="Description" />
+                    </div>
+                    <RadzenTextArea Name="Description" @bind-Value=@DialogFromOption.Model.Description Style="width: 100%;" Rows="3" MaxLength="DataDictionaryItemConsts.MaxDescriptionLength" />
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
     </DialogFormLayout>
 </RadzenTemplateForm>
 

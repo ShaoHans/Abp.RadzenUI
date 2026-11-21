@@ -352,7 +352,9 @@
     "UserForm:SearchRoles": "Search roles",
     "UserForm:RoleFromOrganizationUnit": "From organization unit",
     "RoleForm:IsDefaultHint": "New users are assigned this role automatically.",
-    "RoleForm:IsPublicHint": "Other users can see this role."
+    "RoleForm:IsPublicHint": "Other users can see this role.",
+    "DataDictionaryForm:IsSharedHint": "Shared dictionary types are available to all tenants.",
+    "DataDictionaryForm:IsActiveHint": "Disabled items are hidden from selection lists."
   }
 }
 
