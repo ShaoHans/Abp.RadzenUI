@@ -6,6 +6,7 @@
 @inject ThemeService ThemeService
 @inject IOptions<AbpRadzenUIOptions> AbpRadzenUIOptions
 @inject IHttpContextAccessor HttpContextAccessor
+@inject Microsoft.AspNetCore.Mvc.ViewFeatures.IFileVersionProvider FileVersionProvider
 
 <!DOCTYPE html>
 <html lang="en" dir="@(ThemeService.RightToLeft == true ? "rtl" : "ltr")">
@@ -13,8 +14,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
-    <link href="_content/AbpRadzen.Blazor.Server.UI/css/site.css" rel="stylesheet" />
-    <link href="_content/AbpRadzen.Blazor.Server.UI/app.css" rel="stylesheet" />
+    @* ?v=<content hash>: these files are served without Cache-Control, so browsers reuse a
+       stale copy after an upgrade (layout CSS out of sync with the Razor markup). *@
+    <link href="@WithFileVersion("/_content/AbpRadzen.Blazor.Server.UI/css/site.css")" rel="stylesheet" />
+    <link href="@WithFileVersion("/_content/AbpRadzen.Blazor.Server.UI/app.css")" rel="stylesheet" />
     <HeadOutlet @rendermode="InteractiveServer" />
     <link rel="preload" href="_content/AbpRadzen.Blazor.Server.UI/fonts/MaterialSymbolsOutlined.woff2" as="font" type="font/woff2">
     <RadzenTheme Theme="@_theme" @rendermode="InteractiveServer" />
@@ -60,6 +63,16 @@
 
 @code {
     string _theme = "material-dark";
+
+    /// <summary>
+    /// Appends a content-hash version (same mechanism as asp-append-version) so a changed
+    /// stylesheet gets a new URL. Unchanged path when the file can't be found.
+    /// </summary>
+    string WithFileVersion(string path)
+    {
+        var pathBase = HttpContextAccessor.HttpContext?.Request.PathBase ?? PathString.Empty;
+        return FileVersionProvider.AddFileVersionToPath(pathBase, pathBase.Add(path).Value!);
+    }
 
     protected override void OnInitialized()
     {

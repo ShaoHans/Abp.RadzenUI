@@ -1258,3 +1258,45 @@ html, body {
 .abp-search-box .rz-form-field-content {
     margin-top: 0;
 }
+
+/*
+    Compact app shell: header 40px instead of Radzen's 3.125rem (50px), main area
+    padding 12px instead of 1rem. Both are Radzen's own layout tokens.
+    Full-height pages size themselves as calc(100vh - X) where X starts from
+    these two values: header 40 + body padding 12 * 2 = 64px (plus whatever the
+    page puts above the grid). Keep them in sync.
+*/
+.rz-layout.app-layout-shell {
+    --rz-header-min-height: 2.5rem;
+    --rz-layout-body-padding: 0.75rem;
+    /* min-height alone isn't enough: these two would still stretch the header -
+       the sidebar toggle (24px icon + 2 x 0.8125rem = 50px) and the avatar
+       profile menu (32px + 2 x 0.5rem = 48px). Both fit 40px with these. */
+    --rz-sidebar-toggle-padding: 0.5rem;
+    --rz-profile-menu-padding-block: 0.25rem;
+}
+
+/*
+    Themes differ in ways the tokens above don't cover, and any extra pixel pushes
+    full-height pages into a page scrollbar:
+    - premium material3 hard-codes `.rz-header { padding: 0.5rem }` (40px -> 56px);
+    - standard/software add a 1px header border-bottom (40px -> 41px);
+    - material3 gives the body `margin: 0 12px 12px` (12px less height).
+    So pin the shell: header exactly 40px, border included (box-sizing is border-box
+    in every theme), and no vertical body margin (side margins keep the theme look).
+    Result: content height is always 100vh - 64px.
+*/
+.rz-layout.app-layout-shell > .rz-header {
+    height: 2.5rem;
+    padding-block: 0;
+}
+
+.rz-layout.app-layout-shell > .rz-body {
+    margin-block: 0;
+}
+
+/* The profile menu is inline-block: on the text baseline it leaves a ~2px descender
+   gap below it, pushing the header to 42px. */
+.app-header__profile.rz-profile-menu {
+    vertical-align: middle;
+}
