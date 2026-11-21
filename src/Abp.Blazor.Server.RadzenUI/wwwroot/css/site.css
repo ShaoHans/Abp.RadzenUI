@@ -412,7 +412,9 @@ svg.illustration {
     --rz-panel-menu-item-2nd-level-margin-inline: 0.25rem;
     /* 子级文字与父级文字左对齐：0.75 padding + 1.25 图标 + 0.625 间距 */
     --rz-panel-menu-item-2nd-level-offset: 2.625rem;
-    --rz-panel-menu-item-nested-offset: 0.75rem;
+    /* Each level below the 2nd adds only 4px: 3rd-level items have no icon, so a larger
+       step leaves a visibly empty gap compared with the icon-led 2nd level. */
+    --rz-panel-menu-item-nested-offset: 0.25rem;
     --rz-panel-menu-icon-2nd-level-icon-size: 1.125rem;
     --rz-panel-menu-icon-2nd-level-margin-inline: -1.625rem 0.5rem;
 }
