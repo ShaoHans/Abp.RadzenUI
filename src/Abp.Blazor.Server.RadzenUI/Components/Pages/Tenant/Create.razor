@@ -1,4 +1,5 @@
 ﻿@using Abp.RadzenUI.Components.ObjectExtending
+@using Microsoft.Extensions.Localization
 @using Volo.Abp.AspNetCore.Components
 @using Volo.Abp.AspNetCore.Components.Web
 @using Volo.Abp.TenantManagement
@@ -8,39 +9,55 @@
 
 <RadzenTemplateForm TItem="TenantCreateDto" Data=@DialogFromOption.Model Submit="@(model => DialogFromOption.SubmitAsync(model, () => InvokeAsync(StateHasChanged)))" Style="max-height:calc(100vh - 200px); display: flex;flex-direction:column">
     <DialogFormLayout CancelClick="DialogFromOption.OnCancel" IsSaving="@DialogFromOption.IsSaving">
-        <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
-            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                    <RequiredMark />
-                    <RadzenLabel Text="@L["DisplayName:TenantName"]" Component="TenantName" />
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="8">
-                    <RadzenTextBox Name="TenantName" @bind-Value=@DialogFromOption.Model.Name Style="display: block; width: 100%;" MaxLength="TenantConsts.MaxNameLength" />
-                    <RadzenRequiredValidator Component="TenantName" Text="@L.Required("DisplayName:TenantName")" />
-                </RadzenColumn>
-            </RadzenRow>
-            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                    <RequiredMark />
-                    <RadzenLabel Text="@L["DisplayName:AdminEmailAddress"]" Component="AdminEmailAddress" />
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="8">
-                    <RadzenTextBox Name="AdminEmailAddress" @bind-Value=@DialogFromOption.Model.AdminEmailAddress Style="display: block; width: 100%;" MaxLength="TenantConsts.MaxAdminEmailAddressLength" />
-                    <RadzenRequiredValidator Component="AdminEmailAddress" Text="@L.Required("DisplayName:AdminEmailAddress")" />
-                    <RadzenEmailValidator Component="AdminEmailAddress" Text="@L.ValidEmail("DisplayName:AdminEmailAddress")" />
-                </RadzenColumn>
-            </RadzenRow>
-            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                    <RequiredMark />
-                    <RadzenLabel Text="@L["DisplayName:AdminPassword"]" Component="AdminPassword" />
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="8">
-                    <RadzenPassword Name="AdminPassword" @bind-Value=@DialogFromOption.Model.AdminPassword Style="display: block; width: 100%;" />
-                    <RadzenRequiredValidator Component="AdminPassword" Text="@L.Required("DisplayName:AdminPassword")" />
-                </RadzenColumn>
-            </RadzenRow>
-            <ExtensionProperties TEntityType="TenantCreateDto" TResourceType="AbpTenantManagementResource" Entity="@DialogFromOption.Model" LH="@LH" />
+        <RadzenStack Gap="1.5rem" class="rz-p-1 rz-mb-4">
+            <RadzenStack Gap="0.75rem">
+                <div>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="rz-color-primary rz-mb-1">@IL["TenantForm:TenantSection"]</RadzenText>
+                </div>
+                <RadzenRow Gap="1rem" RowGap="1rem">
+                    <RadzenColumn Size="12">
+                        <RadzenStack Gap="0.25rem">
+                            <div>
+                                <RequiredMark />
+                                <RadzenLabel Text="@L["DisplayName:TenantName"]" Component="TenantName" />
+                            </div>
+                            <RadzenTextBox Name="TenantName" @bind-Value=@DialogFromOption.Model.Name Style="width: 100%;" MaxLength="TenantConsts.MaxNameLength" />
+                            <RadzenRequiredValidator Component="TenantName" Text="@L.Required("DisplayName:TenantName")" />
+                        </RadzenStack>
+                    </RadzenColumn>
+                    <ExtensionProperties TEntityType="TenantCreateDto" TResourceType="AbpTenantManagementResource" Entity="@DialogFromOption.Model" LH="@LH"
+                                         LabelOnTop="true" FieldSizeMD="6" InputStyle="width: 100%;" />
+                </RadzenRow>
+            </RadzenStack>
+            <RadzenStack Gap="0.75rem">
+                <div>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="rz-color-primary rz-mb-1">@IL["TenantForm:AdminSection"]</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Caption" class="rz-m-0 rz-text-secondary-color">@IL["TenantForm:AdminSectionHint"]</RadzenText>
+                </div>
+                <RadzenRow Gap="1rem" RowGap="1rem">
+                    <RadzenColumn Size="12" SizeMD="6">
+                        <RadzenStack Gap="0.25rem">
+                            <div>
+                                <RequiredMark />
+                                <RadzenLabel Text="@L["DisplayName:AdminEmailAddress"]" Component="AdminEmailAddress" />
+                            </div>
+                            <RadzenTextBox Name="AdminEmailAddress" @bind-Value=@DialogFromOption.Model.AdminEmailAddress Style="width: 100%;" MaxLength="TenantConsts.MaxAdminEmailAddressLength" />
+                            <RadzenRequiredValidator Component="AdminEmailAddress" Text="@L.Required("DisplayName:AdminEmailAddress")" />
+                            <RadzenEmailValidator Component="AdminEmailAddress" Text="@L.ValidEmail("DisplayName:AdminEmailAddress")" />
+                        </RadzenStack>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="6">
+                        <RadzenStack Gap="0.25rem">
+                            <div>
+                                <RequiredMark />
+                                <RadzenLabel Text="@L["DisplayName:AdminPassword"]" Component="AdminPassword" />
+                            </div>
+                            <RadzenPassword Name="AdminPassword" @bind-Value=@DialogFromOption.Model.AdminPassword Style="width: 100%;" autocomplete="new-password" />
+                            <RadzenRequiredValidator Component="AdminPassword" Text="@L.Required("DisplayName:AdminPassword")" />
+                        </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenStack>
         </RadzenStack>
     </DialogFormLayout>
 </RadzenTemplateForm>
@@ -48,6 +65,8 @@
 @code {
     [Parameter]
     public DialogFromOption<TenantCreateDto> DialogFromOption { get; set; } = default!;
+
+    [Inject] public IStringLocalizer<AbpRadzenUIResource> IL { get; set; } = default!;
 
     public Create()
     {

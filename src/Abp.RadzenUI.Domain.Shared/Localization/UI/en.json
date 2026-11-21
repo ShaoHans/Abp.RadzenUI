@@ -356,7 +356,10 @@
     "DataDictionaryForm:IsSharedHint": "Shared dictionary types are available to all tenants.",
     "DataDictionaryForm:IsActiveHint": "Disabled items are hidden from selection lists.",
     "Ou:Parent": "Parent unit",
-    "Ou:Parent.None": "None (root unit)"
+    "Ou:Parent.None": "None (root unit)",
+    "TenantForm:TenantSection": "Tenant",
+    "TenantForm:AdminSection": "Administrator",
+    "TenantForm:AdminSectionHint": "An admin user is created in the new tenant with this email and password."
   }
 }
 
