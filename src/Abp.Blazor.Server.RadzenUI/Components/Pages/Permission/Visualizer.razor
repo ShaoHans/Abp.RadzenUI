@@ -93,9 +93,17 @@
                         {
                             <RadzenTabs TabPosition="TabPosition.Left" @bind-SelectedIndex="_treeGroupIndex">
                                 <Tabs>
-                                    @foreach (var group in _filteredGroups)
+                                    @for (var i = 0; i < _filteredGroups.Count; i++)
                                     {
-                                        <RadzenTabsItem Text="@GetTabShowName(group)">
+                                        var index = i;
+                                        <RadzenTabsItem Text="@GetTabShowName(_filteredGroups[index])">
+                                            @* Resolve the group when the panel renders: RadzenTabs renders panels from the
+                                               previous ChildContent, and filtering creates new group objects each time. *@
+                                            @if (index >= _filteredGroups.Count)
+                                            {
+                                                return;
+                                            }
+                                            @{ var group = _filteredGroups[index]; }
                                             @if (group.TreeItems.Count == 0)
                                             {
                                                 @EmptyState(UI["PermissionVisualizer:NoPermissions"])
@@ -430,15 +438,7 @@
         return own.Where(p => !inherited.Contains((p.ProviderName, p.ProviderKey)));
     }
 
-    string GetProviderText(ProviderInfoDto provider)
-    {
-        // ABP's built-in provider names are single letters (R = role, U = user, C = client);
-        // show a readable word for those and keep any custom provider name as-is.
-        var key = $"PermissionVisualizer:Provider.{provider.ProviderName}";
-        var name = UI[key];
-        var providerText = name.ResourceNotFound ? provider.ProviderName : name.Value;
-        return $"{providerText}: {provider.ProviderKey}";
-    }
+    string GetProviderText(ProviderInfoDto provider) => PermissionProviderText.Format(UI, provider);
 
     RenderFragment<string> EmptyState => text =>
         @<RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" Style="height:100%; min-height:260px;">

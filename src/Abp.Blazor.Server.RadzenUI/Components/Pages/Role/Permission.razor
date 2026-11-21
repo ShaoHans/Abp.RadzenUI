@@ -5,7 +5,10 @@
 @using Microsoft.Extensions.Localization
 @using Abp.RadzenUI.Localization
 @using Abp.RadzenUI.Permissions
+@using Volo.Abp.Authorization.Permissions
+@using Volo.Abp.Roles
 @inject IPermissionAppService PermissionAppService
+@inject IPermissionChecker PermissionChecker
 @inject ICurrentApplicationConfigurationCacheResetService CacheResetService
 @inject DialogService DialogService
 @inject IStringLocalizer<AbpRadzenUIResource> UI
@@ -15,10 +18,23 @@
 <RadzenStack JustifyContent="JustifyContent.SpaceBetween"
              Style="height:calc(100vh - 200px)">
     <DialogFormLayout SaveClick="SaveAsync" CancelClick="() => DialogService.Close(false)"
+                      SaveText="@SaveButtonText" SaveDisabled="@(ChangedCount == 0)"
                       BodyStyle="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden">
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start">
-            <RadzenCheckBox TValue="bool" Name="GrantAll" Disabled="_selectAllDisabled" Value="@(_groups.All(x => x.GrantAll))" ValueChanged="GrantAll" />
-            <RadzenLabel Text="@L["SelectAllInAllTabs"]" Component="GrantAll" />
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween"
+                     Gap="1rem" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox TValue="bool" Name="GrantAll" Disabled="_selectAllDisabled" Value="@_groups.All(IsGroupFullyGranted)" ValueChanged="GrantAll" />
+                <RadzenLabel Text="@L["SelectAllInAllTabs"]" Component="GrantAll" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="flex:1; min-width:200px; max-width:320px;">
+                <RadzenTextBox Value="@_keyword" ValueChanged="@OnKeywordChanged" Immediate="true"
+                               Placeholder="@UI["Permission:SearchPlaceholder"]" Style="width:100%;" autocomplete="off" />
+                @if (!string.IsNullOrEmpty(_keyword))
+                {
+                    <RadzenButton Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
+                                  Click="@(() => OnKeywordChanged(null))" />
+                }
+            </RadzenStack>
         </RadzenStack>
         <Devider />
         <RadzenTabs TabPosition="TabPosition.Left" RenderMode="TabRenderMode.Client">
@@ -27,32 +43,61 @@
                 {
                     <RadzenTabsItem Text="@GetTabShowName(item)">
                         <div class="role-permission-panel">
+                            @* Read the filtered tree here, not in the foreach: RadzenTabs renders each panel from
+                               the ChildContent of the previous render, so captured locals would lag one keystroke. *@
+                            @{ var visibleItems = GetVisibleTree(item); }
                             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start">
-                                <RadzenCheckBox TValue="bool" Name="@item.DisplayName" @bind-Value="@item.GrantAll" Disabled="IsPermissionGroupDisabled(item)" />
-                                <RadzenLabel Text="@L["SelectAllInThisTab"]" Component="@item.DisplayName" />
+                                <RadzenCheckBox TValue="bool" Name="@item.DisplayName" Value="@IsGroupFullyGranted(item)"
+                                                ValueChanged="@(v => SetGroupGranted(item, v))" Disabled="IsPermissionGroupDisabled(item)" />
+                                <RadzenLabel Text="@UI["Permission:SelectAllInGroup"]" Component="@item.DisplayName" />
                             </RadzenStack>
                             <RadzenStack Orientation="Orientation.Vertical" Gap="0" class="rz-pt-1"
                                          Style="border-top: var(--rz-grid-cell-border); min-height: 0.5rem;" />
-                            <RadzenTree Data=@item.TreeItems>
-                                <RadzenTreeLevel Text="(i => GetPermissionShownName(((PermissionTreeItemVm)i).Permission))"
-                                                 ChildrenProperty="Children"
-                                                 Expanded="(i=>true)"
-                                                 HasChildren="(i=>((PermissionTreeItemVm)i).Children.Count>0)">
-                                    <Template>
-                                        @{
-                                            if (context.Value is PermissionTreeItemVm treeItem)
-                                            {
-                                                <RadzenCheckBox TValue="bool"
-                                                                Name="@treeItem.Permission.Name"
-                                                                Disabled="@_disabledPermissions.Exists(x=>x.Name==treeItem.Permission.Name)"
-                                                                onclick="@(() => PermissionCheckChanged(treeItem))"
-                                                                @bind-Value="treeItem.Permission.IsGranted" />
-                                                <RadzenLabel Text="@context.Text" Component="@treeItem.Permission.Name" />
+                            @if (visibleItems.Count == 0)
+                            {
+                                <RadzenText TextStyle="TextStyle.Body2" class="rz-text-align-center rz-p-6 rz-text-secondary-color">
+                                    @UI["Permission:NoMatch"]
+                                </RadzenText>
+                            }
+                            else
+                            {
+                                <RadzenTree Data=@visibleItems>
+                                    <RadzenTreeLevel Text="(i => ((PermissionTreeItemVm)i).Permission.DisplayName)"
+                                                     ChildrenProperty="Children"
+                                                     Expanded="(i=>true)"
+                                                     HasChildren="(i=>((PermissionTreeItemVm)i).Children.Count>0)">
+                                        <Template>
+                                            @{
+                                                if (context.Value is PermissionTreeItemVm treeItem)
+                                                {
+                                                    <RadzenCheckBox TValue="bool"
+                                                                    Name="@treeItem.Permission.Name"
+                                                                    Disabled="@(IsDisabledPermission(treeItem.Permission) || IsLocked(treeItem.Permission))"
+                                                                    onclick="@(() => PermissionCheckChanged(treeItem))"
+                                                                    @bind-Value="treeItem.Permission.IsGranted" />
+                                                    <RadzenLabel Text="@context.Text" Component="@treeItem.Permission.Name" />
+                                                    @* A disabled box means another source (e.g. a role) already grants it;
+                                                       name that source so it does not look broken. *@
+                                                    @if (IsLocked(treeItem.Permission))
+                                                    {
+                                                        <RadzenBadge BadgeStyle="BadgeStyle.Base" Variant="Variant.Flat" Shade="Shade.Lighter" IsPill="true"
+                                                                     class="rz-ms-2" Text="@UI["Permission:CannotGrant"]"
+                                                                     title="@UI["Permission:CannotGrant.Tooltip"]" />
+                                                    }
+                                                    else if (IsDisabledPermission(treeItem.Permission))
+                                                    {
+                                                        @foreach (var provider in treeItem.Permission.GrantedProviders.Where(p => p.ProviderName != ProviderName))
+                                                        {
+                                                            <RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" IsPill="true"
+                                                                         class="rz-ms-2" Text="@PermissionProviderText.Format(UI, provider)" />
+                                                        }
+                                                    }
+                                                }
                                             }
-                                        }
-                                    </Template>
-                                </RadzenTreeLevel>
-                            </RadzenTree>
+                                        </Template>
+                                    </RadzenTreeLevel>
+                                </RadzenTree>
+                            }
                         </div>
                     </RadzenTabsItem>
                 }
@@ -83,6 +128,28 @@
     List<PermissionGrantInfoDto> _disabledPermissions = [];
 
     bool _selectAllDisabled;
+
+    string? _keyword;
+
+    /// <summary>
+    /// Permissions the current user may not change. Since ABP 11, <c>PermissionAppService.UpdateAsync</c>
+    /// silently drops any permission the caller does not hold unless the caller is in the "admin" role,
+    /// so ticking these would report success without saving. Lock them instead.
+    /// </summary>
+    readonly HashSet<string> _lockedNames = [];
+
+    /// <summary>Original tree node per permission name. Filtered trees are clones, so
+    /// parent/child propagation must run on the originals to reach hidden nodes too.</summary>
+    readonly Dictionary<string, PermissionTreeItemVm> _itemsByName = [];
+
+    /// <summary>Grant state when the dialog opened, to count unsaved changes.</summary>
+    readonly Dictionary<string, bool> _initialGrants = [];
+
+    int ChangedCount => _itemsByName.Values.Count(x => x.Permission.IsGranted != _initialGrants[x.Permission.Name]);
+
+    string SaveButtonText => ChangedCount == 0
+        ? L["Save"]
+        : UI["Permission:SaveWithChanges", ChangedCount];
 
     public Permission()
     {
@@ -132,12 +199,52 @@
 
         _selectAllDisabled = _groups.All(IsPermissionGroupDisabled);
 
+        foreach (var treeItem in _groups.SelectMany(g => g.Expand()))
+        {
+            _itemsByName[treeItem.Permission.Name] = treeItem;
+            _initialGrants[treeItem.Permission.Name] = treeItem.Permission.IsGranted;
+        }
+
+        await LoadLockedPermissionsAsync();
+
         foreach (var permission in result.Groups.SelectMany(x => x.Permissions))
         {
             if (permission.IsGranted && permission.GrantedProviders.All(x => x.ProviderName != ProviderName))
             {
                 _disabledPermissions.Add(permission);
             }
+        }
+    }
+
+    // Mirrors PermissionAppService.FilterInputPermissionsByCurrentUserAsync (ABP 11).
+    async Task LoadLockedPermissionsAsync()
+    {
+        if (CurrentUser.IsInRole(AbpRoleConsts.AdminRoleName) || _itemsByName.Count == 0)
+        {
+            return;
+        }
+
+        var result = await PermissionChecker.IsGrantedAsync(_itemsByName.Keys.ToArray());
+        foreach (var (name, grant) in result.Result)
+        {
+            if (grant != PermissionGrantResult.Granted)
+            {
+                _lockedNames.Add(name);
+            }
+        }
+    }
+
+    bool IsLocked(PermissionGrantInfoDto permission) => _lockedNames.Contains(permission.Name);
+
+    /// <summary>All permissions in the group that the current user can change are granted.</summary>
+    bool IsGroupFullyGranted(PermissionGroupVm group) =>
+        group.Expand().Where(x => !IsLocked(x.Permission)).All(x => x.Permission.IsGranted);
+
+    void SetGroupGranted(PermissionGroupVm group, bool isGranted)
+    {
+        foreach (var item in group.Expand().Where(x => !IsLocked(x.Permission)))
+        {
+            item.Permission.IsGranted = isGranted;
         }
     }
 
@@ -175,25 +282,57 @@
         return $"{group.DisplayName}（{permissions.Count(x => x.Permission.IsGranted)}/{permissions.Count}）";
     }
 
-    string GetPermissionShownName(PermissionGrantInfoDto permissionGrantInfo)
+    /// <summary>Filtered tree per group, rebuilt only when the keyword changes so that
+    /// ticking a box does not hand the tree brand-new nodes on every render.</summary>
+    readonly Dictionary<PermissionGroupVm, List<PermissionTreeItemVm>> _visibleTrees = [];
+
+    void OnKeywordChanged(string? value)
     {
-        if (!IsDisabledPermission(permissionGrantInfo))
+        _keyword = value;
+        _visibleTrees.Clear();
+
+        if (string.IsNullOrWhiteSpace(_keyword))
         {
-            return permissionGrantInfo.DisplayName;
+            return;
         }
 
-        return string.Format(
-            "{0} ({1})",
-            permissionGrantInfo.DisplayName,
-            permissionGrantInfo.GrantedProviders
-                .Where(p => p.ProviderName != ProviderName)
-                .Select(p => p.ProviderName)
-                .JoinAsString(", ")
-        );
+        var keyword = _keyword.Trim();
+        foreach (var group in _groups)
+        {
+            _visibleTrees[group] = group.TreeItems
+                .Select(x => FilterTree(x, keyword, null))
+                .OfType<PermissionTreeItemVm>()
+                .ToList();
+        }
+    }
+
+    /// <summary>
+    /// The group's tree, narrowed to permissions matching the keyword plus their ancestors.
+    /// Nodes are clones that share the original <see cref="PermissionGrantInfoDto"/>, so checking
+    /// a box still updates the real grant state.
+    /// </summary>
+    List<PermissionTreeItemVm> GetVisibleTree(PermissionGroupVm group) =>
+        _visibleTrees.GetValueOrDefault(group, group.TreeItems);
+
+    static PermissionTreeItemVm? FilterTree(PermissionTreeItemVm item, string keyword, PermissionTreeItemVm? parent)
+    {
+        var clone = new PermissionTreeItemVm(item.Depth, item.Permission) { Parent = parent };
+        clone.Children = item.Children
+            .Select(x => FilterTree(x, keyword, clone))
+            .OfType<PermissionTreeItemVm>()
+            .ToList();
+
+        var matches = item.Permission.DisplayName.Contains(keyword, StringComparison.OrdinalIgnoreCase)
+                      || item.Permission.Name.Contains(keyword, StringComparison.OrdinalIgnoreCase);
+
+        return matches || clone.Children.Count > 0 ? clone : null;
     }
 
     void PermissionCheckChanged(PermissionTreeItemVm treeItem)
     {
+        // The clicked node may be a filtered clone; propagate on the full tree.
+        treeItem = _itemsByName.GetValueOrDefault(treeItem.Permission.Name, treeItem);
+
         if (treeItem.Permission.IsGranted)
         {
             GrantAllDirectParents(treeItem);
@@ -211,7 +350,10 @@
         var parentTreeItem = treeItem.Parent;
         while (parentTreeItem != null)
         {
-            parentTreeItem.Permission.IsGranted = true;
+            if (!IsLocked(parentTreeItem.Permission))
+            {
+                parentTreeItem.Permission.IsGranted = true;
+            }
             parentTreeItem = parentTreeItem.Parent;
             if (parentTreeItem == null)
             {
@@ -224,7 +366,10 @@
     {
         foreach (var child in treeItem.Children)
         {
-            child.Permission.IsGranted = isGranted;
+            if (!IsLocked(child.Permission))
+            {
+                child.Permission.IsGranted = isGranted;
+            }
             GrantAllChildren(child, isGranted);
         }
     }
@@ -233,7 +378,7 @@
     {
         foreach (var g in _groups)
         {
-            g.Grant(isGranted);
+            SetGroupGranted(g, isGranted);
         }
     }
 

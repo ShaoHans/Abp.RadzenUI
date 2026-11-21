@@ -365,7 +365,13 @@
     "PermissionVisualizer:SourcesMore": "{0} 等 {1} 个",
     "PermissionVisualizer:Provider.R": "角色",
     "PermissionVisualizer:Provider.U": "用户",
-    "PermissionVisualizer:Provider.C": "客户端"
+    "PermissionVisualizer:Provider.C": "客户端",
+    "Permission:SearchPlaceholder": "搜索权限",
+    "Permission:SelectAllInGroup": "全选本组",
+    "Permission:NoMatch": "本组没有匹配的权限。",
+    "Permission:SaveWithChanges": "保存（{0} 项变更）",
+    "Permission:CannotGrant": "无权授予",
+    "Permission:CannotGrant.Tooltip": "只能授予自己已拥有的权限。如需授予，请联系 admin 角色的用户。"
   }
 }
 

@@ -89,7 +89,11 @@ else
     [Parameter]
     public string CancelIcon { get; set; } = "cancel";
 
-    protected bool IsSaveDisabled => IsSaving;
+    /// <summary>Disables the save button, e.g. while there is nothing to save.</summary>
+    [Parameter]
+    public bool SaveDisabled { get; set; }
+
+    protected bool IsSaveDisabled => IsSaving || SaveDisabled;
 
     protected bool IsCancelDisabled => DisableCancelWhileSaving && IsSaving;
 

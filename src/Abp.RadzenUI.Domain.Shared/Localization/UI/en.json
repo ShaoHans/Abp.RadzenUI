@@ -367,7 +367,13 @@
     "PermissionVisualizer:SourcesMore": "{0} and {1} in total",
     "PermissionVisualizer:Provider.R": "Role",
     "PermissionVisualizer:Provider.U": "User",
-    "PermissionVisualizer:Provider.C": "Client"
+    "PermissionVisualizer:Provider.C": "Client",
+    "Permission:SearchPlaceholder": "Search permissions",
+    "Permission:SelectAllInGroup": "Select all in this group",
+    "Permission:NoMatch": "No permissions in this group match the search.",
+    "Permission:SaveWithChanges": "Save ({0} changes)",
+    "Permission:CannotGrant": "Not yours to grant",
+    "Permission:CannotGrant.Tooltip": "You can only grant permissions you have yourself. Ask a user in the admin role to grant this one."
   }
 }
 
