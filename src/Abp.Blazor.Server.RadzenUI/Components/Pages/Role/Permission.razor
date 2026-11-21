@@ -415,7 +415,7 @@
             await PermissionAppService.UpdateAsync(ProviderName, ProviderKey, updateDto);
             await CacheResetService.ResetAsync();
 
-            await Notify.Success(L["SuccessfullySaved"]);
+            await Notify.Success(UI["SavedSuccessfully"]);
             DialogService.Close(true);
         }
         catch (Exception ex)

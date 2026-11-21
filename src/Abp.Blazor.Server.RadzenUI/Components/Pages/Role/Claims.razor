@@ -104,7 +104,7 @@
             await RoleClaimAppService.AddClaimAsync(RoleId, _newClaim);
             _newClaim = new();
             await LoadClaimsAsync();
-            await Notify.Success(L["SuccessfullySaved"]);
+            await Notify.Success(L["SavedSuccessfully"]);
         }
         catch (Exception ex)
         {
@@ -129,7 +129,7 @@
 
             await RoleClaimAppService.DeleteClaimAsync(RoleId, claim);
             await LoadClaimsAsync();
-            await Notify.Success(L["SuccessfullyDeleted"]);
+            await Notify.Success(L["DeletedSuccessfully"]);
         }
         catch (Exception ex)
         {
