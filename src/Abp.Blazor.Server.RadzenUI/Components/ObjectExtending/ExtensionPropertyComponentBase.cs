@@ -47,6 +47,20 @@ public abstract class ExtensionPropertyComponentBase<TEntity, TResourceType> : A
     public int InputSizeMD { get; set; } = 8;
 
     /// <summary>
+    /// Renders the label above the input. Each field then becomes a single column, so the
+    /// caller must wrap the fields in a <c>RadzenRow</c>.
+    /// </summary>
+    [Parameter]
+    public bool LabelOnTop { get; set; }
+
+    /// <summary>
+    /// Bootstrap-style column size (1-12) of the whole field on medium+ screens when
+    /// <see cref="LabelOnTop"/> is set.
+    /// </summary>
+    [Parameter]
+    public int FieldSizeMD { get; set; } = 6;
+
+    /// <summary>
     /// Inline style applied to the input control. Defaults to filling the column,
     /// which suits dialogs; pass an empty string to keep Radzen's default width.
     /// </summary>

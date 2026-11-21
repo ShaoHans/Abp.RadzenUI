@@ -1,0 +1,39 @@
+@* Shared label/input layout for extension property inputs.
+   Side-by-side (default): renders its own RadzenRow, label column right-aligned on md+.
+   Label on top: renders a single RadzenColumn, so the caller must place it inside a RadzenRow
+   (which lets several fields sit side by side in a grid). *@
+
+@if (LabelOnTop)
+{
+    <RadzenColumn Size="12" SizeMD="@FieldSizeMD">
+        <RadzenStack Gap="0.25rem">
+            <div>@LabelContent</div>
+            @InputContent
+        </RadzenStack>
+    </RadzenColumn>
+}
+else
+{
+    <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+        <RadzenColumn Size="12" SizeMD="@LabelSizeMD" class="rz-text-align-start rz-text-align-md-end">
+            @LabelContent
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="@InputSizeMD">
+            @InputContent
+        </RadzenColumn>
+    </RadzenRow>
+}
+
+@code {
+    [Parameter] public RenderFragment? LabelContent { get; set; }
+
+    [Parameter] public RenderFragment? InputContent { get; set; }
+
+    [Parameter] public bool LabelOnTop { get; set; }
+
+    [Parameter] public int FieldSizeMD { get; set; } = 6;
+
+    [Parameter] public int LabelSizeMD { get; set; } = 4;
+
+    [Parameter] public int InputSizeMD { get; set; } = 8;
+}

@@ -1,119 +1,35 @@
 @using Abp.RadzenUI.Application.Contracts.Organizations
-@using Abp.RadzenUI.Features.Avatar
 @using Abp.RadzenUI.Components.ObjectExtending
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.Extensions.Localization
-@using Volo.Abp.AspNetCore.Components
-@using Volo.Abp.AspNetCore.Components.Web
 @using Volo.Abp.Identity
 @using Volo.Abp.Identity.Localization
 @inject IIdentityUserAppService UserAppService
-@inject AbpBlazorMessageLocalizerHelper<IdentityResource> LH
 @inherits AbpRadzenUIComponentBase
 
 <RadzenTemplateForm TItem="IdentityUserUpdateDto" Data=@DialogFromOption.Model Submit="@(model => DialogFromOption.SubmitAsync(model, () => InvokeAsync(StateHasChanged)))" Style="max-height:calc(100vh - 200px); display: flex;flex-direction:column">
     <DialogFormLayout CancelClick="@DialogFromOption.OnCancel" IsSaving="@DialogFromOption.IsSaving">
-        <RadzenTabs>
-            <Tabs>
-                <RadzenTabsItem Text="@IL["DisplayName:UserInfo"]">
-                    <RadzenStack Gap="2rem">
-                        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                                <RequiredMark />
-                                <RadzenLabel Text="@L["DisplayName:UserName"]" Component="UserName" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenTextBox Name="UserName" @bind-Value=@DialogFromOption.Model.UserName Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxUserNameLength" />
-                                <RadzenRequiredValidator Component="UserName" Text="@L.Required("DisplayName:UserName")" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                                <RadzenLabel Text="@L["DisplayName:Password"]" Component="Password" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenPassword Name="Password" @bind-Value=@DialogFromOption.Model.Password Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxPasswordLength" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                                <RequiredMark />
-                                <RadzenLabel Text="@L["DisplayName:Email"]" Component="Email" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenTextBox Name="Email" @bind-Value=@DialogFromOption.Model.Email Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxEmailLength" />
-                                <RadzenRequiredValidator Component="Email" Text="@L.Required("DisplayName:Email")" />
-                                <RadzenEmailValidator Component="Email" Text="@L["Volo.Abp.Identity:InvalidEmail", DialogFromOption.Model.Email]" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                                <RadzenLabel Text="@L["DisplayName:PhoneNumber"]" Component="PhoneNumber" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenTextBox Name="PhoneNumber" @bind-Value=@DialogFromOption.Model.PhoneNumber Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxPhoneNumberLength" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                                <RadzenLabel Text="@L["DisplayName:Name"]" Component="Name" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenTextBox Name="Name" @bind-Value=@DialogFromOption.Model.Name Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxNameLength" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                                <RadzenLabel Text="@L["DisplayName:Surname"]" Component="Surname" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenTextBox Name="Surname" @bind-Value=@DialogFromOption.Model.Surname Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxSurnameLength" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                                <RadzenLabel Text="@L["DisplayName:IsActive"]" Component="IsActive" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenCheckBox TValue="bool" @bind-Value=@DialogFromOption.Model.IsActive Name="IsActive" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                                <RadzenLabel Text="@L["DisplayName:LockoutEnabled"]" Component="LockoutEnabled" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenCheckBox TValue="bool" @bind-Value=@DialogFromOption.Model.LockoutEnabled Name="LockoutEnabled" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <ExtensionProperties TEntityType="IdentityUserUpdateDto"
-                                             TResourceType="IdentityResource"
-                                             Entity="@DialogFromOption.Model"
-                                             LH="@LH"
-                                             ExcludedPropertyNames="@(new[] { AvatarConsts.ExtraPropertyName })" />
-                    </RadzenStack>
-                </RadzenTabsItem>
-                @if (HasManagePermissionsPermission)
-                {
-                    <RadzenTabsItem Text="@L["Roles"]">
-                        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                            <RadzenColumn Size="12" SizeMD="12">
-                                <RadzenCheckBoxList Value="@DialogFromOption.Model.RoleNames" TValue="string" Change=@RolesChange Orientation="Orientation.Vertical">
-                                    <Items>
-                                        @foreach (var role in allRoles)
-                                        {
-                                            <RadzenCheckBoxListItem Text="@(role.Disabled ? $"{role.Name}(OU)" : role.Name)"
-                                                                    Value="@role.Name"
-                                                                    Disabled="@role.Disabled" />
-                                        }
-                                    </Items>
-                                </RadzenCheckBoxList>
-                            </RadzenColumn>
-                        </RadzenRow>
-                    </RadzenTabsItem>
-                }
-            </Tabs>
-        </RadzenTabs>
+        <RadzenRow Gap="1.5rem" RowGap="1.5rem" class="rz-p-1 rz-mb-4">
+            <RadzenColumn Size="12" SizeMD="@(HasManagePermissionsPermission ? 7 : 12)">
+                <UserInfoFields TDto="IdentityUserUpdateDto" Model="@DialogFromOption.Model">
+                    <PasswordContent>
+                        <div>
+                            <RadzenLabel Text="@L["DisplayName:Password"]" Component="Password" />
+                        </div>
+                        <RadzenPassword Name="Password" @bind-Value=@DialogFromOption.Model.Password Style="width: 100%;" MaxLength="IdentityUserConsts.MaxPasswordLength"
+                                        Placeholder="@IL["UserForm:PasswordKeepHint"]" autocomplete="new-password" />
+                    </PasswordContent>
+                </UserInfoFields>
+            </RadzenColumn>
+            @if (HasManagePermissionsPermission)
+            {
+                <RadzenColumn Size="12" SizeMD="5">
+                    <RadzenCard Variant="Variant.Filled" class="rz-p-4">
+                        <UserRolesPane Roles="@roles" @bind-SelectedRoleNames="DialogFromOption.Model.RoleNames" />
+                    </RadzenCard>
+                </RadzenColumn>
+            }
+        </RadzenRow>
     </DialogFormLayout>
 </RadzenTemplateForm>
 
@@ -122,10 +38,9 @@
     [Parameter] public Guid UserId { get; set; }
     [Inject] public IStringLocalizer<AbpRadzenUIResource> IL { get; set; } = default!;
     [Inject] public IOrganizationUnitAppService OuAppService { get; set; } = default!;
+
     protected bool HasManagePermissionsPermission { get; set; }
-    IList<string> roleNames = [];
-    IReadOnlyList<string> roleNamesInOu = [];
-    IReadOnlyList<RoleItem> allRoles = [];
+    IReadOnlyList<UserRoleOption> roles = [];
 
     public Edit()
     {
@@ -140,26 +55,21 @@
             IdentityPermissions.Users.ManagePermissions
         );
 
-        roleNames = (await UserAppService.GetAssignableRolesAsync())
+        if (!HasManagePermissionsPermission)
+        {
+            return;
+        }
+
+        var roleNames = (await UserAppService.GetAssignableRolesAsync())
             .Items?.Select(r => r.Name).ToArray()
             ?? [];
 
-        roleNamesInOu = (await OuAppService.GetRoleNamesAsync(UserId)).Items ?? [];
+        var roleNamesInOu = (await OuAppService.GetRoleNamesAsync(UserId)).Items ?? [];
 
-        allRoles =
-            roleNames
-            .Union(roleNamesInOu)              
-            .Select(role => new RoleItem(
-                role,
-                roleNamesInOu.Contains(role)))  
-            .OrderBy(r => r.Name)               
+        roles = roleNames
+            .Union(roleNamesInOu)
+            .OrderBy(r => r)
+            .Select(r => new UserRoleOption(r, roleNamesInOu.Contains(r)))
             .ToList();
     }
-
-    void RolesChange(IEnumerable<string> values)
-    {
-        DialogFromOption.Model.RoleNames = values is null ? [] : values.ToArray();
-    }
-
-    record RoleItem(string Name, bool Disabled);
 }

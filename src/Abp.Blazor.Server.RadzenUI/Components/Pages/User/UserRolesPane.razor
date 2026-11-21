@@ -1,0 +1,85 @@
+@using Microsoft.Extensions.Localization
+@using Volo.Abp.Identity.Localization
+@inherits AbpRadzenUIComponentBase
+
+@* Role picker for the user dialogs: selected count in the header, a filter box once the
+   list gets long, and roles inherited from an organization unit shown read-only. *@
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" class="rz-mb-3">
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="rz-color-primary rz-m-0">@L["Roles"]</RadzenText>
+    <RadzenBadge BadgeStyle="@(SelectedCount > 0 ? BadgeStyle.Primary : BadgeStyle.Base)" Shade="Shade.Lighter" IsPill="true" Text="@IL["UserForm:RolesSelected", SelectedCount]" />
+</RadzenStack>
+
+@if (Roles.Count == 0)
+{
+    <RadzenText TextStyle="TextStyle.Body2" TextAlign="TextAlign.Center" class="rz-py-6 rz-text-secondary-color">@IL["UserForm:NoAssignableRoles"]</RadzenText>
+}
+else
+{
+    @if (Roles.Count > FilterThreshold)
+    {
+        <RadzenTextBox @bind-Value="_filter" Immediate="true" Placeholder="@IL["UserForm:SearchRoles"]" Style="width: 100%;" class="rz-mb-2" />
+    }
+
+    <RadzenStack Gap="0.5rem">
+        @for (var i = 0; i < Roles.Count; i++)
+        {
+            var role = Roles[i];
+            if (!Matches(role))
+            {
+                continue;
+            }
+
+            var fieldName = $"UserRole_{i}";
+            <RadzenStack @key="role.Name" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox TValue="bool" Name="@fieldName"
+                                Value="@IsSelected(role.Name)"
+                                Change="@(value => ToggleAsync(role.Name, value))"
+                                Disabled="@role.InheritedFromOrganizationUnit" />
+                <RadzenLabel Text="@role.Name" Component="@fieldName" />
+                @if (role.InheritedFromOrganizationUnit)
+                {
+                    <RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" IsPill="true" Text="@IL["UserForm:RoleFromOrganizationUnit"]" />
+                }
+            </RadzenStack>
+        }
+    </RadzenStack>
+}
+
+@code {
+    /// <summary>Show the filter box only when the list has more roles than this.</summary>
+    private const int FilterThreshold = 8;
+
+    [Parameter, EditorRequired] public IReadOnlyList<UserRoleOption> Roles { get; set; } = [];
+
+    [Parameter] public string[]? SelectedRoleNames { get; set; }
+
+    [Parameter] public EventCallback<string[]> SelectedRoleNamesChanged { get; set; }
+
+    [Inject] public IStringLocalizer<AbpRadzenUIResource> IL { get; set; } = default!;
+
+    private string? _filter;
+
+    private int SelectedCount => SelectedRoleNames?.Length ?? 0;
+
+    public UserRolesPane()
+    {
+        LocalizationResource = typeof(IdentityResource);
+    }
+
+    private bool IsSelected(string roleName) => SelectedRoleNames?.Contains(roleName) == true;
+
+    private bool Matches(UserRoleOption role) =>
+        string.IsNullOrWhiteSpace(_filter)
+        || role.Name.Contains(_filter.Trim(), StringComparison.OrdinalIgnoreCase);
+
+    private async Task ToggleAsync(string roleName, bool selected)
+    {
+        var current = SelectedRoleNames ?? [];
+        var next = selected
+            ? current.Append(roleName).Distinct().ToArray()
+            : current.Where(r => r != roleName).ToArray();
+
+        await SelectedRoleNamesChanged.InvokeAsync(next);
+    }
+}

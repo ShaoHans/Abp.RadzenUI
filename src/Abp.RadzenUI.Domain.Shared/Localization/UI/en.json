@@ -339,7 +339,18 @@
     "Btn:Export": "Export",
     "Export:Exporting": "Exporting...",
     "Export:Success": "Exported successfully",
-    "Export:NoData": "There is no data to export"
+    "Export:NoData": "There is no data to export",
+    "DisplayName:UserInfo": "User information",
+    "UserForm:AccountSection": "Account",
+    "UserForm:ProfileSection": "Personal information",
+    "UserForm:StatusSection": "Status",
+    "UserForm:IsActiveHint": "Inactive users cannot sign in.",
+    "UserForm:LockoutEnabledHint": "Temporarily lock the account after too many failed sign-in attempts.",
+    "UserForm:PasswordKeepHint": "Leave blank to keep the current password",
+    "UserForm:RolesSelected": "{0} selected",
+    "UserForm:NoAssignableRoles": "No roles available to assign.",
+    "UserForm:SearchRoles": "Search roles",
+    "UserForm:RoleFromOrganizationUnit": "From organization unit"
   }
 }
 

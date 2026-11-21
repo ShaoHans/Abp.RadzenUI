@@ -338,7 +338,17 @@
     "Btn:Export": "导出",
     "Export:Exporting": "正在导出...",
     "Export:Success": "导出成功",
-    "Export:NoData": "没有可导出的数据"
+    "Export:NoData": "没有可导出的数据",
+    "UserForm:AccountSection": "账号信息",
+    "UserForm:ProfileSection": "个人信息",
+    "UserForm:StatusSection": "状态",
+    "UserForm:IsActiveHint": "停用后该用户无法登录。",
+    "UserForm:LockoutEnabledHint": "登录失败次数过多时临时锁定该账户。",
+    "UserForm:PasswordKeepHint": "留空则不修改密码",
+    "UserForm:RolesSelected": "已选 {0} 个",
+    "UserForm:NoAssignableRoles": "暂无可分配的角色。",
+    "UserForm:SearchRoles": "搜索角色",
+    "UserForm:RoleFromOrganizationUnit": "来自组织机构"
   }
 }
 

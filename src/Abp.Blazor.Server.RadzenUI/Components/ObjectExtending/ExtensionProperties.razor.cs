@@ -50,6 +50,19 @@ public partial class ExtensionProperties<TEntityType, TResourceType> : Component
     public int InputSizeMD { get; set; } = 8;
 
     /// <summary>
+    /// Renders labels above inputs. Each property becomes a single column, so place this
+    /// component inside a <c>RadzenRow</c>.
+    /// </summary>
+    [Parameter]
+    public bool LabelOnTop { get; set; }
+
+    /// <summary>
+    /// Column size (1-12) of each property on medium+ screens when <see cref="LabelOnTop"/> is set.
+    /// </summary>
+    [Parameter]
+    public int FieldSizeMD { get; set; } = 6;
+
+    /// <summary>
     /// Inline style for every rendered input. Defaults to filling the column.
     /// </summary>
     [Parameter]
@@ -88,6 +101,8 @@ public partial class ExtensionProperties<TEntityType, TResourceType> : Component
             builder.AddAttribute(5, "LabelSizeMD", LabelSizeMD);
             builder.AddAttribute(6, "InputSizeMD", InputSizeMD);
             builder.AddAttribute(7, "InputStyle", InputStyle);
+            builder.AddAttribute(8, "LabelOnTop", LabelOnTop);
+            builder.AddAttribute(9, "FieldSizeMD", FieldSizeMD);
             builder.CloseComponent();
         };
 }

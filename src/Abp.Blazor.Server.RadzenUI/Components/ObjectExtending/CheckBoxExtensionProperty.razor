@@ -7,11 +7,11 @@
 
 @if (PropertyInfo != null && Entity != null)
 {
-    <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-        <RadzenColumn Size="12" SizeMD="@LabelSizeMD" class="rz-text-align-start rz-text-align-md-end">
+    <ExtensionPropertyField LabelOnTop="@LabelOnTop" FieldSizeMD="@FieldSizeMD" LabelSizeMD="@LabelSizeMD" InputSizeMD="@InputSizeMD">
+        <LabelContent>
             <RadzenLabel Text="@PropertyInfo.GetLocalizedDisplayName(StringLocalizerFactory)" Component="@PropertyInfo.Name" />
-        </RadzenColumn>
-        <RadzenColumn Size="12" SizeMD="@InputSizeMD">
+        </LabelContent>
+        <InputContent>
             @if (ReadOnly)
             {
                 <BooleanIcon Value="@Value" />
@@ -20,6 +20,6 @@
             {
                 <RadzenCheckBox TValue="bool" @bind-Value="@Value" Name="@PropertyInfo.Name" />
             }
-        </RadzenColumn>
-    </RadzenRow>
+        </InputContent>
+    </ExtensionPropertyField>
 }

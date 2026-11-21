@@ -1,0 +1,129 @@
+@typeparam TDto where TDto : IdentityUserCreateOrUpdateDtoBase
+@using Abp.RadzenUI.Components.ObjectExtending
+@using Abp.RadzenUI.Features.Avatar
+@using Microsoft.Extensions.Localization
+@using Volo.Abp.AspNetCore.Components
+@using Volo.Abp.AspNetCore.Components.Web
+@using Volo.Abp.Identity
+@using Volo.Abp.Identity.Localization
+@inject AbpBlazorMessageLocalizerHelper<IdentityResource> LH
+@inherits AbpRadzenUIComponentBase
+
+@* Shared user fields for the create/edit dialogs: grouped sections, labels on top,
+   short fields two per row. The password field differs (required on create, optional
+   on edit), so each dialog passes it in. *@
+
+<RadzenStack Gap="1.5rem">
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="rz-color-primary rz-mb-3">@IL["UserForm:AccountSection"]</RadzenText>
+        <RadzenRow Gap="1rem" RowGap="0.75rem">
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenStack Gap="0.25rem">
+                    <div>
+                        <RequiredMark />
+                        <RadzenLabel Text="@L["DisplayName:UserName"]" Component="@UserNameFieldName" />
+                    </div>
+                    @if (PreventAutofill)
+                    {
+                        <!-- Fake field to stop browser autofill -->
+                        <input type="text" name="fake_username" autocomplete="username" style="display:none" />
+                    }
+                    <RadzenTextBox Name="@UserNameFieldName" @bind-Value="@Model.UserName" Style="width: 100%;" MaxLength="IdentityUserConsts.MaxUserNameLength" />
+                    <RadzenRequiredValidator Component="@UserNameFieldName" Text="@L.Required("DisplayName:UserName")" />
+                </RadzenStack>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenStack Gap="0.25rem">
+                    @PasswordContent
+                </RadzenStack>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenStack Gap="0.25rem">
+                    <div>
+                        <RequiredMark />
+                        <RadzenLabel Text="@L["DisplayName:Email"]" Component="Email" />
+                    </div>
+                    <RadzenTextBox Name="Email" @bind-Value="@Model.Email" Style="width: 100%;" MaxLength="IdentityUserConsts.MaxEmailLength" />
+                    <RadzenRequiredValidator Component="Email" Text="@L.Required("DisplayName:Email")" />
+                    <RadzenEmailValidator Component="Email" Text="@L["Volo.Abp.Identity:InvalidEmail", Model.Email ?? string.Empty]" />
+                </RadzenStack>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenStack Gap="0.25rem">
+                    <div>
+                        <RadzenLabel Text="@L["DisplayName:PhoneNumber"]" Component="PhoneNumber" />
+                    </div>
+                    <RadzenTextBox Name="PhoneNumber" @bind-Value="@Model.PhoneNumber" Style="width: 100%;" MaxLength="IdentityUserConsts.MaxPhoneNumberLength" />
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+    </div>
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="rz-color-primary rz-mb-3">@IL["UserForm:ProfileSection"]</RadzenText>
+        <RadzenRow Gap="1rem" RowGap="0.75rem">
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenStack Gap="0.25rem">
+                    <div>
+                        <RadzenLabel Text="@L["DisplayName:Name"]" Component="Name" />
+                    </div>
+                    <RadzenTextBox Name="Name" @bind-Value="@Model.Name" Style="width: 100%;" MaxLength="IdentityUserConsts.MaxNameLength" />
+                </RadzenStack>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenStack Gap="0.25rem">
+                    <div>
+                        <RadzenLabel Text="@L["DisplayName:Surname"]" Component="Surname" />
+                    </div>
+                    <RadzenTextBox Name="Surname" @bind-Value="@Model.Surname" Style="width: 100%;" MaxLength="IdentityUserConsts.MaxSurnameLength" />
+                </RadzenStack>
+            </RadzenColumn>
+            <ExtensionProperties TEntityType="TDto"
+                                 TResourceType="IdentityResource"
+                                 Entity="@Model"
+                                 LH="@LH"
+                                 LabelOnTop="true"
+                                 FieldSizeMD="6"
+                                 InputStyle="width: 100%;"
+                                 ExcludedPropertyNames="@(new[] { AvatarConsts.ExtraPropertyName })" />
+        </RadzenRow>
+    </div>
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="rz-color-primary rz-mb-3">@IL["UserForm:StatusSection"]</RadzenText>
+        <RadzenStack Gap="0.75rem">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Gap="0.75rem">
+                <RadzenSwitch Name="IsActive" @bind-Value="@Model.IsActive" />
+                <RadzenStack Gap="0.125rem">
+                    <RadzenLabel Text="@L["DisplayName:IsActive"]" Component="IsActive" />
+                    <RadzenText TextStyle="TextStyle.Caption" class="rz-m-0 rz-text-secondary-color">@IL["UserForm:IsActiveHint"]</RadzenText>
+                </RadzenStack>
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Gap="0.75rem">
+                <RadzenSwitch Name="LockoutEnabled" @bind-Value="@Model.LockoutEnabled" />
+                <RadzenStack Gap="0.125rem">
+                    <RadzenLabel Text="@L["DisplayName:LockoutEnabled"]" Component="LockoutEnabled" />
+                    <RadzenText TextStyle="TextStyle.Caption" class="rz-m-0 rz-text-secondary-color">@IL["UserForm:LockoutEnabledHint"]</RadzenText>
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenStack>
+    </div>
+</RadzenStack>
+
+@code {
+    [Parameter, EditorRequired] public TDto Model { get; set; } = default!;
+
+    /// <summary>Label + input for the password column.</summary>
+    [Parameter] public RenderFragment? PasswordContent { get; set; }
+
+    /// <summary>Renders hidden decoy inputs and a non-standard field name so the browser
+    /// does not autofill the admin's own credentials into a new user.</summary>
+    [Parameter] public bool PreventAutofill { get; set; }
+
+    [Inject] public IStringLocalizer<AbpRadzenUIResource> IL { get; set; } = default!;
+
+    private string UserNameFieldName => PreventAutofill ? "RealUserNameField" : "UserName";
+
+    public UserInfoFields()
+    {
+        LocalizationResource = typeof(IdentityResource);
+    }
+}

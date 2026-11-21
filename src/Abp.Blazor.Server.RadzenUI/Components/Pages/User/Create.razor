@@ -1,136 +1,45 @@
 @using Abp.RadzenUI.Components.ObjectExtending
-@using Abp.RadzenUI.Features.Avatar
 @using Microsoft.AspNetCore.Authorization
-@using System.Collections.Immutable
-@using Microsoft.Extensions.Localization
 @using Volo.Abp.AspNetCore.Components
-@using Volo.Abp.AspNetCore.Components.Web
 @using Volo.Abp.Identity
 @using Volo.Abp.Identity.Localization
-@using Volo.Abp.Localization
-@using Volo.Abp.ObjectExtending
 @inject IIdentityUserAppService UserAppService
-@inject AbpBlazorMessageLocalizerHelper<IdentityResource> LH
 @inherits AbpRadzenUIComponentBase
 
 <RadzenTemplateForm TItem="IdentityUserCreateDto" Data=@DialogFromOption.Model Submit="@(model => DialogFromOption.SubmitAsync(model, () => InvokeAsync(StateHasChanged)))" Style="max-height:calc(100vh - 200px); display: flex;flex-direction:column">
     <DialogFormLayout CancelClick="DialogFromOption.OnCancel" IsSaving="@DialogFromOption.IsSaving">
-        <RadzenTabs>
-            <Tabs>
-                <RadzenTabsItem Text="@IL["DisplayName:UserInfo"]">
-                    <RadzenStack Gap="2rem">
-                        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                                <RequiredMark />
-                                <RadzenLabel Text="@L["DisplayName:UserName"]" Component="RealUserNameField" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <!-- Fake field to stop browser autofill -->
-                                <input type="text" name="fake_username" autocomplete="username" style="display:none" />
-                                <RadzenTextBox Name="RealUserNameField" @bind-Value=@DialogFromOption.Model.UserName Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxUserNameLength" />
-                                <RadzenRequiredValidator Component="RealUserNameField" Text="@L.Required("DisplayName:UserName")" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                                <RequiredMark />
-                                <RadzenLabel Text="@L["DisplayName:Password"]" Component="RealPasswordField" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <!-- Fake field to stop browser autofill -->
-                                <input type="password" name="fake_password" autocomplete="new-password" style="display:none" />
-                                <RadzenPassword Name="RealPasswordField" @bind-Value=@DialogFromOption.Model.Password Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxPasswordLength" />
-                                <RadzenRequiredValidator Component="RealPasswordField" Text="@L.Required("DisplayName:Password")" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                                <RequiredMark />
-                                <RadzenLabel Text="@L["DisplayName:Email"]" Component="Email" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenTextBox Name="Email" @bind-Value=@DialogFromOption.Model.Email Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxEmailLength" />
-                                <RadzenRequiredValidator Component="Email" Text="@L.Required("DisplayName:Email")" />
-                                <RadzenEmailValidator Component="Email" Text="@L["Volo.Abp.Identity:InvalidEmail", DialogFromOption.Model.Email]" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                                <RadzenLabel Text="@L["DisplayName:PhoneNumber"]" Component="PhoneNumber" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenTextBox Name="PhoneNumber" @bind-Value=@DialogFromOption.Model.PhoneNumber Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxPhoneNumberLength" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                                <RadzenLabel Text="@L["DisplayName:Name"]" Component="Name" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenTextBox Name="Name" @bind-Value=@DialogFromOption.Model.Name Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxNameLength" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                                <RadzenLabel Text="@L["DisplayName:Surname"]" Component="Surname" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenTextBox Name="Surname" @bind-Value=@DialogFromOption.Model.Surname Style="display: block; width: 100%;" MaxLength="IdentityUserConsts.MaxSurnameLength" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                                <RadzenLabel Text="@L["DisplayName:IsActive"]" Component="IsActive" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenCheckBox TValue="bool" @bind-Value=@DialogFromOption.Model.IsActive Name="IsActive" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                            <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
-                                <RadzenLabel Text="@L["DisplayName:LockoutEnabled"]" Component="LockoutEnabled" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="8">
-                                <RadzenCheckBox TValue="bool" @bind-Value=@DialogFromOption.Model.LockoutEnabled Name="LockoutEnabled" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <ExtensionProperties TEntityType="IdentityUserCreateDto"
-                                             TResourceType="IdentityResource"
-                                             Entity="@DialogFromOption.Model"
-                                             LH="@LH"
-                                             ExcludedPropertyNames="@(new[] { AvatarConsts.ExtraPropertyName })" />
-                    </RadzenStack>
-                </RadzenTabsItem>
-                @if (HasManagePermissionsPermission)
-                {
-                    <RadzenTabsItem Text="@L["Roles"]">
-                        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                            <RadzenColumn Size="12" SizeMD="12">
-                                <RadzenCheckBoxList TValue="string" Change=@RolesChange Orientation="Orientation.Vertical">
-                                    <Items>
-                                        @foreach(var role in roleNames)
-                                        {
-                                            <RadzenCheckBoxListItem Text="@role" Value="@role" />
-                                        }
-                                    </Items>
-                                </RadzenCheckBoxList>
-                            </RadzenColumn>
-                        </RadzenRow>
-                    </RadzenTabsItem>
-                }
-            </Tabs>
-        </RadzenTabs>
+        <RadzenRow Gap="1.5rem" RowGap="1.5rem" class="rz-p-1 rz-mb-4">
+            <RadzenColumn Size="12" SizeMD="@(HasManagePermissionsPermission ? 7 : 12)">
+                <UserInfoFields TDto="IdentityUserCreateDto" Model="@DialogFromOption.Model" PreventAutofill="true">
+                    <PasswordContent>
+                        <div>
+                            <RequiredMark />
+                            <RadzenLabel Text="@L["DisplayName:Password"]" Component="RealPasswordField" />
+                        </div>
+                        <!-- Fake field to stop browser autofill -->
+                        <input type="password" name="fake_password" autocomplete="new-password" style="display:none" />
+                        <RadzenPassword Name="RealPasswordField" @bind-Value=@DialogFromOption.Model.Password Style="width: 100%;" MaxLength="IdentityUserConsts.MaxPasswordLength" />
+                        <RadzenRequiredValidator Component="RealPasswordField" Text="@L.Required("DisplayName:Password")" />
+                    </PasswordContent>
+                </UserInfoFields>
+            </RadzenColumn>
+            @if (HasManagePermissionsPermission)
+            {
+                <RadzenColumn Size="12" SizeMD="5">
+                    <RadzenCard Variant="Variant.Filled" class="rz-p-4">
+                        <UserRolesPane Roles="@roles" @bind-SelectedRoleNames="DialogFromOption.Model.RoleNames" />
+                    </RadzenCard>
+                </RadzenColumn>
+            }
+        </RadzenRow>
     </DialogFormLayout>
 </RadzenTemplateForm>
 
 @code {
     [Parameter] public DialogFromOption<IdentityUserCreateDto> DialogFromOption { get; set; } = default!;
-    [Inject] public IServiceProvider ServiceProvider { get; set; } = default!;
-    [Inject] public IStringLocalizer<AbpRadzenUIResource> IL { get; set; } = default!;
 
-    public ImmutableList<ObjectExtensionPropertyInfo> Properties { get; set; } = ImmutableList<ObjectExtensionPropertyInfo>.Empty;
     protected bool HasManagePermissionsPermission { get; set; }
-    IList<string> roleNames = [];
+    IReadOnlyList<UserRoleOption> roles = [];
 
     public Create()
     {
@@ -140,19 +49,24 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        Properties = await ObjectExtensionManager.Instance.GetPropertiesAndCheckPolicyAsync<IdentityUserCreateDto>(ServiceProvider);
 
         HasManagePermissionsPermission = await AuthorizationService.IsGrantedAsync(
             IdentityPermissions.Users.ManagePermissions
         );
 
-        roleNames = (await UserAppService.GetAssignableRolesAsync())
-            .Items?.Select(r => r.Name).ToArray()
-            ?? [];
-    }
+        if (!HasManagePermissionsPermission)
+        {
+            return;
+        }
 
-    void RolesChange(IEnumerable<string> values)
-    {
-        DialogFromOption.Model.RoleNames = values is null ? [] : values.ToArray();
+        var assignable = (await UserAppService.GetAssignableRolesAsync()).Items ?? [];
+
+        // Pre-select default roles, matching ABP's own create-user modal.
+        DialogFromOption.Model.RoleNames = assignable.Where(r => r.IsDefault).Select(r => r.Name).ToArray();
+
+        roles = assignable
+            .OrderBy(r => r.Name)
+            .Select(r => new UserRoleOption(r.Name))
+            .ToList();
     }
 }
