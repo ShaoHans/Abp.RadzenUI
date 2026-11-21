@@ -15,11 +15,11 @@
                 Count="@_totalCount" IsLoading="@_isLoading">
     <HeaderTemplate>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="0.5rem">
-            <RadzenDatePicker TValue="DateTime?" @bind-Value="_loginTimeStart" ShowTime="true" DateFormat="yyyy-MM-dd HH:mm:ss"
+            <RadzenDatePicker InputSize="InputSize.Small" TValue="DateTime?" @bind-Value="_loginTimeStart" ShowTime="true" DateFormat="yyyy-MM-dd HH:mm:ss"
                               Placeholder="@L["DisplayName:SecurityLog.LoginTimeStart"]" Style="width:220px" />
-            <RadzenDatePicker TValue="DateTime?" @bind-Value="_loginTimeEnd" ShowTime="true" DateFormat="yyyy-MM-dd HH:mm:ss"
+            <RadzenDatePicker InputSize="InputSize.Small" TValue="DateTime?" @bind-Value="_loginTimeEnd" ShowTime="true" DateFormat="yyyy-MM-dd HH:mm:ss"
                               Placeholder="@L["DisplayName:SecurityLog.LoginTimeEnd"]" Style="width:220px" />
-            <RadzenTextBox @bind-Value="_userName" Placeholder="@L["DisplayName:SecurityLog.UserName"]" Style="width:220px;" />
+            <RadzenTextBox InputSize="InputSize.Small" @bind-Value="_userName" Placeholder="@L["DisplayName:SecurityLog.UserName"]" Style="width:220px;" />
             <RadzenButton Icon="search" Text="@L["Btn:Search"]" Click="@(async () => await SearchAsync())" Size="ButtonSize.Small" />
             <RadzenButton Icon="refresh" Text="@L["Btn:Reset"]" ButtonStyle="ButtonStyle.Base" Variant="Variant.Flat" Shade="Shade.Lighter" Click="@(async () => await ResetAsync())" Size="ButtonSize.Small" />
         </RadzenStack>

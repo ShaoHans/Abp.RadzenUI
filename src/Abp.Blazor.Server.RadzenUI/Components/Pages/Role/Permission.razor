@@ -27,7 +27,7 @@
                 <RadzenLabel Text="@L["SelectAllInAllTabs"]" Component="GrantAll" />
             </RadzenStack>
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="flex:1; min-width:200px; max-width:320px;">
-                <RadzenTextBox Value="@_keyword" ValueChanged="@OnKeywordChanged" Immediate="true"
+                <RadzenTextBox InputSize="InputSize.Small" Value="@_keyword" ValueChanged="@OnKeywordChanged" Immediate="true"
                                Placeholder="@UI["Permission:SearchPlaceholder"]" Style="width:100%;" autocomplete="off" />
                 @if (!string.IsNullOrEmpty(_keyword))
                 {

@@ -1247,3 +1247,14 @@ html, body {
         opacity: 1;
     }
 }
+
+/*
+    SearchTextBox (Components/Shared/SearchTextBox.razor): an outlined RadzenFormField
+    always reserves 8px above its content for a floating label (margin-top on
+    .rz-form-field-content) even with no label, and Radzen only ships small-size
+    rules for the filled/flat variants. Drop the reserved space so the small search
+    box lines up with the Small toolbar buttons.
+*/
+.abp-search-box .rz-form-field-content {
+    margin-top: 0;
+}

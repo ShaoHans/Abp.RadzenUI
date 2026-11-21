@@ -18,7 +18,7 @@ else
 {
     @if (Roles.Count > FilterThreshold)
     {
-        <RadzenTextBox @bind-Value="_filter" Immediate="true" Placeholder="@IL["UserForm:SearchRoles"]" Style="width: 100%;" class="rz-mb-2" />
+        <RadzenTextBox InputSize="InputSize.Small" @bind-Value="_filter" Immediate="true" Placeholder="@IL["UserForm:SearchRoles"]" Style="width: 100%;" class="rz-mb-2" />
     }
 
     <RadzenStack Gap="0.5rem">

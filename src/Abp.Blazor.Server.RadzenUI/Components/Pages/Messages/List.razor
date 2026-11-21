@@ -10,13 +10,13 @@
 <RadzenCard Variant="Variant.Outlined" class="rz-mb-3 rz-p-3">
     <RadzenRow Gap="1rem" RowGap="0.75rem">
         <RadzenColumn Size="12" SizeMD="4" SizeLG="2">
-            <RadzenTextBox Placeholder="@L["Message:TitlePlaceholder"]"
+            <RadzenTextBox InputSize="InputSize.Small" Placeholder="@L["Message:TitlePlaceholder"]"
                            @bind-Value="_keyword"
                            Style="width: 100%;"
                            Name="MessageTitle" />
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="4" SizeLG="2">
-            <RadzenDropDown TValue="MessageReadStatus?"
+            <RadzenDropDown InputSize="InputSize.Small" TValue="MessageReadStatus?"
                             Data="@_readStatusOptions"
                             TextProperty="Text"
                             ValueProperty="Value"
@@ -27,7 +27,7 @@
                             AllowClear="true" />
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="4" SizeLG="2">
-            <RadzenDropDown TValue="string"
+            <RadzenDropDown InputSize="InputSize.Small" TValue="string"
                             Data="@_messageTypeOptions"
                             TextProperty="Text"
                             ValueProperty="Value"

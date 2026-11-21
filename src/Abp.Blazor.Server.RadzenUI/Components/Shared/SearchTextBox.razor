@@ -6,12 +6,12 @@
 *@
 @* AllowFloatingLabel=false: with the floating label on, RadzenFormField overwrites the
    child input's placeholder with " " to make room for the label, so the hint vanishes. *@
-<RadzenFormField Style="@Style" Variant="Variant.Outlined" AllowFloatingLabel="false">
+<RadzenFormField Style="@Style" Variant="Variant.Outlined" AllowFloatingLabel="false" class="abp-search-box">
     <Start>
         <RadzenIcon Icon="search" IconStyle="IconStyle.Secondary" />
     </Start>
     <ChildContent>
-        <RadzenTextBox Value="@Keyword" Placeholder="@PlaceHoder" title="@PlaceHoder" aria-label="@PlaceHoder"
+        <RadzenTextBox InputSize="InputSize.Small" Value="@Keyword" Placeholder="@PlaceHoder" title="@PlaceHoder" aria-label="@PlaceHoder"
                        @oninput="HandleInput" @onkeydown="HandleKeyDown" />
     </ChildContent>
     <End>
