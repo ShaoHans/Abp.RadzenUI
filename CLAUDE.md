@@ -8,7 +8,7 @@ Abp RadzenUI is a **Blazor Server UI theme + admin-shell library** built on the 
 
 Beyond styling, the core package ships a full Blazor Server runtime entry point, Radzen service registration, layout/menu/localization/auth-redirect wiring, and built-in modules: data dictionary, user messages, linked accounts, avatar upload, and the ABP management pages (identity, tenants, settings, audit/security logs).
 
-- Target framework: `net10.0` everywhere. Central package versions live in `Directory.Packages.props` (ABP `10.5.0`, `Radzen.Blazor` `11.1.1`). Common build props in `Directory.Build.props`; package version is `AbpRadzenUIPackageVersion`.
+- Target framework: `net11.0` everywhere. Central package versions live in `Directory.Packages.props` (ABP `11.0.0`, `Radzen.Blazor` `13.1.0`). Common build props in `Directory.Build.props`; package version is `AbpRadzenUIPackageVersion`.
 - **`AGENTS.md` is the authoritative deep-dive** (in Chinese) covering module registration, UI shell, menus, and per-module directories. Read it before non-trivial changes to the core package.
 
 ## Commands
