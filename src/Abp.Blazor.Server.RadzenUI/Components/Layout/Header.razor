@@ -129,6 +129,24 @@
     .app-header__actions .rz-profile-menu > li > .rz-navigation-item-wrapper > .rz-navigation-item-link > .rz-navigation-item-icon-children {
         display: none !important;
     }
+    /* Profile menu popup: user card header, thin dividers, red sign-out. */
+    .app-header__user-card {
+        pointer-events: none;
+        min-width: 15rem;
+    }
+    .app-header__user-card .rz-navigation-item-link {
+        padding-block: 0.75rem !important;
+    }
+    .app-header__menu-divider {
+        border: none;
+        height: 1px;
+        margin: 0.25rem 0;
+        background-color: color-mix(in srgb, var(--rz-text-color) 12%, transparent);
+    }
+    /* Themes colour menu text through this token with a more specific selector. */
+    .app-header__menu-danger {
+        --rz-menu-item-color: var(--rz-danger);
+    }
     /* Sidebar-width toggle area */
     .app-header__sidebar-area {
         min-width: clamp(14rem, 13.5rem + 0.6vw, 15rem);
@@ -281,15 +299,41 @@
                                     </RadzenStack>
                                 </Template>
                                 <ChildContent>
-                                    <RadzenProfileMenuItem Text="@CurrentUser.UserName"></RadzenProfileMenuItem>
-                                    <Devider />
+                                    @* User card: who is signed in (and in which tenant) - matters once linked
+                                       accounts let people switch identities. Not clickable. *@
+                                    <RadzenProfileMenuItem class="app-header__user-card">
+                                        <Template>
+                                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.75rem">
+                                                @if (_avatarUrl.IsNullOrWhiteSpace())
+                                                {
+                                                    <RadzenGravatar Email="@CurrentUser.Email" Style="width:2.5rem;height:2.5rem;border-radius:50%;flex-shrink:0;" />
+                                                }
+                                                else
+                                                {
+                                                    <img src="@_avatarUrl" alt="@CurrentUser.UserName" style="width:2.5rem;height:2.5rem;border-radius:50%;object-fit:cover;flex-shrink:0;" />
+                                                }
+                                                <RadzenStack Gap="0" Style="min-width:0">
+                                                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.Span" class="rz-m-0" Style="font-weight:600">@GetUserDisplayName()</RadzenText>
+                                                    <RadzenText TextStyle="TextStyle.Caption" TagName="TagName.Span" class="rz-m-0" Style="color:var(--rz-text-secondary-color)">@(CurrentUser.Email ?? CurrentUser.UserName)</RadzenText>
+                                                    @if (CurrentTenant.IsAvailable)
+                                                    {
+                                                        <RadzenText TextStyle="TextStyle.Caption" TagName="TagName.Span" class="rz-m-0" Style="color:var(--rz-text-secondary-color)">@TL["Tenant"]: @(CurrentTenant.Name)</RadzenText>
+                                                    }
+                                                </RadzenStack>
+                                            </RadzenStack>
+                                        </Template>
+                                    </RadzenProfileMenuItem>
+                                    <hr class="app-header__menu-divider" />
                                     <RadzenProfileMenuItem Text="@TL["LinkedAccounts:Title"]" Icon="link" Path="/account/linked-accounts"></RadzenProfileMenuItem>
                                     @if (_linkedAccountSession?.CanGoBack == true)
                                     {
                                         <RadzenProfileMenuItem Text="@TL["LinkedAccounts:BackToPreviousAccount"]" Icon="undo" Path="@GetBackPath()"></RadzenProfileMenuItem>
                                     }
                                     <RadzenProfileMenuItem Text="@L["MyAccount"]" Icon="person" Path="/account/manage"></RadzenProfileMenuItem>
-                                    <RadzenProfileMenuItem Text="@L["LoggedOutTitle"]" Icon="logout" Path="/account/logout"></RadzenProfileMenuItem>
+                                    <hr class="app-header__menu-divider" />
+                                    @* Sign-out is the one action that ends the session: red, like row-menu Delete. *@
+                                    <RadzenProfileMenuItem Text="@L["LoggedOutTitle"]" Icon="logout" IconColor="@Colors.Danger" Path="/account/logout"
+                                                           class="app-header__menu-danger"></RadzenProfileMenuItem>
                                 </ChildContent>
                             </RadzenProfileMenu>
                         </div>
@@ -312,6 +356,13 @@
     [Parameter] public EventCallback<EventArgs> MessageToggle { get; set; }
     [Parameter] public bool MessagePanelOpen { get; set; }
     [Inject] IUIPlaceHolderResolver UIPlaceHolderResolver { get; set; } = default!;
+    /// <summary>"Surname Name" per the localized format, falling back to the user name.</summary>
+    string GetUserDisplayName()
+    {
+        var fullName = string.Format(TL["User:FullNameFormat"], CurrentUser.Name, CurrentUser.SurName).Trim();
+        return string.IsNullOrWhiteSpace(fullName) ? CurrentUser.UserName ?? string.Empty : fullName;
+    }
+
     TitleBarSettings _titleBar = new();
     string? _avatarUrl;
     bool _isFullscreen;
