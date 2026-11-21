@@ -1,6 +1,7 @@
 ﻿using Abp.RadzenUI.Localization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
+using Radzen;
 using Radzen.Blazor;
 
 namespace Abp.RadzenUI.Components.Shared;
@@ -10,9 +11,19 @@ namespace Abp.RadzenUI.Components.Shared;
 /// </summary>
 /// <typeparam name="TItem">Data type of table records.</typeparam>
 [CascadingTypeParameter(nameof(TItem))]
-public class LocalizedDataGrid<TItem>()
+public class LocalizedDataGrid<TItem>
     : RadzenDataGrid<TItem> where TItem : notnull
 {
+    public LocalizedDataGrid()
+    {
+        // Radzen defaults the pager's page-size dropdown to InputSize.Medium, and
+        // Density.Compact only shrinks the page buttons - next to them the dropdown
+        // looks oversized. Default it to Small to match the compact list style.
+        // Set in the constructor (not OnInitialized) so an explicit
+        // PagerInputSize from a page still wins.
+        PagerInputSize = InputSize.Small;
+    }
+
     [Inject]
     private IStringLocalizer<AbpRadzenUIResource> L { get; set; } = default!;
 
