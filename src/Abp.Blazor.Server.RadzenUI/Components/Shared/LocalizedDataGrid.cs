@@ -22,6 +22,11 @@ public class LocalizedDataGrid<TItem>
         // Set in the constructor (not OnInitialized) so an explicit
         // PagerInputSize from a page still wins.
         PagerInputSize = InputSize.Small;
+
+        // Every list uses the compact density (smaller rows and pager buttons);
+        // defaulting it here keeps dialogs and new grids from falling back to the
+        // large Radzen default. Still overridable per page.
+        Density = Density.Compact;
     }
 
     [Inject]

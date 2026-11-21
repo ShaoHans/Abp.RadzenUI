@@ -28,8 +28,8 @@
                     <RadzenDataGridColumn Title="@L["DisplayName:RoleName"]" Property="@nameof(IdentityRoleDto.Name)">
                         <Template>
                             <RadzenLabel Text="@context.Name" />
-                            <RadzenBadge Text="@L["DisplayName:IsDefault"]" Visible="context.IsDefault" BadgeStyle="BadgeStyle.Success" />
-                            <RadzenBadge Text="@L["DisplayName:IsPublic"]" Visible="context.IsPublic" BadgeStyle="BadgeStyle.Info" />
+                            <RadzenBadge Text="@L["DisplayName:IsDefault"]" Visible="context.IsDefault" BadgeStyle="BadgeStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter" IsPill="true" Style="text-transform:none" />
+                            <RadzenBadge Text="@L["DisplayName:IsPublic"]" Visible="context.IsPublic" BadgeStyle="BadgeStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" IsPill="true" Style="text-transform:none" />
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
