@@ -6,11 +6,11 @@ Abp RadzenUI 是一个基于 ABP Framework 和 Radzen Blazor 的 Blazor Server U
 
 这个仓库不只是外观主题，还封装了 Blazor Server 运行入口、Radzen 服务注册、布局、菜单、本地化、认证跳转、通知/消息适配、设置页承载、头像上传、关联账户、数据字典、用户消息、审计日志、身份安全日志、租户和身份管理页面等能力。
 
-当前解决方案主要面向 `.NET 10`，集中包版本管理在 `Directory.Packages.props` 中。关键版本包括：
+当前解决方案主要面向 `.NET 11`，集中包版本管理在 `Directory.Packages.props` 中。关键版本包括：
 
 - ABP：`11.0.0`
-- Radzen.Blazor：`11.2.0`
-- 目标框架：`net10.0`
+- Radzen.Blazor：`13.1.0`
+- 目标框架：`net11.0`
 
 ## 解决方案结构
 
