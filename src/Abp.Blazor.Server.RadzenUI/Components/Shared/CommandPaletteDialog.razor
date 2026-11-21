@@ -212,7 +212,14 @@
         if (firstRender)
         {
             _dotNetRef = DotNetObjectReference.Create(this);
-            await JSRuntime.InvokeVoidAsync("abpRadzenCommandPalette.setDialog", _dotNetRef);
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("abpRadzenCommandPalette.setDialog", _dotNetRef);
+            }
+            catch (JSDisconnectedException)
+            {
+                return;
+            }
         }
 
         if (_shouldFocus)

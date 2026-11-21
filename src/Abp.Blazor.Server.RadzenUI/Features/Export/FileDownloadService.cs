@@ -59,12 +59,19 @@ public class FileDownloadService : IFileDownloadService
     private async Task SendAsync(string fileName, Stream stream, CancellationToken cancellationToken)
     {
         using var streamRef = new DotNetStreamReference(stream);
-        await _jsRuntime.InvokeVoidAsync(
-            "abpRadzenDownload.saveAsFile",
-            cancellationToken,
-            fileName,
-            streamRef
-        );
+        try
+        {
+            await _jsRuntime.InvokeVoidAsync(
+                "abpRadzenDownload.saveAsFile",
+                cancellationToken,
+                fileName,
+                streamRef
+            );
+        }
+        catch (JSDisconnectedException)
+        {
+            // 线路已断开（用户关闭/离开页面），没有可接收文件的浏览器，忽略即可。
+        }
     }
 
     private static void TryDelete(string filePath)

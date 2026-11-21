@@ -24,7 +24,13 @@
         if (firstRender)
         {
             _dotNetRef = DotNetObjectReference.Create(this);
-            await JSRuntime.InvokeVoidAsync("abpRadzenCommandPalette.initialize", _dotNetRef);
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("abpRadzenCommandPalette.initialize", _dotNetRef);
+            }
+            catch (JSDisconnectedException)
+            {
+            }
         }
     }
 

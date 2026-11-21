@@ -67,7 +67,12 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
         {
             await JSRuntime.InvokeVoidAsync(
                 "abpRadzenAvatar.initialize",
@@ -94,12 +99,21 @@
                 }
             );
         }
+        catch (JSDisconnectedException)
+        {
+        }
     }
 
     async Task PickFileAsync()
     {
         _errorMessage = null;
-        await JSRuntime.InvokeVoidAsync("abpRadzenAvatar.pickFile", _editorId);
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("abpRadzenAvatar.pickFile", _editorId);
+        }
+        catch (JSDisconnectedException)
+        {
+        }
     }
 
     async Task UploadAsync()

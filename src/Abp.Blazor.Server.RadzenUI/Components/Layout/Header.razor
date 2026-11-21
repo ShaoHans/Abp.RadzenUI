@@ -351,16 +351,29 @@
         }
 
         _dotNetReference = DotNetObjectReference.Create(this);
-        _isFullscreen = await JSRuntime.InvokeAsync<bool>(
-            "abpRadzenFullscreen.initialize",
-            _dotNetReference
-        );
+        try
+        {
+            _isFullscreen = await JSRuntime.InvokeAsync<bool>(
+                "abpRadzenFullscreen.initialize",
+                _dotNetReference
+            );
+        }
+        catch (JSDisconnectedException)
+        {
+            return;
+        }
         await InvokeAsync(StateHasChanged);
     }
 
     async Task ToggleFullscreenAsync()
     {
-        _isFullscreen = await JSRuntime.InvokeAsync<bool>("abpRadzenFullscreen.toggle");
+        try
+        {
+            _isFullscreen = await JSRuntime.InvokeAsync<bool>("abpRadzenFullscreen.toggle");
+        }
+        catch (JSDisconnectedException)
+        {
+        }
     }
 
     async Task ToggleMessagesAsync()
