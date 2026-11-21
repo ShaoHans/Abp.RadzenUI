@@ -373,7 +373,16 @@
     "Permission:NoMatch": "No permissions in this group match the search.",
     "Permission:SaveWithChanges": "Save ({0} changes)",
     "Permission:CannotGrant": "Not yours to grant",
-    "Permission:CannotGrant.Tooltip": "You can only grant permissions you have yourself. Ask a user in the admin role to grant this one."
+    "Permission:CannotGrant.Tooltip": "You can only grant permissions you have yourself. Ask a user in the admin role to grant this one.",
+    "Setting:Email.SenderSection": "Sender",
+    "Setting:Email.ServerSection": "SMTP server",
+    "Setting:Email.AuthSection": "Authentication",
+    "Setting:Email.EnableSslHint": "Encrypt the connection to the mail server. Most providers (e.g. port 587) require it.",
+    "Setting:Email.UseDefaultCredentialsHint": "Sign in with the Windows account the server runs as. Leave off for ordinary SMTP accounts.",
+    "Setting:Email.PasswordKeepHint": "Leave blank to keep the current password",
+    "Setting:Email.DomainHint": "Only for Windows/Exchange NTLM sign-in. Leave blank for ordinary SMTP servers.",
+    "Setting:Timezone.Placeholder": "Select a time zone",
+    "Setting:Timezone.Hint": "Dates and times across the system are shown in this time zone."
   }
 }
 

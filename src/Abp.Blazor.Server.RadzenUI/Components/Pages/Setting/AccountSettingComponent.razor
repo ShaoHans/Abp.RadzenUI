@@ -6,35 +6,25 @@
 @inject IStringLocalizer<AccountResource> IL
 
 <RadzenTemplateForm TItem="AccountSettingsDto" Data=@AccountSettings Submit="UpdateSettingsAsync">
-    <RadzenStack Gap="2rem">
-        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.75rem">
-            <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
-                <RadzenLabel Text="@IL["DisplayName:Abp.Account.IsSelfRegistrationEnabled"]" Component="@nameof(AccountSettingsDto.IsSelfRegistrationEnabled)" />
-            </RadzenColumn>
-            <RadzenColumn Size="12" SizeMD="8">
-                <RadzenStack Gap="0.35rem">
-                    <RadzenCheckBox TValue="bool" Name="@nameof(AccountSettingsDto.IsSelfRegistrationEnabled)" @bind-Value="@AccountSettings.IsSelfRegistrationEnabled" Style="display:block" />
-                    <RadzenLabel Text="@IL["Description:Abp.Account.IsSelfRegistrationEnabled"]" class="rz-color-primary" Style="display:block; line-height:1.5;" />
+    <RadzenStack Gap="1.5rem" class="rz-p-1" Style="max-width: 720px;">
+        <RadzenStack Gap="1rem">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Gap="0.75rem">
+                <RadzenSwitch Name="@nameof(AccountSettingsDto.IsSelfRegistrationEnabled)" @bind-Value="@AccountSettings.IsSelfRegistrationEnabled" />
+                <RadzenStack Gap="0.125rem">
+                    <RadzenLabel Text="@IL["DisplayName:Abp.Account.IsSelfRegistrationEnabled"]" Component="@nameof(AccountSettingsDto.IsSelfRegistrationEnabled)" />
+                    <RadzenText TextStyle="TextStyle.Caption" class="rz-m-0 rz-text-secondary-color">@IL["Description:Abp.Account.IsSelfRegistrationEnabled"]</RadzenText>
                 </RadzenStack>
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.75rem">
-            <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
-                <RadzenLabel Text="@IL["DisplayName:Abp.Account.EnableLocalLogin"]" Component="@nameof(AccountSettingsDto.EnableLocalLogin)" />
-            </RadzenColumn>
-            <RadzenColumn Size="12" SizeMD="8">
-                <RadzenStack Gap="0.35rem">
-                    <RadzenCheckBox TValue="bool" Name="@nameof(AccountSettingsDto.EnableLocalLogin)" @bind-Value="@AccountSettings.EnableLocalLogin" Style="display:block" />
-                    <RadzenLabel Text="@IL["Description:Abp.Account.EnableLocalLogin"]" class="rz-color-primary" Style="display:block; line-height:1.5;" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Gap="0.75rem">
+                <RadzenSwitch Name="@nameof(AccountSettingsDto.EnableLocalLogin)" @bind-Value="@AccountSettings.EnableLocalLogin" />
+                <RadzenStack Gap="0.125rem">
+                    <RadzenLabel Text="@IL["DisplayName:Abp.Account.EnableLocalLogin"]" Component="@nameof(AccountSettingsDto.EnableLocalLogin)" />
+                    <RadzenText TextStyle="TextStyle.Caption" class="rz-m-0 rz-text-secondary-color">@IL["Description:Abp.Account.EnableLocalLogin"]</RadzenText>
                 </RadzenStack>
-            </RadzenColumn>
-        </RadzenRow>
-        
-        <RadzenRow AlignItems="AlignItems.Center" RowGap="0.75rem">
-            <RadzenColumn Size="12" SizeMD="2" class="rz-text-align-start rz-text-align-md-end">
-                <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="@L["Save"]"></RadzenButton>
-            </RadzenColumn>
-        </RadzenRow>
+            </RadzenStack>
+        </RadzenStack>
+        <div>
+            <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="@L["Save"]" />
+        </div>
     </RadzenStack>
 </RadzenTemplateForm>
-

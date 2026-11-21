@@ -12,20 +12,27 @@
 
 <RadzenMediaQuery Query="(max-width: 768px)" Change="OnCompactChange" />
 
-<RadzenTabs @bind-SelectedIndex=@_selectedIndex
-            Change="@TabChange"
-            TabPosition="@(isCompact ? TabPosition.Top : TabPosition.Left)"
-            RenderMode="TabRenderMode.Client"
-            Style="width:100%;min-width:0;">
-    <Tabs>
-        @foreach (var group in SettingComponentCreationContext.Groups)
-        {
-            <RadzenTabsItem Text="@group.DisplayName">
-                @RenderComponent(group)
-            </RadzenTabsItem>
-        }
-    </Tabs>
-</RadzenTabs>
+@* Render only once every contributor has run and the groups are sorted. Rendering earlier
+   (at the first awaited contributor) creates tabs in the unsorted order; after Normalize()
+   the tab items are reused by position, and because RadzenTabs draws panels from the previous
+   ChildContent, headers and panels stay mismatched. *@
+@if (_groupsReady)
+{
+    <RadzenTabs @bind-SelectedIndex=@_selectedIndex
+                Change="@TabChange"
+                TabPosition="@(isCompact ? TabPosition.Top : TabPosition.Left)"
+                RenderMode="TabRenderMode.Client"
+                Style="width:100%;min-width:0;">
+        <Tabs>
+            @foreach (var group in SettingComponentCreationContext.Groups)
+            {
+                <RadzenTabsItem @key="group.Key" Text="@group.DisplayName">
+                    @RenderComponent(group)
+                </RadzenTabsItem>
+            }
+        </Tabs>
+    </RadzenTabs>
+}
 
 @code {
     [Inject]
@@ -41,6 +48,7 @@
 
     int _selectedIndex = 0;
     bool isCompact;
+    bool _groupsReady;
 
     public Manage()
     {
@@ -58,6 +66,7 @@
         SettingComponentCreationContext.Normalize();
 
         SetSelectedTabIndex();
+        _groupsReady = true;
     }
 
     void SetSelectedTabIndex()
