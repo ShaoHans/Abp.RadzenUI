@@ -3,41 +3,43 @@
 @inject DialogService DialogService
 @inherits AbpRadzenUIComponentBase
 
-<RadzenStack Style="max-height:calc(100vh - 200px); min-height: 300px;">
+<RadzenStack Style="max-height:calc(100vh - 200px);">
     <DialogFormLayout ShowSave="false" CancelText="@L["Close"]" CancelIcon="close"
                       CancelClick="() => DialogService.Close(false)">
-        <RadzenStack Gap="1rem" class="rz-p-4">
-            <RadzenDataGrid @ref="_grid" Data="@_connectionStrings" TItem="TenantConnectionStringDto"
-                            AllowSorting="false" Style="min-height: 200px;">
-                <HeaderTemplate>
-                    <RadzenButton Icon="add" Text="@L["ConnectionString:Add"]" Size="ButtonSize.Small"
+        <RadzenStack Gap="1rem" class="rz-p-1 rz-mb-4">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="rz-color-primary rz-m-0">
+                    @L["ConnectionString:Manage"] (@_connectionStrings.Count)
+                </RadzenText>
+                @if (!_showForm)
+                {
+                    <RadzenButton Icon="add" Text="@L["ConnectionString:Add"]" Variant="Variant.Text" Size="ButtonSize.Small"
                                   Click="ShowAddForm" />
-                </HeaderTemplate>
+                }
+            </RadzenStack>
+
+            <RadzenDataGrid @ref="_grid" Data="@_connectionStrings" TItem="TenantConnectionStringDto"
+                            AllowSorting="false" Density="Density.Compact">
+                <EmptyTemplate>
+                    <RadzenText TextStyle="TextStyle.Body2" class="rz-text-align-center rz-p-4 rz-text-secondary-color">
+                        @L["ConnectionString:Empty"]
+                    </RadzenText>
+                </EmptyTemplate>
                 <Columns>
                     <RadzenDataGridColumn Property="@nameof(TenantConnectionStringDto.Name)"
-                                          Title="@L["ConnectionString:Name"]" Width="180px">
-                        <Template>
-                            <RadzenText>@context.Name</RadzenText>
-                            @if (context.Name == DefaultConnectionStringName)
-                            {
-                                <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="Default" Style="margin-left: 4px;" />
-                            }
-                        </Template>
-                    </RadzenDataGridColumn>
+                                          Title="@L["ConnectionString:Name"]" Width="160px" />
                     <RadzenDataGridColumn Property="@nameof(TenantConnectionStringDto.Value)"
                                           Title="@L["ConnectionString:Value"]">
                         <Template>
-                            <RadzenText title="@context.Value" Style="max-width: 350px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;">
-                                @MaskConnectionString(context.Value)
-                            </RadzenText>
+                            <span title="@context.Value">@MaskConnectionString(context.Value)</span>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Title="@L["Actions"]" Width="120px" Sortable="false">
+                    <RadzenDataGridColumn Title="@L["Actions"]" Width="96px" Sortable="false" TextAlign="TextAlign.Center">
                         <Template>
-                            <RadzenButton Icon="edit" title="@L["Btn:Edit"]" ButtonStyle="ButtonStyle.Success"
-                                          Size="ButtonSize.Small" Click="@(() => EditConnectionString(context))" />
-                            <RadzenButton Icon="delete" title="@L["Btn:Delete"]" ButtonStyle="ButtonStyle.Danger"
-                                          Size="ButtonSize.Small" Click="@(() => DeleteConnectionStringAsync(context))" />
+                            <RadzenButton Icon="edit" title="@L["Btn:Edit"]" Variant="Variant.Text"
+                                          Size="ButtonSize.ExtraSmall" Click="@(() => EditConnectionString(context))" />
+                            <RadzenButton Icon="delete" title="@L["Btn:Delete"]" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Text"
+                                          Size="ButtonSize.ExtraSmall" Click="@(() => DeleteConnectionStringAsync(context))" />
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
@@ -45,37 +47,31 @@
 
             @if (_showForm)
             {
-                <RadzenCard>
-                    <RadzenText TextStyle="TextStyle.Subtitle2">
-                        @(_isEditing ? L["ConnectionString:Edit"] : L["ConnectionString:Add"])
-                    </RadzenText>
-                    <RadzenStack Gap="0.5rem" class="rz-mt-2">
-                        <RadzenRow AlignItems="AlignItems.Center">
-                            <RadzenColumn Size="3">
+                <RadzenCard Variant="Variant.Filled" class="rz-p-4">
+                    <RadzenStack Gap="1rem">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-m-0">
+                            @(_isEditing ? L["ConnectionString:Edit"] : L["ConnectionString:Add"])
+                        </RadzenText>
+                        <RadzenStack Gap="0.25rem">
+                            <div>
                                 <RequiredMark />
                                 <RadzenLabel Text="@L["ConnectionString:Name"]" Component="CsName" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="9">
-                                <RadzenTextBox Name="CsName" @bind-Value="_editingName"
-                                               Disabled="@_isEditing"
-                                               Style="width: 100%;" Placeholder="Default" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <RadzenRow AlignItems="AlignItems.Center">
-                            <RadzenColumn Size="3">
+                            </div>
+                            <RadzenTextBox Name="CsName" @bind-Value="_editingName" Disabled="@_isEditing"
+                                           Style="width: 100%;" Placeholder="Default" autocomplete="off" />
+                        </RadzenStack>
+                        <RadzenStack Gap="0.25rem">
+                            <div>
                                 <RequiredMark />
                                 <RadzenLabel Text="@L["ConnectionString:Value"]" Component="CsValue" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="9">
-                                <RadzenTextArea Name="CsValue" @bind-Value="_editingValue"
-                                                Style="width: 100%;" Rows="2"
-                                                Placeholder="Server=...;Database=...;" />
-                            </RadzenColumn>
-                        </RadzenRow>
+                            </div>
+                            <RadzenTextArea Name="CsValue" @bind-Value="_editingValue" Style="width: 100%;" Rows="3"
+                                            Placeholder="Server=...;Database=...;" />
+                        </RadzenStack>
                         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
-                            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="@L["Cancel"]"
+                            <RadzenButton ButtonStyle="ButtonStyle.Base" Variant="Variant.Text" Text="@L["Cancel"]"
                                           Size="ButtonSize.Small" Click="CancelForm" />
-                            <RadzenButton ButtonStyle="ButtonStyle.Primary" Text="@L["Save"]"
+                            <RadzenButton ButtonStyle="ButtonStyle.Primary" Icon="save" Text="@L["Save"]"
                                           Size="ButtonSize.Small" Click="SaveConnectionStringAsync" />
                         </RadzenStack>
                     </RadzenStack>
@@ -88,8 +84,6 @@
 @code {
     [Parameter]
     public Guid TenantId { get; set; }
-
-    const string DefaultConnectionStringName = "Default";
 
     RadzenDataGrid<TenantConnectionStringDto> _grid = default!;
     List<TenantConnectionStringDto> _connectionStrings = [];

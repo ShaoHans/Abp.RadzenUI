@@ -357,7 +357,10 @@
     "Ou:Parent.None": "无（根机构）",
     "TenantForm:TenantSection": "租户信息",
     "TenantForm:AdminSection": "管理员账号",
-    "TenantForm:AdminSectionHint": "将用此邮箱和密码在新租户中创建管理员用户。"
+    "TenantForm:AdminSectionHint": "将用此邮箱和密码在新租户中创建管理员用户。",
+    "ConnectionString:Empty": "暂无连接字符串，该租户使用宿主数据库。",
+    "User:LockPreview.Until": "{0} 在 {1} 之前无法登录。",
+    "User:LockPreview.Permanent": "{0} 将无法登录，直到管理员手动解锁。"
   }
 }
 

@@ -359,7 +359,10 @@
     "Ou:Parent.None": "None (root unit)",
     "TenantForm:TenantSection": "Tenant",
     "TenantForm:AdminSection": "Administrator",
-    "TenantForm:AdminSectionHint": "An admin user is created in the new tenant with this email and password."
+    "TenantForm:AdminSectionHint": "An admin user is created in the new tenant with this email and password.",
+    "ConnectionString:Empty": "No connection strings. This tenant uses the host database.",
+    "User:LockPreview.Until": "{0} cannot sign in until {1}.",
+    "User:LockPreview.Permanent": "{0} cannot sign in until an administrator unlocks the account."
   }
 }
 

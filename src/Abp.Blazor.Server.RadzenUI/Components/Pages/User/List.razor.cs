@@ -202,7 +202,7 @@ public partial class List
         await DialogService.OpenAsync<SetPassword>(
             $"{IL["User:SetPassword"]} - {user.UserName}",
             new Dictionary<string, object?> { { "UserId", user.Id } },
-            SetDialogOptions()
+            new DialogOptions { Draggable = true, Width = "480px" }
         );
     }
 }

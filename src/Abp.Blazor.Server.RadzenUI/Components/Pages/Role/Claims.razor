@@ -7,38 +7,52 @@
 @inject IStringLocalizer<AbpRadzenUIResource> UL
 @inherits AbpRadzenUIComponentBase
 
-<RadzenStack Style="max-height:calc(100vh - 200px); min-height: 300px;">
+<RadzenStack Style="max-height:calc(100vh - 200px);">
     <DialogFormLayout ShowSave="false" CancelText="@UL["Close"]" CancelIcon="close"
                       CancelClick="() => DialogService.Close(false)">
-        <RadzenStack Gap="1rem" class="rz-p-4">
-            @* Add Claim Form *@
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-mb-2">@UL["RoleClaim:AddNew"]</RadzenText>
+        <RadzenStack Gap="1rem" class="rz-p-1 rz-mb-4">
+            <RadzenCard Variant="Variant.Filled" class="rz-p-4">
                 <RadzenTemplateForm TItem="CreateRoleClaimDto" Data="_newClaim" Submit="AddClaimAsync">
-                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Gap="0.5rem" Wrap="FlexWrap.Wrap">
-                        <RadzenStack Gap="0.25rem" Style="flex:1; min-width: 150px;">
-                            <RadzenLabel Text="@UL["RoleClaim:ClaimType"]" Component="ClaimType" />
-                            <RadzenTextBox Name="ClaimType" @bind-Value="_newClaim.ClaimType"
-                                           MaxLength="256" Style="width:100%;" />
+                    <RadzenRow Gap="0.75rem" RowGap="0.75rem" AlignItems="AlignItems.End">
+                        <RadzenColumn Size="12" SizeMD="5">
+                            <RadzenStack Gap="0.25rem">
+                                <div>
+                                    <RequiredMark />
+                                    <RadzenLabel Text="@UL["RoleClaim:ClaimType"]" Component="ClaimType" />
+                                </div>
+                                <RadzenTextBox Name="ClaimType" @bind-Value="_newClaim.ClaimType"
+                                               MaxLength="256" Style="width: 100%;" autocomplete="off" />
+                            </RadzenStack>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="5">
+                            <RadzenStack Gap="0.25rem">
+                                <div>
+                                    <RequiredMark />
+                                    <RadzenLabel Text="@UL["RoleClaim:ClaimValue"]" Component="ClaimValue" />
+                                </div>
+                                <RadzenTextBox Name="ClaimValue" @bind-Value="_newClaim.ClaimValue"
+                                               MaxLength="1024" Style="width: 100%;" autocomplete="off" />
+                            </RadzenStack>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="2">
+                            <RadzenButton ButtonType="ButtonType.Submit" Icon="add" Text="@UL["Btn:Add"]"
+                                          ButtonStyle="ButtonStyle.Primary" Style="width: 100%;" />
+                        </RadzenColumn>
+                        @* Validators sit below the row so an error does not push the button out of line. *@
+                        <RadzenColumn Size="12">
                             <RadzenRequiredValidator Component="ClaimType" Text="@L.Required("RoleClaim:ClaimType")" />
-                        </RadzenStack>
-                        <RadzenStack Gap="0.25rem" Style="flex:1; min-width: 150px;">
-                            <RadzenLabel Text="@UL["RoleClaim:ClaimValue"]" Component="ClaimValue" />
-                            <RadzenTextBox Name="ClaimValue" @bind-Value="_newClaim.ClaimValue"
-                                           MaxLength="1024" Style="width:100%;" />
                             <RadzenRequiredValidator Component="ClaimValue" Text="@L.Required("RoleClaim:ClaimValue")" />
-                        </RadzenStack>
-                        <RadzenButton ButtonType="ButtonType.Submit" Icon="add" Text="@UL["Btn:Add"]"
-                                      ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" />
-                    </RadzenStack>
+                        </RadzenColumn>
+                    </RadzenRow>
                 </RadzenTemplateForm>
             </RadzenCard>
 
-            @* Claims List *@
-            <RadzenDataGrid Data="@_claims" TItem="RoleClaimDto" AllowSorting="true"
-                            Style="height: 300px;" Density="Density.Compact">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="rz-color-primary rz-m-0">
+                @UL["RoleClaim:Claims"] (@_claims.Count)
+            </RadzenText>
+            <RadzenDataGrid Data="@_claims" TItem="RoleClaimDto" AllowSorting="true" Density="Density.Compact">
                 <EmptyTemplate>
-                    <RadzenText TextStyle="TextStyle.Body2" class="rz-text-align-center rz-p-4">
+                    <RadzenText TextStyle="TextStyle.Body2" class="rz-text-align-center rz-p-4 rz-text-secondary-color">
                         @UL["RoleClaim:NoClaims"]
                     </RadzenText>
                 </EmptyTemplate>
@@ -49,7 +63,7 @@
                                           Title="@UL["RoleClaim:ClaimValue"]" />
                     <RadzenDataGridColumn Title="@L["Actions"]" Width="80px" Sortable="false" TextAlign="TextAlign.Center">
                         <Template Context="claim">
-                            <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.ExtraSmall"
+                            <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Text" Size="ButtonSize.ExtraSmall"
                                           title="@UL["Btn:Delete"]"
                                           Click="@(async () => await DeleteClaimAsync(claim))" />
                         </Template>
