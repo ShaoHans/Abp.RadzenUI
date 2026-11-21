@@ -6,35 +6,50 @@
 
 @if (SelectedOu == null)
 {
-    <RadzenText Text="@IL["Ou:Role.Tooltip"]" TextAlign="TextAlign.Start" />
+    <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" class="rz-py-12">
+        <RadzenIcon Icon="lan" Style="font-size:48px; color:var(--rz-text-secondary-color)" />
+        <RadzenText TextStyle="TextStyle.Body1" Style="color:var(--rz-text-secondary-color)" Text="@IL["Ou:Role.Tooltip"]" />
+    </RadzenStack>
 }
 else
 {
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
-        <RadzenText Text="@SelectedOu.DisplayName" TextAlign="TextAlign.Start" />
-        <RadzenButton Text="@IL["Ou:Role.Add"]" Icon="add" Click="@OpenSeleteRoleDialogAsync" />
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center"
+                 Gap="0.5rem" class="rz-my-3">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.375rem">
+            <RadzenIcon Icon="lan" IconStyle="IconStyle.Secondary" />
+            <RadzenText TextStyle="TextStyle.Subtitle1" Style="margin:0" Text="@SelectedOu.DisplayName" />
+            <RadzenBadge Text="@_totalCount.ToString()" BadgeStyle="BadgeStyle.Primary" Variant="Variant.Flat" Shade="Shade.Lighter" IsPill="true" />
+        </RadzenStack>
+        <RadzenButton Text="@IL["Ou:Role.Add"]" Icon="add" Size="ButtonSize.Small" Click="@OpenSeleteRoleDialogAsync" />
     </RadzenStack>
 
-    <RadzenStack Gap="1rem" Style="margin-top:5px;">
-        <LocalizedDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true" Density="Density.Default"
-                        PagerHorizontalAlign="HorizontalAlign.Center" PageSize="@_defaultPageSize"
-                        PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
-                        Count="@_totalCount" IsLoading="@_isLoading">
-            <Columns>
-                <RadzenDataGridColumn Title="@L["DisplayName:RoleName"]" Property="@nameof(IdentityRoleDto.Name)">
-                    <Template>
-                        <RadzenLabel Text="@context.Name" />
-                        <RadzenBadge Text="@L["DisplayName:IsDefault"]" Visible="context.IsDefault" BadgeStyle="BadgeStyle.Success" />
-                        <RadzenBadge Text="@L["DisplayName:IsPublic"]" Visible="context.IsPublic" BadgeStyle="BadgeStyle.Info" />
-                    </Template>
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn Title="@L["Actions"]" Width="60px" Frozen="true" Filterable="false" Sortable="false">
-                    <Template>
-                        <RadzenButton Icon="delete" title="@L["Delete"]" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small"
-                                      Click=@(async () => await OpenDeleteConfirmDialogAsync(context.Id, context.Name)) />
-                    </Template>
-                </RadzenDataGridColumn>
-            </Columns>
-        </LocalizedDataGrid>
-    </RadzenStack>
+    <LocalizedDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true" Density="Density.Compact"
+                       PagerHorizontalAlign="HorizontalAlign.Center" PageSize="@_defaultPageSize" Style="height:calc(100vh - 275px)"
+                       PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
+                       Count="@_totalCount" IsLoading="@_isLoading">
+        <Columns>
+            <RadzenDataGridColumn Title="@L["DisplayName:RoleName"]" Property="@nameof(IdentityRoleDto.Name)" MinWidth="200px">
+                <Template>
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.375rem" Wrap="FlexWrap.NoWrap">
+                        <span title="@context.Name">@context.Name</span>
+                        <RadzenBadge Text="@L["DisplayName:IsDefault"]" Visible="context.IsDefault" BadgeStyle="BadgeStyle.Success"
+                                     Variant="Variant.Flat" Shade="Shade.Lighter" IsPill="true" Style="text-transform:none" />
+                        <RadzenBadge Text="@L["DisplayName:IsPublic"]" Visible="context.IsPublic" BadgeStyle="BadgeStyle.Info"
+                                     Variant="Variant.Flat" Shade="Shade.Lighter" IsPill="true" Style="text-transform:none" />
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Title="@L["Actions"]" Width="100px" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+                <Template>
+                    <RowActionMenu Actions="@_rowActions" MoreTitle="@L["Actions"]"
+                                   OnAction="@(_ => OpenDeleteConfirmDialogAsync(context.Id, context.Name))" />
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </LocalizedDataGrid>
+}
+
+@code {
+    /// <summary>Only "remove from unit" is offered, rendered by RowActionMenu as a single icon button.</summary>
+    IReadOnlyList<RowAction> _rowActions => [new RowAction("delete", L["Delete"], "delete", Colors.Danger)];
 }

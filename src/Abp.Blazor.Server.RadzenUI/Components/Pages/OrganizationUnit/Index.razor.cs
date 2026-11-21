@@ -4,6 +4,8 @@ using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Models;
 using Abp.RadzenUI.Permissions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Radzen;
 using Radzen.Blazor;
 using Volo.Abp.ObjectExtending;
@@ -116,18 +118,50 @@ public partial class Index
         }
     }
 
-    private async Task TreeItemOnClick(RadzenSplitButtonItem item, string buttonName)
-    {
-        if (item == null)
-        {
-            return;
-        }
+    [Inject]
+    private ContextMenuService ContextMenuService { get; set; } = default!;
 
-        var action = Enum.Parse<OuTreeItemAction>(item.Value!.ToString()!);
+    private void OpenTreeItemMenu(MouseEventArgs args, OrganizationUnitTreeItemVm ou)
+    {
+        ContextMenuService.Open(
+            args,
+            [
+                new ContextMenuItem { Text = L["Ou:NewSubOu"], Icon = "add", Value = OuTreeItemAction.AddSubOu },
+                new ContextMenuItem { Text = L["Ou:EditOu"], Icon = "edit", Value = OuTreeItemAction.Edit },
+                new ContextMenuItem
+                {
+                    Text = L["Ou:DeleteOu"],
+                    Icon = "delete",
+                    IconColor = Colors.Danger,
+                    Value = OuTreeItemAction.Delete,
+                },
+            ],
+            async e =>
+            {
+                ContextMenuService.Close();
+                if (e.Value is OuTreeItemAction action)
+                {
+                    await InvokeAsync(() => TreeItemActionAsync(action, ou));
+                }
+            }
+        );
+    }
+
+    // The menu belongs to a specific node, so act on that node (and select it,
+    // which also refreshes the members/roles panel) rather than on whatever was
+    // selected before - otherwise "add sub unit" could land under another node.
+    // Invoked from the ContextMenuService popup, not from an event handler of this
+    // component, so Blazor won't re-render this page on its own afterwards: call
+    // StateHasChanged explicitly, once for the selection and once after the dialog
+    // callback has reloaded the tree.
+    private async Task TreeItemActionAsync(OuTreeItemAction action, OrganizationUnitTreeItemVm ou)
+    {
+        _selectedOu = ou;
+        StateHasChanged();
+
         switch (action)
         {
             case OuTreeItemAction.Edit:
-                var ou = GetSelectedOu()!;
                 await OpenEditDialogAsync<EditOu>(
                     @L["Ou:EditOu.Title", ou.DisplayName],
                     new OrganizationUnitDto
@@ -144,10 +178,9 @@ public partial class Index
                 await OpenCreateOuDialogAsync(asRoot: false);
                 break;
             case OuTreeItemAction.Delete:
-                var selectedOu = GetSelectedOu()!;
                 await OpenDeleteConfirmDialogAsync(
-                    selectedOu.Id,
-                    confirm: L["Ou:DeleteOu.ConfirmMessage", selectedOu.DisplayName],
+                    ou.Id,
+                    confirm: L["Ou:DeleteOu.ConfirmMessage", ou.DisplayName],
                     callback: async () =>
                     {
                         _selectedOu = null;
@@ -155,9 +188,9 @@ public partial class Index
                     }
                 );
                 break;
-            default:
-                break;
         }
+
+        StateHasChanged();
     }
 
     private OrganizationUnitTreeItemVm? GetSelectedOu()

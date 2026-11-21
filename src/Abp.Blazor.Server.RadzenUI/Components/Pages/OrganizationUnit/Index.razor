@@ -4,59 +4,75 @@
 
 <PageTitle>@L["OrganizationUnits"]</PageTitle>
 
-<RadzenCardGroup Responsive="true">
-
+@* Two equal-height panels: tree on the left, members/roles of the selected unit on the right. *@
+<RadzenRow Gap="1rem" Style="height:calc(100vh - 110px)">
     @if (HasManageTreePermission)
     {
-        <RadzenCard Variant="Variant.Filled" Style="margin-right:10px;">
-            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
-                <RadzenText Text="@L["Ou:Tree"]" TextAlign="TextAlign.Start" />
-                <RadzenButton Text="@L["Ou:NewRootOu"]" Icon="add"
-                              Click="@(() => OpenCreateOuDialogAsync(asRoot: true))" />
-            </RadzenStack>
+        <RadzenColumn Size="12" SizeMD="4" Style="height:100%">
+            <RadzenCard Variant="Variant.Filled" Style="height:100%; display:flex; flex-direction:column; gap:0.75rem">
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenText Text="@L["Ou:Tree"]" TextStyle="TextStyle.H6" Style="margin:0" />
+                    <RadzenButton Text="@L["Ou:NewRootOu"]" Icon="add" Size="ButtonSize.Small"
+                                  Click="@(() => OpenCreateOuDialogAsync(asRoot: true))" />
+                </RadzenStack>
 
-            <RadzenTree Style="width: 100%; height: 100%"
-                        Data=@_ouTree @bind-Value="@_selectedOu">
-                <RadzenTreeLevel TextProperty="@nameof(OrganizationUnitTreeItemVm.DisplayName)"
-                                 ChildrenProperty="@nameof(OrganizationUnitTreeItemVm.Children)"
-                                 Expanded="(i=>true)"
-                                 HasChildren="(i=>((OrganizationUnitTreeItemVm)i).Children.Count>0)">
-                    <Template>
-                        @{
-                            if (context.Value is OrganizationUnitTreeItemVm treeItem)
+                @* Node look lives in site.css (.ou-tree): Radzen component roots don't get the scoped-CSS
+                   attribute, so styling the tree needs a native wrapper + global rules. Right-click opens the
+                   same menu as the "more" button. *@
+                <div class="ou-tree">
+                <RadzenTree Style="width:100%; height:100%" Data=@_ouTree @bind-Value="@_selectedOu"
+                            ItemContextMenu="@(args => { if (args.Value is OrganizationUnitTreeItemVm ou) OpenTreeItemMenu(args, ou); })">
+                    <RadzenTreeLevel TextProperty="@nameof(OrganizationUnitTreeItemVm.DisplayName)"
+                                     ChildrenProperty="@nameof(OrganizationUnitTreeItemVm.Children)"
+                                     Expanded="(i=>true)"
+                                     HasChildren="(i=>((OrganizationUnitTreeItemVm)i).Children.Count>0)">
+                        <Template>
+                            @if (context.Value is OrganizationUnitTreeItemVm treeItem)
                             {
-                                <RadzenSplitButton Text="@treeItem.DisplayName" Variant="Variant.Text" Icon="lan"
-                                                   Click=@(args => TreeItemOnClick(args, "SplitButton with icon"))>
-                                    <ChildContent>
-                                        <RadzenSplitButtonItem Text="@L["Ou:EditOu"]" Icon="edit" Value="@OuTreeItemAction.Edit.ToString()" />
-                                        <RadzenSplitButtonItem Text="@L["Ou:NewSubOu"]" Icon="add" Value="@OuTreeItemAction.AddSubOu.ToString()" />
-                                        <RadzenSplitButtonItem Text="@L["Ou:DeleteOu"]" Icon="add" Value="@OuTreeItemAction.Delete.ToString()" />
-                                    </ChildContent>
-                                </RadzenSplitButton>
+                                <div class="ou-tree-node @(treeItem.ParentId == null ? "ou-tree-node--root" : null)">
+                                    <span class="ou-tree-node__icon">
+                                        <RadzenIcon Icon="@(treeItem.Children.Count > 0 ? "account_tree" : "lan")" />
+                                    </span>
+                                    <span class="ou-tree-node__name" title="@treeItem.DisplayName">@treeItem.DisplayName</span>
+                                    @if (treeItem.Children.Count > 0)
+                                    {
+                                        <span class="ou-tree-node__count">@treeItem.Children.Count</span>
+                                    }
+                                    @* Shown on hover / when selected. stopPropagation keeps the click from also
+                                       toggling/selecting the node; menu items act on this node. *@
+                                    <span class="ou-tree-node__actions" @onclick:stopPropagation="true">
+                                        <RadzenButton Icon="more_horiz" title="@L["Actions"]" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base"
+                                                      Size="ButtonSize.ExtraSmall" Click="@(args => OpenTreeItemMenu(args, treeItem))" />
+                                    </span>
+                                </div>
                             }
-                        }
-                    </Template>
-                </RadzenTreeLevel>
-            </RadzenTree>
-        </RadzenCard>
+                        </Template>
+                    </RadzenTreeLevel>
+                </RadzenTree>
+                </div>
+            </RadzenCard>
+        </RadzenColumn>
     }
 
-    <RadzenCard Variant="Variant.Filled">
-        <RadzenTabs>
-            <Tabs>
-                @if (HasManageUsersPermission)
-                {
-                    <RadzenTabsItem Text="@L["Ou:Members"]">
-                        <OuMembers SelectedOu="@GetSelectedOu()" />
-                    </RadzenTabsItem>
-                }
-                @if (HasManageRolesPermission)
-                {
-                    <RadzenTabsItem Text="@L["Ou:Roles"]">
-                        <OuRoles SelectedOu="@GetSelectedOu()" />
-                    </RadzenTabsItem>
-                }
-            </Tabs>
-        </RadzenTabs>
-    </RadzenCard>
-</RadzenCardGroup>
+    <RadzenColumn Size="12" SizeMD="@(HasManageTreePermission ? 8 : 12)" Style="height:100%">
+        @* overflow:hidden - the tabs and the unit title stay put; only the grids scroll (they get a fixed height). *@
+        <RadzenCard Variant="Variant.Filled" Style="height:100%; overflow:hidden">
+            <RadzenTabs>
+                <Tabs>
+                    @if (HasManageUsersPermission)
+                    {
+                        <RadzenTabsItem Text="@L["Ou:Members"]">
+                            <OuMembers SelectedOu="@GetSelectedOu()" />
+                        </RadzenTabsItem>
+                    }
+                    @if (HasManageRolesPermission)
+                    {
+                        <RadzenTabsItem Text="@L["Ou:Roles"]">
+                            <OuRoles SelectedOu="@GetSelectedOu()" />
+                        </RadzenTabsItem>
+                    }
+                </Tabs>
+            </RadzenTabs>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
