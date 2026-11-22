@@ -217,6 +217,14 @@ app.UseRadzenUI();
 - `Components/Shared/CommandPaletteDialog.razor`:对话框内容,输入框 + 官方 `RadzenTabs`(仅鼠标点击切换,`GroupIcon` 作为 tab 图标)+ 结果列表 + 底部快捷键提示;仅一个 tab 时不显示 tab 条;支持 ↑↓/↵ 键盘导航(Esc 由 dialog 处理)。仅剩输入框/结果项/快捷键标签等命令面板固有样式。
 - `wwwroot/js/command-palette.js`:全局 Ctrl/⌘+K 监听 + 输入框聚焦,沿用 `fullscreen.js` 的 `dotNetRef` 模块模式,脚本在 `App.razor` 中引入。
 
+行为约束(改面板时不要破坏):
+
+- 只有 `Ready` 状态下的结果可以被回车/点击选中;关键字一变即进入 `Searching`,切 tab 时立即清空旧结果。状态必须在第一个 `await` 之前改好。
+- 已有弹框或带遮罩的侧边弹框时不打开面板:Radzen 在路由跳转时会关掉所有弹框,会丢失表单内容。
+- 贡献器的构造、属性、`SearchAsync` 异常都只跳过该贡献器;tab 因此无结果时显示「搜索失败」而不是「未找到结果」。对话框不在布局的错误边界内,异常不能漏出去。
+- 输入法组字中的按键(`isComposing` / `keyCode 229`)不拦截。
+- tab 切换回调不能 `await` 搜索:`RadzenTabs` 会在回调结束后聚焦 tab 栏,回调必须立刻返回,随后 `OnAfterRenderAsync` 才能把焦点放回输入框。
+
 贡献器需可从 DI 解析(实现 `ITransientDependency`/`IScopedDependency` 或手动注册)。本地化 key 前缀为 `CommandPalette:`。`samples/CRM.Blazor.Web/Search/ProductCommandPaletteContributor.cs` 是 host 侧实体搜索 tab 的完整示例。
 
 ## 页面开发模式

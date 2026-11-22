@@ -12,12 +12,28 @@
 
 @code {
     bool _open;
+    int _openDialogs;
+    bool _modalSideDialogOpen;
     DotNetObjectReference<CommandPalette>? _dotNetRef;
 
     protected override void OnInitialized()
     {
         State.OpenRequested += OpenAsync;
+        DialogService.OnOpen += OnDialogOpen;
+        DialogService.OnClose += OnDialogClose;
+        DialogService.OnSideOpen += OnSideDialogOpen;
+        DialogService.OnSideClose += OnSideDialogClose;
     }
+
+    void OnDialogOpen(string? title, Type type, Dictionary<string, object?> parameters, DialogOptions options) =>
+        _openDialogs++;
+
+    void OnDialogClose(dynamic? result) => _openDialogs = Math.Max(0, _openDialogs - 1);
+
+    void OnSideDialogOpen(Type type, Dictionary<string, object?> parameters, SideDialogOptions options) =>
+        _modalSideDialogOpen = options.ShowMask;
+
+    void OnSideDialogClose(dynamic? result) => _modalSideDialogOpen = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -39,7 +55,9 @@
 
     public async Task OpenAsync()
     {
-        if (_open || !Manager.Enabled)
+        // Navigating from the palette makes Radzen close every open dialog, losing what was typed in it.
+        // A side panel without mask doesn't block: the menu behind it can navigate away just the same.
+        if (_open || _openDialogs > 0 || _modalSideDialogOpen || !Manager.Enabled)
         {
             return;
         }
@@ -71,6 +89,10 @@
     public async ValueTask DisposeAsync()
     {
         State.OpenRequested -= OpenAsync;
+        DialogService.OnOpen -= OnDialogOpen;
+        DialogService.OnClose -= OnDialogClose;
+        DialogService.OnSideOpen -= OnSideDialogOpen;
+        DialogService.OnSideClose -= OnSideDialogClose;
 
         if (_dotNetRef is not null)
         {

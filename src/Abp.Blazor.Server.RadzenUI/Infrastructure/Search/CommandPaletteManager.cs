@@ -27,16 +27,23 @@ public class CommandPaletteManager(
 
         foreach (var contributor in ResolveContributors())
         {
-            // First contributor for a given key defines the tab's label/order.
-            if (!tabs.ContainsKey(contributor.GroupKey))
+            try
             {
-                tabs[contributor.GroupKey] = new CommandPaletteTab
+                // First contributor for a given key defines the tab's label/order.
+                if (!tabs.ContainsKey(contributor.GroupKey))
                 {
-                    Key = contributor.GroupKey,
-                    DisplayName = contributor.GroupDisplayName,
-                    Icon = contributor.GroupIcon,
-                    Order = contributor.Order,
-                };
+                    tabs[contributor.GroupKey] = new CommandPaletteTab
+                    {
+                        Key = contributor.GroupKey,
+                        DisplayName = contributor.GroupDisplayName,
+                        Icon = contributor.GroupIcon,
+                        Order = contributor.Order,
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                LogSkipped(ex, contributor.GetType());
             }
         }
 
@@ -63,33 +70,44 @@ public class CommandPaletteManager(
         };
 
         var results = new List<CommandPaletteItem>();
+        var searched = false;
+        var failed = false;
 
         // Only the contributor(s) belonging to the active tab run — never all of them.
         foreach (var contributor in ResolveContributors())
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (!string.Equals(contributor.GroupKey, tabKey, StringComparison.Ordinal))
-            {
-                continue;
-            }
-
+            var inTab = false;
             try
             {
+                inTab = string.Equals(contributor.GroupKey, tabKey, StringComparison.Ordinal);
+                if (!inTab)
+                {
+                    continue;
+                }
+
+                searched = true;
                 var items = await contributor.SearchAsync(context);
                 results.AddRange(items);
             }
-            catch (OperationCanceledException)
+            // Only our own cancellation; a timeout inside the contributor is a failure.
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
                 throw;
             }
             catch (Exception ex)
             {
                 // A single failing contributor must not break the palette.
-                logger.LogError(ex,
-                    "Command palette contributor {Type} threw and was skipped.",
-                    contributor.GetType().FullName);
+                failed |= inTab;
+                LogSkipped(ex, contributor.GetType());
             }
+        }
+
+        // Nothing to show because the tab's source is broken, which is not "no results".
+        if (results.Count == 0 && (failed || !searched))
+        {
+            return new CommandPaletteSearchFailure();
         }
 
         return results
@@ -102,16 +120,36 @@ public class CommandPaletteManager(
     {
         foreach (var contributorType in _options.Contributors)
         {
-            if (serviceProvider.GetService(contributorType) is ICommandPaletteContributor contributor)
+            if (TryResolve(contributorType) is { } contributor)
             {
                 yield return contributor;
             }
-            else
-            {
-                logger.LogWarning(
-                    "Command palette contributor {Type} is not registered in DI and was skipped.",
-                    contributorType.FullName);
-            }
         }
     }
+
+    ICommandPaletteContributor? TryResolve(Type contributorType)
+    {
+        try
+        {
+            if (serviceProvider.GetService(contributorType) is ICommandPaletteContributor contributor)
+            {
+                return contributor;
+            }
+
+            logger.LogWarning(
+                "Command palette contributor {Type} is not registered in DI and was skipped.",
+                contributorType.FullName);
+        }
+        catch (Exception ex)
+        {
+            LogSkipped(ex, contributorType);
+        }
+
+        return null;
+    }
+
+    void LogSkipped(Exception exception, Type contributorType) =>
+        logger.LogError(exception,
+            "Command palette contributor {Type} threw and was skipped.",
+            contributorType.FullName);
 }

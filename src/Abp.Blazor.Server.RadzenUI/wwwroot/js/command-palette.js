@@ -22,6 +22,16 @@ window.abpRadzenCommandPalette = (() => {
             dotNetRef = reference;
 
             keydownHandler = (e) => {
+                // An IME is composing (Safari reports its last key only through keyCode 229):
+                // no preventDefault, the key is the IME's. While the palette is open, also keep it
+                // from Radzen's handlers, or the Esc that cancels composing closes the dialog.
+                if (e.isComposing || e.keyCode === 229) {
+                    if (dialogRef) {
+                        e.stopPropagation();
+                    }
+                    return;
+                }
+
                 // While the palette dialog is open, own the navigation keys in the
                 // capture phase so focusable widgets inside (e.g. RadzenTabs headers)
                 // never consume Enter/arrows — keeps result navigation focus-independent.
@@ -57,14 +67,12 @@ window.abpRadzenCommandPalette = (() => {
         clearDialog: function () {
             dialogRef = null;
         },
-        // Moves focus into the palette input once it is rendered.
+        // Moves focus into the palette input (on open and after a tab switch). No select():
+        // typing after a tab switch continues the keyword instead of replacing it.
         focus: function (selector) {
             const el = document.querySelector(selector);
             if (el) {
                 el.focus();
-                if (typeof el.select === "function") {
-                    el.select();
-                }
             }
         },
         dispose: dispose

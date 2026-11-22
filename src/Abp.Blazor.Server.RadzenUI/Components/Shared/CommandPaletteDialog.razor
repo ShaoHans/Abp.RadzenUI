@@ -1,5 +1,6 @@
 @using Abp.RadzenUI.Infrastructure.Search
 @using Microsoft.Extensions.Localization
+@using Microsoft.Extensions.Logging
 @using Microsoft.JSInterop
 @implements IAsyncDisposable
 @inject ICommandPaletteManager Manager
@@ -7,6 +8,7 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @inject IStringLocalizer<Abp.RadzenUI.Localization.AbpRadzenUIResource> TL
+@inject ILogger<CommandPaletteDialog> Logger
 
 <style>
     /* Strip the Radzen dialog's default chrome so the palette sits flush. */
@@ -53,6 +55,11 @@
         overflow-y: auto;
         max-height: 46vh;
         padding: 0.35rem 0;
+    }
+    /* Rows of the previous keyword, kept while searching so the list doesn't flicker. */
+    .cmdk-results--stale .cmdk-item {
+        opacity: 0.5;
+        pointer-events: none;
     }
     .cmdk-item {
         display: flex;
@@ -126,8 +133,9 @@
 
     @if (_tabs.Count > 1)
     {
-        <RadzenTabs @bind-SelectedIndex="_selectedTabIndex"
-                    Change="OnTabChangedAsync"
+        @* Not @bind + Change: that renders once with the new tab selected and the old tab's rows. *@
+        <RadzenTabs SelectedIndex="_selectedTabIndex"
+                    SelectedIndexChanged="OnTabChanged"
                     RenderMode="TabRenderMode.Server">
             <Tabs>
                 @foreach (var tab in _tabs)
@@ -152,6 +160,9 @@
 </div>
 
 @code {
+    enum SearchState { Ready, Searching, Failed }
+
+    SearchState _state;
     string _keyword = string.Empty;
     List<CommandPaletteTab> _tabs = [];
     string _activeTabKey = string.Empty;
@@ -163,11 +174,14 @@
     CancellationTokenSource? _searchCts;
     DotNetObjectReference<CommandPaletteDialog>? _dotNetRef;
 
-    RenderFragment ResultsFragment =>@<div class="cmdk-results">
+    // _items can only be selected while Ready; otherwise they belong to an older keyword.
+    bool CanSelect => _state == SearchState.Ready;
+
+    RenderFragment ResultsFragment =>@<div class="@ResultsCssClass">
         @if (_items.Count == 0)
         {
             <div class="cmdk-empty">
-                @(_keyword.Length == 0 ? TL["CommandPalette:Hint"] : TL["CommandPalette:NoResults"])
+                @GetEmptyText()
             </div>
         }
         else
@@ -237,11 +251,19 @@
 
     async Task OnInputAsync(ChangeEventArgs e)
     {
+        var previous = _keyword.Trim();
         _keyword = e.Value?.ToString() ?? string.Empty;
-        await SearchAsync(debounce: true);
+
+        // The query is trimmed, so a space at either end changes nothing.
+        if (_keyword.Trim() != previous)
+        {
+            await SearchAsync(debounce: true);
+        }
     }
 
-    async Task OnTabChangedAsync(int index)
+    // Must not await the search: RadzenTabs focuses its tab list when this returns. Returning at
+    // once puts that before our render, so OnAfterRenderAsync has the last word and focuses the input.
+    void OnTabChanged(int index)
     {
         if (index < 0 || index >= _tabs.Count)
         {
@@ -250,9 +272,9 @@
 
         _selectedTabIndex = index;
         _activeTabKey = _tabs[index].Key;
-        _activeIndex = -1;
+        _items = [];
         _shouldFocus = true;
-        await SearchAsync(debounce: false);
+        _ = SearchAsync(debounce: false); // handles its own errors and re-renders when done
     }
 
     async Task SearchAsync(bool debounce)
@@ -265,6 +287,17 @@
         // Capture the token before a newer keystroke/tab switch can dispose the source.
         var token = cts.Token;
 
+        // All of this has to happen before the first await, which is where Blazor renders.
+        _activeIndex = -1;
+        if (_keyword.Trim().Length < Manager.MinKeywordLength)
+        {
+            _items = [];
+            _state = SearchState.Ready;
+            return;
+        }
+
+        _state = SearchState.Searching;
+
         try
         {
             if (debounce)
@@ -275,18 +308,28 @@
             var items = await Manager.SearchAsync(_activeTabKey, _keyword, token);
 
             // Bail if a newer search superseded this one.
-            if (token.IsCancellationRequested || !ReferenceEquals(_searchCts, cts))
+            if (token.IsCancellationRequested)
             {
                 return;
             }
 
             _items = items.ToList();
+            _state = items is CommandPaletteSearchFailure ? SearchState.Failed : SearchState.Ready;
             _activeIndex = _items.Count > 0 ? 0 : -1;
-            await InvokeAsync(StateHasChanged);
         }
-        catch (OperationCanceledException)
+        catch (Exception) when (token.IsCancellationRequested)
         {
+            return;
         }
+        catch (Exception ex)
+        {
+            // The dialog is outside the layout's error boundary: anything escaping ends the circuit.
+            Logger.LogError(ex, "Command palette search failed.");
+            _items = [];
+            _state = SearchState.Failed;
+        }
+
+        await InvokeAsync(StateHasChanged);
     }
 
     // Invoked from the JS capture-phase keydown listener while this dialog is open, so
@@ -306,7 +349,7 @@
                 await InvokeAsync(StateHasChanged);
                 break;
             case "Enter":
-                if (_activeIndex >= 0 && _activeIndex < _items.Count)
+                if (CanSelect && _activeIndex >= 0 && _activeIndex < _items.Count)
                 {
                     await ActivateAsync(_items[_activeIndex]);
                 }
@@ -316,7 +359,7 @@
 
     void Move(int delta)
     {
-        if (_items.Count == 0)
+        if (!CanSelect || _items.Count == 0)
         {
             return;
         }
@@ -326,13 +369,44 @@
 
     async Task ActivateAsync(CommandPaletteItem item)
     {
+        // A click can still arrive from a row rendered before the keyword or tab changed.
+        if (!CanSelect || !_items.Contains(item))
+        {
+            return;
+        }
+
         DialogService.Close();
         NavigationManager.NavigateTo(item.Url, forceLoad: item.ForceLoad);
         await Task.CompletedTask;
     }
 
     string ItemCssClass(int index) =>
-        index == _activeIndex ? "cmdk-item cmdk-item--active" : "cmdk-item";
+        CanSelect && index == _activeIndex ? "cmdk-item cmdk-item--active" : "cmdk-item";
+
+    string ResultsCssClass => CanSelect ? "cmdk-results" : "cmdk-results cmdk-results--stale";
+
+    string GetEmptyText()
+    {
+        if (_state == SearchState.Failed)
+        {
+            return TL["CommandPalette:Failed"];
+        }
+
+        if (_state == SearchState.Searching)
+        {
+            return TL["CommandPalette:Searching"];
+        }
+
+        var length = _keyword.Trim().Length;
+        if (length == 0)
+        {
+            return TL["CommandPalette:Hint"];
+        }
+
+        return length < Manager.MinKeywordLength
+            ? TL["CommandPalette:MinLength", Manager.MinKeywordLength]
+            : TL["CommandPalette:NoResults"];
+    }
 
     public async ValueTask DisposeAsync()
     {
