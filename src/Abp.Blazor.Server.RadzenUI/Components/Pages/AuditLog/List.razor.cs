@@ -17,7 +17,6 @@ public partial class List : IDisposable
     {
         ObjectMapperContext = typeof(AbpRadzenUIModule);
         LocalizationResource = typeof(AuditLoggingResource);
-        _defaultPageSize = 20;
     }
 
     protected override void OnInitialized()

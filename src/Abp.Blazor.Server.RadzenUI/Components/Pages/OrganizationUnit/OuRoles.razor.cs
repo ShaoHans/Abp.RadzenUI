@@ -1,4 +1,5 @@
 using Abp.RadzenUI.Application.Contracts.Organizations;
+using Abp.RadzenUI.Components.Shared;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -31,7 +32,6 @@ public partial class OuRoles
     protected int _totalCount;
     protected readonly bool _showPagerSummary = true;
     protected bool _isLoading = true;
-    protected int _defaultPageSize = 10;
 
     protected PagedAndSortedResultRequestDto GetListInput = new();
 
@@ -84,7 +84,7 @@ public partial class OuRoles
 
         if (GetListInput is ILimitedResultRequest limitedResultRequestInput)
         {
-            limitedResultRequestInput.MaxResultCount = args.Top ?? _defaultPageSize;
+            limitedResultRequestInput.MaxResultCount = args.Top ?? LocalizedDataGrid.DefaultPageSize;
         }
 
         return Task.CompletedTask;

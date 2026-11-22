@@ -1,4 +1,5 @@
 using Abp.RadzenUI.Application.Contracts.Messages;
+using Abp.RadzenUI.Components.Shared;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Infrastructure.Navigation;
 using Microsoft.AspNetCore.Components;
@@ -32,7 +33,6 @@ public partial class List
     [Inject]
     public IStringLocalizer<AbpRadzenUIResource> UL { get; set; } = default!;
 
-    private readonly int _defaultPageSize = 20;
     private IReadOnlyList<ReadStatusOption> _readStatusOptions = [];
 
     private RadzenDataGrid<UserMessageDto> _grid = default!;
@@ -103,7 +103,7 @@ public partial class List
                     ReadStatus = _readStatus,
                     Sorting = sorting,
                     SkipCount = args.Skip ?? 0,
-                    MaxResultCount = args.Top ?? _defaultPageSize,
+                    MaxResultCount = args.Top ?? LocalizedDataGrid.DefaultPageSize,
                 }
             );
 

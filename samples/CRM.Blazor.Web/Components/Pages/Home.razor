@@ -52,7 +52,7 @@
             <RadzenTabsItem Text="@($"Commits({commitCount})")">
                 <div class="app-fill-tab-panel">
                     <LocalizedDataGrid ColumnWidth="150px" TItem="CommitDto" AllowPaging="true"
-                    IsLoading="isLoading" Count="@commitCount" PageSize="20" Data="@commits" LoadData="@LoadCommits">
+                    IsLoading="isLoading" Count="@commitCount" Data="@commits" LoadData="@LoadCommits">
                         <Columns>
                             <RadzenDataGridColumn Property="@nameof(CommitDto.Committer.AvatarUrl)" Title="Avatar" Sortable="false" Filterable="false" Width="80px">
                                 <Template Context="data">
@@ -127,7 +127,7 @@
     {
         isLoading = true;
         var skip = args.Skip ?? 0;
-        var take = args.Top ?? 20;
+        var take = args.Top ?? LocalizedDataGrid.DefaultPageSize;
         try
         {
             commits = await GitHubClient.GetRepositoryCommitsAsync(take, (skip / take) + 1);

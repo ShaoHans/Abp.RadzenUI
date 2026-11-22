@@ -41,7 +41,7 @@
     private string _targetPageText = "1";
     private int _lastSyncedPage = 1;
 
-    private int EffectivePageSize => PageSize ?? Grid?.PageSize ?? 10;
+    private int EffectivePageSize => PageSize ?? Grid?.PageSize ?? LocalizedDataGrid.DefaultPageSize;
 
     private int TotalPages => Math.Max(1, (int)Math.Ceiling(Count / (double)EffectivePageSize));
 

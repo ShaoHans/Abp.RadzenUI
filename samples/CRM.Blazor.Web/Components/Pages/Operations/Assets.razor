@@ -41,7 +41,6 @@
                     IsLoading="@_isLoading"
                     AllowPaging="true"
                     AllowSorting="true"
-                    PageSize="20"
                     PagerHorizontalAlign="HorizontalAlign.Center"
                     ShowPagingSummary="true">
     <Columns>
@@ -101,7 +100,7 @@
                 Status = _status,
                 Category = _category,
                 SkipCount = args.Skip ?? 0,
-                MaxResultCount = args.Top ?? 20,
+                MaxResultCount = args.Top ?? LocalizedDataGrid.DefaultPageSize,
                 Sorting = args.OrderBy
             });
 

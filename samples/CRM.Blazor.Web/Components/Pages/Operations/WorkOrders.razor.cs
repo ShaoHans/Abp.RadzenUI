@@ -1,3 +1,4 @@
+using Abp.RadzenUI.Components.Shared;
 using Abp.RadzenUI;
 using CRM.Enums;
 using CRM.Localization;
@@ -70,7 +71,7 @@ public partial class WorkOrders : IDisposable
                 Type = _type,
                 OwnerName = _ownerName,
                 SkipCount = args.Skip ?? 0,
-                MaxResultCount = args.Top ?? 20,
+                MaxResultCount = args.Top ?? LocalizedDataGrid.DefaultPageSize,
                 Sorting = args.OrderBy
             });
 

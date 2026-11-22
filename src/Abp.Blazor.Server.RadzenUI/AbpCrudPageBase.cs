@@ -159,7 +159,7 @@ public abstract class AbpCrudPageBase<
     protected readonly IEnumerable<int> _pageSizeOptions = LocalizedDataGrid.DefaultPageSizeOptions;
     protected readonly bool _showPagerSummary = true;
     protected bool _isLoading = true;
-    protected int _defaultPageSize = 10;
+    protected int _defaultPageSize = LocalizedDataGrid.DefaultPageSize;
 
     protected TGetListInput GetListInput = new();
     protected TCreateViewModel NewEntity;

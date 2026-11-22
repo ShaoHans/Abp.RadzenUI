@@ -15,7 +15,6 @@ public partial class List
     {
         ObjectMapperContext = typeof(AbpRadzenUIModule);
         LocalizationResource = typeof(AbpRadzenUIResource);
-        _defaultPageSize = 20;
     }
 
     protected override Task UpdateGetListInputAsync(LoadDataArgs args)

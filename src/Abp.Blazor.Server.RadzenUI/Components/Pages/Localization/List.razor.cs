@@ -1,3 +1,4 @@
+using Abp.RadzenUI.Components.Shared;
 using System.Globalization;
 using Abp.RadzenUI.Application.Contracts.LocalizationTexts;
 using Abp.RadzenUI.Localization;
@@ -38,7 +39,6 @@ public partial class List
     private string? _filter;
     private bool _onlyOverridden;
 
-    private readonly int _defaultPageSize = 20;
 
     public bool HasEditPermission { get; set; }
     public bool HasDeletePermission { get; set; }
@@ -117,7 +117,7 @@ public partial class List
                     OnlyOverridden = _onlyOverridden,
                     Sorting = args.OrderBy,
                     SkipCount = args.Skip ?? 0,
-                    MaxResultCount = args.Top ?? _defaultPageSize,
+                    MaxResultCount = args.Top ?? LocalizedDataGrid.DefaultPageSize,
                 });
 
             _items = result.Items;

@@ -9,7 +9,7 @@
     <DialogFormLayout CancelClick="@(() => DialogService.Close(false))" SaveClick="@SaveAsync">
         <RadzenStack Gap="1rem">
             <LocalizedDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true" Density="Density.Compact"
-                            PagerHorizontalAlign="HorizontalAlign.Center" PageSize="@_defaultPageSize"
+                            PagerHorizontalAlign="HorizontalAlign.Center"
                             ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
                             Count="@_totalCount" IsLoading="@_isLoading" 
                             SelectionMode="DataGridSelectionMode.Multiple" @bind-Value="@_selectedUsers">

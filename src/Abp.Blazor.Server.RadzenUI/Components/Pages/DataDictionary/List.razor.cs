@@ -42,7 +42,6 @@ public partial class List
     private bool _isItemLoading;
     private bool _shouldLoadSelectedTypeItems;
     private string? _itemFilter;
-    private readonly int _defaultPageSize = 10;
 
     public bool HasCreatePermission { get; set; }
     public bool HasUpdatePermission { get; set; }
@@ -105,7 +104,7 @@ public partial class List
                     Filter = _typeFilter,
                     Sorting = args.OrderBy,
                     SkipCount = args.Skip ?? 0,
-                    MaxResultCount = args.Top ?? _defaultPageSize,
+                    MaxResultCount = args.Top ?? LocalizedDataGrid.DefaultPageSize,
                 }
             );
 
@@ -373,7 +372,7 @@ public partial class List
                 Filter = _itemFilter,
                 Sorting = args.OrderBy,
                 SkipCount = args.Skip ?? 0,
-                MaxResultCount = args.Top ?? _defaultPageSize,
+                MaxResultCount = args.Top ?? LocalizedDataGrid.DefaultPageSize,
             };
 
             var result = await ItemAppService.GetListAsync(input);

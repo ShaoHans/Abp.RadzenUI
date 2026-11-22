@@ -14,7 +14,7 @@
         <LocalizedDataGrid @ref="_typeGrid" Data="@_types" TItem="DataDictionaryTypeDto"
                         AllowPaging="true" AllowSorting="true" Density="Density.Compact"
                         PagerHorizontalAlign="HorizontalAlign.Center"
-                        Style="flex:1; min-height:0" PageSize="@_defaultPageSize"
+                        Style="flex:1; min-height:0"
                         IsLoading="@_isTypeLoading"
                         LoadData="LoadTypesAsync" Count="@_typeTotalCount"
                         RowSelect="SelectTypeAsync"
@@ -83,7 +83,7 @@
         {
             <LocalizedDataGrid @ref="_itemGrid" Data="@_items" AllowPaging="true" AllowSorting="true" Density="Density.Compact"
                             PagerHorizontalAlign="HorizontalAlign.Center"
-                            Style="flex:1; min-height:0" PageSize="@_defaultPageSize"
+                            Style="flex:1; min-height:0"
                             ShowPagingSummary="true"
                             LoadData="LoadItemsAsync" Count="@_itemTotalCount" IsLoading="@_isItemLoading">
                 <HeaderTemplate>

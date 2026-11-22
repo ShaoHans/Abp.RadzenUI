@@ -15,6 +15,9 @@ namespace Abp.RadzenUI.Components.Shared;
 /// <summary>What all <see cref="LocalizedDataGrid{TItem}"/> share, usable without naming a TItem.</summary>
 public static class LocalizedDataGrid
 {
+    /// <summary>The page size of every list until the user picks one.</summary>
+    public static int DefaultPageSize { get; } = 10;
+
     /// <summary>The page sizes every list offers. Keep to it: the picked size is shared by all lists.</summary>
     public static IReadOnlyList<int> DefaultPageSizeOptions { get; } = Array.AsReadOnly([10, 20, 30, 50, 100]);
 }
@@ -33,6 +36,7 @@ public class LocalizedDataGrid<TItem>
     private static readonly FieldInfo? PickedPageSize = typeof(PagedDataBoundComponent<TItem>)
         .GetField("pageSize", BindingFlags.Instance | BindingFlags.NonPublic);
 
+    private bool _defaultPageSizeSet;
     private bool _settingParameters;
     private bool _checkFirstPage;
     private int? _appliedPageSize;
@@ -81,6 +85,13 @@ public class LocalizedDataGrid<TItem>
         _settingParameters = true;
         try
         {
+            if (!_defaultPageSizeSet)
+            {
+                // Not in the constructor: Radzen's setter needs the render handle. A PageSize of the page still wins.
+                _defaultPageSizeSet = true;
+                PageSize = LocalizedDataGrid.DefaultPageSize;
+            }
+
             return base.SetParametersAsync(parameters);
         }
         finally
@@ -135,7 +146,7 @@ public class LocalizedDataGrid<TItem>
             await FirstPage(true);
             StateHasChanged();
         }
-        // The page queried before the grid existed, so with its own default.
+        // The page queried before the grid existed, and with another size than the grid's.
         else if (_checkFirstPage && Count > 0 && Data is { } data)
         {
             _checkFirstPage = false;
@@ -151,10 +162,11 @@ public class LocalizedDataGrid<TItem>
     {
         base.OnInitialized();
 
+        _checkFirstPage = SharesPageSize && LoadData.HasDelegate;
+
         if (SharesPageSize && SharedPageSize is { } saved && PageSizeOptions!.Contains(saved))
         {
             _appliedPageSize = saved;
-            _checkFirstPage = saved != PageSize && LoadData.HasDelegate;
             PickedPageSize?.SetValue(this, saved);
         }
 
