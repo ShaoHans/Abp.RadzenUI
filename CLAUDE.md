@@ -54,6 +54,7 @@ This is the load-bearing part of the design — a host ABP Blazor Server project
 ### Key extension points
 
 - **CRUD pages**: inherit `AbpCrudPageBase` (`src/Abp.Blazor.Server.RadzenUI/AbpCrudPageBase.cs`) for consistent Radzen DataGrid loading, paging/sorting, create/edit/delete dialogs, `Create/Update/DeletePolicyName` permission checks, and error handling.
+- **Page height**: never write `height:calc(100vh - Npx)` on a page. A DataGrid that is the page's last direct child fills the window automatically; other layouts use the `app-fill-*` classes (see "Pages that fill the window" in `wwwroot/css/site.css`).
 - **Settings pages**: implement `ISettingComponentContributor` and register it in `SettingManagementComponentOptions.Contributors`.
 - **Profile-page extension properties**: identity-user extension properties show up on `/account/manage` (PersonalInfo tab). Per-property behavior is `ProfileExtensionPropertyMode` (`Hidden` / `ReadOnly` / `Editable`), set via `property.ConfigureProfile(...)` when defining the property, with the fallback in `AbpRadzenUIProfileOptions.DefaultExtensionPropertyMode` (default `ReadOnly`). `AbpRadzenUIProfileAppService` enforces it server-side. Admin user dialogs are unaffected.
 - **EF Core**: host DbContext must call `builder.ConfigureAbpRadzenUI()` in `OnModelCreating` and declare the built-in DbSets if using those modules.

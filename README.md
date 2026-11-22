@@ -22,6 +22,7 @@ English | [简体中文](README_zh-CN.md)
 - [Use the Data Dictionary Module](#-use-the-data-dictionary-module)
 - [Use the Messages Module](#-use-the-messages-module)
 - [Use the Command Palette (Ctrl+K)](#-use-the-command-palette-ctrlk)
+- [Lay Out List Pages](#-lay-out-list-pages)
 - [Use Data Export (Excel)](#-use-data-export-excel)
 - [Preview the Interface](#-preview-the-interface)
 
@@ -460,6 +461,40 @@ Configure<CommandPaletteOptions>(options =>
 That is all — a "Products" tab now appears in the palette. See [ProductCommandPaletteContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/Search/ProductCommandPaletteContributor.cs) for the complete sample.
 
 `CommandPaletteOptions` also exposes `Enabled`, `MinKeywordLength`, and `MaxResultsPerGroup`.
+
+## 📐 Lay Out List Pages
+
+A list page needs no height. When a DataGrid is a direct child of the page and its last element, it takes whatever height is left below the header and the content above it, and only the rows scroll. Filters can wrap or expand without any pixel math:
+
+```razor
+<RadzenCard class="rz-mb-3">
+    @* filters *@
+</RadzenCard>
+
+<LocalizedDataGrid Data="@_entities" AllowPaging="true">
+    @* columns *@
+</LocalizedDataGrid>
+```
+
+The automatic layout leaves a page alone when:
+
+- the grid has an inline `height`, `min-height` or `max-height`, so remove `Style="height:calc(100vh - Npx)"` to get the automatic layout;
+- another element follows the grid, or the page has several grids side by side in the markup;
+- the grid is wrapped in another element;
+- the grid has `class="app-grid-no-fill"` (use it for a grid that should grow with its rows, or that gets its height from your own CSS).
+
+For other layouts use these classes:
+
+| Class | Put it on | Effect |
+|-------|-----------|--------|
+| `app-fill-page` | a wrapper around the page | Flex column of the content height. A DataGrid directly inside takes the remaining height, even if something follows it. |
+| `app-fill-row` | a `RadzenRow` of panels | Equal-height panels. Give the card `height:100%; display:flex; flex-direction:column` and its grid `flex:1; min-height:0`. |
+| `app-fill-tabs` | a `RadzenTabs` inside a fill page, or inside a flex-column card of a fill row | Tabs take the remaining height. |
+| `app-fill-tab-panel` | a native `div` around the content of a tab | The grid in the tab takes the remaining height. |
+
+These classes bound the height only from 768px wide and 30rem tall. `app-fill-row` with several panels needs 1024px, which is where `SizeMD` columns stop stacking. Below that the page scrolls normally.
+
+While a page is filled it is a flex column, so inline elements placed directly next to the grid (a lone button, for example) stretch to full width. Wrap them in a `RadzenStack`.
 
 ## 📤 Use Data Export (Excel)
 

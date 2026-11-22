@@ -22,6 +22,7 @@ Abp RadzenUI 是一个基于 [ABP](https://github.com/abpframework/abp) 框架�
 - [使用数据字典模块](#-使用数据字典模块)
 - [使用消息模块](#-使用消息模块)
 - [使用全局搜索 / 命令面板（Ctrl+K）](#-使用全局搜索--命令面板ctrlk)
+- [列表页布局](#-列表页布局)
 - [使用数据导出（Excel）](#-使用数据导出excel)
 - [界面预览](#-界面预览)
 
@@ -455,6 +456,40 @@ Configure<CommandPaletteOptions>(options =>
 这样面板里就会多出一个"产品"tab。完整示例见 [ProductCommandPaletteContributor](https://github.com/ShaoHans/Abp.RadzenUI/blob/main/samples/CRM.Blazor.Web/Search/ProductCommandPaletteContributor.cs)。
 
 `CommandPaletteOptions` 还提供 `Enabled`、`MinKeywordLength`、`MaxResultsPerGroup` 等配置项。
+
+## 📐 列表页布局
+
+列表页不需要写高度。当 DataGrid 是页面的直接子元素、并且是最后一个元素时，它会自动占满顶部栏和上方内容以下的剩余高度，只有表格内部滚动。筛选栏换行、展开都不用再算像素：
+
+```razor
+<RadzenCard class="rz-mb-3">
+    @* 筛选条件 *@
+</RadzenCard>
+
+<LocalizedDataGrid Data="@_entities" AllowPaging="true">
+    @* 列定义 *@
+</LocalizedDataGrid>
+```
+
+以下情况不会自动铺满：
+
+- 表格写了内联 `height`、`min-height` 或 `max-height`（想自动铺满就删掉 `Style="height:calc(100vh - Npx)"`）；
+- 表格后面还有别的元素，或者页面里并列放了多个表格；
+- 表格被包在别的元素里；
+- 表格带有 `class="app-grid-no-fill"`（用于希望随行数增高、或者高度由自己的 CSS 决定的表格）。
+
+其它布局使用以下 class：
+
+| Class | 加在哪里 | 效果 |
+|-------|----------|------|
+| `app-fill-page` | 页面外层容器 | 内容区高度的纵向 flex。直接放在里面的表格占满剩余高度，表格后面有内容时也可以。 |
+| `app-fill-row` | 分栏的 `RadzenRow` | 各栏等高。卡片写 `height:100%; display:flex; flex-direction:column`，表格写 `flex:1; min-height:0`。 |
+| `app-fill-tabs` | fill page 内、或 fill row 中纵向 flex 卡片内的 `RadzenTabs` | Tabs 占满剩余高度。 |
+| `app-fill-tab-panel` | 包住 tab 内容的原生 `div` | tab 内的表格占满剩余高度。 |
+
+这些 class 只在宽度不小于 768px、高度不小于 30rem 时限高。多栏的 `app-fill-row` 需要 1024px（`SizeMD` 的列从这个宽度起才并排）。更小时页面正常滚动。
+
+自动铺满时页面是纵向 flex，与表格同级的行内元素（例如单独一个按钮）会被拉成整行宽，请用 `RadzenStack` 包一下。
 
 ## 📤 使用数据导出（Excel）
 

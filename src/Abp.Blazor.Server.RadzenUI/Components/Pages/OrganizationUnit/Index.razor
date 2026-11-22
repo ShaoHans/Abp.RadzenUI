@@ -5,10 +5,10 @@
 <PageTitle>@L["OrganizationUnits"]</PageTitle>
 
 @* Two equal-height panels: tree on the left, members/roles of the selected unit on the right. *@
-<RadzenRow Gap="1rem" Style="height:calc(100vh - 64px)">
+<RadzenRow Gap="1rem" class="app-fill-row">
     @if (HasManageTreePermission)
     {
-        <RadzenColumn Size="12" SizeMD="4" Style="height:100%">
+        <RadzenColumn Size="12" SizeMD="4">
             <RadzenCard Variant="Variant.Filled" Style="height:100%; display:flex; flex-direction:column; gap:0.75rem">
                 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center" Gap="0.5rem">
                     <RadzenText Text="@L["Ou:Tree"]" TextStyle="TextStyle.H6" Style="margin:0" />
@@ -54,21 +54,25 @@
         </RadzenColumn>
     }
 
-    <RadzenColumn Size="12" SizeMD="@(HasManageTreePermission ? 8 : 12)" Style="height:100%">
-        @* overflow:hidden - the tabs and the unit title stay put; only the grids scroll (they get a fixed height). *@
-        <RadzenCard Variant="Variant.Filled" Style="height:100%; overflow:hidden">
-            <RadzenTabs>
+    <RadzenColumn Size="12" SizeMD="@(HasManageTreePermission ? 8 : 12)">
+        @* The tabs and the unit title stay put; the grid gets the height left over (site.css .app-fill-tabs). *@
+        <RadzenCard Variant="Variant.Filled" Style="height:100%; display:flex; flex-direction:column; overflow:hidden">
+            <RadzenTabs class="app-fill-tabs">
                 <Tabs>
                     @if (HasManageUsersPermission)
                     {
                         <RadzenTabsItem Text="@L["Ou:Members"]">
-                            <OuMembers SelectedOu="@GetSelectedOu()" />
+                            <div class="app-fill-tab-panel">
+                                <OuMembers SelectedOu="@GetSelectedOu()" />
+                            </div>
                         </RadzenTabsItem>
                     }
                     @if (HasManageRolesPermission)
                     {
                         <RadzenTabsItem Text="@L["Ou:Roles"]">
-                            <OuRoles SelectedOu="@GetSelectedOu()" />
+                            <div class="app-fill-tab-panel">
+                                <OuRoles SelectedOu="@GetSelectedOu()" />
+                            </div>
                         </RadzenTabsItem>
                     }
                 </Tabs>

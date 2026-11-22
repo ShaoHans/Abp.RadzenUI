@@ -1264,13 +1264,14 @@ html, body {
 /*
     Compact app shell: header 40px instead of Radzen's 3.125rem (50px), main area
     padding 12px instead of 1rem. Both are Radzen's own layout tokens.
-    Full-height pages size themselves as calc(100vh - X) where X starts from
-    these two values: header 40 + body padding 12 * 2 = 64px (plus whatever the
-    page puts above the grid). Keep them in sync.
+    What is left for a page is --app-content-height, derived from these two tokens;
+    the "Pages that fill the window" rules below use it, so pages never do their own
+    calc(100vh - Npx).
 */
 .rz-layout.app-layout-shell {
     --rz-header-min-height: 2.5rem;
     --rz-layout-body-padding: 0.75rem;
+    --app-content-height: calc(100dvh - var(--rz-header-min-height) - 2 * var(--rz-layout-body-padding));
     /* min-height alone isn't enough: these two would still stretch the header -
        the sidebar toggle (24px icon + 2 x 0.8125rem = 50px) and the avatar
        profile menu (32px + 2 x 0.5rem = 48px). Both fit 40px with these. */
@@ -1286,10 +1287,10 @@ html, body {
     - material3 gives the body `margin: 0 12px 12px` (12px less height).
     So pin the shell: header exactly 40px, border included (box-sizing is border-box
     in every theme), and no vertical body margin (side margins keep the theme look).
-    Result: content height is always 100vh - 64px.
+    Result: the content height is always exactly --app-content-height.
 */
 .rz-layout.app-layout-shell > .rz-header {
-    height: 2.5rem;
+    height: var(--rz-header-min-height);
     padding-block: 0;
 }
 
@@ -1301,4 +1302,108 @@ html, body {
    gap below it, pushing the header to 42px. */
 .app-header__profile.rz-profile-menu {
     vertical-align: middle;
+}
+
+/*
+    Pages that fill the window.
+
+    1. List pages need no markup: a DataGrid that is a direct child of the page and
+       its last element takes the height left by whatever is above it (filters can
+       wrap or expand freely). Left alone on purpose:
+       - a grid with an inline height / min-height / max-height: it sizes itself
+         (a zero flex-basis would silently ignore that height);
+       - a grid followed by another element, which also covers several grids;
+       - a grid with class="app-grid-no-fill".
+
+    2. Other layouts opt in:
+       - app-fill-page: a flex column of the content height; a direct DataGrid fills it;
+       - app-fill-row: a RadzenRow of equal-height panels;
+       - app-fill-tabs + app-fill-tab-panel: RadzenTabs inside either of the above,
+         and a native div around the tab content. The div is the flex column because
+         .rz-tabview-panel must not get display:flex (Radzen toggles it inline).
+       These bound the height only where there is room for it. On phones, in very
+       short windows and for stacked panels the page scrolls normally instead.
+       Note that SizeMD columns stack below 1024px (Radzen md), not 768px.
+*/
+.app-layout-frame > .rz-col-12:has(> .rz-data-grid:not(.app-grid-no-fill, [style*="height"])):not(:has(> .rz-data-grid ~ :not(style, script, link))) {
+    display: flex;
+    flex-direction: column;
+    height: var(--app-content-height);
+}
+
+.app-layout-frame > .rz-col-12:has(> .rz-data-grid:not(.app-grid-no-fill, [style*="height"])):not(:has(> .rz-data-grid ~ :not(style, script, link))) > :not(.rz-data-grid) {
+    flex-shrink: 0;
+}
+
+/* The minimum keeps the grid usable in a short window; the page scrolls then. */
+.app-layout-frame > .rz-col-12:has(> .rz-data-grid:not(.app-grid-no-fill, [style*="height"])):not(:has(> .rz-data-grid ~ :not(style, script, link))) > .rz-data-grid {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 15rem;
+}
+
+@media (min-width: 768px) and (min-height: 30rem) {
+    .app-fill-page {
+        display: flex;
+        flex-direction: column;
+        height: var(--app-content-height);
+    }
+
+    .app-fill-page > * {
+        flex-shrink: 0;
+    }
+
+    /* A single panel never stacks. */
+    .app-fill-row:has(> :only-child) {
+        height: var(--app-content-height);
+    }
+
+    /* The row alone is not enough: a wrapping flex line is as tall as its content,
+       so each column needs the height too. */
+    .app-fill-row > :only-child {
+        height: 100%;
+    }
+
+    /* flex: 1 (basis 0%) rather than basis 0: in a stacked, auto-height row it
+       falls back to the content height instead of collapsing. */
+    .app-fill-tabs {
+        flex: 1;
+        min-width: 0;
+        min-height: 0;
+    }
+
+    .app-fill-tabs > .rz-tabview-panels {
+        min-height: 0;
+    }
+
+    .app-fill-tabs > .rz-tabview-panels > .rz-tabview-panel:has(> .app-fill-tab-panel) {
+        height: 100%;
+    }
+
+    .app-fill-tab-panel {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .app-fill-tab-panel > :not(.rz-data-grid) {
+        flex-shrink: 0;
+    }
+
+    .app-fill-page > .rz-data-grid,
+    .app-fill-tab-panel > .rz-data-grid {
+        flex: 1;
+        min-width: 0;
+        min-height: 15rem;
+    }
+}
+
+@media (min-width: 1024px) and (min-height: 30rem) {
+    .app-fill-row {
+        height: var(--app-content-height);
+    }
+
+    .app-fill-row > [class*="rz-col-"] {
+        height: 100%;
+    }
 }

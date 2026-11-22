@@ -7,76 +7,80 @@
 
 <PageTitle>Home</PageTitle>
 
-<RadzenText TextStyle="TextStyle.DisplayH5" TextAlign="TextAlign.Center">@repository.Description</RadzenText>
+<div class="app-fill-page">
+    <RadzenText TextStyle="TextStyle.DisplayH5" TextAlign="TextAlign.Center">@repository.Description</RadzenText>
 
-<RadzenTabs Change="TabChanged">
-    <Tabs>
-        <RadzenTabsItem Text="Welcome" >
-            @if (CurrentUser is null || !CurrentUser.IsAuthenticated)
-            {
-                <p>You are not logged in yet, please <RadzenLink Icon="login" Path="/account/login">log in</RadzenLink></p>
-            }
-            else
-            {
-                <h1>Hello, <RadzenLink Path="/account/manage#PersonalInfo" Text="@CurrentUser.UserName" /></h1>
+    <RadzenTabs Change="TabChanged" class="app-fill-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Welcome" >
+                @if (CurrentUser is null || !CurrentUser.IsAuthenticated)
+                {
+                    <p>You are not logged in yet, please <RadzenLink Icon="login" Path="/account/login">log in</RadzenLink></p>
+                }
+                else
+                {
+                    <h1>Hello, <RadzenLink Path="/account/manage#PersonalInfo" Text="@CurrentUser.UserName" /></h1>
 
-                <p>Welcome to your new app.</p>
-            }
-            <RadzenRow Gap="2rem" RowGap="2rem" class="rz-p-0 rz-p-md-12">
-                <RadzenColumn Size="12" SizeMD="12">
-                    <HomeClock />
-                </RadzenColumn>
-            </RadzenRow>
-        </RadzenTabsItem>
+                    <p>Welcome to your new app.</p>
+                }
+                <RadzenRow Gap="2rem" RowGap="2rem" class="rz-p-0 rz-p-md-12">
+                    <RadzenColumn Size="12" SizeMD="12">
+                        <HomeClock />
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
 
-        <RadzenTabsItem Text="@($"Stars({repository.StargazersCount})")">
-            <RadzenDataList WrapItems="true" AllowPaging="false" IsLoading="@isLoading" Data="@stargazers" TItem="RepositoryStargazerDto">
-                <Template Context="stargazer">
-                    <RadzenCard Style="width:300px;">
-                        <RadzenStack AlignItems="AlignItems.Center" Gap="1rem">
-                            <RadzenImage Path="@stargazer.User.AvatarUrl" Style="width: 80px; height: 80px; border-radius: 50%" AlternateText="@stargazer.User.UserName" />
-                            <RadzenStack Gap="0">
-                                <div class="rz-text-align-center">
-                                    <RadzenLink Path="@stargazer.User.HomeUrl" Target="_blank" Text="@stargazer.User.UserName" />
-                                </div>
-                                <RadzenText TextStyle="TextStyle.Body2" TextAlign="TextAlign.Center">Starred At:@stargazer.StarredAt</RadzenText>
+            <RadzenTabsItem Text="@($"Stars({repository.StargazersCount})")">
+                <RadzenDataList WrapItems="true" AllowPaging="false" IsLoading="@isLoading" Data="@stargazers" TItem="RepositoryStargazerDto">
+                    <Template Context="stargazer">
+                        <RadzenCard Style="width:300px;">
+                            <RadzenStack AlignItems="AlignItems.Center" Gap="1rem">
+                                <RadzenImage Path="@stargazer.User.AvatarUrl" Style="width: 80px; height: 80px; border-radius: 50%" AlternateText="@stargazer.User.UserName" />
+                                <RadzenStack Gap="0">
+                                    <div class="rz-text-align-center">
+                                        <RadzenLink Path="@stargazer.User.HomeUrl" Target="_blank" Text="@stargazer.User.UserName" />
+                                    </div>
+                                    <RadzenText TextStyle="TextStyle.Body2" TextAlign="TextAlign.Center">Starred At:@stargazer.StarredAt</RadzenText>
+                                </RadzenStack>
                             </RadzenStack>
-                        </RadzenStack>
-                    </RadzenCard>
-                </Template>
-            </RadzenDataList>
-            <RadzenPager Density="@Density" HorizontalAlign="HorizontalAlign.Center" Count="@repository.StargazersCount" PageSize="@pageSize" PageNumbersCount="6" PageChanged="@PageChanged" />
-        </RadzenTabsItem>
+                        </RadzenCard>
+                    </Template>
+                </RadzenDataList>
+                <RadzenPager Density="@Density" HorizontalAlign="HorizontalAlign.Center" Count="@repository.StargazersCount" PageSize="@pageSize" PageNumbersCount="6" PageChanged="@PageChanged" />
+            </RadzenTabsItem>
 
-        <RadzenTabsItem Text="@($"Commits({commitCount})")">
-            <LocalizedDataGrid ColumnWidth="150px" TItem="CommitDto" AllowPaging="true" Style="height:calc(100vh - 160px)"
-            IsLoading="isLoading" Count="@commitCount" PageSize="20" Data="@commits" LoadData="@LoadCommits">
-                <Columns>
-                    <RadzenDataGridColumn Property="@nameof(CommitDto.Committer.AvatarUrl)" Title="Avatar" Sortable="false" Filterable="false" Width="80px">
-                        <Template Context="data">
-                            <RadzenImage Path="@data.Committer?.AvatarUrl" Style="width: 40px; height: 40px; border-radius: 8px;" />
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Property="@nameof(CommitDto.Commit.Committer.Name)" Title="Name">
-                        <Template Context="data">
-                            @data.Commit.Committer.Name
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Property="@nameof(CommitDto.Commit.Message)" Title="Message">
-                        <Template Context="data">
-                            <RadzenLink Path="@data.HtmlUrl" Target="_blank">@data.Commit.Message</RadzenLink>
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Property="@nameof(CommitDto.Commit.Committer.Date)" Title="Date">
-                        <Template Context="data">
-                            @data.Commit.Committer.Date.ToLocalTime()
-                        </Template>
-                    </RadzenDataGridColumn>
-                </Columns>
-            </LocalizedDataGrid>
-        </RadzenTabsItem>
-    </Tabs>
-</RadzenTabs>
+            <RadzenTabsItem Text="@($"Commits({commitCount})")">
+                <div class="app-fill-tab-panel">
+                    <LocalizedDataGrid ColumnWidth="150px" TItem="CommitDto" AllowPaging="true"
+                    IsLoading="isLoading" Count="@commitCount" PageSize="20" Data="@commits" LoadData="@LoadCommits">
+                        <Columns>
+                            <RadzenDataGridColumn Property="@nameof(CommitDto.Committer.AvatarUrl)" Title="Avatar" Sortable="false" Filterable="false" Width="80px">
+                                <Template Context="data">
+                                    <RadzenImage Path="@data.Committer?.AvatarUrl" Style="width: 40px; height: 40px; border-radius: 8px;" />
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn Property="@nameof(CommitDto.Commit.Committer.Name)" Title="Name">
+                                <Template Context="data">
+                                    @data.Commit.Committer.Name
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn Property="@nameof(CommitDto.Commit.Message)" Title="Message">
+                                <Template Context="data">
+                                    <RadzenLink Path="@data.HtmlUrl" Target="_blank">@data.Commit.Message</RadzenLink>
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn Property="@nameof(CommitDto.Commit.Committer.Date)" Title="Date">
+                                <Template Context="data">
+                                    @data.Commit.Committer.Date.ToLocalTime()
+                                </Template>
+                            </RadzenDataGridColumn>
+                        </Columns>
+                    </LocalizedDataGrid>
+                </div>
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+</div>
 
 @code {
     Density Density = Density.Compact;

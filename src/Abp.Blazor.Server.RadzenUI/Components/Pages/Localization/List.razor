@@ -7,7 +7,7 @@
 
 <PageTitle>@L["Menu:Localization"]</PageTitle>
 
-<RadzenRow Gap="1rem" Style="height:calc(100vh - 64px)">
+<RadzenRow Gap="1rem" class="app-fill-row">
     <RadzenColumn Size="12">
         <RadzenCard Variant="Variant.Filled" Style="height:100%; display:flex; flex-direction:column">
             <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween"
@@ -45,7 +45,7 @@
             <LocalizedDataGrid @ref="_grid" Data="@_items" TItem="LocalizationTextItemDto"
                             AllowPaging="true" AllowSorting="true"
                             PagerHorizontalAlign="HorizontalAlign.Center"
-                            Style="flex:1" PageSize="@_defaultPageSize"
+                            Style="flex:1; min-height:0" PageSize="@_defaultPageSize"
                             PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="true"
                             IsLoading="@_isLoading"
                             LoadData="LoadDataAsync" Count="@_totalCount">

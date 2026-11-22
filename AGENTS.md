@@ -163,6 +163,16 @@ app.UseRadzenUI();
 - 用户头像和个人菜单。
 - 关联账户入口及返回上一个账号入口。
 
+## 页面高度（列表页自动铺满）
+
+规则集中在 `wwwroot/css/site.css` 末尾的「Pages that fill the window」，**页面不要写 `height:calc(100vh - Npx)`**：
+
+- 普通列表页：表格作为页面的直接子元素、且放在最后，即自动铺满。表格有内联 height / min-height / max-height、后面还有元素、或带 `app-grid-no-fill` 时不参与。
+- 其它布局显式加 class：`app-fill-page`（整页纵向 flex）、`app-fill-row`（分栏等高）、`app-fill-tabs` + `app-fill-tab-panel`（Tabs 内表格）。参考 `DataDictionary/List.razor`、`OrganizationUnit/Index.razor`。
+- 可用高度只来自 `--app-content-height`（由 `--rz-header-min-height`、`--rz-layout-body-padding` 计算），改外壳尺寸只改这两个变量。
+- Radzen 断点：`SizeSM` 768px、`SizeMD` 1024px。分栏限高的媒体查询必须与列的并排断点一致。
+- 这些 class 是对使用方公开的约定（README「列表页布局」），改名属于破坏性变更。
+
 ## 菜单系统
 
 内置菜单贡献器在 `src/Abp.Blazor.Server.RadzenUI/Menus`：

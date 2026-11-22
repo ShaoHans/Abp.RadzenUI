@@ -8,14 +8,14 @@
 
 <PageTitle>@L["Menu:DataDictionary"]</PageTitle>
 
-<RadzenRow Gap="1rem" Style="height:calc(100vh - 64px)">
+<RadzenRow Gap="1rem" class="app-fill-row">
     @* Left panel - Dictionary Types *@
     <RadzenColumn Size="12" SizeMD="6">
         <RadzenCard Variant="Variant.Filled" Style="height:100%; display:flex; flex-direction:column">
             <LocalizedDataGrid @ref="_typeGrid" Data="@_types" TItem="DataDictionaryTypeDto"
                             AllowPaging="true" AllowSorting="true" Density="Density.Compact"
                             PagerHorizontalAlign="HorizontalAlign.Center"
-                            Style="flex:1" PageSize="@_defaultPageSize"
+                            Style="flex:1; min-height:0" PageSize="@_defaultPageSize"
                             PageSizeOptions="@_pageSizeOptions" 
                             IsLoading="@_isTypeLoading"
                             LoadData="LoadTypesAsync" Count="@_typeTotalCount"
@@ -102,7 +102,7 @@
                 }
                 <LocalizedDataGrid @ref="_itemGrid" Data="@_items" AllowPaging="true" AllowSorting="true" Density="Density.Compact"
                                 PagerHorizontalAlign="HorizontalAlign.Center"
-                                Style="flex:1" PageSize="@_defaultPageSize"
+                                Style="flex:1; min-height:0" PageSize="@_defaultPageSize"
                                 PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="true"
                                 LoadData="LoadItemsAsync" Count="@_itemTotalCount" IsLoading="@_isItemLoading">
                     <HeaderTemplate>

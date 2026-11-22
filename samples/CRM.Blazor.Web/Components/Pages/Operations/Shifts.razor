@@ -6,7 +6,7 @@
 
 <PageTitle>@L["OperationShifts"]</PageTitle>
 
-<RadzenStack Gap="1rem" class="rz-p-4">
+<RadzenStack Gap="1rem" class="app-fill-page rz-p-4">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="1rem" Wrap="FlexWrap.Wrap">
         <RadzenStack Gap="0.2rem">
             <RadzenText TextStyle="TextStyle.H5"><strong>@L["OperationShifts"]</strong></RadzenText>
@@ -22,7 +22,7 @@
                      EndProperty="@nameof(ShiftAppointment.End)"
                      TextProperty="@nameof(ShiftAppointment.Text)"
                      SelectedIndex="2"
-                     Style="height:calc(100vh - 180px);min-height:560px;">
+                     Style="flex:1; height:auto; min-height:min(560px, 60vh);">
         <Template Context="item">
             <RadzenStack Gap="0.15rem">
                 <RadzenText TextStyle="TextStyle.Caption"><strong>@item.Text</strong></RadzenText>
