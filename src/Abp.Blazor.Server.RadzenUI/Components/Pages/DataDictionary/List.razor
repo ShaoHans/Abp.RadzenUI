@@ -10,137 +10,136 @@
 
 <RadzenRow Gap="1rem" class="app-fill-row">
     @* Left panel - Dictionary Types *@
-    <RadzenColumn Size="12" SizeMD="6">
-        <RadzenCard Variant="Variant.Filled" Style="height:100%; display:flex; flex-direction:column">
-            <LocalizedDataGrid @ref="_typeGrid" Data="@_types" TItem="DataDictionaryTypeDto"
-                            AllowPaging="true" AllowSorting="true" Density="Density.Compact"
-                            PagerHorizontalAlign="HorizontalAlign.Center"
-                            Style="flex:1; min-height:0" PageSize="@_defaultPageSize"
-                            PageSizeOptions="@_pageSizeOptions" 
-                            IsLoading="@_isTypeLoading"
-                            LoadData="LoadTypesAsync" Count="@_typeTotalCount"
-                            RowSelect="SelectTypeAsync"
-                            RowRender="OnTypeRowRender">
-                <HeaderTemplate>
-                    <RadzenStack Gap="8px">
-                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween"
-                                     AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="8px">
-                            <RadzenText Text="@L["DataDictionary:Types"]" TextStyle="TextStyle.H6" Style="margin:0" />
-                            @if (HasCreatePermission)
-                            {
-                                <RadzenButton Icon="add" Text="@L["Btn:Add"]" Size="ButtonSize.Small"
-                                              Click="OpenCreateTypeDialogAsync" />
-                            }
-                        </RadzenStack>
-                        <SearchTextBox PlaceHoder="@($"{L["DisplayName:DataDictionaryType.Code"]}/{L["DisplayName:DataDictionaryType.Name"]}")"
-                                       Style="width:240px;max-width:100%"
-                                       @bind-Keyword="_typeFilter"
-                                       SearchAsync="SearchTypesAsync" />
+    <RadzenColumn Size="12" SizeMD="6" Style="display:flex; flex-direction:column">
+        <LocalizedDataGrid @ref="_typeGrid" Data="@_types" TItem="DataDictionaryTypeDto"
+                        AllowPaging="true" AllowSorting="true" Density="Density.Compact"
+                        PagerHorizontalAlign="HorizontalAlign.Center"
+                        Style="flex:1; min-height:0" PageSize="@_defaultPageSize"
+                        PageSizeOptions="@_pageSizeOptions"
+                        IsLoading="@_isTypeLoading"
+                        LoadData="LoadTypesAsync" Count="@_typeTotalCount"
+                        RowSelect="SelectTypeAsync"
+                        RowRender="OnTypeRowRender">
+            <HeaderTemplate>
+                <RadzenStack Gap="8px">
+                    @* Both title rows are as tall as a small button, so the panels line up without one too. *@
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween"
+                                 AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="8px" Style="min-height:var(--rz-button-size-sm)">
+                        <RadzenText Text="@L["DataDictionary:Types"]" TextStyle="TextStyle.H6" Style="margin:0" />
+                        @if (HasCreatePermission)
+                        {
+                            <RadzenButton Icon="add" Text="@L["Btn:Add"]" Size="ButtonSize.Small"
+                                          Click="OpenCreateTypeDialogAsync" />
+                        }
                     </RadzenStack>
-                </HeaderTemplate>
-                <Columns>
-                    <RadzenDataGridColumn Property="@nameof(DataDictionaryTypeDto.Code)"
-                                          Title="@L["DisplayName:DataDictionaryType.Code"]" Width="130px" />
-                    <RadzenDataGridColumn Property="@nameof(DataDictionaryTypeDto.Name)"
-                                          Title="@L["DisplayName:DataDictionaryType.Name"]" Width="160px" />
-                    <RadzenDataGridColumn Property="@nameof(DataDictionaryTypeDto.IsShared)"
-                                          Title="@L["DisplayName:DataDictionaryType.IsShared"]" Width="90px" Sortable="false" TextAlign="TextAlign.Center">
-                        <Template Context="type">
-                            <RadzenBadge Text="@L["DataDictionary:SharedBadge"]" Visible="type.IsShared" BadgeStyle="BadgeStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" IsPill="true" Style="text-transform:none" />
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Property="@nameof(DataDictionaryTypeDto.Description)"
-                                          Title="@L["DisplayName:DataDictionaryType.Description"]" MinWidth="160px">
-                        <Template Context="type">
-                            <TextOrDash Text="@type.Description" />
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Title="@UL["Actions"]" Width="100px" Sortable="false" TextAlign="TextAlign.Center">
-                        <Template Context="type">
-                            @* Stop the click from also selecting the row (RowSelect loads its items). *@
-                            <div @onclick:stopPropagation="true">
-                                <RowActionMenu Actions="@BuildTypeRowActions(type)"
-                                               OnAction="@(key => HandleTypeRowActionAsync(key, type))"
-                                               MoreTitle="@UL["Actions"]" />
-                            </div>
-                        </Template>
-                    </RadzenDataGridColumn>
-                </Columns>
-            </LocalizedDataGrid>
-        </RadzenCard>
+                    <SearchTextBox PlaceHoder="@($"{L["DisplayName:DataDictionaryType.Code"]}/{L["DisplayName:DataDictionaryType.Name"]}")"
+                                   Style="width:240px;max-width:100%"
+                                   @bind-Keyword="_typeFilter"
+                                   SearchAsync="SearchTypesAsync" />
+                </RadzenStack>
+            </HeaderTemplate>
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(DataDictionaryTypeDto.Code)"
+                                      Title="@L["DisplayName:DataDictionaryType.Code"]" Width="130px" />
+                <RadzenDataGridColumn Property="@nameof(DataDictionaryTypeDto.Name)"
+                                      Title="@L["DisplayName:DataDictionaryType.Name"]" Width="160px" />
+                <RadzenDataGridColumn Property="@nameof(DataDictionaryTypeDto.IsShared)"
+                                      Title="@L["DisplayName:DataDictionaryType.IsShared"]" Width="90px" Sortable="false" TextAlign="TextAlign.Center">
+                    <Template Context="type">
+                        <RadzenBadge Text="@L["DataDictionary:SharedBadge"]" Visible="type.IsShared" BadgeStyle="BadgeStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" IsPill="true" Style="text-transform:none" />
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(DataDictionaryTypeDto.Description)"
+                                      Title="@L["DisplayName:DataDictionaryType.Description"]" MinWidth="160px">
+                    <Template Context="type">
+                        <TextOrDash Text="@type.Description" />
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Title="@UL["Actions"]" Width="100px" Sortable="false" TextAlign="TextAlign.Center">
+                    <Template Context="type">
+                        @* Stop the click from also selecting the row (RowSelect loads its items). *@
+                        <div @onclick:stopPropagation="true">
+                            <RowActionMenu Actions="@BuildTypeRowActions(type)"
+                                           OnAction="@(key => HandleTypeRowActionAsync(key, type))"
+                                           MoreTitle="@UL["Actions"]" />
+                        </div>
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </LocalizedDataGrid>
     </RadzenColumn>
 
     @* Right panel - Dictionary Items *@
-    <RadzenColumn Size="12" SizeMD="6">
-        <RadzenCard Variant="Variant.Filled" Style="height:100%; display:flex; flex-direction:column">
-            @if (_selectedType == null)
-            {
-                <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="flex:1">
-                    <RadzenIcon Icon="list_alt" Style="font-size:48px; color:var(--rz-text-secondary-color)" />
-                    <RadzenText TextStyle="TextStyle.H6" Style="color:var(--rz-text-secondary-color)">
-                        @L["DataDictionary:SelectType"]
-                    </RadzenText>
-                </RadzenStack>
-            }
-            else
-            {
-                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween"
-                             AlignItems="AlignItems.Center" class="rz-mb-2">
-                    <RadzenText TextStyle="TextStyle.H6" Style="margin:0">
-                        @L["DataDictionary:Items"] - @_selectedType.Name
-                    </RadzenText>
-                    @if (HasCreatePermission && CanManageSelectedType)
-                    {
-                        <RadzenButton Icon="add" Text="@L["Btn:Add"]" Size="ButtonSize.Small"
-                                      Click="OpenCreateItemDialogAsync" />
-                    }
-                </RadzenStack>
-                @if (IsSelectedTypeReadOnly)
-                {
-                    <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Size="AlertSize.ExtraSmall"
-                                 AllowClose="false" class="rz-mb-2" Text="@L["DataDictionary:SharedReadonlyHint"]" />
-                }
-                <LocalizedDataGrid @ref="_itemGrid" Data="@_items" AllowPaging="true" AllowSorting="true" Density="Density.Compact"
-                                PagerHorizontalAlign="HorizontalAlign.Center"
-                                Style="flex:1; min-height:0" PageSize="@_defaultPageSize"
-                                PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="true"
-                                LoadData="LoadItemsAsync" Count="@_itemTotalCount" IsLoading="@_isItemLoading">
-                    <HeaderTemplate>
+    <RadzenColumn Size="12" SizeMD="6" Style="display:flex; flex-direction:column">
+        @if (_selectedType == null)
+        {
+            <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="flex:1">
+                <RadzenIcon Icon="list_alt" Style="font-size:48px; color:var(--rz-text-secondary-color)" />
+                <RadzenText TextStyle="TextStyle.H6" Style="color:var(--rz-text-secondary-color)">
+                    @L["DataDictionary:SelectType"]
+                </RadzenText>
+            </RadzenStack>
+        }
+        else
+        {
+            <LocalizedDataGrid @ref="_itemGrid" Data="@_items" AllowPaging="true" AllowSorting="true" Density="Density.Compact"
+                            PagerHorizontalAlign="HorizontalAlign.Center"
+                            Style="flex:1; min-height:0" PageSize="@_defaultPageSize"
+                            PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="true"
+                            LoadData="LoadItemsAsync" Count="@_itemTotalCount" IsLoading="@_isItemLoading">
+                <HeaderTemplate>
+                    @{ var itemsTitle = $"{L["DataDictionary:Items"]} - {_selectedType.Name}"; }
+                    <RadzenStack Gap="8px">
+                        @* No wrapping: a long type name would push this panel below the left one. *@
+                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween"
+                                     AlignItems="AlignItems.Center" Wrap="FlexWrap.NoWrap" Gap="8px" Style="min-height:var(--rz-button-size-sm)">
+                            <RadzenText Text="@itemsTitle" title="@itemsTitle" TextStyle="TextStyle.H6" class="rz-text-truncate" Style="margin:0; min-width:0" />
+                            @if (HasCreatePermission && CanManageSelectedType)
+                            {
+                                <RadzenButton Icon="add" Text="@L["Btn:Add"]" Size="ButtonSize.Small" Style="flex-shrink:0"
+                                              Click="OpenCreateItemDialogAsync" />
+                            }
+                        </RadzenStack>
                         <SearchTextBox PlaceHoder="@($"{L["DisplayName:DataDictionaryItem.Code"]}/{L["DisplayName:DataDictionaryItem.Name"]}")"
                                        Style="width:240px;max-width:100%"
                                        @bind-Keyword="_itemFilter"
                                        SearchAsync="SearchItemsAsync" />
-                    </HeaderTemplate>
-                    <Columns>
-                        <RadzenDataGridColumn Property="@nameof(DataDictionaryItemDto.Code)"
-                                              Title="@L["DisplayName:DataDictionaryItem.Code"]" Width="120px" />
-                        <RadzenDataGridColumn Property="@nameof(DataDictionaryItemDto.Name)"
-                                              Title="@L["DisplayName:DataDictionaryItem.Name"]" Width="150px" />
-                        <RadzenDataGridColumn Property="@nameof(DataDictionaryItemDto.Sort)"
-                                              Title="@L["DisplayName:DataDictionaryItem.Sort"]" Width="80px" TextAlign="TextAlign.Right" />
-                        <RadzenDataGridColumn Property="@nameof(DataDictionaryItemDto.IsActive)"
-                                              Title="@L["DisplayName:DataDictionaryItem.IsActive"]" Width="100px" Sortable="false">
-                            <Template Context="item">
-                                <RadzenSwitch Value="@item.IsActive" Disabled="@(!HasUpdatePermission || !CanManageSelectedType)"
-                                              Change="@(async (bool _) => await ToggleItemActiveAsync(item))" />
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Property="@nameof(DataDictionaryItemDto.Description)"
-                                              Title="@L["DisplayName:DataDictionaryItem.Description"]" Sortable="false" MinWidth="160px">
-                            <Template Context="item">
-                                <TextOrDash Text="@item.Description" />
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Title="@UL["Actions"]" Width="100px" Sortable="false" TextAlign="TextAlign.Center">
-                            <Template Context="item">
-                                <RowActionMenu Actions="@ItemRowActions"
-                                               OnAction="@(key => HandleItemRowActionAsync(key, item))"
-                                               MoreTitle="@UL["Actions"]" />
-                            </Template>
-                        </RadzenDataGridColumn>
-                    </Columns>
-                </LocalizedDataGrid>
-            }
-        </RadzenCard>
+                        @if (IsSelectedTypeReadOnly)
+                        {
+                            <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Size="AlertSize.ExtraSmall"
+                                         AllowClose="false" Style="margin:0" Text="@L["DataDictionary:SharedReadonlyHint"]" />
+                        }
+                    </RadzenStack>
+                </HeaderTemplate>
+                <Columns>
+                    <RadzenDataGridColumn Property="@nameof(DataDictionaryItemDto.Code)"
+                                          Title="@L["DisplayName:DataDictionaryItem.Code"]" Width="120px" />
+                    <RadzenDataGridColumn Property="@nameof(DataDictionaryItemDto.Name)"
+                                          Title="@L["DisplayName:DataDictionaryItem.Name"]" Width="150px" />
+                    <RadzenDataGridColumn Property="@nameof(DataDictionaryItemDto.Sort)"
+                                          Title="@L["DisplayName:DataDictionaryItem.Sort"]" Width="80px" TextAlign="TextAlign.Right" />
+                    <RadzenDataGridColumn Property="@nameof(DataDictionaryItemDto.IsActive)"
+                                          Title="@L["DisplayName:DataDictionaryItem.IsActive"]" Width="100px" Sortable="false">
+                        <Template Context="item">
+                            <RadzenSwitch Value="@item.IsActive" Disabled="@(!HasUpdatePermission || !CanManageSelectedType)"
+                                          Change="@(async (bool _) => await ToggleItemActiveAsync(item))" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Property="@nameof(DataDictionaryItemDto.Description)"
+                                          Title="@L["DisplayName:DataDictionaryItem.Description"]" Sortable="false" MinWidth="160px">
+                        <Template Context="item">
+                            <TextOrDash Text="@item.Description" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Title="@UL["Actions"]" Width="100px" Sortable="false" TextAlign="TextAlign.Center">
+                        <Template Context="item">
+                            <RowActionMenu Actions="@ItemRowActions"
+                                           OnAction="@(key => HandleItemRowActionAsync(key, item))"
+                                           MoreTitle="@UL["Actions"]" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </LocalizedDataGrid>
+        }
     </RadzenColumn>
 </RadzenRow>
