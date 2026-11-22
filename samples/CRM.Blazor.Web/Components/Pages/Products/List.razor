@@ -13,7 +13,7 @@
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap" Gap="8px">
             @if (HasCreatePermission)
             {
-                <RadzenButton Icon="add" Text="@L["NewProduct"]" Click="@(async()=>{await OpenCreateDialogAsync<Create>(L["NewProduct"], SetDialogOptions);})" />
+                <RadzenButton Icon="add" Text="@L["NewProduct"]" Size="ButtonSize.Small" Click="@(async()=>{await OpenCreateDialogAsync<Create>(L["NewProduct"], SetDialogOptions);})" />
             }
             <ExportButton Visible="HasExportPermission" Busy="IsExporting" OnClick="ExportAsync" />
             @* <RadzenStack Orientation="Orientation.Vertical" style="margin-left: auto;">

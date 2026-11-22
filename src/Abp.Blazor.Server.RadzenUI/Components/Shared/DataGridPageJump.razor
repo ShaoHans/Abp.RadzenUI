@@ -6,17 +6,19 @@
              JustifyContent="JustifyContent.End"
              Gap="8px"
              Wrap="FlexWrap.Wrap">
-    <RadzenLabel Text="@LabelText" />
+    <RadzenLabel Text="@LabelText" TextStyle="@LabelTextStyle" />
     <RadzenTextBox Value="@_targetPageText"
+                   InputSize="@TextBoxSize"
                    Placeholder="@Placeholder"
                    Change="OnTextChanged"
                    @oninput="OnInput"
                    @onkeydown="OnKeyDownAsync"
-                   style="width: 96px;" />
+                   style="@TextBoxStyle" />
     <RadzenButton Text="@ButtonText"
+                  Size="@Size"
                   Disabled="@(!CanJump)"
                   Click="JumpToPageAsync" />
-    <RadzenText TextStyle="TextStyle.Body2">/ @TotalPages</RadzenText>
+    <RadzenText TextStyle="@TotalTextStyle">/ @TotalPages</RadzenText>
 </RadzenStack>
 
 @code {
@@ -38,8 +40,31 @@
     [Parameter]
     public string ButtonText { get; set; } = "Go";
 
+    /// <summary>
+    /// Size of the whole control: button, text box and texts. Defaults to Small to match list toolbars.
+    /// </summary>
+    [Parameter]
+    public ButtonSize Size { get; set; } = ButtonSize.Small;
+
     private string _targetPageText = "1";
     private int _lastSyncedPage = 1;
+
+    private bool IsCompact => Size is ButtonSize.Small or ButtonSize.ExtraSmall;
+
+    private InputSize TextBoxSize => Size switch
+    {
+        ButtonSize.ExtraSmall => InputSize.ExtraSmall,
+        ButtonSize.Small => InputSize.Small,
+        ButtonSize.Large => InputSize.Large,
+        _ => InputSize.Medium
+    };
+
+    // Radzen has no width parameter. 64px fits 5 digits with the compact padding.
+    private string TextBoxStyle => IsCompact ? "width: 64px;" : "width: 96px;";
+
+    private TextStyle? LabelTextStyle => IsCompact ? TextStyle.Caption : null;
+
+    private TextStyle TotalTextStyle => IsCompact ? TextStyle.Caption : TextStyle.Body2;
 
     private int EffectivePageSize => PageSize ?? Grid?.PageSize ?? LocalizedDataGrid.DefaultPageSize;
 
