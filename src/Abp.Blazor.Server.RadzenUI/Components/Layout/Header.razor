@@ -147,10 +147,25 @@
     .app-header__menu-danger {
         --rz-menu-item-color: var(--rz-danger);
     }
+    /* Always one row: the header height is fixed, so a wrapped row would cover the page.
+       The actions keep their width; the breadcrumb gives way first, then the title. */
+    .app-header .app-header__row {
+        flex-wrap: nowrap;
+    }
+    .app-header .app-header__row > .app-header__start {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+    .app-header .app-header__row > .app-header__end {
+        flex: none;
+    }
+    .app-header__title > .app-header__icon-action,
+    .app-header__sidebar-area > .rz-sidebar-toggle {
+        flex-shrink: 0;
+    }
     /* Sidebar-width toggle area */
     .app-header__sidebar-area {
         min-width: clamp(14rem, 13.5rem + 0.6vw, 15rem);
-        flex-shrink: 0;
         display: flex;
         align-items: center;
     }
@@ -158,6 +173,8 @@
     .app-header__breadcrumb {
         display: inline-flex;
         align-items: center;
+        min-width: 0;
+        flex-shrink: 1000;
         overflow: hidden;
     }
     .app-header__breadcrumb .rz-breadcrumb {
@@ -183,24 +200,49 @@
         font-size: 0.875rem;
     }
 
-    @@media (max-width: 640.98px) {
+    /* Mobile shell: the menu is an overlay, nothing to line the title up with. */
+    @@media (max-width: 768px) {
         .app-header__sidebar-area {
             min-width: 0;
-            width: 100%;
         }
+    }
 
-        .app-header__title {
-            width: 100%;
-        }
-
+    @@media (max-width: 640.98px) {
         .app-header__breadcrumb {
             display: none;
         }
+    }
 
-        .app-header__actions {
-            justify-content: flex-start;
-            flex-wrap: wrap;
-            row-gap: 0.35rem;
+    /* Phones: tighter buttons, so that all of them still fit at 320px. */
+    @@media (max-width: 480.98px) {
+        .app-header .app-header__actions {
+            gap: 0.125rem;
+        }
+
+        .app-header .app-header__actions .app-header__icon-action,
+        .app-header .app-header__actions .app-header__menu--language > li > .rz-navigation-item-wrapper > .rz-navigation-item-link {
+            width: 1.75rem !important;
+            height: 1.75rem !important;
+        }
+
+        .app-header .app-header__title > .app-header__icon-action {
+            width: 1.75rem;
+            min-width: 0;
+            padding: 0;
+            margin: 0 !important; /* beats the button's inline margin */
+        }
+
+        .app-header .app-header__sidebar-area > .rz-sidebar-toggle {
+            padding-inline: 0.25rem;
+            margin-inline: 0;
+        }
+
+        .app-header .app-header__actions .app-header__profile.rz-profile-menu {
+            padding-inline: 0;
+        }
+
+        .app-header .app-header__actions .app-header__profile > li > .rz-navigation-item-wrapper > .rz-navigation-item-link {
+            padding: 0 !important;
         }
     }
 </style>
@@ -208,7 +250,7 @@
 <RadzenHeader class="app-header">
     <ChildContent>
         <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px" class="app-header__row">
-            <RadzenColumn Size="12" SizeMD="8">
+            <RadzenColumn class="app-header__start">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" class="app-header__title">
                     <div class="app-header__sidebar-area">
                         <RadzenSidebarToggle Click="@MenuToggle" />
@@ -232,7 +274,7 @@
                     }
                 </RadzenStack>
             </RadzenColumn>
-            <RadzenColumn Size="12" SizeMD="4">
+            <RadzenColumn class="app-header__end">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" JustifyContent="JustifyContent.End" class="app-header__actions">
                     <button type="button"
                             class="app-header__action app-header__icon-action"
