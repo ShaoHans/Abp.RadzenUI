@@ -43,7 +43,6 @@ public partial class List
     private bool _shouldLoadSelectedTypeItems;
     private string? _itemFilter;
     private readonly int _defaultPageSize = 10;
-    private readonly IEnumerable<int> _pageSizeOptions = [10, 20, 30];
 
     public bool HasCreatePermission { get; set; }
     public bool HasUpdatePermission { get; set; }

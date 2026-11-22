@@ -29,7 +29,6 @@ public partial class OuRoles
     protected RadzenDataGrid<IdentityRoleDto> _grid = default!;
     protected IReadOnlyList<IdentityRoleDto> _entities = [];
     protected int _totalCount;
-    protected readonly IEnumerable<int> _pageSizeOptions = [10, 20, 30];
     protected readonly bool _showPagerSummary = true;
     protected bool _isLoading = true;
     protected int _defaultPageSize = 10;
@@ -58,7 +57,7 @@ public partial class OuRoles
             return;
         }
         await TrySetPermissionsAsync();
-        await LoadDataAsync(new LoadDataArgs());
+        await LoadDataAsync(new LoadDataArgs { Top = _grid?.PageSize });
     }
 
     protected virtual async Task LoadDataAsync(LoadDataArgs args)

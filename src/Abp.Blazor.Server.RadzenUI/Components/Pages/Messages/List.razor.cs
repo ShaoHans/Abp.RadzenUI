@@ -33,7 +33,6 @@ public partial class List
     public IStringLocalizer<AbpRadzenUIResource> UL { get; set; } = default!;
 
     private readonly int _defaultPageSize = 20;
-    private readonly IEnumerable<int> _pageSizeOptions = [10, 20, 50];
     private IReadOnlyList<ReadStatusOption> _readStatusOptions = [];
 
     private RadzenDataGrid<UserMessageDto> _grid = default!;

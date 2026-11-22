@@ -7,7 +7,7 @@
 
 <LocalizedDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true" AllowFiltering="true"
                 PagerHorizontalAlign="HorizontalAlign.Center" PageSize="@_defaultPageSize"
-                PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
+                ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
                 Count="@_totalCount" IsLoading="@_isLoading">
     <HeaderTemplate>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap" Gap="8px">

@@ -28,7 +28,6 @@ public partial class SelectRole
     protected RadzenDataGrid<IdentityRoleDto> _grid = default!;
     protected IReadOnlyList<IdentityRoleDto> _entities = [];
     protected int _totalCount;
-    protected readonly IEnumerable<int> _pageSizeOptions = [10, 20, 30];
     protected readonly bool _showPagerSummary = true;
     protected bool _isLoading = true;
     protected int _defaultPageSize = 10;

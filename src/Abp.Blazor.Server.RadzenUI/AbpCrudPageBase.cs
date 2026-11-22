@@ -156,12 +156,10 @@ public abstract class AbpCrudPageBase<
     protected RadzenDataGrid<TListViewModel> _grid = default!;
     protected IReadOnlyList<TListViewModel> _entities = [];
     protected int _totalCount;
-    protected readonly IEnumerable<int> _pageSizeOptions = [10, 20, 30, 50, 100];
+    protected readonly IEnumerable<int> _pageSizeOptions = LocalizedDataGrid.DefaultPageSizeOptions;
     protected readonly bool _showPagerSummary = true;
     protected bool _isLoading = true;
     protected int _defaultPageSize = 10;
-    bool _isInteractive;
-    int? _lastPersistedPageSize;
 
     protected TGetListInput GetListInput = new();
     protected TCreateViewModel NewEntity;
@@ -195,20 +193,10 @@ public abstract class AbpCrudPageBase<
 
     protected override async Task OnInitializedAsync()
     {
-        await TrySetPermissionsAsync();
+        // Before the await: the first render happens there.
         InitializePageSizePreference();
+        await TrySetPermissionsAsync();
         await LoadDataAsync(new LoadDataArgs { Top = _defaultPageSize });
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender)
-        {
-            return;
-        }
-
-        _isInteractive = true;
-        await PersistPageSizeCookieAsync(_defaultPageSize);
     }
 
     /// <summary>Whether the last <see cref="LoadDataAsync"/> failed. The grid keeps its previous rows; derived pages can skip follow-ups such as restoring state from the URL.</summary>
@@ -220,7 +208,11 @@ public abstract class AbpCrudPageBase<
         Exception? error = null;
         try
         {
-            await UpdatePageSizePreferenceAsync(args);
+            if (IsSupportedPageSize(args.Top))
+            {
+                _defaultPageSize = args.Top!.Value;
+            }
+
             await UpdateGetListInputAsync(args);
             var result = await AppService.GetListAsync(GetListInput);
             _entities = MapToListViewModel(result.Items);
@@ -302,53 +294,11 @@ public abstract class AbpCrudPageBase<
         }
 
         _defaultPageSize = pageSize!.Value;
-        GridPageSizePreferenceService.PageSize = _defaultPageSize;
-        _lastPersistedPageSize = _defaultPageSize;
-    }
-
-    async Task UpdatePageSizePreferenceAsync(LoadDataArgs args)
-    {
-        if (!IsSupportedPageSize(args.Top))
-        {
-            return;
-        }
-
-        _defaultPageSize = args.Top!.Value;
-        GridPageSizePreferenceService.PageSize = _defaultPageSize;
-
-        if (_isInteractive)
-        {
-            await PersistPageSizeCookieAsync(_defaultPageSize);
-        }
     }
 
     bool IsSupportedPageSize(int? pageSize)
     {
         return pageSize.HasValue && _pageSizeOptions.Contains(pageSize.Value);
-    }
-
-    async Task PersistPageSizeCookieAsync(int pageSize)
-    {
-        if (_lastPersistedPageSize == pageSize)
-        {
-            return;
-        }
-
-        try
-        {
-            await JSRuntime.InvokeVoidAsync(
-                "abpRadzenCookie.set",
-                AbpRadzenUICookieHelper.PageSizeKey,
-                pageSize.ToString(CultureInfo.InvariantCulture),
-                3650
-            );
-        }
-        catch (JSDisconnectedException)
-        {
-            return;
-        }
-
-        _lastPersistedPageSize = pageSize;
     }
 
     private async Task TrySetPermissionsAsync()

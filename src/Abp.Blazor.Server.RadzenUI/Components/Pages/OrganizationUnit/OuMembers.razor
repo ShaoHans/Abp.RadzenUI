@@ -25,7 +25,7 @@ else
 
     <LocalizedDataGrid @ref="_grid" Data="@_entities" AllowPaging="true" AllowSorting="true" Density="Density.Compact"
                        PagerHorizontalAlign="HorizontalAlign.Center" PageSize="@_defaultPageSize"
-                       PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
+                       ShowPagingSummary="@_showPagerSummary" LoadData="LoadDataAsync"
                        Count="@_totalCount" IsLoading="@_isLoading">
         <HeaderTemplate>
             <SearchTextBox PlaceHoder="@($"{L["DisplayName:UserName"]}/{L["DisplayName:Email"]}")"

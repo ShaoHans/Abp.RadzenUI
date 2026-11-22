@@ -27,7 +27,6 @@ public partial class SelectMember
     protected RadzenDataGrid<IdentityUserDto> _grid = default!;
     protected IReadOnlyList<IdentityUserDto> _entities = [];
     protected int _totalCount;
-    protected readonly IEnumerable<int> _pageSizeOptions = [10, 20, 30];
     protected readonly bool _showPagerSummary = true;
     protected bool _isLoading = true;
     protected int _defaultPageSize = 10;

@@ -39,7 +39,6 @@ public partial class List
     private bool _onlyOverridden;
 
     private readonly int _defaultPageSize = 20;
-    private readonly IEnumerable<int> _pageSizeOptions = [10, 20, 30, 50, 100];
 
     public bool HasEditPermission { get; set; }
     public bool HasDeletePermission { get; set; }
