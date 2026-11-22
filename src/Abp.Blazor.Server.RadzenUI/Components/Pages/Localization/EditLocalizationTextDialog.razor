@@ -4,34 +4,43 @@
 @inject DialogService DialogService
 @inject IStringLocalizer<AbpRadzenUIResource> L
 
-<RadzenStack Gap="1rem">
-    <RadzenFormField Text="@L["Localization:Key"]" Variant="Variant.Outlined" Style="width:100%">
-        <RadzenTextBox Value="@Item.Key" ReadOnly="true" />
-    </RadzenFormField>
-
-    <RadzenFormField Text="@L["Localization:BaseValue"]" Variant="Variant.Outlined" Style="width:100%">
-        <RadzenTextArea Value="@(Item.BaseValue ?? string.Empty)" ReadOnly="true" Rows="3" />
-    </RadzenFormField>
-
-    <RadzenFormField Text="@L["Localization:OverrideValue"]" Variant="Variant.Outlined" Style="width:100%">
-        <RadzenTextArea @bind-Value="_value" Rows="4" />
-    </RadzenFormField>
-
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween"
-                 AlignItems="AlignItems.Center">
-        <div>
-            @if (CanReset)
-            {
-                <RadzenButton Text="@L["Localization:Reset"]" Icon="restart_alt" ButtonStyle="ButtonStyle.Danger"
-                              Variant="Variant.Flat" Click="OnReset" />
-            }
-        </div>
-        <RadzenStack Orientation="Orientation.Horizontal" Gap="8px">
-            <RadzenButton Text="@L["Cancel"]" ButtonStyle="ButtonStyle.Light" Click="OnCancel" />
-            <RadzenButton Text="@L["Save"]" ButtonStyle="ButtonStyle.Primary" Click="OnSave" />
-        </RadzenStack>
-    </RadzenStack>
-</RadzenStack>
+<RadzenTemplateForm TItem="EditResult" Data="@_model" Submit="@(model => DialogService.Close(model))"
+                    Style="max-height:calc(100vh - 200px); display: flex; flex-direction:column">
+    <DialogFormLayout CancelClick="OnCancel">
+        <RadzenRow Gap="1rem" RowGap="1rem" class="rz-p-1 rz-mb-4">
+            <RadzenColumn Size="12">
+                <RadzenStack Gap="0.25rem">
+                    <div>
+                        <RadzenLabel Text="@L["Localization:Key"]" />
+                    </div>
+                    <RadzenTextBox Value="@Item.Key" Disabled="true" Style="width: 100%;" />
+                </RadzenStack>
+            </RadzenColumn>
+            <RadzenColumn Size="12">
+                <RadzenStack Gap="0.25rem">
+                    <div>
+                        <RadzenLabel Text="@L["Localization:BaseValue"]" />
+                    </div>
+                    <RadzenTextArea Value="@(Item.BaseValue ?? string.Empty)" Disabled="true" Style="width: 100%;" Rows="3" />
+                </RadzenStack>
+            </RadzenColumn>
+            <RadzenColumn Size="12">
+                <RadzenStack Gap="0.25rem">
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween"
+                                 AlignItems="AlignItems.Center" Gap="0.5rem">
+                        <RadzenLabel Text="@L["Localization:OverrideValue"]" Component="Value" />
+                        @if (CanReset)
+                        {
+                            <RadzenButton ButtonType="ButtonType.Button" Text="@L["Localization:Reset"]" Icon="restart_alt"
+                                          ButtonStyle="ButtonStyle.Danger" Variant="Variant.Text" Size="ButtonSize.Small" Click="OnReset" />
+                        }
+                    </RadzenStack>
+                    <RadzenTextArea Name="Value" @bind-Value="_model.Value" Style="width: 100%;" Rows="3" />
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+    </DialogFormLayout>
+</RadzenTemplateForm>
 
 @code {
     [Parameter]
@@ -40,14 +49,12 @@
     [Parameter]
     public bool CanReset { get; set; }
 
-    private string _value = string.Empty;
+    private readonly EditResult _model = new();
 
     protected override void OnInitialized()
     {
-        _value = Item.OverrideValue ?? Item.BaseValue ?? string.Empty;
+        _model.Value = Item.OverrideValue ?? Item.BaseValue ?? string.Empty;
     }
-
-    private void OnSave() => DialogService.Close(new EditResult { Value = _value });
 
     private void OnReset() => DialogService.Close(new EditResult { Reset = true });
 

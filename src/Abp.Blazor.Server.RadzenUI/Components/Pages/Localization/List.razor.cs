@@ -1,6 +1,6 @@
-using Abp.RadzenUI.Components.Shared;
 using System.Globalization;
 using Abp.RadzenUI.Application.Contracts.LocalizationTexts;
+using Abp.RadzenUI.Components.Shared;
 using Abp.RadzenUI.Localization;
 using Abp.RadzenUI.Permissions;
 using Microsoft.AspNetCore.Authorization;
@@ -39,6 +39,8 @@ public partial class List
     private string? _filter;
     private bool _onlyOverridden;
 
+    private IReadOnlyList<RowAction> RowActions =>
+        HasEditPermission ? [new RowAction("edit", UL["Edit"], string.Empty, IsPrimary: true)] : [];
 
     public bool HasEditPermission { get; set; }
     public bool HasDeletePermission { get; set; }
@@ -140,7 +142,7 @@ public partial class List
         var result = await DialogService.OpenAsync<EditLocalizationTextDialog>(
             L["Localization:EditText"],
             parameters,
-            new DialogOptions { Draggable = true, Width = "640px" });
+            new DialogOptions { Draggable = true, Width = "600px" });
 
         if (result is not EditLocalizationTextDialog.EditResult editResult)
         {

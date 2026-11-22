@@ -7,45 +7,6 @@
 
 <PageTitle>@L["PageTitle:Messages"]</PageTitle>
 
-<RadzenCard Variant="Variant.Outlined" class="rz-mb-3 rz-p-3">
-    <RadzenRow Gap="1rem" RowGap="0.75rem">
-        <RadzenColumn Size="12" SizeMD="4" SizeLG="2">
-            <RadzenTextBox InputSize="InputSize.Small" Placeholder="@L["Message:TitlePlaceholder"]"
-                           @bind-Value="_keyword"
-                           Style="width: 100%;"
-                           Name="MessageTitle" />
-        </RadzenColumn>
-        <RadzenColumn Size="12" SizeMD="4" SizeLG="2">
-            <RadzenDropDown InputSize="InputSize.Small" TValue="MessageReadStatus?"
-                            Data="@_readStatusOptions"
-                            TextProperty="Text"
-                            ValueProperty="Value"
-                            Value="@_readStatus"
-                            Change="OnReadStatusChangedAsync"
-                            Style="width: 100%;"
-                            Placeholder="@L["Message:All"]"
-                            AllowClear="true" />
-        </RadzenColumn>
-        <RadzenColumn Size="12" SizeMD="4" SizeLG="2">
-            <RadzenDropDown InputSize="InputSize.Small" TValue="string"
-                            Data="@_messageTypeOptions"
-                            TextProperty="Text"
-                            ValueProperty="Value"
-                            Value="@_selectedMessageType"
-                            Change="OnMessageTypeChangedAsync"
-                            Style="width: 100%;"
-                            Placeholder="@L["Message:TypePlaceholder"]"
-                            AllowClear="true" />
-        </RadzenColumn>
-        <RadzenColumn Size="12" SizeMD="4" SizeLG="2">
-            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" Wrap="FlexWrap.Wrap">
-                <RadzenButton Text="@L["Btn:Search"]" ButtonStyle="ButtonStyle.Primary" Icon="search" Click="SearchAsync" Size="ButtonSize.Small" />
-                <RadzenButton Text="@L["Btn:Reset"]" ButtonStyle="ButtonStyle.Base" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="refresh" Click="ResetFiltersAsync" Size="ButtonSize.Small" />
-            </RadzenStack>
-        </RadzenColumn>
-    </RadzenRow>
-</RadzenCard>
-
 <LocalizedDataGrid @ref="_grid"
                    Data="@_messages"
                    TItem="UserMessageDto"
@@ -72,6 +33,34 @@
                           Text="@L["Message:MarkAllAsRead"]"
                           Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter"
                           Click="MarkAllAsReadAsync" />
+            @* Actions on the left, filters on the right; the filters wrap as a group. *@
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="0.5rem"
+                         Style="max-width:100%;margin-inline-start:auto">
+                <RadzenTextBox InputSize="InputSize.Small" Placeholder="@L["Message:TitlePlaceholder"]"
+                               @bind-Value="_keyword"
+                               Style="width:220px;max-width:100%"
+                               Name="MessageTitle" />
+                <RadzenDropDown InputSize="InputSize.Small" TValue="MessageReadStatus?"
+                                Data="@_readStatusOptions"
+                                TextProperty="Text"
+                                ValueProperty="Value"
+                                Value="@_readStatus"
+                                Change="OnReadStatusChangedAsync"
+                                Style="width:160px;max-width:100%"
+                                Placeholder="@L["Message:All"]"
+                                AllowClear="true" />
+                <RadzenDropDown InputSize="InputSize.Small" TValue="string"
+                                Data="@_messageTypeOptions"
+                                TextProperty="Text"
+                                ValueProperty="Value"
+                                Value="@_selectedMessageType"
+                                Change="OnMessageTypeChangedAsync"
+                                Style="width:180px;max-width:100%"
+                                Placeholder="@L["Message:TypePlaceholder"]"
+                                AllowClear="true" />
+                <RadzenButton Text="@L["Btn:Search"]" ButtonStyle="ButtonStyle.Primary" Icon="search" Click="SearchAsync" Size="ButtonSize.Small" />
+                <RadzenButton Text="@L["Btn:Reset"]" ButtonStyle="ButtonStyle.Base" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="refresh" Click="ResetFiltersAsync" Size="ButtonSize.Small" />
+            </RadzenStack>
         </RadzenStack>
     </HeaderTemplate>
     <Columns>
