@@ -3,7 +3,7 @@
     <TargetFramework>net11.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
-    <AbpRadzenUIPackageVersion>3.4.0</AbpRadzenUIPackageVersion>
+    <AbpRadzenUIPackageVersion>3.4.1</AbpRadzenUIPackageVersion>
     <Version Condition="'$(Version)' == ''">$(AbpRadzenUIPackageVersion)</Version>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <AbpProjectType>app</AbpProjectType>
